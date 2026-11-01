@@ -1,0 +1,2698 @@
+{
+  "env_id": "filegator",
+  "_prep_version": 3,
+  "entities": [
+    {
+      "name": "User",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "username",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "role",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "guest",
+            "user",
+            "admin"
+          ],
+          "default": "user"
+        },
+        {
+          "name": "permissions",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "homedir",
+          "type": "text",
+          "nullable": false,
+          "default": "/"
+        },
+        {
+          "name": "password",
+          "type": "text",
+          "nullable": false
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "username"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Session",
+      "columns": [
+        {
+          "name": "sess_id",
+          "type": "text",
+          "pk": true
+        },
+        {
+          "name": "sess_data",
+          "type": "json",
+          "nullable": false
+        },
+        {
+          "name": "sess_lifetime",
+          "type": "int",
+          "nullable": false
+        },
+        {
+          "name": "sess_time",
+          "type": "int",
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "name": "FSNode",
+      "columns": [
+        {
+          "name": "path",
+          "type": "text",
+          "pk": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "type",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "dir",
+            "file",
+            "back"
+          ]
+        },
+        {
+          "name": "size",
+          "type": "int",
+          "nullable": false
+        },
+        {
+          "name": "time",
+          "type": "int",
+          "nullable": false
+        },
+        {
+          "name": "permissions",
+          "type": "text",
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "name": "TmpfsFile",
+      "columns": [
+        {
+          "name": "name",
+          "type": "text",
+          "pk": true
+        },
+        {
+          "name": "size",
+          "type": "int",
+          "nullable": false
+        },
+        {
+          "name": "time",
+          "type": "int",
+          "nullable": false
+        }
+      ]
+    }
+  ],
+  "tools": [
+    {
+      "tool": "user_authenticate",
+      "op": "action",
+      "family": "guard.auth",
+      "exec_spec": {
+        "verify": {
+          "entity": "User",
+          "username_col": "username",
+          "password_col": "password"
+        }
+      },
+      "input_schema": {
+        "password": {
+          "type": "text",
+          "description": "The account password, checked against the stored hash.",
+          "required": true
+        },
+        "username": {
+          "type": "text",
+          "description": "The account username.",
+          "required": true
+        }
+      },
+      "_evidence": {
+        "locator": "backend/Controllers/AuthController.php:30",
+        "id_local": "User.authenticate",
+        "entry": {
+          "kind": "http",
+          "route": "POST /login",
+          "locator": "backend/Controllers/routes.php:16"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "$username = $request->input('username');\n$password = $request->input('password');\n$ip = $request->getClientIp();\n$lockfile = md5($ip).'.lock';\nif ($tmpfs->exists($lockfile) && strlen($tmpfs->read($lockfile)) >= $lockout_attempts) { return $response->json('Not Allowed', 429); }\nif ($auth->authenticate($username, $password)) { return $response->json($auth->user()); }\n$tmpfs->write($lockfile, 'x', true);\nreturn $response->json('Login failed, please try again', 422);",
+        "edges": [
+          "JsonFile::authenticate (JsonFile.php:65-81): verifyPassword($password, $u['password'])"
+        ]
+      },
+      "entity": "User",
+      "_binds": {
+        "password": "User.password",
+        "username": "User.username"
+      },
+      "_output_schema": {
+        "user": "the authenticated User (role, permissions, homedir, username, name)"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "username",
+                  "op": "eq",
+                  "value": {
+                    "arg": "username"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "password",
+          "username"
+        ],
+        "messages": {
+          "auth": "You must already be signed in.",
+          "precondition": "That account does not exist.",
+          "required": "You must provide a username and password."
+        }
+      },
+      "description": "Sign in with a username and password, opening the session that every other tool resolves as $actor. Requires an existing account; fails on wrong credentials."
+    },
+    {
+      "tool": "user_logout",
+      "op": "action",
+      "family": "guard.logout",
+      "exec_spec": {
+        "entity": "User"
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "backend/Controllers/AuthController.php:63",
+        "id_local": "User.logout",
+        "entry": {
+          "kind": "http",
+          "route": "POST /logout",
+          "locator": "backend/Controllers/routes.php:26"
+        },
+        "entity_why": "primary effect auth lands on this table",
+        "ref_code": "public function logout(Response $response, AuthInterface $auth)\n{\n    return $response->json($auth->forget());\n}"
+      },
+      "entity": "User",
+      "_output_schema": {
+        "result": "session invalidation result"
+      },
+      "description": "End the current session so the caller is signed out.",
+      "guards": {
+        "messages": {
+          "auth": "There is no session to end."
+        }
+      }
+    },
+    {
+      "tool": "user_getcurrent",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "User",
+        "lookup_by": {
+          "username": {
+            "$session": "username"
+          }
+        }
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "backend/Controllers/AuthController.php:68",
+        "id_local": "User.getCurrent",
+        "entry": {
+          "kind": "http",
+          "route": "GET /getuser",
+          "locator": "backend/Controllers/routes.php:36"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "public function getUser(Response $response, AuthInterface $auth)\n{\n    $user = $auth->user() ?: $auth->getGuest();\n    return $response->json($user);\n}",
+        "scope": "scope=none: returns the session's own account row (or guest); no owner column filter by design (AuthController.php:68)."
+      },
+      "entity": "User",
+      "_output_schema": {
+        "user": "the current User row, or the guest User"
+      },
+      "description": "Return the signed-in user's own account row (role, permissions, home directory); the guest account if not signed in.",
+      "guards": {
+        "messages": {
+          "auth": "Sign in first."
+        }
+      }
+    },
+    {
+      "tool": "user_changepassword",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "User",
+        "row_key": {
+          "username": {
+            "$session": "username"
+          }
+        },
+        "fields": [
+          "username",
+          "name",
+          "role",
+          "permissions",
+          "homedir",
+          "password"
+        ],
+        "set": {
+          "password": {
+            "$arg": "newpassword"
+          }
+        }
+      },
+      "input_schema": {
+        "newpassword": {
+          "type": "text",
+          "description": "The new password to store.",
+          "required": true
+        },
+        "oldpassword": {
+          "type": "text",
+          "description": "The current password, verified against the stored hash.",
+          "required": true
+        },
+        "username": {
+          "type": "text",
+          "description": ""
+        },
+        "name": {
+          "type": "text",
+          "description": ""
+        },
+        "role": {
+          "type": "text",
+          "description": ""
+        },
+        "permissions": {
+          "type": "text",
+          "description": ""
+        },
+        "homedir": {
+          "type": "text",
+          "description": ""
+        }
+      },
+      "_evidence": {
+        "locator": "backend/Controllers/AuthController.php:75",
+        "id_local": "User.changePassword",
+        "entry": {
+          "kind": "http",
+          "route": "POST /changepassword",
+          "locator": "backend/Controllers/routes.php:46"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "$validation = $validator->validate($request->all(), ['oldpassword'=>'required','newpassword'=>'required']);\nif ($validation->fails()) { return $response->json($errors->firstOfAll(), 422); }\nif (! $auth->authenticate($auth->user()->getUsername(), $request->input('oldpassword'))) { return $response->json(['oldpassword' => 'Wrong password'], 422); }\nreturn $response->json($auth->update($auth->user()->getUsername(), $auth->user(), $request->input('newpassword')));",
+        "edges": [
+          "AuthController.php:84-87 authenticates against oldpassword before updating",
+          "Router.php:51; routes.php:46"
+        ]
+      },
+      "entity": "User",
+      "_output_schema": {
+        "user": "the updated User row"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "username",
+                  "op": "eq",
+                  "value": {
+                    "session": "username"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            },
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "username"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "user",
+                          "admin"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "newpassword",
+          "oldpassword"
+        ],
+        "messages": {
+          "auth": "You must sign in first.",
+          "precondition": "That user no longer exists.",
+          "required": "Both the old and the new password are required."
+        },
+        "preconditions_note": "flattened by build-spec agent 2026-09-05: the two mined clauses (target-row state + admin session role) were falling out of an OR/DNF; both are required, so they are a single AND-group. evidence: user_create Router.php:51;routes.php:242 / AdminController.php:45, user_update routes.php:252 / AdminController.php:77, user_delete routes.php:262 / AdminController.php:115, user_changepassword routes.php:46 / AuthController.php:84-87."
+      },
+      "_defaulted": [
+        "argument invented from the write column",
+        "fields"
+      ],
+      "description": "Change the signed-in user's own password. The old password must verify before the new one is kept."
+    },
+    {
+      "tool": "user_list",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "User"
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "backend/Controllers/AdminController.php:32",
+        "id_local": "User.list",
+        "entry": {
+          "kind": "http",
+          "route": "GET /listusers",
+          "locator": "backend/Controllers/routes.php:232"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "public function listUsers(Request $request, Response $response)\n{\n    return $response->json($this->auth->allUsers());\n}",
+        "edges": [
+          "Router.php:51 route only registered when hasRole(['admin']); absent route -> 404 (ErrorController.php:25); routes.php:232"
+        ]
+      },
+      "entity": "User",
+      "_output_schema": {
+        "users": "list of all User rows"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "username"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "eq",
+                      "value": "admin"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must sign in first.",
+          "precondition": "Only an admin can list user accounts.",
+          "not_found": "No user account matched."
+        }
+      },
+      "description": "List every user account. Admin-only."
+    },
+    {
+      "tool": "user_create",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "User",
+        "fields": [
+          "name",
+          "username",
+          "homedir",
+          "role",
+          "permissions",
+          "password"
+        ],
+        "unique_on": [
+          "username"
+        ]
+      },
+      "input_schema": {
+        "homedir": {
+          "type": "text",
+          "description": "The path under the admin home to give this user; default \"user\".",
+          "required": true
+        },
+        "name": {
+          "type": "text",
+          "description": "The display name.",
+          "required": true
+        },
+        "username": {
+          "type": "text",
+          "description": "The new account username (must be unique).",
+          "required": true
+        },
+        "password": {
+          "type": "text",
+          "description": "The initial password for the new account.",
+          "required": true
+        },
+        "role": {
+          "type": "text",
+          "description": "Role: guest, user or admin; default user."
+        },
+        "permissions": {
+          "type": "json",
+          "description": "Comma-separated capability list, e.g. read,write,upload."
+        }
+      },
+      "_evidence": {
+        "locator": "backend/Controllers/AdminController.php:37",
+        "id_local": "User.create",
+        "entry": {
+          "kind": "http",
+          "route": "POST /storeuser",
+          "locator": "backend/Controllers/routes.php:242"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "if ($this->auth->find($request->input('username'))) { return $response->json(['username' => 'Username already taken'], 422); }\n$user->setName($request->input('name'));\n$user->setUsername($request->input('username'));\n$user->setHomedir(rtrim($this->auth->user()->getHomeDir(), $this->storage->getSeparator()).$this->storage->getSeparator().ltrim($request->input('homedir'), $this->storage->getSeparator()));\n$user->setRole($request->input('role', 'user'));\n$user->setPermissions($request->input('permissions'));\n$ret = $this->auth->add($user, $request->input('password'));",
+        "edges": [
+          "AdminController.php:45 (username already taken) -> JsonFile::add throws (JsonFile.php:123)",
+          "Router.php:51; routes.php:242"
+        ]
+      },
+      "entity": "User",
+      "_binds": {
+        "homedir": "User.homedir",
+        "name": "User.name",
+        "username": "User.username",
+        "role": "User.role",
+        "permissions": "User.permissions"
+      },
+      "_output_schema": {
+        "user": "the created User row"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "username",
+                  "op": "eq",
+                  "value": {
+                    "arg": "username"
+                  }
+                }
+              },
+              "op": "eq",
+              "n": 0
+            },
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "username"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "eq",
+                      "value": "admin"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "homedir",
+          "name",
+          "username",
+          "password"
+        ],
+        "messages": {
+          "auth": "You must sign in first.",
+          "precondition": "Only an admin can create users, and the username must not already be taken.",
+          "required": "A username, name and password are required.",
+          "unique": "That username is already taken."
+        },
+        "preconditions_note": "flattened by build-spec agent 2026-09-05: the two mined clauses (target-row state + admin session role) were falling out of an OR/DNF; both are required, so they are a single AND-group. evidence: user_create Router.php:51;routes.php:242 / AdminController.php:45, user_update routes.php:252 / AdminController.php:77, user_delete routes.php:262 / AdminController.php:115, user_changepassword routes.php:46 / AuthController.php:84-87."
+      },
+      "description": "Create a new user account with an initial password. Admin-only; the username must not already be taken."
+    },
+    {
+      "tool": "user_update",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "User",
+        "row_key": {
+          "username": {
+            "$arg": "username"
+          }
+        },
+        "fields": [
+          "name",
+          "username",
+          "homedir",
+          "role",
+          "permissions",
+          "password"
+        ]
+      },
+      "input_schema": {
+        "homedir": {
+          "type": "text",
+          "description": "The new home directory.",
+          "required": true
+        },
+        "name": {
+          "type": "text",
+          "description": "The new display name.",
+          "required": true
+        },
+        "username": {
+          "type": "text",
+          "description": "The username of the account to update, which also carries the new value.",
+          "required": true
+        },
+        "password": {
+          "type": "text",
+          "description": "A new password to set."
+        },
+        "role": {
+          "type": "text",
+          "description": "The new role: guest, user or admin."
+        },
+        "permissions": {
+          "type": "json",
+          "description": "The new comma-separated permissions."
+        }
+      },
+      "_evidence": {
+        "locator": "backend/Controllers/AdminController.php:75",
+        "id_local": "User.update",
+        "entry": {
+          "kind": "http",
+          "route": "POST /updateuser/{username}",
+          "locator": "backend/Controllers/routes.php:252"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "$user = $this->auth->find($username);\nif (! $user) { return $response->json('User not found', 422); }\nif ($username != $request->input('username') && $this->auth->find($request->input('username'))) { return $response->json(['username' => 'Username already taken'], 422); }\n$user->setName($request->input('name'));\n$user->setUsername($request->input('username'));\n$user->setHomedir($request->input('homedir'));\n$user->setRole($request->input('role', 'user'));\n$user->setPermissions($request->input('permissions'));\nreturn $response->json($this->auth->update($username, $user, $request->input('password",
+        "edges": [
+          "AdminController.php:77 (User not found); JsonFile::update throws if missing (JsonFile.php:96)",
+          "Router.php:51; routes.php:252"
+        ]
+      },
+      "entity": "User",
+      "_binds": {
+        "homedir": "User.homedir",
+        "name": "User.name",
+        "username": "User.username",
+        "role": "User.role",
+        "permissions": "User.permissions"
+      },
+      "_output_schema": {
+        "user": "the updated User row"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "username",
+                  "op": "eq",
+                  "value": {
+                    "arg": "username"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            },
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "username"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "eq",
+                      "value": "admin"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "homedir",
+          "name",
+          "username"
+        ],
+        "messages": {
+          "auth": "You must sign in first.",
+          "precondition": "Only an admin can update users.",
+          "not_found": "No user account has that username.",
+          "unique": "That username is already taken.",
+          "required": "The target username is required."
+        },
+        "preconditions_note": "flattened by build-spec agent 2026-09-05: the two mined clauses (target-row state + admin session role) were falling out of an OR/DNF; both are required, so they are a single AND-group. evidence: user_create Router.php:51;routes.php:242 / AdminController.php:45, user_update routes.php:252 / AdminController.php:77, user_delete routes.php:262 / AdminController.php:115, user_changepassword routes.php:46 / AuthController.php:84-87."
+      },
+      "description": "Update an existing user's account details (name, role, home directory, permissions, password) by username. Admin-only. The username cannot be renamed onto one that is taken; the target user must exist."
+    },
+    {
+      "tool": "user_delete",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "User",
+        "lookup_by": {
+          "username": {
+            "$arg": "username"
+          }
+        }
+      },
+      "input_schema": {
+        "username": {
+          "type": "text",
+          "description": "Username of the account to delete.",
+          "required": true
+        }
+      },
+      "_evidence": {
+        "locator": "backend/Controllers/AdminController.php:113",
+        "id_local": "User.delete",
+        "entry": {
+          "kind": "http",
+          "route": "POST /deleteuser/{username}",
+          "locator": "backend/Controllers/routes.php:262"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "$user = $this->auth->find($username);\nif (! $user || $user->getUsername() == 'guest') { return $response->json('User not found', 422); }\nreturn $response->json($this->auth->delete($user));",
+        "edges": [
+          "AdminController.php:115 guards against deleting the guest account",
+          "Router.php:51; routes.php:262"
+        ]
+      },
+      "entity": "User",
+      "_binds": {
+        "username": "User.username"
+      },
+      "_output_schema": {
+        "result": "true on success"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "arg": "username"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "ne",
+                      "value": "guest"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            },
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "username"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "eq",
+                      "value": "admin"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "username"
+        ],
+        "messages": {
+          "auth": "You must sign in first.",
+          "precondition": "Only an admin can delete users, and the guest account cannot be deleted.",
+          "not_found": "No deleteable user account has that username.",
+          "required": "The target username is required."
+        },
+        "preconditions_note": "flattened by build-spec agent 2026-09-05: the two mined clauses (target-row state + admin session role) were falling out of an OR/DNF; both are required, so they are a single AND-group. evidence: user_create Router.php:51;routes.php:242 / AdminController.php:45, user_update routes.php:252 / AdminController.php:77, user_delete routes.php:262 / AdminController.php:115, user_changepassword routes.php:46 / AuthController.php:84-87."
+      },
+      "description": "Permanently delete a user account by username. Admin-only; the guest account cannot be deleted and no non-existent user is."
+    },
+    {
+      "tool": "fsnode_listdirectory",
+      "op": "read",
+      "family": "search",
+      "exec_spec": {
+        "entity": "FSNode"
+      },
+      "input_schema": {
+        "dir": {
+          "type": "text",
+          "description": "Directory path within the user home to list."
+        }
+      },
+      "_evidence": {
+        "locator": "backend/Controllers/FileController.php:58",
+        "id_local": "FSNode.listDirectory",
+        "entry": {
+          "kind": "http",
+          "route": "POST /getdir",
+          "locator": "backend/Controllers/routes.php:77"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "$path = $request->input('dir', $this->session->get(self::SESSION_CWD, $this->separator));\n$content = $this->storage->getDirectoryCollection($path);\nreturn $response->json($content);",
+        "edges": [
+          "Router.php:51 requires permission 'read'; routes.php:77"
+        ],
+        "scope": "scope=none (global row set): FSNode has no owner col — rows represent the shared user filespace tree, and the read gates on the session user's own permissions in the guard; listing is not owner-filtered in code (FileController.php:58)."
+      },
+      "entity": "FSNode",
+      "_binds": {
+        "dir": "FSNode.path"
+      },
+      "_output_schema": {
+        "files": "list of FSNode rows (type, path, name, size, time, permissions)"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "username"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "permissions",
+                      "op": "icontains",
+                      "value": "read"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must sign in first.",
+          "precondition": "Your account needs the read permission.",
+          "not_found": "That directory could not be listed."
+        }
+      },
+      "description": "List the files and directories inside a folder of the signed-in user's filespace. Requires the read permission."
+    },
+    {
+      "tool": "fsnode_changedirectory",
+      "op": "action",
+      "family": "search",
+      "exec_spec": {
+        "entity": "FSNode"
+      },
+      "input_schema": {
+        "to": {
+          "type": "text",
+          "description": "Directory path to make the current working directory."
+        }
+      },
+      "_evidence": {
+        "locator": "backend/Controllers/FileController.php:49",
+        "id_local": "FSNode.changeDirectory",
+        "entry": {
+          "kind": "http",
+          "route": "POST /changedir",
+          "locator": "backend/Controllers/routes.php:66"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "$path = $request->input('to', $this->separator);\n$this->session->set(self::SESSION_CWD, $path);\nreturn $response->json($this->storage->getDirectoryCollection($path));",
+        "edges": [
+          "Router.php:51 requires 'read'; routes.php:66"
+        ],
+        "scope": "scope=none: same reason as fsnode_listdirectory — session-CWD change with no owner filter on the FSNode table (FileController.php:49)."
+      },
+      "entity": "FSNode",
+      "_binds": {
+        "to": "FSNode.path"
+      },
+      "_output_schema": {
+        "files": "list of FSNode rows for the new directory"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "username"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "permissions",
+                      "op": "icontains",
+                      "value": "read"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must sign in first.",
+          "precondition": "Your account needs the read permission.",
+          "not_found": "That directory could not be opened."
+        }
+      },
+      "description": "Set the session's current working directory and list its contents. Requires the read permission."
+    },
+    {
+      "tool": "fsnode_create",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "FSNode",
+        "fields": [
+          "name"
+        ]
+      },
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "description": "Name of the file or directory to create.",
+          "required": true
+        },
+        "type": {
+          "type": "text",
+          "description": "\"file\" or \"dir\"; default \"file\"."
+        }
+      },
+      "_evidence": {
+        "locator": "backend/Controllers/FileController.php:67",
+        "id_local": "FSNode.createNew",
+        "entry": {
+          "kind": "http",
+          "route": "POST /createnew",
+          "locator": "backend/Controllers/routes.php:165"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "$type = $request->input('type', 'file');\n$path = $this->session->get(self::SESSION_CWD, $this->separator);\nif ($type == 'dir') { $this->storage->createDir($path, $request->input('name')); }\nif ($type == 'file') { $this->storage->createFile($path, $request->input('name')); }\nreturn $response->json('Done');",
+        "edges": [
+          "Router.php:51 requires read,write; routes.php:165"
+        ]
+      },
+      "entity": "FSNode",
+      "_binds": {
+        "name": "FSNode.name"
+      },
+      "_output_schema": {
+        "result": "'Done'"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "username"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "permissions",
+                      "op": "icontains",
+                      "value": "read"
+                    },
+                    {
+                      "node": "field",
+                      "col": "permissions",
+                      "op": "icontains",
+                      "value": "write"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "name"
+        ],
+        "messages": {
+          "auth": "You must sign in first.",
+          "precondition": "Your account needs read and write permissions.",
+          "required": "A name is required."
+        }
+      },
+      "description": "Create a new empty file or directory in the session's current directory. Requires read and write permissions.",
+      "_note": "arg types derived from ref_code (createNew accepts name/type); cleaned by build-spec agent"
+    },
+    {
+      "tool": "fsnode_copy",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "FSNode",
+        "fields": [
+          "name",
+          "type",
+          "size",
+          "time",
+          "permissions"
+        ]
+      },
+      "input_schema": {
+        "items": {
+          "type": "json",
+          "description": "List of items to copy, each with a path and type (file/dir).",
+          "required": true
+        },
+        "destination": {
+          "type": "text",
+          "description": "Destination folder path."
+        }
+      },
+      "_evidence": {
+        "locator": "backend/Controllers/FileController.php:83",
+        "id_local": "FSNode.copyItems",
+        "entry": {
+          "kind": "http",
+          "route": "POST /copyitems",
+          "locator": "backend/Controllers/routes.php:88"
+        },
+        "entity_why": "merged from TmpfsFile staging onto FSNode: copies into the user filespace (FileController.php:83-92)",
+        "ref_code": "foreach ($items as $item) {\n    if ($item->type == 'dir') { $this->storage->copyDir($item->path, $destination); }\n    if ($item->type == 'file') { $this->storage->copyFile($item->path, $destination); }\n}\nreturn $response->json('Done');",
+        "edges": [
+          "Router.php:51 requires read,write; routes.php:88"
+        ]
+      },
+      "entity": "FSNode",
+      "_binds": {
+        "destination": "FSNode.path",
+        "items": "FSNode.path"
+      },
+      "_output_schema": {
+        "result": "'Done'"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "username"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "permissions",
+                      "op": "icontains",
+                      "value": "read"
+                    },
+                    {
+                      "node": "field",
+                      "col": "permissions",
+                      "op": "icontains",
+                      "value": "write"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "items"
+        ],
+        "messages": {
+          "auth": "You must sign in first.",
+          "precondition": "Your account needs read and write permissions.",
+          "required": "At least one item is required."
+        }
+      },
+      "_defaulted": [
+        "argument invented from the write column",
+        "dropped unwritable columns ['path']",
+        "fields"
+      ],
+      "description": "Copy one or more files/directories to a destination folder. Requires read and write permissions.",
+      "_note": "merged entity from TmpfsFile to FSNode; write columns invent-named from effect, dropped unwritable path; arg types derived from ref_code; cleaned by build-spec agent"
+    },
+    {
+      "tool": "fsnode_move",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "FSNode",
+        "row_key": {
+          "path": {
+            "$arg": "items"
+          }
+        },
+        "fields": [
+          "name",
+          "type",
+          "size",
+          "time",
+          "permissions"
+        ]
+      },
+      "input_schema": {
+        "items": {
+          "type": "json",
+          "description": "List of items to move, each with a path and type (file/dir).",
+          "required": true
+        },
+        "destination": {
+          "type": "text",
+          "description": "Destination folder path."
+        }
+      },
+      "_evidence": {
+        "locator": "backend/Controllers/FileController.php:100",
+        "id_local": "FSNode.moveItems",
+        "entry": {
+          "kind": "http",
+          "route": "POST /moveitems",
+          "locator": "backend/Controllers/routes.php:99"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "foreach ($items as $item) {\n    $full_destination = trim($destination, $this->separator).$this->separator.ltrim($item->name, $this->separator);\n    $this->storage->move($item->path, $full_destination);\n}\nreturn $response->json('Done');",
+        "edges": [
+          "Router.php:51 requires read,write; routes.php:99"
+        ]
+      },
+      "entity": "FSNode",
+      "_binds": {
+        "destination": "FSNode.path",
+        "items": "FSNode.path"
+      },
+      "_output_schema": {
+        "result": "'Done'"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "username"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "permissions",
+                      "op": "icontains",
+                      "value": "read"
+                    },
+                    {
+                      "node": "field",
+                      "col": "permissions",
+                      "op": "icontains",
+                      "value": "write"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "items"
+        ],
+        "messages": {
+          "auth": "You must sign in first.",
+          "precondition": "Your account needs read and write permissions.",
+          "required": "At least one item is required."
+        }
+      },
+      "_defaulted": [
+        "argument invented from the write column",
+        "dropped unwritable columns ['path']",
+        "fields",
+        "row_key (the locator column is also writable — the bound arg may be a new value, not an address)"
+      ],
+      "description": "Move one or more files/directories into a destination folder. Requires read and write permissions.",
+      "_note": "row_key binds a write column; dropped unwritable path; arg types derived from ref_code (row_key and fields are approximate for the move); cleaned by build-spec agent"
+    },
+    {
+      "tool": "fsnode_renameitem",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "FSNode",
+        "row_key": {
+          "name": {
+            "$arg": "name"
+          }
+        },
+        "fields": [
+          "name"
+        ]
+      },
+      "input_schema": {
+        "destination": {
+          "type": "text",
+          "description": "Folder containing the item; default root."
+        },
+        "from": {
+          "type": "text",
+          "description": "Current name of the item.",
+          "required": true
+        },
+        "to": {
+          "type": "text",
+          "description": "New name for the item.",
+          "required": true
+        },
+        "name": {
+          "type": "text",
+          "description": ""
+        }
+      },
+      "_evidence": {
+        "locator": "backend/Controllers/FileController.php:161",
+        "id_local": "FSNode.renameItem",
+        "entry": {
+          "kind": "http",
+          "route": "POST /renameitem",
+          "locator": "backend/Controllers/routes.php:110"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "$destination = $request->input('destination', $this->separator);\n$from = $request->input('from');\n$to = $request->input('to');\n$this->storage->rename($destination, $from, $to);\nreturn $response->json('Done');",
+        "edges": [
+          "Router.php:51 requires read,write; routes.php:110"
+        ]
+      },
+      "entity": "FSNode",
+      "_binds": {
+        "destination": "FSNode.path",
+        "from": "FSNode.name",
+        "to": "FSNode.name"
+      },
+      "_output_schema": {
+        "result": "'Done'"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "username"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "permissions",
+                      "op": "icontains",
+                      "value": "read"
+                    },
+                    {
+                      "node": "field",
+                      "col": "permissions",
+                      "op": "icontains",
+                      "value": "write"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "from",
+          "to"
+        ],
+        "messages": {
+          "auth": "You must sign in first.",
+          "precondition": "Your account needs read and write permissions.",
+          "required": "Both the current and the new name are required."
+        }
+      },
+      "_defaulted": [
+        "row_key (no parameter found; the column name is standing in as one)"
+      ],
+      "description": "Rename a file or directory to a new name within a destination folder. Requires read and write permissions.",
+      "_note": "row_key fell back to column name (from) standing in as a parameter; arg types derived from ref_code; cleaned by build-spec agent"
+    },
+    {
+      "tool": "fsnode_zip",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "FSNode",
+        "fields": [
+          "name"
+        ]
+      },
+      "input_schema": {
+        "destination": {
+          "type": "text",
+          "description": "Folder where the archive is written."
+        },
+        "items": {
+          "type": "json",
+          "description": "List of items to archive, each with a path and type.",
+          "required": true
+        },
+        "name": {
+          "type": "text",
+          "description": "Name of the archive file."
+        }
+      },
+      "_evidence": {
+        "locator": "backend/Controllers/FileController.php:115",
+        "id_local": "FSNode.zipItems",
+        "entry": {
+          "kind": "http",
+          "route": "POST /zipitems",
+          "locator": "backend/Controllers/routes.php:121"
+        },
+        "entity_why": "merged from TmpfsFile staging onto FSNode: stores the archive in the user filespace (FileController.php:115-125)",
+        "ref_code": "$archiver->createArchive($this->storage);\nforeach ($items as $item) {\n    if ($item->type == 'dir') { $archiver->addDirectoryFromStorage($item->path); }\n    if ($item->type == 'file') { $archiver->addFileFromStorage($item->path); }\n}\n$archiver->storeArchive($destination, $name);\nreturn $response->json('Done');",
+        "edges": [
+          "Router.php:51 requires read,write,zip; routes.php:121"
+        ]
+      },
+      "entity": "FSNode",
+      "_binds": {
+        "destination": "FSNode.path",
+        "items": "FSNode.path",
+        "name": "FSNode.name"
+      },
+      "_output_schema": {
+        "result": "'Done'"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "username"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "permissions",
+                      "op": "icontains",
+                      "value": "read"
+                    },
+                    {
+                      "node": "field",
+                      "col": "permissions",
+                      "op": "icontains",
+                      "value": "write"
+                    },
+                    {
+                      "node": "field",
+                      "col": "permissions",
+                      "op": "icontains",
+                      "value": "zip"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "items"
+        ],
+        "messages": {
+          "auth": "You must sign in first.",
+          "precondition": "Your account needs read, write and zip permissions.",
+          "required": "At least one item is required."
+        }
+      },
+      "_defaulted": [
+        "dropped unwritable columns ['path']"
+      ],
+      "description": "Create a zip archive in a destination folder containing the listed items. Requires read, write and zip permissions.",
+      "_note": "merged entity from TmpfsFile to FSNode; dropped unwritable path; arg types derived from ref_code; cleaned by build-spec agent"
+    },
+    {
+      "tool": "fsnode_unzip",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "FSNode",
+        "fields": [
+          "name",
+          "type",
+          "size",
+          "time",
+          "permissions"
+        ]
+      },
+      "input_schema": {
+        "item": {
+          "type": "text",
+          "description": "Path of the zip archive to extract.",
+          "required": true
+        },
+        "destination": {
+          "type": "text",
+          "description": "Folder to extract into; default root."
+        }
+      },
+      "_evidence": {
+        "locator": "backend/Controllers/FileController.php:137",
+        "id_local": "FSNode.unzipItem",
+        "entry": {
+          "kind": "http",
+          "route": "POST /unzipitem",
+          "locator": "backend/Controllers/routes.php:132"
+        },
+        "entity_why": "merged from TmpfsFile staging onto FSNode: extracts into the user filespace (FileController.php:137-145)",
+        "ref_code": "$source = $request->input('item');\n$destination = $request->input('destination', $this->separator);\n$archiver->uncompress($source, $destination, $this->storage);\nreturn $response->json('Done');",
+        "edges": [
+          "Router.php:51 requires read,write,zip; routes.php:132"
+        ]
+      },
+      "entity": "FSNode",
+      "_binds": {
+        "destination": "FSNode.path",
+        "item": "FSNode.path"
+      },
+      "_output_schema": {
+        "result": "'Done'"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "username"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "permissions",
+                      "op": "icontains",
+                      "value": "read"
+                    },
+                    {
+                      "node": "field",
+                      "col": "permissions",
+                      "op": "icontains",
+                      "value": "write"
+                    },
+                    {
+                      "node": "field",
+                      "col": "permissions",
+                      "op": "icontains",
+                      "value": "zip"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "item"
+        ],
+        "messages": {
+          "auth": "You must sign in first.",
+          "precondition": "Your account needs read, write and zip permissions.",
+          "required": "The archive path is required."
+        }
+      },
+      "_defaulted": [
+        "argument invented from the write column",
+        "dropped unwritable columns ['path']",
+        "fields"
+      ],
+      "description": "Extract a zip archive into a destination folder. Requires read, write and zip permissions.",
+      "_note": "merged entity from TmpfsFile to FSNode; dropped unwritable path; arg types derived from ref_code; cleaned by build-spec agent"
+    },
+    {
+      "tool": "fsnode_chmod",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "FSNode",
+        "row_key": {
+          "path": {
+            "$arg": "items"
+          }
+        },
+        "fields": [
+          "permissions"
+        ]
+      },
+      "input_schema": {
+        "items": {
+          "type": "json",
+          "description": "List of items to change, each with a path.",
+          "required": true
+        },
+        "permissions": {
+          "type": "int",
+          "description": "The new permission bits."
+        },
+        "recursive": {
+          "type": "text",
+          "description": "\"true\" to apply to the subtree of each directory."
+        }
+      },
+      "_evidence": {
+        "locator": "backend/Controllers/FileController.php:147",
+        "id_local": "FSNode.chmodItems",
+        "entry": {
+          "kind": "http",
+          "route": "POST /chmoditems",
+          "locator": "backend/Controllers/routes.php:143"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "foreach ($items as $item) {\n    $this->storage->chmod($item->path, $permissions, $recursive);\n}\nreturn $response->json('Done');",
+        "edges": [
+          "Router.php:51 requires read,write,chmod; routes.php:143"
+        ]
+      },
+      "entity": "FSNode",
+      "_binds": {
+        "items": "FSNode.path",
+        "permissions": "FSNode.permissions"
+      },
+      "_output_schema": {
+        "result": "'Done'"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "username"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "permissions",
+                      "op": "icontains",
+                      "value": "read"
+                    },
+                    {
+                      "node": "field",
+                      "col": "permissions",
+                      "op": "icontains",
+                      "value": "write"
+                    },
+                    {
+                      "node": "field",
+                      "col": "permissions",
+                      "op": "icontains",
+                      "value": "chmod"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "items"
+        ],
+        "messages": {
+          "auth": "You must sign in first.",
+          "precondition": "Your account needs read, write and chmod permissions.",
+          "required": "At least one item is required."
+        }
+      },
+      "description": "Change the permissions of one or more files/directories, optionally recursively. Requires read, write and chmod permissions."
+    },
+    {
+      "tool": "fsnode_delete",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "FSNode",
+        "lookup_by": {
+          "path": {
+            "$arg": "items"
+          }
+        }
+      },
+      "input_schema": {
+        "items": {
+          "type": "json",
+          "description": "List of items to delete, each with a path and type (file/dir).",
+          "required": true
+        }
+      },
+      "_evidence": {
+        "locator": "backend/Controllers/FileController.php:172",
+        "id_local": "FSNode.deleteItems",
+        "entry": {
+          "kind": "http",
+          "route": "POST /deleteitems",
+          "locator": "backend/Controllers/routes.php:154"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "foreach ($items as $item) {\n    if ($item->type == 'dir') { $this->storage->deleteDir($item->path); }\n    if ($item->type == 'file') { $this->storage->deleteFile($item->path); }\n}\nreturn $response->json('Done');",
+        "edges": [
+          "Router.php:51 requires read,write; routes.php:154"
+        ]
+      },
+      "entity": "FSNode",
+      "_binds": {
+        "items": "FSNode.path"
+      },
+      "_output_schema": {
+        "result": "'Done'"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "username"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "permissions",
+                      "op": "icontains",
+                      "value": "read"
+                    },
+                    {
+                      "node": "field",
+                      "col": "permissions",
+                      "op": "icontains",
+                      "value": "write"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "items"
+        ],
+        "messages": {
+          "auth": "You must sign in first.",
+          "precondition": "Your account needs read and write permissions.",
+          "required": "At least one item is required."
+        }
+      },
+      "description": "Permanently delete one or more files/directories. Requires read and write permissions."
+    },
+    {
+      "tool": "fsnode_write_file",
+      "op": "update",
+      "family": "crud.upsert",
+      "exec_spec": {
+        "entity": "FSNode",
+        "key": {
+          "name": {
+            "$arg": "name"
+          }
+        },
+        "insert_fields": [
+          "name"
+        ],
+        "set_on_exists": {}
+      },
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "description": "Name of the file to write.",
+          "required": true
+        },
+        "content": {
+          "type": "text",
+          "description": "The new text content of the file.",
+          "required": true
+        }
+      },
+      "_evidence": {
+        "locator": "backend/Controllers/FileController.php:188",
+        "id_local": "FSNode.saveContent",
+        "entry": {
+          "kind": "http",
+          "route": "POST /savecontent",
+          "locator": "backend/Controllers/routes.php:272"
+        },
+        "entity_why": "primary effect row_upsert lands on this table",
+        "ref_code": "$stream = tmpfile();\nfwrite($stream, $content);\nrewind($stream);\n$this->storage->deleteFile($path.$this->separator.$name);\n$this->storage->store($path, $name, $stream);\nreturn $response->json('Done');",
+        "edges": [
+          "Router.php:51 requires read,write; routes.php:272"
+        ]
+      },
+      "entity": "FSNode",
+      "_binds": {
+        "name": "FSNode.name"
+      },
+      "_output_schema": {
+        "result": "'Done'"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "username"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "permissions",
+                      "op": "icontains",
+                      "value": "read"
+                    },
+                    {
+                      "node": "field",
+                      "col": "permissions",
+                      "op": "icontains",
+                      "value": "write"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "name",
+          "content"
+        ],
+        "messages": {
+          "auth": "You must sign in first.",
+          "precondition": "Your account needs read and write permissions.",
+          "required": "A name and content are required."
+        }
+      },
+      "description": "Overwrite the text content of an existing file (or create it) at the session's current path. Requires read and write permissions."
+    },
+    {
+      "tool": "fsnode_upload",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "TmpfsFile",
+        "fields": [
+          "size",
+          "time"
+        ],
+        "set_on_create": {
+          "time": "2026-01-01T00:00:00"
+        }
+      },
+      "input_schema": {
+        "resumableChunkNumber": {
+          "type": "int",
+          "description": "The 1-based index of this chunk.",
+          "required": true
+        },
+        "resumableFilename": {
+          "type": "text",
+          "description": "Name of the target file.",
+          "required": true
+        },
+        "resumableIdentifier": {
+          "type": "text",
+          "description": "A stable identifier shared by all chunks of the upload.",
+          "required": true
+        },
+        "resumableRelativePath": {
+          "type": "text",
+          "description": "Target destination path (relative path).",
+          "required": true
+        },
+        "resumableTotalChunks": {
+          "type": "int",
+          "description": "Total number of chunks.",
+          "required": true
+        },
+        "resumableTotalSize": {
+          "type": "int",
+          "description": "Total expected size in bytes.",
+          "required": true
+        },
+        "size": {
+          "type": "int",
+          "description": "Byte size of this chunk."
+        }
+      },
+      "_evidence": {
+        "locator": "backend/Controllers/UploadController.php:59",
+        "id_local": "FSNode.upload",
+        "entry": {
+          "kind": "http",
+          "route": "POST /upload",
+          "locator": "backend/Controllers/routes.php:187"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "$this->tmpfs->write($prefix.$file_name.'.part'.$chunk_number, $stream);\n$chunks_size = 0;\nforeach ($this->tmpfs->findAll($prefix.'*') as $chunk) { $chunks_size += $chunk['size']; }\nif ($chunks_size > $this->config->get('frontend_config.upload_max_size')) { ...cleanup, error 422... }\nif ($chunks_size >= $total_size) {\n  ...assemble parts into $assembled...\n  $res = $this->storage->store($destination, $name, $final['stream'], $overwrite_on_upload);\n  ...cleanup...\n  return $res ? $response->json('Stored') : $response->json('Error storing file');\n}\nreturn $response->json('Uploaded');",
+        "edges": [
+          "Router.php:51 requires upload; routes.php:187"
+        ]
+      },
+      "entity": "TmpfsFile",
+      "_binds": {
+        "resumableFilename": "FSNode.name",
+        "resumableRelativePath": "FSNode.path"
+      },
+      "_output_schema": {
+        "result": "'Uploaded' | 'Stored'"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "username"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "permissions",
+                      "op": "icontains",
+                      "value": "upload"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "resumableChunkNumber",
+          "resumableFilename",
+          "resumableIdentifier",
+          "resumableRelativePath",
+          "resumableTotalChunks",
+          "resumableTotalSize"
+        ],
+        "messages": {
+          "auth": "You must sign in first.",
+          "precondition": "Your account needs the upload permission.",
+          "required": "All resumable chunk parameters are required."
+        }
+      },
+      "_defaulted": [
+        "argument invented from the write column",
+        "fields"
+      ],
+      "description": "Upload a resumable (chunked) file: buffers a chunk to the temp store and, when all chunks have arrived, assembles them into the target file. Requires the upload permission.",
+      "_note": "arg types derived from ref_code; tmpfs row is best-effort (fields approximate); cleaned by build-spec agent"
+    },
+    {
+      "tool": "tmpfsfile_chunkcheck",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "TmpfsFile",
+        "lookup_by": {
+          "name": {
+            "$arg": "resumableFilename"
+          }
+        }
+      },
+      "input_schema": {
+        "resumableChunkNumber": {
+          "type": "int",
+          "description": "The chunk number to check.",
+          "required": true
+        },
+        "resumableFilename": {
+          "type": "text",
+          "description": "Name of the target file.",
+          "required": true
+        },
+        "resumableIdentifier": {
+          "type": "text",
+          "description": "The upload identifier shared by all chunks.",
+          "required": true
+        }
+      },
+      "_evidence": {
+        "locator": "backend/Controllers/UploadController.php:42",
+        "id_local": "TmpfsFile.chunkCheck",
+        "entry": {
+          "kind": "http",
+          "route": "GET /upload",
+          "locator": "backend/Controllers/routes.php:176"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "$chunk_file = 'multipart_'.$clean_username.'_'.$identifier.'_'.$file_name.'.part'.$chunk_number;\nif ($this->tmpfs->exists($chunk_file)) { return $response->json('Chunk exists', 200); }\nreturn $response->json('Chunk does not exists', 204);",
+        "edges": [
+          "Router.php:51 requires upload; routes.php:176"
+        ],
+        "scope": "scope=none: checks a temp chunk by constructed key; the semantic owner check (the batch archive) lives in the batch-download tool's own ownsBatchArchive inline check, not a column filter (UploadController.php:42)."
+      },
+      "entity": "TmpfsFile",
+      "_binds": {
+        "resumableFilename": "TmpfsFile.name"
+      },
+      "_output_schema": {
+        "result": "'Chunk exists' | 'Chunk does not exists'"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "username"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "permissions",
+                      "op": "icontains",
+                      "value": "upload"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "resumableChunkNumber",
+          "resumableFilename",
+          "resumableIdentifier"
+        ],
+        "messages": {
+          "auth": "You must sign in first.",
+          "precondition": "Your account needs the upload permission.",
+          "required": "All resumable chunk parameters are required.",
+          "not_found": "That chunk does not exist in the temp store."
+        }
+      },
+      "description": "Ask whether a specific resumable-upload chunk already exists in the temp store, so a client can skip re-uploading it. Requires the upload permission."
+    },
+    {
+      "tool": "fsnode_download",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "FSNode",
+        "lookup_by": {
+          "path": {
+            "$arg": "path"
+          }
+        }
+      },
+      "input_schema": {
+        "path": {
+          "type": "text",
+          "description": "Path of the file to download.",
+          "required": true
+        }
+      },
+      "_evidence": {
+        "locator": "backend/Controllers/DownloadController.php:55",
+        "id_local": "FSNode.download",
+        "entry": {
+          "kind": "http",
+          "route": "GET /download",
+          "locator": "backend/Controllers/routes.php:198"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "try {\n    $file = $this->storage->readStream((string) base64_decode($request->input('path')));\n} catch (\\Exception $e) { return $response->redirect('/'); }\n...stream file...",
+        "edges": [
+          "Router.php:51 requires download; routes.php:198"
+        ],
+        "scope": "scope=none: download reads by absolute path with no owner filter; the download permission gate is in the guard (DownloadController.php:55)."
+      },
+      "entity": "FSNode",
+      "_binds": {
+        "path": "FSNode.path"
+      },
+      "_output_schema": {
+        "stream": "raw file bytes"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "username"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "permissions",
+                      "op": "icontains",
+                      "value": "download"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "path"
+        ],
+        "messages": {
+          "auth": "You must sign in first.",
+          "precondition": "Your account needs the download permission.",
+          "not_found": "That file could not be read."
+        }
+      },
+      "description": "Download a single file as raw bytes. Requires the download permission."
+    },
+    {
+      "tool": "fsnode_batchdownloadcreate",
+      "op": "action",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "TmpfsFile",
+        "fields": [
+          "size",
+          "time"
+        ],
+        "set_on_create": {
+          "time": "2026-01-01T00:00:00"
+        }
+      },
+      "input_schema": {
+        "items": {
+          "type": "json",
+          "description": "List of items to include, each with a path and type.",
+          "required": true
+        },
+        "size": {
+          "type": "int",
+          "description": ""
+        }
+      },
+      "_evidence": {
+        "locator": "backend/Controllers/DownloadController.php:131",
+        "id_local": "FSNode.batchDownloadCreate",
+        "entry": {
+          "kind": "http",
+          "route": "POST /batchdownload",
+          "locator": "backend/Controllers/routes.php:209"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "$uniqid = $archiver->createArchive($this->storage);\n$this->rememberBatchArchive($uniqid);\n$this->session->save();\nforeach ($items as $item) { if ($item->type == 'dir') { $archiver->addDirectoryFromStorage($item->path); } if ($item->type == 'file') { $archiver->addFileFromStorage($item->path); } }\n$archiver->closeArchive();\nreturn $response->json(['uniqid' => $uniqid]);",
+        "edges": [
+          "Router.php:51 requires read,download,batchdownload; routes.php:209"
+        ]
+      },
+      "entity": "TmpfsFile",
+      "_binds": {
+        "items": "FSNode.path"
+      },
+      "_output_schema": {
+        "uniqid": "archive id bound to the session"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "username"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "permissions",
+                      "op": "icontains",
+                      "value": "read"
+                    },
+                    {
+                      "node": "field",
+                      "col": "permissions",
+                      "op": "icontains",
+                      "value": "download"
+                    },
+                    {
+                      "node": "field",
+                      "col": "permissions",
+                      "op": "icontains",
+                      "value": "batchdownload"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "items"
+        ],
+        "messages": {
+          "auth": "You must sign in first.",
+          "precondition": "Your account needs read, download and batchdownload permissions.",
+          "required": "At least one item is required."
+        }
+      },
+      "_defaulted": [
+        "argument invented from the write column",
+        "fields"
+      ],
+      "description": "Stage a batch download: build a zip archive of the listed items in the temp store and return an id. Requires read, download and batchdownload permissions; the archive is only downloadable by the same session."
+    },
+    {
+      "tool": "tmpfsfile_batchdownloadstart",
+      "op": "read",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "TmpfsFile",
+        "lookup_by": {
+          "name": {
+            "$arg": "uniqid"
+          }
+        }
+      },
+      "input_schema": {
+        "uniqid": {
+          "type": "text",
+          "description": "The archive id returned by the batch-download staging call.",
+          "required": true
+        }
+      },
+      "_evidence": {
+        "locator": "backend/Controllers/DownloadController.php:158",
+        "id_local": "TmpfsFile.batchDownloadStart",
+        "entry": {
+          "kind": "http",
+          "route": "GET /batchdownload",
+          "locator": "backend/Controllers/routes.php:220"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "$uniqid = (string) preg_replace('/[^0-9a-zA-Z_]/', '', (string) $request->input('uniqid'));\nif (! $this->ownsBatchArchive($uniqid)) { return $response->redirect('/'); }\n$file = $tmpfs->readStream($uniqid);\n...stream archive...\n$tmpfs->remove($uniqid);",
+        "edges": [
+          "Router.php:51 requires read,download,batchdownload; routes.php:220"
+        ],
+        "scope": "scope=none: reads/removes a tmp archive by id; ownership is enforced by the inline ownsBatchArchive check, which reads session state, not a column on TmpfsFile (DownloadController.php:158)."
+      },
+      "entity": "TmpfsFile",
+      "_binds": {
+        "uniqid": "TmpfsFile.name"
+      },
+      "_output_schema": {
+        "stream": "raw zip bytes; archive removed after streaming"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "username"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "permissions",
+                      "op": "icontains",
+                      "value": "read"
+                    },
+                    {
+                      "node": "field",
+                      "col": "permissions",
+                      "op": "icontains",
+                      "value": "download"
+                    },
+                    {
+                      "node": "field",
+                      "col": "permissions",
+                      "op": "icontains",
+                      "value": "batchdownload"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "uniqid"
+        ],
+        "messages": {
+          "auth": "You must sign in first.",
+          "precondition": "Your account needs read, download and batchdownload permissions.",
+          "not_found": "No staged batch archive matches that id."
+        }
+      },
+      "description": "Start the download of a previously staged batch archive by id, streaming the zip bytes and removing the archive after. Requires read, download and batchdownload permissions; only the session that staged it may fetch it."
+    }
+  ],
+  "seed_state": {
+    "User": [
+      {
+        "id": 1,
+        "username": "ops@filegator.example",
+        "name": "Admin",
+        "role": "admin",
+        "permissions": "read,write,upload,download,batchdownload,zip,chmod",
+        "homedir": "/admin",
+        "password": "pw-operations"
+      },
+      {
+        "id": 2,
+        "username": "member@filegator.example",
+        "name": "Alice",
+        "role": "user",
+        "permissions": "read,write,upload,download,zip",
+        "homedir": "/admin/alice",
+        "password": "pw-member"
+      },
+      {
+        "id": 3,
+        "username": "readonly@filegator.example",
+        "name": "Bob",
+        "role": "user",
+        "permissions": "read",
+        "homedir": "/admin/bob",
+        "password": "pw-readonly"
+      },
+      {
+        "id": 4,
+        "username": "guest",
+        "name": "Guest",
+        "role": "guest",
+        "permissions": "read",
+        "homedir": "/",
+        "password": ""
+      }
+    ],
+    "Session": [],
+    "FSNode": [
+      {
+        "path": "/",
+        "name": "/",
+        "type": "dir",
+        "size": 0,
+        "time": 1,
+        "permissions": "drwxr-xr-x",
+        "id": 1
+      },
+      {
+        "path": "/admin",
+        "name": "admin",
+        "type": "dir",
+        "size": 0,
+        "time": 1,
+        "permissions": "drwxr-xr-x",
+        "id": 2
+      },
+      {
+        "path": "/admin/alice",
+        "name": "alice",
+        "type": "dir",
+        "size": 0,
+        "time": 1,
+        "permissions": "drwxr-xr-x",
+        "id": 3
+      },
+      {
+        "path": "/admin/bob",
+        "name": "bob",
+        "type": "dir",
+        "size": 0,
+        "time": 1,
+        "permissions": "drwxr-xr-x",
+        "id": 4
+      },
+      {
+        "path": "/admin/alice/readme.md",
+        "name": "readme.md",
+        "type": "file",
+        "size": 1042,
+        "time": 1,
+        "permissions": "-rw-r--r--",
+        "id": 5
+      },
+      {
+        "path": "/admin/alice/notes.txt",
+        "name": "notes.txt",
+        "type": "file",
+        "size": 230,
+        "time": 1,
+        "permissions": "-rw-r--r--",
+        "id": 6
+      }
+    ],
+    "TmpfsFile": []
+  },
+  "summary": "FileGator is a self-hosted web-based file manager (PHP+Flysystem backend, Vue frontend): it authenticates users against a persisted user store (JSON file or SQL users table), scopes each session to a per-user home directory, and exposes a FileController API to browse, create, copy, move, rename, zip/unzip, chmod, delete and edit files/directories in that namespace, plus admin CRUD on user accounts and chunked upload/download/batch-download.",
+  "_auth_candidates": [
+    {
+      "entity": "User",
+      "username_col": "username",
+      "password_col": "password"
+    }
+  ],
+  "_session_fields": [
+    "username"
+  ],
+  "_read_denied": "not_found",
+  "_no_edges": [
+    {
+      "id_local": "FSNode.changeDirectory",
+      "why": "sets session cwd and lists; no pre-checks beyond the shared Router gate, calls nothing (FileController.php:49)"
+    },
+    {
+      "id_local": "FSNode.listDirectory",
+      "why": "pure listing; no pre-checks beyond the shared Router gate, calls nothing (FileController.php:58)"
+    },
+    {
+      "id_local": "FSNode.createNew",
+      "why": "creates a file/dir via storage; holds a guards edge only, calls nothing else (FileController.php:67)"
+    },
+    {
+      "id_local": "FSNode.copyItems",
+      "why": "copies via storage; guards edge only, calls nothing (FileController.php:83)"
+    },
+    {
+      "id_local": "FSNode.moveItems",
+      "why": "moves via storage; guards edge only, calls nothing (FileController.php:100)"
+    },
+    {
+      "id_local": "FSNode.renameItem",
+      "why": "renames via storage; guards edge only, calls nothing (FileController.php:161)"
+    },
+    {
+      "id_local": "FSNode.zipItems",
+      "why": "builds archive via ZipArchiver; guards edge only, calls nothing (FileController.php:115)"
+    },
+    {
+      "id_local": "FSNode.unzipItem",
+      "why": "extracts zip; guards edge only, calls nothing (FileController.php:137)"
+    },
+    {
+      "id_local": "FSNode.chmodItems",
+      "why": "changes perms via storage; guards edge only, calls nothing (FileController.php:147)"
+    },
+    {
+      "id_local": "FSNode.deleteItems",
+      "why": "deletes via storage; guards edge only, calls nothing (FileController.php:172)"
+    },
+    {
+      "id_local": "FSNode.saveContent",
+      "why": "overwrites file via delete+store; guards edge only, calls nothing (FileController.php:188)"
+    },
+    {
+      "id_local": "FSNode.upload",
+      "why": "writes chunks and assembles into storage; guards edge only, calls nothing (UploadController.php:59)"
+    },
+    {
+      "id_local": "TmpfsFile.chunkCheck",
+      "why": "checks for a tmp chunk; guards edge only, calls nothing (UploadController.php:42)"
+    },
+    {
+      "id_local": "FSNode.download",
+      "why": "reads and streams a file; guards edge only, calls nothing (DownloadController.php:55)"
+    },
+    {
+      "id_local": "FSNode.batchDownloadCreate",
+      "why": "creates a session-bound archive; guards edge only, calls nothing (DownloadController.php:131)"
+    },
+    {
+      "id_local": "TmpfsFile.batchDownloadStart",
+      "why": "reads and deletes a tmp archive; its ownsBatchArchive check is inline in the same op, so no separate guarded sub-op (DownloadController.php:158)"
+    },
+    {
+      "id_local": "Config.getFrontendConfig",
+      "why": "returns static config; reads nothing persisted, calls nothing (ViewController.php:24)"
+    },
+    {
+      "id_local": "User.logout",
+      "why": "invalidates session; no pre-checks, calls nothing (AuthController.php:63)"
+    },
+    {
+      "id_local": "User.getCurrent",
+      "why": "returns session user or guest; no pre-checks, calls nothing (AuthController.php:68)"
+    }
+  ],
+  "requires_auth": true,
+  "auth": {
+    "account_entity": "User",
+    "username_col": "username",
+    "password_col": "password",
+    "session_fields": {
+      "username": "username"
+    }
+  }
+}

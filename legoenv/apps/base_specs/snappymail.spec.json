@@ -1,0 +1,2228 @@
+{
+  "env_id": "snappymail",
+  "_prep_version": 3,
+  "entities": [
+    {
+      "name": "RainloopUser",
+      "columns": [
+        {
+          "name": "rl_email",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "default": ""
+        },
+        {
+          "name": "pw",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        },
+        {
+          "name": "id",
+          "type": "id"
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "rl_email"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "RainloopSystem",
+      "columns": [
+        {
+          "name": "sys_name",
+          "type": "text",
+          "pk": true
+        },
+        {
+          "name": "value_int",
+          "type": "int",
+          "nullable": false,
+          "default": 0
+        }
+      ]
+    },
+    {
+      "name": "AbContact",
+      "columns": [
+        {
+          "name": "id_contact",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "id_contact_str",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        },
+        {
+          "name": "id_user",
+          "type": "text",
+          "nullable": false,
+          "fk_to": "RainloopUser.rl_email"
+        },
+        {
+          "name": "display",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        },
+        {
+          "name": "changed",
+          "type": "int",
+          "nullable": false,
+          "immutable": true,
+          "default": 0
+        },
+        {
+          "name": "deleted",
+          "type": "int",
+          "nullable": false,
+          "enum": [
+            0,
+            1
+          ],
+          "default": false
+        },
+        {
+          "name": "etag",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        }
+      ],
+      "_lifecycle": {
+        "col": "deleted",
+        "initial": 0,
+        "states": [
+          0,
+          1
+        ],
+        "via": {
+          "PdoAddressBook.DeleteContacts": {
+            "col": "deleted",
+            "from": [
+              0
+            ],
+            "to": 1
+          }
+        }
+      }
+    },
+    {
+      "name": "AbProperty",
+      "columns": [
+        {
+          "name": "id_prop",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "id_contact",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "AbContact.id_contact"
+        },
+        {
+          "name": "id_user",
+          "type": "text",
+          "nullable": false,
+          "fk_to": "RainloopUser.rl_email"
+        },
+        {
+          "name": "prop_type",
+          "type": "int",
+          "nullable": false
+        },
+        {
+          "name": "prop_type_str",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        },
+        {
+          "name": "prop_value",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        },
+        {
+          "name": "prop_value_custom",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        },
+        {
+          "name": "prop_value_lower",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        },
+        {
+          "name": "prop_frec",
+          "type": "int",
+          "nullable": false,
+          "default": 0
+        }
+      ]
+    },
+    {
+      "name": "Domain",
+      "columns": [
+        {
+          "name": "name",
+          "type": "text",
+          "pk": true
+        }
+      ]
+    },
+    {
+      "name": "DomainConfig",
+      "columns": [
+        {
+          "name": "name",
+          "type": "text",
+          "pk": true
+        },
+        {
+          "name": "IMAP",
+          "type": "json"
+        },
+        {
+          "name": "SMTP",
+          "type": "json"
+        },
+        {
+          "name": "Sieve",
+          "type": "json"
+        },
+        {
+          "name": "whiteList",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "aliasName",
+          "type": "text",
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "name": "DomainDisabled",
+      "columns": [
+        {
+          "name": "name",
+          "type": "text",
+          "pk": true
+        }
+      ]
+    },
+    {
+      "name": "UserConfigData",
+      "columns": [
+        {
+          "name": "local_part",
+          "type": "text",
+          "pk": true
+        },
+        {
+          "name": "domain",
+          "type": "text",
+          "pk": true
+        },
+        {
+          "name": "subfolder",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        },
+        {
+          "name": "key",
+          "type": "text",
+          "pk": true
+        },
+        {
+          "name": "value",
+          "type": "json"
+        }
+      ]
+    },
+    {
+      "name": "UserSettings",
+      "columns": [
+        {
+          "name": "account",
+          "type": "text",
+          "pk": true
+        },
+        {
+          "name": "key",
+          "type": "text",
+          "pk": true
+        },
+        {
+          "name": "value",
+          "type": "json"
+        }
+      ]
+    },
+    {
+      "name": "DomainData",
+      "columns": [
+        {
+          "name": "local_part",
+          "type": "text",
+          "pk": true
+        },
+        {
+          "name": "domain",
+          "type": "text",
+          "pk": true
+        },
+        {
+          "name": "subfolder",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        },
+        {
+          "name": "key",
+          "type": "text",
+          "pk": true
+        },
+        {
+          "name": "value",
+          "type": "json"
+        }
+      ]
+    },
+    {
+      "name": "CryptoKeyRecord",
+      "columns": [
+        {
+          "name": "account",
+          "type": "text",
+          "pk": true
+        },
+        {
+          "name": "storagetype",
+          "type": "text",
+          "pk": true
+        },
+        {
+          "name": "key",
+          "type": "text",
+          "pk": true
+        },
+        {
+          "name": "value",
+          "type": "json"
+        }
+      ]
+    },
+    {
+      "name": "UserFile",
+      "columns": [
+        {
+          "name": "local_part",
+          "type": "text",
+          "pk": true
+        },
+        {
+          "name": "domain",
+          "type": "text",
+          "pk": true
+        },
+        {
+          "name": "subaccount",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "key",
+          "type": "text",
+          "pk": true
+        },
+        {
+          "name": "value",
+          "type": "json"
+        }
+      ]
+    },
+    {
+      "name": "SystemConfig",
+      "columns": [
+        {
+          "name": "section",
+          "type": "text",
+          "pk": true
+        },
+        {
+          "name": "key",
+          "type": "text",
+          "pk": true
+        },
+        {
+          "name": "value",
+          "type": "json"
+        }
+      ]
+    },
+    {
+      "name": "PGPKey",
+      "columns": [
+        {
+          "name": "account",
+          "type": "text",
+          "pk": true
+        },
+        {
+          "name": "keyid",
+          "type": "text",
+          "pk": true
+        },
+        {
+          "name": "value",
+          "type": "json"
+        }
+      ]
+    },
+    {
+      "name": "SMimeCertificate",
+      "columns": [
+        {
+          "name": "account",
+          "type": "text",
+          "pk": true
+        },
+        {
+          "name": "key",
+          "type": "text",
+          "pk": true
+        },
+        {
+          "name": "value",
+          "type": "text"
+        }
+      ]
+    },
+    {
+      "name": "AccountRecord",
+      "columns": [
+        {
+          "name": "main_email",
+          "type": "text",
+          "pk": true
+        },
+        {
+          "name": "email",
+          "type": "text",
+          "pk": true
+        },
+        {
+          "name": "value",
+          "type": "json"
+        }
+      ]
+    },
+    {
+      "name": "IdentityRecord",
+      "columns": [
+        {
+          "name": "main_email",
+          "type": "text",
+          "pk": true
+        },
+        {
+          "name": "id",
+          "type": "text",
+          "pk": true
+        },
+        {
+          "name": "value",
+          "type": "json"
+        }
+      ]
+    },
+    {
+      "name": "ContactsSyncConfig",
+      "columns": [
+        {
+          "name": "account",
+          "type": "text",
+          "pk": true
+        },
+        {
+          "name": "key",
+          "type": "text",
+          "pk": true
+        },
+        {
+          "name": "value",
+          "type": "json"
+        }
+      ]
+    },
+    {
+      "name": "SieveScript",
+      "columns": [
+        {
+          "name": "account",
+          "type": "text",
+          "pk": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "pk": true
+        },
+        {
+          "name": "active",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "body",
+          "type": "text"
+        }
+      ]
+    }
+  ],
+  "tools": [
+    {
+      "tool": "sign_in",
+      "op": "action",
+      "family": "guard.auth",
+      "exec_spec": {
+        "verify": {
+          "entity": "RainloopUser",
+          "username_col": "rl_email",
+          "password_col": "pw"
+        }
+      },
+      "input_schema": {
+        "rl_email": {
+          "type": "text",
+          "required": true,
+          "description": "The account email / login, e.g. alice@example.com."
+        },
+        "pw": {
+          "type": "text",
+          "required": false,
+          "description": "The account password, verified against the external mail server."
+        },
+        "password": {
+          "type": "text",
+          "required": true
+        }
+      },
+      "_evidence": {
+        "locator": "snappymail/v/0.0.0/app/libraries/RainLoop/Actions/User.php:36",
+        "id_local": "Actions.DoLogin",
+        "entry": {
+          "kind": "http",
+          "route": "POST ?/Json/0/0/",
+          "locator": "snappymail/v/0.0.0/app/libraries/RainLoop/ServiceActions.php:73"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "public function DoLogin() : array {\n  try { $oAccount=$this->LoginProcess(Trim($this->GetActionParam('Email','')),new SensitiveString($this->GetActionParam('Password',''))); } catch(Throwable $e){ $this->loginErrorDelay(); throw $e; }\n  empty($this->GetActionParam('signMe',0)) || $this->SetSignMeToken($oAccount);\n  $sLanguage=$this->GetActionParam('language',''); if($oAccount&&$sLanguage){ $oSettings=$this->SettingsProvider()->Load($oAccount); if($sCurrentLanguage!==$sLanguage){ $oSettings->SetConf('language',$sLanguage); $oSettings->save(); } }\n  return $this->DefaultResponse($this->AppData(f",
+        "edges": [
+          "resolveLoginCredentials + DomainProvider.getByEmailAddress gate login by configured domain / whitelist (Actions/UserAuth.php:142, Providers/Domain.php:150)",
+          "login.credentials resolves the domain: DomainProvider.getByEmailAddress throws DomainNotAllowed when no config or whitelist fails (Providers/Domain.php:150)"
+        ]
+      },
+      "entity": "RainloopUser",
+      "_output_schema": {
+        "Result": "bool",
+        "ResultList": "AppData"
+      },
+      "guards": {
+        "required": [
+          "rl_email",
+          "password"
+        ],
+        "messages": {
+          "auth": "Not applicable; this is the sign-in tool.",
+          "not_found": "No mail account with that email and password."
+        }
+      },
+      "description": "Sign in as a mail account with its email and password. SnappyMail authenticates against the configured IMAP/SMTP server, so any account whose credentials are recorded can sign in. The session it opens is what $actor resolves to for contacts, additional accounts, identities, settings and filter scripts.",
+      "_defaulted": []
+    },
+    {
+      "tool": "sign_out",
+      "op": "action",
+      "family": "guard.logout",
+      "exec_spec": {},
+      "input_schema": {},
+      "_evidence": {
+        "locator": "snappymail/v/0.0.0/app/libraries/RainLoop/Actions/User.php:67",
+        "id_local": "Actions.DoLogout",
+        "entry": {
+          "kind": "http",
+          "route": "POST ?/Json/0/0/",
+          "locator": "snappymail/v/0.0.0/app/libraries/RainLoop/ServiceActions.php:73"
+        },
+        "entity_why": "cannot determine the entity",
+        "ref_code": "public function DoLogout() : array {\n  $bMain=true; $this->Logout($bMain);\n  $bMain&&$this->ClearSignMeData();\n  return $this->TrueResponse();\n}",
+        "edges": [
+          "Actions/UserAuth.php:236 — clear session/auth cookies for a signed-in account"
+        ]
+      },
+      "_output_schema": {
+        "Result": "bool"
+      },
+      "_defaulted": [],
+      "description": "End the current mail-account session and clear its cookies.",
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You are not signed in."
+        }
+      }
+    },
+    {
+      "tool": "sign_in_admin",
+      "op": "action",
+      "family": "guard.auth",
+      "exec_spec": {
+        "verify": {
+          "entity": "RainloopSystem",
+          "username_col": "sys_name",
+          "password_col": "value_int"
+        }
+      },
+      "input_schema": {
+        "sys_name": {
+          "type": "text",
+          "required": true,
+          "description": "The admin login (security.admin_login)."
+        },
+        "value_int": {
+          "type": "int",
+          "required": true,
+          "description": "The admin password value."
+        }
+      },
+      "_evidence": {
+        "locator": "snappymail/v/0.0.0/app/libraries/RainLoop/ActionsAdmin.php:113",
+        "id_local": "ActionsAdmin.DoAdminLogin",
+        "entry": {
+          "kind": "http",
+          "route": "POST ?/Json/0/0/",
+          "locator": "snappymail/v/0.0.0/app/libraries/RainLoop/ServiceActions.php:117"
+        },
+        "entity_why": "primary effect auth lands on this table",
+        "ref_code": "public function DoAdminLogin() : array {\n  $sLogin=trim($this->GetActionParam('Login','')); $oPassword=new SensitiveString($this->GetActionParam('Password',''));\n  $totp=$this->Config()->Get('security','admin_totp','');\n  if(!strlen($sLogin)||!strlen($oPassword)||!$this->Config()->Get('security','allow_admin_panel',true)||$sLogin!==$this->Config()->Get('security','admin_login','')||!$this->Config()->ValidatePassword($oPassword)||($totp&&!TOTP::Verify($totp,$this->GetActionParam('TOTP','')))){ $this->loginErrorDelay(); throw new ClientException(AuthError); }\n  $sToken=$this->setAdminAuthToken()",
+        "edges": [
+          "DoAdminLogin refuses when allow_admin_panel disabled (ActionsAdmin.php:113)",
+          "validate Password against admin_password hash + admin_login / admin_totp, else AuthError + loginErrorDelay (ActionsAdmin.php:113)"
+        ]
+      },
+      "entity": "RainloopSystem",
+      "_output_schema": {
+        "Result": "bool",
+        "ResultList": "admin AppData"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "SystemConfig",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "key",
+                      "op": "eq",
+                      "value": "allow_admin_panel"
+                    },
+                    {
+                      "node": "field",
+                      "col": "value",
+                      "op": "eq",
+                      "value": true
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "sys_name",
+          "value_int"
+        ],
+        "messages": {
+          "auth": "Not applicable; this is the sign-in tool.",
+          "precondition": "The admin panel is disabled (security.allow_admin_panel).",
+          "not_found": "Admin login or password is wrong."
+        }
+      },
+      "description": "Sign in to the admin panel with the admin login and password (the single admin record). Refused when security.allow_admin_panel is not enabled. Opens the admin session (realm \"admin\") that gates every admin-domain tool.",
+      "auth_realm": "admin",
+      "_defaulted": []
+    },
+    {
+      "tool": "sign_out_admin",
+      "op": "action",
+      "family": "guard.logout",
+      "exec_spec": {},
+      "input_schema": {},
+      "_evidence": {
+        "locator": "snappymail/v/0.0.0/app/libraries/RainLoop/ActionsAdmin.php:137",
+        "id_local": "ActionsAdmin.DoAdminLogout",
+        "entry": {
+          "kind": "http",
+          "route": "POST ?/Json/0/0/",
+          "locator": "snappymail/v/0.0.0/app/libraries/RainLoop/ServiceActions.php:73"
+        },
+        "entity_why": "cannot determine the entity",
+        "ref_code": "public function DoAdminLogout() : array {\n  $sAdminKey=$this->getAdminAuthKey(); if($sAdminKey){ $this->Cacher(null,true)->Delete(KeyPathHelper::SessionAdminKey($sAdminKey)); }\n  Cookies::clear(static::$AUTH_ADMIN_TOKEN_KEY); return $this->TrueResponse();\n}",
+        "edges": [
+          "ActionsAdmin DoAdminLogout — deletes SessionAdminKey, clears smadmin cookie (ActionsAdmin.php:137, Actions/Admin.php:14)"
+        ]
+      },
+      "_output_schema": {
+        "Result": "bool"
+      },
+      "_defaulted": [],
+      "description": "End the admin-panel session and clear its session key and cookie.",
+      "auth_realm": "admin",
+      "guards": {
+        "requires_auth": true,
+        "auth_realm": "admin",
+        "messages": {
+          "auth": "You are not signed in to the admin panel."
+        }
+      }
+    },
+    {
+      "tool": "actions_doaccountsetup",
+      "op": "create",
+      "family": "crud.upsert",
+      "exec_spec": {
+        "entity": "AccountRecord",
+        "key": {
+          "email": {
+            "$arg": "email"
+          }
+        },
+        "insert_fields": {
+          "value": {
+            "$arg": "name"
+          },
+          "main_email": {
+            "$session": "account_email"
+          }
+        },
+        "set_on_exists": {
+          "value": {
+            "$arg": "name"
+          }
+        }
+      },
+      "input_schema": {
+        "email": {
+          "type": "text",
+          "required": true,
+          "description": "Email of the additional account."
+        },
+        "password": {
+          "type": "text",
+          "required": false,
+          "description": "Optional password to (re)verify credentials against the mail server."
+        },
+        "new": {
+          "type": "bool",
+          "required": false,
+          "description": "True to add a new account, false/omitted to edit an existing one."
+        },
+        "name": {
+          "type": "text",
+          "required": false,
+          "description": "Display name for the account."
+        }
+      },
+      "_evidence": {
+        "locator": "snappymail/v/0.0.0/app/libraries/RainLoop/Actions/Accounts.php:75",
+        "id_local": "Actions.DoAccountSetup",
+        "entry": {
+          "kind": "http",
+          "route": "POST ?/Json/0/0/",
+          "locator": "snappymail/v/0.0.0/app/libraries/RainLoop/ServiceActions.php:73"
+        },
+        "entity_why": "primary effect row_upsert lands on this table",
+        "ref_code": "public function DoAccountSetup(): array {\n  $aAccounts=$this->GetAccounts($oMainAccount); $sEmail=trim($this->GetActionParam('email',''));\n  if($bNew||strlen($oPassword)){ $oNewAccount=$this->LoginProcess($sEmail,$oPassword,false); $aAccount=$oNewAccount->asTokenArray($oMainAccount); }\n  if($bNew){ if(isset($aAccounts[$sEmail])) throw new ClientException(AccountAlreadyExists); } else if(!isset($aAccounts[$sEmail])) throw new ClientException(AccountDoesNotExist);\n  $aAccounts[$sEmail]=$aAccount; if($aAccounts[$sEmail]){ $aAccounts[$sEmail]['name']=trim($this->GetActionParam('name','')); $this->",
+        "edges": [
+          "getAccountFromToken requires a valid AUTH_SPEC_TOKEN_KEY session cookie (Actions/UserAuth.php:236)"
+        ]
+      },
+      "entity": "AccountRecord",
+      "_binds": {
+        "email": "AccountRecord.email",
+        "name": "AccountRecord.value"
+      },
+      "_output_schema": {
+        "Result": "bool"
+      },
+      "guards": {
+        "required": [
+          "email"
+        ],
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in before managing accounts."
+        }
+      },
+      "_defaulted": [],
+      "description": "Add or edit an additional mail account linked to your main account (the main account email comes from the current session). Passing a password re-verifies credentials against the mail server."
+    },
+    {
+      "tool": "actions_doaccountdelete",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "AccountRecord",
+        "lookup_by": {
+          "email": {
+            "$arg": "email"
+          }
+        },
+        "main_email": {
+          "$session": "account_email"
+        }
+      },
+      "input_schema": {
+        "email": {
+          "type": "text",
+          "required": true,
+          "description": "Email of the additional account to remove."
+        }
+      },
+      "_evidence": {
+        "locator": "snappymail/v/0.0.0/app/libraries/RainLoop/Actions/Accounts.php:171",
+        "id_local": "Actions.DoAccountDelete",
+        "entry": {
+          "kind": "http",
+          "route": "POST ?/Json/0/0/",
+          "locator": "snappymail/v/0.0.0/app/libraries/RainLoop/ServiceActions.php:73"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "public function DoAccountDelete(): array {\n  $sEmailToDelete=IDN::emailToAscii(trim($this->GetActionParam('emailToDelete',''))); $aAccounts=$this->GetAccounts($oMainAccount);\n  if(strlen($sEmailToDelete)&&isset($aAccounts[$sEmailToDelete])){ ... unset($aAccounts[$sEmailToDelete]); $this->SetAccounts($oMainAccount,$aAccounts); return $this->TrueResponse(array('Reload'=>$bReload)); }\n  return $this->FalseResponse();\n}"
+      },
+      "entity": "AccountRecord",
+      "_output_schema": {
+        "Reload": "bool"
+      },
+      "guards": {
+        "required": [
+          "email"
+        ],
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in before managing accounts.",
+          "not_found": "No additional account with that email exists."
+        }
+      },
+      "description": "Remove an additional mail account from your main account."
+    },
+    {
+      "tool": "actions_doidentityupdate",
+      "op": "update",
+      "family": "crud.upsert",
+      "exec_spec": {
+        "entity": "IdentityRecord",
+        "key": {
+          "id": {
+            "$arg": "Id"
+          },
+          "main_email": {
+            "$session": "account_email"
+          }
+        },
+        "insert_fields": {
+          "value": {
+            "$arg": "identity"
+          }
+        },
+        "set_on_exists": {
+          "value": {
+            "$arg": "identity"
+          }
+        }
+      },
+      "input_schema": {
+        "Id": {
+          "type": "text",
+          "required": true,
+          "description": "Identity id; \"---\" denotes the primary account identity."
+        },
+        "identity": {
+          "type": "json",
+          "required": true,
+          "description": "Identity object: {Name, Email, Signature, ReplyTo}."
+        }
+      },
+      "_evidence": {
+        "locator": "snappymail/v/0.0.0/app/libraries/RainLoop/Actions/Accounts.php:267",
+        "id_local": "Actions.DoIdentityUpdate",
+        "entry": {
+          "kind": "http",
+          "route": "POST ?/Json/0/0/",
+          "locator": "snappymail/v/0.0.0/app/libraries/RainLoop/ServiceActions.php:73"
+        },
+        "entity_why": "primary effect row_upsert lands on this table",
+        "ref_code": "public function DoIdentityUpdate(): array {\n  $oIdentity=new Identity(); if(!$oIdentity->FromJSON($this->GetActionParams(),true)) throw new ClientException(InvalidInputArgument);\n  $this->IdentitiesProvider()->UpdateIdentity($oAccount,$oIdentity); return $this->TrueResponse();\n}"
+      },
+      "entity": "IdentityRecord",
+      "_binds": {
+        "Id": "IdentityRecord.id",
+        "Email": "IdentityRecord.value",
+        "Name": "IdentityRecord.value",
+        "Signature": "IdentityRecord.value",
+        "ReplyTo": "IdentityRecord.value"
+      },
+      "_output_schema": {
+        "Result": "bool"
+      },
+      "guards": {
+        "required": [
+          "Id",
+          "identity"
+        ],
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in before managing identities."
+        }
+      },
+      "_defaulted": [],
+      "description": "Create or update one of your identities. The identity is addressed by its id under your account (pass Id \"---\" for the primary account identity); the identity payload carries its name, email, signature and reply-to."
+    },
+    {
+      "tool": "actions_doidentitydelete",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "IdentityRecord",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        },
+        "main_email": {
+          "$session": "account_email"
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "text",
+          "required": true,
+          "description": "Identity id to delete."
+        }
+      },
+      "_evidence": {
+        "locator": "snappymail/v/0.0.0/app/libraries/RainLoop/Actions/Accounts.php:287",
+        "id_local": "Actions.DoIdentityDelete",
+        "entry": {
+          "kind": "http",
+          "route": "POST ?/Json/0/0/",
+          "locator": "snappymail/v/0.0.0/app/libraries/RainLoop/ServiceActions.php:73"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "public function DoIdentityDelete(): array {\n  if(!$this->GetCapa(Capa::IDENTITIES)) return $this->FalseResponse();\n  $sId=trim($this->GetActionParam('idToDelete','')); if(empty($sId)) throw new ClientException(UnknownError);\n  $this->IdentitiesProvider()->DeleteIdentity($oAccount,$sId); return $this->TrueResponse();\n}"
+      },
+      "entity": "IdentityRecord",
+      "_output_schema": {
+        "Result": "bool"
+      },
+      "guards": {
+        "required": [
+          "id"
+        ],
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in before managing identities.",
+          "not_found": "No identity with that id exists."
+        }
+      },
+      "description": "Delete one of your identities by id."
+    },
+    {
+      "tool": "actions_dosettingsupdate",
+      "op": "update",
+      "family": "crud.upsert",
+      "exec_spec": {
+        "entity": "UserSettings",
+        "row_key": {
+          "account": {
+            "$session": "account_email"
+          }
+        },
+        "fields": [
+          "value"
+        ],
+        "set": {
+          "value": "<merged settings json>"
+        },
+        "key": {
+          "account": {
+            "$session": "account_email"
+          },
+          "key": {
+            "$const": "settings"
+          }
+        },
+        "insert_fields": {
+          "value": {
+            "$arg": "settings"
+          }
+        },
+        "set_on_exists": {
+          "value": {
+            "$arg": "settings"
+          }
+        }
+      },
+      "input_schema": {
+        "settings": {
+          "type": "json",
+          "required": true,
+          "description": "Settings object to persist, e.g. {theme: \"dark\", messages_per_page: 50}."
+        }
+      },
+      "_evidence": {
+        "locator": "snappymail/v/0.0.0/app/libraries/RainLoop/Actions/User.php:129",
+        "id_local": "Actions.DoSettingsUpdate",
+        "entry": {
+          "kind": "http",
+          "route": "POST ?/Json/0/0/",
+          "locator": "snappymail/v/0.0.0/app/libraries/RainLoop/ServiceActions.php:73"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "public function DoSettingsUpdate() : array {\n  $oSettings=$this->SettingsProvider()->Load($oAccount); $oSettingsLocal=$this->SettingsProvider(true)->Load($oAccount);\n  $this->setSettingsFromParams($oSettings,'hourCycle','string'); ... $this->setSettingsFromParams($oSettings,'MessagesPerPage','int',fn($i)=>min(100,max(10,$i))); ... $this->setSettingsFromParams($oSettingsLocal,'Theme','string'); ...\n  return $this->DefaultResponse($oSettings->save()&&$oSettingsLocal->save());\n}"
+      },
+      "entity": "UserSettings",
+      "_binds": {
+        "Theme": "UserSettings.value",
+        "language": "UserSettings.value",
+        "MessagesPerPage": "UserSettings.value",
+        "Layout": "UserSettings.value"
+      },
+      "_output_schema": {
+        "Result": "bool"
+      },
+      "_defaulted": [],
+      "description": "Update your mail-client settings. Your settings are stored as one JSON blob per account; pass the settings object you want saved (theme, language, messages-per-page, layout, ...). Creates the settings row if it does not exist yet.",
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "settings"
+        ],
+        "messages": {
+          "auth": "You must sign in before updating your settings."
+        }
+      }
+    },
+    {
+      "tool": "actions_dosystemfoldersupdate",
+      "op": "update",
+      "family": "crud.upsert",
+      "exec_spec": {
+        "entity": "UserSettings",
+        "row_key": {
+          "account": {
+            "$session": "account_email"
+          }
+        },
+        "fields": [
+          "value"
+        ],
+        "set": {
+          "value": "<settings_local json with folder confs>"
+        },
+        "key": {
+          "account": {
+            "$session": "account_email"
+          },
+          "key": {
+            "$const": "settings_local"
+          }
+        },
+        "insert_fields": {
+          "value": {
+            "$arg": "folders"
+          }
+        },
+        "set_on_exists": {
+          "value": {
+            "$arg": "folders"
+          }
+        }
+      },
+      "input_schema": {
+        "folders": {
+          "type": "json",
+          "required": true,
+          "description": "Folder mapping object, e.g. {sent: \"Sent\", drafts: \"Drafts\", junk: \"Junk\", trash: \"Trash\", archive: \"Archive\"}."
+        }
+      },
+      "_evidence": {
+        "locator": "snappymail/v/0.0.0/app/libraries/RainLoop/Actions/Folders.php:398",
+        "id_local": "Actions.DoSystemFoldersUpdate",
+        "entry": {
+          "kind": "http",
+          "route": "POST ?/Json/0/0/",
+          "locator": "snappymail/v/0.0.0/app/libraries/RainLoop/ServiceActions.php:73"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "public function DoSystemFoldersUpdate() : array {\n  $oSettingsLocal=$this->SettingsProvider(true)->Load($oAccount);\n  $oSettingsLocal->SetConf('SentFolder',$this->GetActionParam('sent','')); ... $oSettingsLocal->SetConf('ArchiveFolder',$this->GetActionParam('archive',''));\n  return $this->DefaultResponse($oSettingsLocal->save());\n}"
+      },
+      "entity": "UserSettings",
+      "_binds": {
+        "sent": "UserSettings.value",
+        "drafts": "UserSettings.value",
+        "junk": "UserSettings.value",
+        "trash": "UserSettings.value",
+        "archive": "UserSettings.value"
+      },
+      "_output_schema": {
+        "Result": "bool"
+      },
+      "_defaulted": [],
+      "description": "Set which IMAP folders are used for the system folders. The folder mapping is stored as one JSON blob per account. Creates the settings_local row if it does not exist yet.",
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "folders"
+        ],
+        "messages": {
+          "auth": "You must sign in before updating your folders."
+        }
+      }
+    },
+    {
+      "tool": "actions_docontactsave",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "target": {
+          "entity": "AbProperty",
+          "lookup_by": {
+            "id_prop": {
+              "$arg": "id_prop"
+            }
+          }
+        },
+        "entity": "AbContact",
+        "fields": {
+          "display": {
+            "$arg": "jCard"
+          }
+        },
+        "set_on_create": {
+          "id_user": {
+            "$session": "account_email"
+          },
+          "id_contact_str": {
+            "$arg": "uid"
+          }
+        }
+      },
+      "input_schema": {
+        "jCard": {
+          "type": "json",
+          "required": true,
+          "description": "The vCard contact as jCard JSON."
+        },
+        "uid": {
+          "type": "text",
+          "required": false,
+          "description": "Optional id string for the contact."
+        }
+      },
+      "_evidence": {
+        "locator": "snappymail/v/0.0.0/app/libraries/RainLoop/Actions/Contacts.php:169",
+        "id_local": "Actions.DoContactSave",
+        "entry": {
+          "kind": "http",
+          "route": "POST ?/Json/0/0/",
+          "locator": "snappymail/v/0.0.0/app/libraries/RainLoop/ServiceActions.php:73"
+        },
+        "entity_why": "primary effect spawn lands on this table",
+        "ref_code": "public function DoContactSave() : array {\n  if($this->HasActionParam('uid')&&$this->HasActionParam('jCard')){\n    $vCard=Reader::readJson($this->GetActionParam('jCard')); if($vCard instanceof VCard){ $vCard->REV=gmdate('Ymd\\\\THis\\\\Z');\n      $sUid=trim($this->GetActionParam('uid')); $oContact=$sUid?$oAddressBookProvider->GetContactByID($sUid):null; if(!$oContact){$oContact=new Contact();}\n      $oContact->setVCard($vCard); $bResult=$oAddressBookProvider->ContactSave($oContact); } }\n  return $this->DefaultResponse(array('ResultID'=>$bResult?$oContact->id:'','Result'=>$bResult));\n}"
+      },
+      "entity": "AbContact",
+      "_binds": {
+        "uid": "AbContact.id_contact_str"
+      },
+      "_output_schema": {
+        "ResultID": "string",
+        "Result": "bool"
+      },
+      "_candidate_preconditions": [
+        [
+          {
+            "entity": "AbContact",
+            "scope": [
+              {
+                "col": "id_user",
+                "op": "eq",
+                "value": {
+                  "ref": "$actor.id"
+                }
+              }
+            ],
+            "card": {
+              "op": "gte",
+              "n": 1
+            }
+          }
+        ]
+      ],
+      "guards": {
+        "required": [
+          "jCard"
+        ],
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in before saving contacts."
+        }
+      },
+      "_defaulted": [],
+      "description": "Save a new contact into your address book from a vCard jCard. The jCard is stored on the record along with the contact display data."
+    },
+    {
+      "tool": "actions_docontacts",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "AbContact",
+        "scope": {
+          "where": {
+            "id_user": {
+              "$session": "account_email"
+            }
+          }
+        },
+        "search_fields": [
+          "display",
+          "id_contact_str"
+        ],
+        "rank": {
+          "method": "substring",
+          "fields": [
+            "display",
+            "id_contact_str"
+          ]
+        },
+        "pagination": {
+          "default_limit": 20,
+          "limit": {
+            "$arg": "Limit"
+          },
+          "start": {
+            "$arg": "Offset"
+          }
+        },
+        "filter": {
+          "op": "and",
+          "clauses": [
+            {
+              "col": "deleted",
+              "mode": "exact",
+              "val": 0
+            },
+            {
+              "op": "or",
+              "clauses": [
+                {
+                  "col": "display",
+                  "mode": "substring",
+                  "val": {
+                    "$arg": "Search"
+                  },
+                  "optional": true
+                },
+                {
+                  "col": "id_contact_str",
+                  "mode": "substring",
+                  "val": {
+                    "$arg": "Search"
+                  },
+                  "optional": true
+                }
+              ]
+            }
+          ]
+        },
+        "sort": {
+          "col": "display",
+          "dir": "asc"
+        }
+      },
+      "input_schema": {
+        "Search": {
+          "type": "text",
+          "required": false,
+          "description": "Free-text to match against contact name or id."
+        },
+        "Offset": {
+          "type": "int",
+          "required": false,
+          "description": "Pagination offset."
+        },
+        "Limit": {
+          "type": "int",
+          "required": false,
+          "description": "Maximum number of contacts to return (default 20)."
+        }
+      },
+      "_evidence": {
+        "locator": "snappymail/v/0.0.0/app/libraries/RainLoop/Actions/Contacts.php:126",
+        "id_local": "Actions.DoContacts",
+        "entry": {
+          "kind": "http",
+          "route": "POST ?/Json/0/0/",
+          "locator": "snappymail/v/0.0.0/app/libraries/RainLoop/ServiceActions.php:73"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "public function DoContacts() : array {\n  $sSearch=trim($this->GetActionParam('Search','')); $iOffset=(int)$this->GetActionParam('Offset',0); $iLimit=(int)$this->GetActionParam('Limit',20);\n  if($oAbp->IsActive()){ $iResultCount=0; $mResult=$oAbp->GetContacts($iOffset,$iLimit,$sSearch,$iResultCount); }\n  return $this->DefaultResponse(array('Offset'=>$iOffset,'Limit'=>$iLimit,'Count'=>$iResultCount,'Search'=>$sSearch,'List'=>$mResult));\n}"
+      },
+      "entity": "AbContact",
+      "_output_schema": {
+        "List": "[Contact]",
+        "Count": "int",
+        "Offset": "int",
+        "Limit": "int",
+        "Search": "text"
+      },
+      "description": "Search your address book. Returns contacts whose display name or contact id contains the given text, ordered by display name, paged by Offset/Limit. Only your own contacts are visible.",
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in before reading your contacts."
+        }
+      }
+    },
+    {
+      "tool": "actions_docontactsdelete",
+      "op": "update",
+      "family": "crud.soft_delete",
+      "exec_spec": {
+        "entity": "AbContact",
+        "lookup_by": {
+          "id_contact": {
+            "$arg": "id_contact"
+          }
+        },
+        "set": {
+          "deleted": 1
+        }
+      },
+      "input_schema": {
+        "id_contact": {
+          "type": "int",
+          "required": true,
+          "description": "id_contact of the contact to soft-delete."
+        }
+      },
+      "_evidence": {
+        "locator": "snappymail/v/0.0.0/app/libraries/RainLoop/Actions/Contacts.php:154",
+        "id_local": "Actions.DoContactsDelete",
+        "entry": {
+          "kind": "http",
+          "route": "POST ?/Json/0/0/",
+          "locator": "snappymail/v/0.0.0/app/libraries/RainLoop/ServiceActions.php:73"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "public function DoContactsDelete() : array {\n  $aUids=explode(',',(string)$this->GetActionParam('uids','')); $aFilteredUids=array_filter(array_map('intval',$aUids));\n  if(count($aFilteredUids)&&$this->AddressBookProvider($oAccount)->IsActive()){ $bResult=$this->AddressBookProvider($oAccount)->DeleteContacts($aFilteredUids); }\n  return $this->DefaultResponse($bResult);\n}",
+        "edges": [
+          "PdoAddressBook.DeleteContacts sets deleted=1 (PdoAddressBook.php); DoContactsDelete soft-deletes by id (Contacts.php:154)"
+        ]
+      },
+      "entity": "AbContact",
+      "_binds": {
+        "id_contact": "AbContact.id_contact"
+      },
+      "_output_schema": {
+        "Result": "bool"
+      },
+      "guards": {
+        "required": [
+          "id_contact"
+        ],
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "AbContact",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id_contact",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id_contact"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "id_user",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_email"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must sign in before deleting contacts.",
+          "precondition": "You can only delete one of your own contacts.",
+          "not_found": "No contact with that id_contact exists."
+        }
+      },
+      "description": "Soft-delete one of your contacts by id_contact: it is marked deleted and no longer appears in contact searches. Fails if the id is not one of your own contacts."
+    },
+    {
+      "tool": "actions_dosavecontactssyncdata",
+      "op": "update",
+      "family": "crud.upsert",
+      "exec_spec": {
+        "entity": "ContactsSyncConfig",
+        "key": {
+          "account": {
+            "$session": "account_email"
+          },
+          "key": {
+            "$const": "contacts_sync"
+          }
+        },
+        "insert_fields": {
+          "value": {
+            "$arg": "config"
+          }
+        },
+        "set_on_exists": {
+          "value": {
+            "$arg": "config"
+          }
+        }
+      },
+      "input_schema": {
+        "config": {
+          "type": "json",
+          "required": true,
+          "description": "Contacts sync config object: {Mode, User, Password, Url}."
+        }
+      },
+      "_evidence": {
+        "locator": "snappymail/v/0.0.0/app/libraries/RainLoop/Actions/Contacts.php:37",
+        "id_local": "Actions.DoSaveContactsSyncData",
+        "entry": {
+          "kind": "http",
+          "route": "POST ?/Json/0/0/",
+          "locator": "snappymail/v/0.0.0/app/libraries/RainLoop/ServiceActions.php:73"
+        },
+        "entity_why": "primary effect row_upsert lands on this table",
+        "ref_code": "public function DoSaveContactsSyncData() : array {\n  $sPassword=$this->GetActionParam('Password','');\n  $bResult=$this->setContactsSyncData($oAccount,array('Mode'=>intval($this->GetActionParam('Mode','0')),'User'=>$this->GetActionParam('User',''),'Password'=>...,'Url'=>$this->GetActionParam('Url','')));\n  return $this->DefaultResponse($bResult);\n}"
+      },
+      "entity": "ContactsSyncConfig",
+      "_binds": {
+        "Mode": "ContactsSyncConfig.value",
+        "User": "ContactsSyncConfig.value",
+        "Url": "ContactsSyncConfig.value"
+      },
+      "_output_schema": {
+        "Result": "bool"
+      },
+      "_defaulted": [],
+      "description": "Save your CardDAV contacts-sync configuration (sync mode, user, password, server URL). The password is stored encrypted.",
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "config"
+        ],
+        "messages": {
+          "auth": "You must sign in before saving contacts sync data."
+        }
+      }
+    },
+    {
+      "tool": "actions_doadmindomainsave",
+      "op": "create",
+      "family": "crud.upsert",
+      "exec_spec": {
+        "entity": "DomainConfig",
+        "key": {
+          "name": {
+            "$arg": "name"
+          }
+        },
+        "insert_fields": [
+          "IMAP",
+          "SMTP",
+          "Sieve",
+          "whiteList"
+        ],
+        "set_on_exists": {}
+      },
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "Domain name, e.g. example.com."
+        },
+        "IMAP": {
+          "type": "json",
+          "required": false,
+          "description": "IMAP server configuration for the domain."
+        },
+        "SMTP": {
+          "type": "json",
+          "required": false,
+          "description": "SMTP server configuration for the domain."
+        },
+        "Sieve": {
+          "type": "json",
+          "required": false,
+          "description": "Sieve server configuration for the domain."
+        },
+        "whiteList": {
+          "type": "text",
+          "required": false,
+          "description": "Login whitelist for the domain."
+        }
+      },
+      "_evidence": {
+        "locator": "snappymail/v/0.0.0/app/libraries/RainLoop/Actions/AdminDomains.php:45",
+        "id_local": "Actions.DoAdminDomainSave",
+        "entry": {
+          "kind": "http",
+          "route": "POST ?/Json/0/0/",
+          "locator": "snappymail/v/0.0.0/app/libraries/RainLoop/ServiceActions.php:117"
+        },
+        "entity_why": "primary effect row_upsert lands on this table",
+        "ref_code": "public function DoAdminDomainSave() : array {\n  $this->IsAdminLoggined();\n  $oDomain=$this->DomainProvider()->LoadOrCreateNewFromAction($this);\n  return $this->DefaultResponse($oDomain?$this->DomainProvider()->Save($oDomain):false);\n}"
+      },
+      "entity": "DomainConfig",
+      "_binds": {
+        "name": "DomainConfig.name",
+        "IMAP": "DomainConfig.IMAP",
+        "SMTP": "DomainConfig.SMTP",
+        "Sieve": "DomainConfig.Sieve",
+        "whiteList": "DomainConfig.whiteList"
+      },
+      "_output_schema": {
+        "Result": "bool"
+      },
+      "guards": {
+        "required": [
+          "name"
+        ],
+        "requires_auth": true,
+        "auth_realm": "admin",
+        "messages": {
+          "auth": "Sign in to the admin panel first (sign_in_admin).",
+          "realm": "This is an admin-panel action; sign in as admin with sign_in_admin."
+        }
+      },
+      "_defaulted": [],
+      "description": "Create or update a mail domain configuration: its IMAP, SMTP and Sieve server settings and its login whitelist. Admin-only."
+    },
+    {
+      "tool": "actions_doadmindomaindelete",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "DomainConfig",
+        "lookup_by": {
+          "name": {
+            "$arg": "name"
+          }
+        },
+        "side_effect": [
+          {
+            "entity": "DomainDisabled",
+            "where": {
+              "name": {
+                "$arg": "name"
+              }
+            }
+          }
+        ]
+      },
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "Domain name to delete."
+        }
+      },
+      "_evidence": {
+        "locator": "snappymail/v/0.0.0/app/libraries/RainLoop/Actions/AdminDomains.php:29",
+        "id_local": "Actions.DoAdminDomainDelete",
+        "entry": {
+          "kind": "http",
+          "route": "POST ?/Json/0/0/",
+          "locator": "snappymail/v/0.0.0/app/libraries/RainLoop/ServiceActions.php:117"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "public function DoAdminDomainDelete() : array {\n  $this->IsAdminLoggined();\n  return $this->DefaultResponse($this->DomainProvider()->Delete($this->GetActionParam('name','')));\n}"
+      },
+      "entity": "DomainConfig",
+      "_binds": {
+        "name": "DomainConfig.name"
+      },
+      "_output_schema": {
+        "Result": "bool"
+      },
+      "guards": {
+        "required": [
+          "name"
+        ],
+        "requires_auth": true,
+        "auth_realm": "admin",
+        "messages": {
+          "auth": "Sign in to the admin panel first (sign_in_admin).",
+          "realm": "This is an admin-panel action; sign in as admin with sign_in_admin.",
+          "not_found": "No domain config with that name exists."
+        }
+      },
+      "description": "Delete a mail domain configuration and its disabled marker. Admin-only."
+    },
+    {
+      "tool": "actions_doadmindomaindisable",
+      "op": "update",
+      "family": "crud.upsert",
+      "exec_spec": {
+        "entity": "DomainDisabled",
+        "key": {
+          "name": {
+            "$arg": "name"
+          }
+        },
+        "insert_fields": {
+          "name": {
+            "$arg": "name"
+          }
+        },
+        "set_on_exists": {}
+      },
+      "input_schema": {
+        "name": "text",
+        "disabled": "bool"
+      },
+      "_evidence": {
+        "locator": "snappymail/v/0.0.0/app/libraries/RainLoop/Actions/AdminDomains.php:35",
+        "id_local": "Actions.DoAdminDomainDisable",
+        "entry": {
+          "kind": "http",
+          "route": "POST ?/Json/0/0/",
+          "locator": "snappymail/v/0.0.0/app/libraries/RainLoop/ServiceActions.php:117"
+        },
+        "entity_why": "primary effect row_upsert lands on this table",
+        "ref_code": "public function DoAdminDomainDisable() : array {\n  $this->IsAdminLoggined();\n  return $this->DefaultResponse($this->DomainProvider()->Disable((string)$this->GetActionParam('name',''),!empty($this->GetActionParam('disabled','0'))));\n}"
+      },
+      "entity": "DomainDisabled",
+      "_binds": {
+        "name": "DomainDisabled.name"
+      },
+      "_output_schema": {
+        "Result": "bool"
+      },
+      "guards": {
+        "required": [
+          "name",
+          "disabled"
+        ],
+        "requires_auth": true,
+        "auth_realm": "admin",
+        "messages": {
+          "auth": "Sign in to the admin panel first (sign_in_admin).",
+          "realm": "This is an admin-panel action; sign in as admin with sign_in_admin."
+        }
+      },
+      "_defaulted": []
+    },
+    {
+      "tool": "actions_doadmindomainlist",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "DomainConfig",
+        "search_fields": [
+          "name"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "name"
+          ]
+        },
+        "sort": {
+          "col": "name",
+          "dir": "asc"
+        },
+        "scope": {}
+      },
+      "input_schema": {
+        "includeAliases": {
+          "type": "bool",
+          "required": false,
+          "description": "Whether to include domain aliases in the list."
+        }
+      },
+      "_evidence": {
+        "locator": "snappymail/v/0.0.0/app/libraries/RainLoop/Actions/AdminDomains.php:22",
+        "id_local": "Actions.DoAdminDomainList",
+        "entry": {
+          "kind": "http",
+          "route": "POST ?/Json/0/0/",
+          "locator": "snappymail/v/0.0.0/app/libraries/RainLoop/ServiceActions.php:117"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "public function DoAdminDomainList() : array {\n  $this->IsAdminLoggined();\n  return $this->DefaultResponse($this->DomainProvider()->GetList(!empty($this->GetActionParam('includeAliases','1'))));\n}",
+        "global_why": "admin-only global directory scan (DefaultDomain.php:217); no owner column exists on DomainConfig"
+      },
+      "entity": "DomainConfig",
+      "_output_schema": {
+        "@Collection": "[Domain]"
+      },
+      "description": "List all configured mail domains (optionally including aliases). Admin-only; this is a global directory scan, not scoped to any account.",
+      "guards": {
+        "requires_auth": true,
+        "auth_realm": "admin",
+        "messages": {
+          "auth": "Sign in to the admin panel first (sign_in_admin).",
+          "realm": "This is an admin-panel action; sign in as admin with sign_in_admin."
+        }
+      }
+    },
+    {
+      "tool": "actionsadmin_doadminsettingsupdate",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "SystemConfig",
+        "row_key": {
+          "section": {
+            "$const": "webmail"
+          },
+          "key": {
+            "$const": "settings"
+          }
+        },
+        "set": {
+          "value": {
+            "$arg": "settings"
+          }
+        }
+      },
+      "input_schema": {
+        "settings": {
+          "type": "json",
+          "required": true,
+          "description": "Webmail config object, e.g. {attachment_limit: 25, contacts_enable: true}."
+        }
+      },
+      "_evidence": {
+        "locator": "snappymail/v/0.0.0/app/libraries/RainLoop/ActionsAdmin.php:44",
+        "id_local": "ActionsAdmin.DoAdminSettingsUpdate",
+        "entry": {
+          "kind": "http",
+          "route": "POST ?/Json/0/0/",
+          "locator": "snappymail/v/0.0.0/app/libraries/RainLoop/ServiceActions.php:117"
+        },
+        "entity_why": "neither effects nor id_local said; inferred SystemConfig from params.binds",
+        "ref_code": "public function DoAdminSettingsUpdate() : array {\n  $this->IsAdminLoggined(); $oConfig=$this->Config();\n  $this->setConfigFromParams($oConfig,'Theme','webmail','theme','string',...); ... $this->setConfigFromParams($oConfig,'contactsPdoDsn','contacts','pdo_dsn','string'); ...\n  return $this->DefaultResponse($oConfig->Save());\n}"
+      },
+      "entity": "SystemConfig",
+      "_binds": {
+        "attachmentLimit": "SystemConfig.value",
+        "contactsEnable": "SystemConfig.value"
+      },
+      "_output_schema": {
+        "Result": "bool"
+      },
+      "_defaulted": [],
+      "description": "Update global webmail configuration (e.g. attachment size limit, contacts support). Admin-only; the config is stored as a JSON value on the webmail config row.",
+      "guards": {
+        "requires_auth": true,
+        "auth_realm": "admin",
+        "required": [
+          "settings"
+        ],
+        "messages": {
+          "auth": "Sign in to the admin panel first (sign_in_admin).",
+          "realm": "This is an admin-panel action; sign in as admin with sign_in_admin."
+        }
+      }
+    },
+    {
+      "tool": "actionsadmin_doadminpasswordupdate",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "SystemConfig",
+        "row_key": {
+          "section": {
+            "$const": "security"
+          },
+          "key": {
+            "$const": "credentials"
+          }
+        },
+        "set": {
+          "value": {
+            "$arg": "credentials"
+          }
+        }
+      },
+      "input_schema": {
+        "credentials": {
+          "type": "json",
+          "required": true,
+          "description": "New admin credentials object: {admin_login, admin_totp, admin_password}."
+        }
+      },
+      "_evidence": {
+        "locator": "snappymail/v/0.0.0/app/libraries/RainLoop/ActionsAdmin.php:179",
+        "id_local": "ActionsAdmin.DoAdminPasswordUpdate",
+        "entry": {
+          "kind": "http",
+          "route": "POST ?/Json/0/0/",
+          "locator": "snappymail/v/0.0.0/app/libraries/RainLoop/ServiceActions.php:117"
+        },
+        "entity_why": "neither effects nor id_local said; inferred SystemConfig from params.binds",
+        "ref_code": "public function DoAdminPasswordUpdate() : array {\n  $this->IsAdminLoggined(); ...\n  if($oConfig->ValidatePassword($oPassword)){ $sLogin=trim($this->GetActionParam('Login','')); if(strlen($sLogin)){$oConfig->Set('security','admin_login',$sLogin);}\n    $oConfig->Set('security','admin_totp',$this->GetActionParam('TOTP','')); if(strlen($oNewPassword)){ $oConfig->SetPassword($oNewPassword); ... } $bResult=$oConfig->Save(); }\n  return $this->DefaultResponse($bResult?array('Weak'=>is_file($passfile)):false);\n}"
+      },
+      "entity": "SystemConfig",
+      "_binds": {
+        "Login": "SystemConfig.value",
+        "TOTP": "SystemConfig.value"
+      },
+      "_output_schema": {
+        "Result": "bool",
+        "Weak": "bool"
+      },
+      "guards": {
+        "required": [
+          "credentials"
+        ],
+        "requires_auth": true,
+        "auth_realm": "admin",
+        "messages": {
+          "auth": "Sign in to the admin panel first (sign_in_admin).",
+          "realm": "This is an admin-panel action; sign in as admin with sign_in_admin."
+        }
+      },
+      "_defaulted": [],
+      "description": "Change the admin panel credentials (login, TOTP secret and password). The new credentials are stored on the security config row. Admin-only."
+    },
+    {
+      "tool": "actions_dofiltersscriptsave",
+      "op": "create",
+      "family": "crud.upsert",
+      "exec_spec": {
+        "entity": "SieveScript",
+        "key": {
+          "account": {
+            "$session": "account_email"
+          },
+          "name": {
+            "$arg": "name"
+          }
+        },
+        "insert_fields": {
+          "body": {
+            "$arg": "body"
+          }
+        },
+        "set_on_exists": {
+          "body": {
+            "$arg": "body"
+          }
+        }
+      },
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "Script name."
+        },
+        "body": {
+          "type": "text",
+          "required": true,
+          "description": "Sieve script source."
+        }
+      },
+      "_evidence": {
+        "locator": "snappymail/v/0.0.0/app/libraries/RainLoop/Actions/Filters.php:28",
+        "id_local": "Actions.DoFiltersScriptSave",
+        "entry": {
+          "kind": "http",
+          "route": "POST ?/Json/0/0/",
+          "locator": "snappymail/v/0.0.0/app/libraries/RainLoop/ServiceActions.php:73"
+        },
+        "entity_why": "primary effect row_upsert lands on this table",
+        "ref_code": "public function DoFiltersScriptSave() : array {\n  $oAccount=$this->getAccountFromToken(); if(!$this->GetCapa(Capa::SIEVE,$oAccount)) return $this->FalseResponse();\n  $sName=$this->GetActionParam('name','');\n  return $this->DefaultResponse($this->FiltersProvider()->Save($oAccount,$sName,$this->GetActionParam('body','')));\n}"
+      },
+      "entity": "SieveScript",
+      "_output_schema": {
+        "Result": "bool"
+      },
+      "guards": {
+        "required": [
+          "name",
+          "body"
+        ],
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in before saving filters."
+        }
+      },
+      "_defaulted": [],
+      "description": "Save a Sieve filter script for your account, creating or updating it by name."
+    },
+    {
+      "tool": "actions_dofiltersscriptactivate",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "SieveScript",
+        "row_key": {
+          "account": {
+            "$session": "account_email"
+          },
+          "name": {
+            "$arg": "name"
+          }
+        },
+        "fields": [
+          "active",
+          "body"
+        ],
+        "set": {
+          "active": {
+            "$const": true
+          }
+        }
+      },
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "Script name to activate."
+        }
+      },
+      "_evidence": {
+        "locator": "snappymail/v/0.0.0/app/libraries/RainLoop/Actions/Filters.php:50",
+        "id_local": "Actions.DoFiltersScriptActivate",
+        "entry": {
+          "kind": "http",
+          "route": "POST ?/Json/0/0/",
+          "locator": "snappymail/v/0.0.0/app/libraries/RainLoop/ServiceActions.php:73"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "public function DoFiltersScriptActivate() : array {\n  $oAccount=$this->getAccountFromToken(); if(!$this->GetCapa(Capa::SIEVE,$oAccount)) return $this->FalseResponse();\n  return $this->DefaultResponse($this->FiltersProvider()->ActivateScript($oAccount,$this->GetActionParam('name','')));\n}"
+      },
+      "entity": "SieveScript",
+      "_binds": {
+        "name": "SieveScript.name"
+      },
+      "_output_schema": {
+        "Result": "bool"
+      },
+      "guards": {
+        "required": [
+          "name"
+        ],
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in before activating filters.",
+          "not_found": "No Sieve script with that name exists."
+        }
+      },
+      "_defaulted": [],
+      "description": "Activate one of your Sieve filter scripts by name."
+    },
+    {
+      "tool": "actions_dofiltersscriptdelete",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "SieveScript",
+        "lookup_by": {
+          "account": {
+            "$session": "account_email"
+          },
+          "name": {
+            "$arg": "name"
+          }
+        }
+      },
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "Script name to delete."
+        }
+      },
+      "_evidence": {
+        "locator": "snappymail/v/0.0.0/app/libraries/RainLoop/Actions/Filters.php:66",
+        "id_local": "Actions.DoFiltersScriptDelete",
+        "entry": {
+          "kind": "http",
+          "route": "POST ?/Json/0/0/",
+          "locator": "snappymail/v/0.0.0/app/libraries/RainLoop/ServiceActions.php:73"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "public function DoFiltersScriptDelete() : array {\n  $oAccount=$this->getAccountFromToken(); if(!$this->GetCapa(Capa::SIEVE,$oAccount)) return $this->FalseResponse();\n  return $this->DefaultResponse($this->FiltersProvider()->DeleteScript($oAccount,$this->GetActionParam('name','')));\n}"
+      },
+      "entity": "SieveScript",
+      "_binds": {
+        "name": "SieveScript.name"
+      },
+      "_output_schema": {
+        "Result": "bool"
+      },
+      "guards": {
+        "required": [
+          "name"
+        ],
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in before deleting filters.",
+          "not_found": "No Sieve script with that name exists."
+        }
+      },
+      "description": "Delete one of your Sieve filter scripts by name."
+    },
+    {
+      "tool": "actions_dostorepgpkey",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "PGPKey",
+        "fields": {
+          "value": {
+            "$arg": "key"
+          }
+        },
+        "set_on_create": {
+          "account": {
+            "$session": "account_email"
+          },
+          "keyid": {
+            "$arg": "keyId"
+          }
+        }
+      },
+      "input_schema": {
+        "key": {
+          "type": "json",
+          "required": true,
+          "description": "The PGP key material to store."
+        },
+        "keyId": {
+          "type": "text",
+          "required": true,
+          "description": "Key id used to address the stored key."
+        }
+      },
+      "_evidence": {
+        "locator": "snappymail/v/0.0.0/app/libraries/RainLoop/Actions/Pgp.php:283",
+        "id_local": "Actions.DoStorePGPKey",
+        "entry": {
+          "kind": "http",
+          "route": "POST ?/Json/0/0/",
+          "locator": "snappymail/v/0.0.0/app/libraries/RainLoop/ServiceActions.php:73"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "public function DoStorePGPKey() : array {\n  $key=$this->GetActionParam('key',''); $keyId=$this->GetActionParam('keyId','');\n  return $this->DefaultResponse(($key&&$keyId&&Backup::PGPKey($key,$keyId)));\n}"
+      },
+      "entity": "PGPKey",
+      "_binds": {
+        "key": "PGPKey.value",
+        "keyId": "PGPKey.keyid"
+      },
+      "_output_schema": {
+        "Result": "bool"
+      },
+      "guards": {
+        "required": [
+          "key",
+          "keyId"
+        ],
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in before storing a PGP key."
+        }
+      },
+      "_defaulted": [],
+      "description": "Store a PGP public key for your account under a key id (for backup/encryption)."
+    }
+  ],
+  "seed_state": {
+    "RainloopUser": [
+      {
+        "rl_email": "ops@snappymail.example",
+        "pw": "pw-operations",
+        "id": 1
+      },
+      {
+        "rl_email": "colleague@snappymail.example",
+        "pw": "pw-colleague",
+        "id": 2
+      }
+    ],
+    "RainloopSystem": [
+      {
+        "sys_name": "admin",
+        "value_int": 424242,
+        "id": 1
+      }
+    ],
+    "DomainConfig": [
+      {
+        "name": "example.com",
+        "IMAP": {
+          "host": "imap.example.com"
+        },
+        "SMTP": {},
+        "Sieve": {},
+        "whiteList": "",
+        "aliasName": null,
+        "id": 1
+      }
+    ],
+    "DomainDisabled": [],
+    "SystemConfig": [
+      {
+        "section": "security",
+        "key": "allow_admin_panel",
+        "value": true,
+        "id": 1
+      },
+      {
+        "section": "webmail",
+        "key": "settings",
+        "value": {},
+        "id": 2
+      },
+      {
+        "section": "security",
+        "key": "credentials",
+        "value": {},
+        "id": 3
+      }
+    ],
+    "UserSettings": [
+      {
+        "account": "ops@snappymail.example",
+        "key": "settings",
+        "value": {
+          "language": "en"
+        },
+        "id": 1
+      },
+      {
+        "account": "ops@snappymail.example",
+        "key": "settings_local",
+        "value": {},
+        "id": 2
+      },
+      {
+        "account": "colleague@snappymail.example",
+        "key": "settings",
+        "value": {
+          "language": "en"
+        },
+        "id": 3
+      }
+    ],
+    "ContactsSyncConfig": [
+      {
+        "account": "ops@snappymail.example",
+        "key": "contacts_sync",
+        "value": {
+          "Mode": 0,
+          "User": "",
+          "Url": ""
+        },
+        "id": 1
+      }
+    ],
+    "AbContact": [
+      {
+        "id": 1,
+        "id_contact": 1,
+        "id_contact_str": "c-ada-1",
+        "id_user": "ops@snappymail.example",
+        "display": "Alice Example",
+        "changed": 0,
+        "deleted": 0,
+        "etag": ""
+      },
+      {
+        "id": 2,
+        "id_contact": 2,
+        "id_contact_str": "c-ada-2",
+        "id_user": "ops@snappymail.example",
+        "display": "Bob Builder",
+        "changed": 0,
+        "deleted": 0,
+        "etag": ""
+      }
+    ],
+    "SieveScript": [
+      {
+        "account": "ops@snappymail.example",
+        "name": "main",
+        "active": true,
+        "body": "if true { keep; }",
+        "id": 1
+      }
+    ]
+  },
+  "summary": "SnappyMail is a self-hosted PHP webmail client: it authenticates against external IMAP/SMTP/Sieve/CardDAV servers and persists its own accounts, domains, contacts, settings, filter scripts and encryption keys. There are two realms behind one surface: mail users (sign_in for contacts, additional accounts, identities, settings and filter scripts) and the admin panel (sign_in_admin for domains and global config). All client state is stored as JSON blobs keyed by the account email; the admin tools are the only globally-scoped surface.",
+  "_fk_gravity": {
+    "entity": "RainloopUser",
+    "fk_count": 2
+  },
+  "_read_denied": "not_found",
+  "auth": {
+    "account_entity": "RainloopUser",
+    "username_col": "rl_email",
+    "password_col": "pw",
+    "session_fields": {
+      "account_email": "rl_email"
+    }
+  }
+}

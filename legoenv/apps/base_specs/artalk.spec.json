@@ -1,0 +1,3132 @@
+{
+  "env_id": "artalk",
+  "_prep_version": 3,
+  "entities": [
+    {
+      "name": "Site",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false,
+          "max": 255
+        },
+        {
+          "name": "urls",
+          "type": "text"
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "audit": true
+        },
+        {
+          "name": "deleted_at",
+          "type": "datetime",
+          "nullable": true,
+          "audit": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "name"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Page",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "key",
+          "type": "text",
+          "nullable": false,
+          "max": 255
+        },
+        {
+          "name": "title",
+          "type": "text"
+        },
+        {
+          "name": "admin_only",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "site_name",
+          "type": "text",
+          "nullable": false,
+          "fk_to": "Site.name",
+          "on_delete": "cascade",
+          "max": 255
+        },
+        {
+          "name": "vote_up",
+          "type": "int",
+          "default": 0
+        },
+        {
+          "name": "vote_down",
+          "type": "int",
+          "default": 0
+        },
+        {
+          "name": "pv",
+          "type": "int",
+          "default": 0
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "audit": true
+        },
+        {
+          "name": "deleted_at",
+          "type": "datetime",
+          "nullable": true,
+          "audit": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "key",
+            "site_name"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "User",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false,
+          "max": 255
+        },
+        {
+          "name": "email",
+          "type": "text",
+          "nullable": false,
+          "max": 255
+        },
+        {
+          "name": "link",
+          "type": "text"
+        },
+        {
+          "name": "password",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "badge_name",
+          "type": "text"
+        },
+        {
+          "name": "badge_color",
+          "type": "text"
+        },
+        {
+          "name": "last_ip",
+          "type": "text"
+        },
+        {
+          "name": "last_ua",
+          "type": "text"
+        },
+        {
+          "name": "is_admin",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "receive_email",
+          "type": "bool",
+          "default": true
+        },
+        {
+          "name": "token_valid_from",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "is_in_conf",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "audit": true
+        },
+        {
+          "name": "deleted_at",
+          "type": "datetime",
+          "nullable": true,
+          "audit": true
+        }
+      ]
+    },
+    {
+      "name": "AuthIdentity",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "provider",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "local",
+            "email",
+            "oauth",
+            "github"
+          ]
+        },
+        {
+          "name": "remote_uid",
+          "type": "text",
+          "nullable": false,
+          "max": 255
+        },
+        {
+          "name": "user_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "User.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "token",
+          "type": "text"
+        },
+        {
+          "name": "confirmed_at",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "expires_at",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "audit": true
+        },
+        {
+          "name": "deleted_at",
+          "type": "datetime",
+          "nullable": true,
+          "audit": true
+        }
+      ]
+    },
+    {
+      "name": "UserEmailVerify",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "email",
+          "type": "text",
+          "nullable": false,
+          "max": 255
+        },
+        {
+          "name": "code",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "expires_at",
+          "type": "datetime",
+          "nullable": false
+        },
+        {
+          "name": "ip",
+          "type": "text"
+        },
+        {
+          "name": "ua",
+          "type": "text"
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "audit": true
+        },
+        {
+          "name": "deleted_at",
+          "type": "datetime",
+          "nullable": true,
+          "audit": true
+        }
+      ]
+    },
+    {
+      "name": "Comment",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "content",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "page_key",
+          "type": "text",
+          "nullable": false,
+          "fk_to": "Page.key",
+          "on_delete": "cascade",
+          "max": 255
+        },
+        {
+          "name": "site_name",
+          "type": "text",
+          "nullable": false,
+          "fk_to": "Site.name",
+          "on_delete": "cascade",
+          "max": 255
+        },
+        {
+          "name": "user_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "User.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "is_verified",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "ua",
+          "type": "text"
+        },
+        {
+          "name": "ip",
+          "type": "text"
+        },
+        {
+          "name": "rid",
+          "type": "id",
+          "default": 0
+        },
+        {
+          "name": "is_collapsed",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "is_pending",
+          "type": "bool",
+          "enum": [
+            false,
+            true
+          ],
+          "default": false
+        },
+        {
+          "name": "is_pinned",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "vote_up",
+          "type": "int",
+          "default": 0
+        },
+        {
+          "name": "vote_down",
+          "type": "int",
+          "default": 0
+        },
+        {
+          "name": "root_id",
+          "type": "id",
+          "default": 0
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "audit": true
+        },
+        {
+          "name": "deleted_at",
+          "type": "datetime",
+          "nullable": true,
+          "audit": true
+        }
+      ],
+      "_lifecycle": {
+        "col": "is_pending",
+        "initial": false,
+        "states": [
+          false,
+          true
+        ],
+        "via": {
+          "Comment.create": {
+            "col": "is_pending",
+            "from": [
+              false
+            ],
+            "to": true
+          },
+          "Comment.update": {
+            "col": "is_pending",
+            "from": [
+              true
+            ],
+            "to": false
+          }
+        }
+      }
+    },
+    {
+      "name": "Notify",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "user_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "User.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "comment_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Comment.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "is_read",
+          "type": "bool",
+          "enum": [
+            false,
+            true
+          ],
+          "default": false
+        },
+        {
+          "name": "read_at",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "is_emailed",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "email_at",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "key",
+          "type": "text",
+          "nullable": false,
+          "max": 255
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "audit": true
+        },
+        {
+          "name": "deleted_at",
+          "type": "datetime",
+          "nullable": true,
+          "audit": true
+        }
+      ],
+      "_lifecycle": {
+        "col": "is_read",
+        "initial": false,
+        "states": [
+          false,
+          true
+        ],
+        "via": {
+          "Notify.read": {
+            "col": "is_read",
+            "from": [
+              false
+            ],
+            "to": true
+          }
+        }
+      }
+    },
+    {
+      "name": "Vote",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "target_id",
+          "type": "id",
+          "nullable": false
+        },
+        {
+          "name": "type",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "comment_up",
+            "comment_down",
+            "page_up",
+            "page_down"
+          ]
+        },
+        {
+          "name": "user_id",
+          "type": "id",
+          "fk_to": "User.id",
+          "nullable": true
+        },
+        {
+          "name": "ua",
+          "type": "text"
+        },
+        {
+          "name": "ip",
+          "type": "text"
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "audit": true
+        },
+        {
+          "name": "deleted_at",
+          "type": "datetime",
+          "nullable": true,
+          "audit": true
+        }
+      ]
+    }
+  ],
+  "tools": [
+    {
+      "tool": "comment_create",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Comment",
+        "fields": [
+          "content",
+          "rid",
+          "ua"
+        ],
+        "set_on_create": {
+          "page_key": {
+            "$arg": "page_key"
+          },
+          "site_name": {
+            "$arg": "site_name"
+          },
+          "user_id": {
+            "$ref": {
+              "entity": "User",
+              "where": {
+                "name": {
+                  "$arg": "name"
+                },
+                "email": {
+                  "$arg": "email"
+                }
+              },
+              "col": "id"
+            }
+          },
+          "is_pending": false,
+          "is_collapsed": false,
+          "is_pinned": false,
+          "is_verified": true
+        }
+      },
+      "input_schema": {
+        "name": "text",
+        "email": "text",
+        "link": "text",
+        "content": "text",
+        "rid": "int",
+        "ua": "text",
+        "page_key": "text",
+        "page_title": "text",
+        "site_name": "text"
+      },
+      "_evidence": {
+        "locator": "server/handler/comment_create.go:117",
+        "id_local": "Comment.create",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/v2/comments",
+          "locator": "server/handler/comment_create.go:66"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "comment := entity.Comment{\n Content: p.Content, PageKey: page.Key, SiteName: p.SiteName, UserID: user.ID,\n Rid: p.Rid, RootID: FindCommentRootID(p.Rid), IsPending:false, IsCollapsed:false, IsPinned:false, IsVerified:isVerified}\nif !isAdmin && app.Conf().Moderator.PendingDefault { comment.IsPending = true }\napp.Dao().CreateComment(&comment)\ngo commentCreatedJobs(app, comment, parentComment, ...)",
+        "edges": [
+          "isAllowComment: admin-only page or admin name/email requires a logged-in admin (server/handler/comment_create.go:154); token-bearing but empty user rejected",
+          "common.CheckSiteExist (server/common/site.go:13) in comment_create.go:75",
+          "parent comment must exist, share page_key, and allow reply (comment_create.go:95-107)"
+        ]
+      },
+      "entity": "Comment",
+      "_binds": {
+        "content": "Comment.content",
+        "rid": "Comment.rid",
+        "ua": "Comment.ua",
+        "page_key": "Comment.page_key",
+        "site_name": "Comment.site_name"
+      },
+      "_output_schema": {
+        "comment": "the created cooked Comment row"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Site",
+                "where": {
+                  "node": "field",
+                  "col": "name",
+                  "op": "eq",
+                  "value": {
+                    "arg": "site_name"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": false,
+        "required": [
+          "name",
+          "email",
+          "content",
+          "page_key",
+          "site_name"
+        ],
+        "messages": {
+          "auth": "You must sign in, or provide a valid name/email, to comment on an admin-only page.",
+          "precondition": "Your comment is refused: the site does not exist, or the parent comment is missing / collapsed / not approved / disallows replies, or your name/email does not match an existing account — register first.",
+          "fk": "Your name/email must match an existing account before you can post — register first."
+        }
+      },
+      "description": "Post a comment on a page, as a signed-in user or as a visitor identified by name/email (a matching user is found or created, and the session owner is recorded as the author). The site, the reply chain and moderating rules are checked before storing; on a moderator-pending site the comment is stored as pending for review. Public: no sign-in required unless the page is admin-only. Fails if the site does not exist, the parent comment is missing / collapsed / not approved / does not allow replies, or the page is admin-only and you are not the admin."
+    },
+    {
+      "tool": "comment_list",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Comment",
+        "search_fields": [
+          "content",
+          "page_key",
+          "ip",
+          "ua"
+        ],
+        "rank": {
+          "method": "substring",
+          "fields": [
+            "content",
+            "page_key",
+            "ip",
+            "ua"
+          ]
+        },
+        "pagination": {
+          "default_limit": 20
+        }
+      },
+      "input_schema": {
+        "page_key": "text",
+        "site_name": "text",
+        "limit": "int",
+        "offset": "int",
+        "flat_mode": "bool",
+        "sort_by": "text",
+        "view_only_admin": "bool",
+        "search": "text",
+        "type": "text",
+        "scope": "text",
+        "name": "text",
+        "email": "text"
+      },
+      "_evidence": {
+        "locator": "server/handler/comments_get/expose.go:24",
+        "id_local": "Comment.list",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v2/comments",
+          "locator": "server/handler/comment_list.go:60"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "scopes := GetQueryScopes(dao, opts) // page/user/site scope + SearchScope + CommonScope(no pending for non-admin)\ndao.DB().Model(&entity.Comment{}).Scopes(scopes...).Scopes(OnlyRoot if Nested).Order(GetSortSQL(...)).Offset. Limit.Find(&comments)",
+        "edges": [
+          "CheckSiteExist only when scope==page (comment_list.go:83)"
+        ]
+      },
+      "entity": "Comment",
+      "_output_schema": {
+        "comments": "list of cooked Comment rows",
+        "count": "int",
+        "roots_count": "int",
+        "page": "optional cooked Page"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Site",
+                "where": {
+                  "node": "field",
+                  "col": "name",
+                  "op": "eq",
+                  "value": {
+                    "arg": "site_name"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "page_key"
+        ],
+        "messages": {
+          "precondition": "That site does not exist. Create it with site_create first, or pass a valid site_name."
+        }
+      },
+      "description": "Search comments across a site, optionally narrowed by page, admin-view (including pending), sort, and free-text over content. Fails if the site does not exist."
+    },
+    {
+      "tool": "comment_get",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Comment",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "input_schema": {
+        "id": "int"
+      },
+      "_evidence": {
+        "locator": "server/handler/comment_get.go:28",
+        "id_local": "Comment.get",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v2/comments/{id}",
+          "locator": "server/handler/comment_get.go:28"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "comment := app.Dao().FindComment(uint(id)); if comment.IsEmpty() { 404 }\nif comment.Rid != 0 { rC := CookComment(FindComment(comment.Rid)); rC.Visible=false; replyComment=&rC }\nreturn CookComment(&comment)"
+      },
+      "entity": "Comment",
+      "_binds": {
+        "id": "Comment.id"
+      },
+      "_output_schema": {
+        "comment": "cooked Comment row",
+        "reply_comment": "optional cooked reply Comment"
+      },
+      "guards": {
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "not_found": "No comment has that id."
+        }
+      },
+      "description": "Fetch a single comment by id, with its reply-chain context when it is a reply. Public. Fails (not found) if no comment has that id."
+    },
+    {
+      "tool": "comment_update",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Comment",
+        "row_key": {
+          "id": {
+            "$arg": "id"
+          }
+        },
+        "fields": [
+          "content",
+          "is_collapsed",
+          "is_pinned",
+          "is_pending"
+        ],
+        "set": {
+          "site_name": {
+            "$arg": "site_name"
+          },
+          "page_key": {
+            "$arg": "page_key"
+          },
+          "rid": {
+            "$arg": "rid"
+          }
+        }
+      },
+      "input_schema": {
+        "id": "int",
+        "site_name": "text",
+        "content": "text",
+        "page_key": "text",
+        "nick": "text",
+        "email": "text",
+        "link": "text",
+        "rid": "int",
+        "ua": "text",
+        "ip": "text",
+        "is_collapsed": "bool",
+        "is_pending": "bool",
+        "is_pinned": "bool"
+      },
+      "_evidence": {
+        "locator": "server/handler/comment_update.go:83",
+        "id_local": "Comment.update",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /api/v2/comments/{id}",
+          "locator": "server/handler/comment_update.go:83"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "comment := FindComment(id); if p.Content != \"\" { comment.Content = p.Content }\nuser,_ := FindCreateUser(p.Nick, p.Email, p.Link); if user.ID != comment.UserID { comment.UserID = user.ID }\ncomment.IsCollapsed=p.IsCollapsed; comment.IsPinned=p.IsPinned\nif p.IsPending != comment.IsPending { comment.IsPending = p.IsPending; if !comment.IsPending { renotifyWhenPendingModified(app,&comment) } }\napp.Dao().UpdateComment(&comment)",
+        "edges": [
+          "common.AdminGuard (server/common/check.go:14) via route registration in server/server.go admin()",
+          "CheckSiteExist (comment_update.go:96)"
+        ]
+      },
+      "entity": "Comment",
+      "_binds": {
+        "id": "Comment.id",
+        "site_name": "Comment.site_name",
+        "content": "Comment.content",
+        "page_key": "Comment.page_key",
+        "rid": "Comment.rid",
+        "ua": "Comment.ua",
+        "ip": "Comment.ip",
+        "is_collapsed": "Comment.is_collapsed",
+        "is_pending": "Comment.is_pending",
+        "is_pinned": "Comment.is_pinned"
+      },
+      "_output_schema": {
+        "comment": "updated cooked Comment row"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "is_admin",
+                      "op": "eq",
+                      "value": true
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            },
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Site",
+                "where": {
+                  "node": "field",
+                  "col": "name",
+                  "op": "eq",
+                  "value": {
+                    "arg": "site_name"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "id",
+          "site_name",
+          "is_pending"
+        ],
+        "messages": {
+          "auth": "You must sign in as an admin to moderate comments.",
+          "precondition": "Only an admin can moderate comments.",
+          "not_found": "No comment has that id."
+        }
+      },
+      "description": "Admin edit an existing comment: rewrite content, reassign its author, toggle collapsed/pinned, or move it between pending and approved — refusing an approval (is_pending true->false) alerts the affected users. Requires sign-in as admin and that the site exists. Fails if the comment id does not exist."
+    },
+    {
+      "tool": "comment_delete",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "Comment",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "input_schema": {
+        "id": "int"
+      },
+      "_evidence": {
+        "locator": "server/handler/comment_delete.go:29",
+        "id_local": "Comment.delete",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/v2/comments/{id}",
+          "locator": "server/handler/comment_delete.go:29"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "comment := app.Dao().FindComment(uint(id)); if comment.IsEmpty(){404}\napp.Dao().DelComment(&comment)  // deletes Notify(comment_id=id) + Vote(target_id & comment_*) + the comment\napp.Dao().DelCommentChildren(comment.ID)  // recursively delete descendants",
+        "edges": [
+          "common.AdminGuard (server/common/check.go:14) via route registration in server/server.go admin()"
+        ]
+      },
+      "entity": "Comment",
+      "_binds": {
+        "id": "Comment.id"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "is_admin",
+                      "op": "eq",
+                      "value": true
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must sign in as an admin to moderate comments.",
+          "precondition": "Only an admin can moderate comments.",
+          "not_found": "No comment has that id."
+        }
+      },
+      "description": "Delete a comment and, recursively, all of its replies plus the notify/vote rows referencing them. Admin-only. Fails if no comment has that id."
+    },
+    {
+      "tool": "site_create",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Site",
+        "fields": [
+          "name"
+        ],
+        "set_on_create": {
+          "urls": {
+            "$arg": "urls"
+          }
+        },
+        "unique_on": [
+          "name"
+        ]
+      },
+      "input_schema": {
+        "name": "text",
+        "urls": "json"
+      },
+      "_evidence": {
+        "locator": "server/handler/site_create.go:44",
+        "id_local": "Site.create",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/v2/sites",
+          "locator": "server/handler/site_create.go:44"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "if !app.Dao().FindSite(p.Name).IsEmpty() { 400 already exists }\nsite := entity.Site{Name: p.Name}; site.Urls = strings.Join(p.Urls, \",\")\napp.Dao().CreateSite(&site)",
+        "edges": [
+          "common.AdminGuard (server/common/check.go:14) via route registration in server/server.go admin()"
+        ]
+      },
+      "entity": "Site",
+      "_binds": {
+        "name": "Site.name"
+      },
+      "_output_schema": {
+        "site": "cooked Site"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "is_admin",
+                      "op": "eq",
+                      "value": true
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "name",
+          "urls"
+        ],
+        "messages": {
+          "auth": "You must sign in as an admin.",
+          "precondition": "Only an admin can perform this action.",
+          "unique": "That name (or name+email) is already taken."
+        }
+      },
+      "description": "Create a site with a unique name plus a list of URLs. Admin-only. Fails if a site with that name already exists."
+    },
+    {
+      "tool": "site_list",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Site",
+        "rank": {
+          "method": "exact"
+        }
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "server/handler/site_list.go:30",
+        "id_local": "Site.list",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v2/sites",
+          "locator": "server/handler/site_list.go:30"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "sites := app.Dao().FindAllSitesCooked(); return RespData(c, SiteList{Sites: sites, Count: len(sites)})",
+        "edges": [
+          "common.AdminGuard (server/common/check.go:14) via route registration in server/server.go admin()"
+        ]
+      },
+      "entity": "Site",
+      "_output_schema": {
+        "sites": "list of cooked Sites",
+        "count": "int"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "is_admin",
+                      "op": "eq",
+                      "value": true
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in as an admin.",
+          "precondition": "Only an admin can perform this action."
+        }
+      },
+      "description": "List every site (name and its URL list). Admin-only."
+    },
+    {
+      "tool": "site_update",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Site",
+        "row_key": {
+          "id": {
+            "$arg": "id"
+          }
+        },
+        "fields": [
+          "name"
+        ],
+        "set": {
+          "urls": {
+            "$arg": "urls"
+          }
+        }
+      },
+      "input_schema": {
+        "id": "int",
+        "name": "text",
+        "urls": "json"
+      },
+      "_evidence": {
+        "locator": "server/handler/site_update.go:49",
+        "id_local": "Site.update",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /api/v2/sites/{id}",
+          "locator": "server/handler/site_update.go:49"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "site := FindSiteByID(id); if site.IsEmpty(){404}; modifyName := p.Name != site.Name\nif modifyName { for _,comment := range comments {comment.SiteName=p.Name; UpdateComment(&comment)}; for _,page := range pages {page.SiteName=p.Name; UpdatePage(&page)} }\nsite.Name = p.Name; site.Urls = strings.Join(p.Urls, \",\"); app.Dao().UpdateSite(&site)",
+        "edges": [
+          "common.AdminGuard (server/common/check.go:14) via route registration in server/server.go admin()"
+        ]
+      },
+      "entity": "Site",
+      "_binds": {
+        "id": "Site.id",
+        "name": "Site.name"
+      },
+      "_output_schema": {
+        "site": "cooked Site"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "is_admin",
+                      "op": "eq",
+                      "value": true
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "id",
+          "name",
+          "urls"
+        ],
+        "messages": {
+          "auth": "You must sign in as an admin.",
+          "precondition": "Only an admin can perform this action.",
+          "not_found": "That record no longer exists."
+        }
+      },
+      "description": "Rename a site and/or replace its URL list. Admin-only. Renaming cascades the new name onto every page and comment under it. Fails if the site id does not exist."
+    },
+    {
+      "tool": "site_delete",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "Site",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "input_schema": {
+        "id": "int"
+      },
+      "_evidence": {
+        "locator": "server/handler/site_delete.go:26",
+        "id_local": "Site.delete",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/v2/sites/{id}",
+          "locator": "server/handler/site_delete.go:26"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "site := FindSiteByID(id); if site.IsEmpty(){404}\napp.Dao().DelSite(&site)  // deletes Site, then all Pages with site_name (each DelPage cascades comments+votes)",
+        "edges": [
+          "common.AdminGuard (server/common/check.go:14) via route registration in server/server.go admin()"
+        ]
+      },
+      "entity": "Site",
+      "_binds": {
+        "id": "Site.id"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "is_admin",
+                      "op": "eq",
+                      "value": true
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must sign in as an admin.",
+          "precondition": "Only an admin can perform this action.",
+          "not_found": "That record no longer exists."
+        }
+      },
+      "description": "Delete a site and cascade away every page, comment and vote that lives under it. Admin-only. Fails if the site id does not exist."
+    },
+    {
+      "tool": "page_list",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Page",
+        "search_fields": [
+          "key",
+          "title"
+        ],
+        "rank": {
+          "method": "substring",
+          "fields": [
+            "key",
+            "title"
+          ]
+        },
+        "pagination": {
+          "default_limit": 20
+        }
+      },
+      "input_schema": {
+        "site_name": "text",
+        "limit": "int",
+        "offset": "int",
+        "search": "text"
+      },
+      "_evidence": {
+        "locator": "server/handler/page_list.go:34",
+        "id_local": "Page.list",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v2/pages",
+          "locator": "server/handler/page_list.go:34"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "q := app.Dao().DB().Model(&entity.Page{}).Order(\"created_at DESC\")\nif p.SiteName != \"\" { CheckSiteExist; q = q.Where(\"site_name = ?\", p.SiteName) }\nif p.Search != \"\" { q = q.Where(\"LOWER(key) LIKE LOWER(?) OR LOWER(title) LIKE LOWER(?)\", ...) }",
+        "edges": [
+          "common.AdminGuard (server/common/check.go:14) via route registration in server/server.go admin()"
+        ]
+      },
+      "entity": "Page",
+      "_output_schema": {
+        "count": "int",
+        "pages": "list of cooked Page rows"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "is_admin",
+                      "op": "eq",
+                      "value": true
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in as an admin.",
+          "precondition": "Only an admin can perform this action."
+        }
+      },
+      "description": "List pages within a site, newest first, optionally filtered by free-text key/title. Admin-only. Fails if the site does not exist."
+    },
+    {
+      "tool": "page_pv",
+      "op": "action",
+      "family": "crud.upsert",
+      "exec_spec": {
+        "entity": "Page",
+        "key": {
+          "key": {
+            "$arg": "page_key"
+          },
+          "site_name": {
+            "$arg": "site_name"
+          }
+        },
+        "insert_fields": {
+          "key": {
+            "$arg": "page_key"
+          },
+          "site_name": {
+            "$arg": "site_name"
+          },
+          "title": {
+            "$arg": "page_title"
+          }
+        },
+        "set_on_exists": {}
+      },
+      "input_schema": {
+        "page_key": "text",
+        "page_title": "text",
+        "site_name": "text",
+        "key": "text"
+      },
+      "_evidence": {
+        "locator": "server/handler/page_pv.go:38",
+        "id_local": "Page.pv",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/v2/pages/pv",
+          "locator": "server/handler/page_pv.go:38"
+        },
+        "entity_why": "primary effect row_upsert lands on this table",
+        "ref_code": "page := app.Dao().FindCreatePage(p.PageKey, p.PageTitle, p.SiteName) // find else create\npage.PV++; app.Dao().UpdatePage(&page); return PV",
+        "edges": [
+          "site existence implied by FindCreatePage keyed on site_name (page_pv.go)"
+        ]
+      },
+      "entity": "Page",
+      "_binds": {
+        "page_key": "Page.key",
+        "site_name": "Page.site_name"
+      },
+      "_output_schema": {
+        "pv": "int",
+        "page": "cooked Page or equivalent"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Site",
+                "where": {
+                  "node": "field",
+                  "col": "name",
+                  "op": "eq",
+                  "value": {
+                    "arg": "site_name"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "page_key"
+        ],
+        "messages": {
+          "precondition": "The site does not exist.",
+          "not_found": "The page could not be created."
+        }
+      },
+      "_defaulted": [
+        "fields (mapped to the real parameter names via binds)"
+      ],
+      "description": "Ensure the page (page_key, site_name) exists for pageview tracking, creating it first with the given title if absent, and return its current view count. This is the embed's pageview hook; it registers the page so later comments attach to it. Fails if the site does not exist."
+    },
+    {
+      "tool": "page_update",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Page",
+        "row_key": {
+          "id": {
+            "$arg": "id"
+          }
+        },
+        "fields": [
+          "title",
+          "admin_only"
+        ],
+        "set": {
+          "key": {
+            "$arg": "key"
+          }
+        }
+      },
+      "input_schema": {
+        "id": "int",
+        "site_name": "text",
+        "key": "text",
+        "title": "text",
+        "admin_only": "bool"
+      },
+      "_evidence": {
+        "locator": "server/handler/page_update.go:54",
+        "id_local": "Page.update",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /api/v2/pages/{id}",
+          "locator": "server/handler/page_update.go:54"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "page := FindPageByID(id); if page.IsEmpty(){404}\nmodifyKey := p.Key != page.Key; if modifyKey && !FindPage(p.Key, page.SiteName).IsEmpty() { 400 exists }\nif modifyKey { for _,comment := range comments {comment.PageKey = p.Key; UpdateComment(&comment)}; page.Key = p.Key }\npage.Title=p.Title; page.AdminOnly=p.AdminOnly; app.Dao().UpdatePage(&page)",
+        "edges": [
+          "common.AdminGuard (server/common/check.go:14) via route registration in server/server.go admin()",
+          "CheckSiteExist (page_update.go:64)"
+        ]
+      },
+      "entity": "Page",
+      "_binds": {
+        "id": "Page.id",
+        "site_name": "Page.site_name",
+        "key": "Page.key",
+        "title": "Page.title",
+        "admin_only": "Page.admin_only"
+      },
+      "_output_schema": {
+        "page": "cooked Page"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "is_admin",
+                      "op": "eq",
+                      "value": true
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            },
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Site",
+                "where": {
+                  "node": "field",
+                  "col": "name",
+                  "op": "eq",
+                  "value": {
+                    "arg": "site_name"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "id",
+          "site_name",
+          "key",
+          "title",
+          "admin_only"
+        ],
+        "messages": {
+          "auth": "You must sign in as an admin.",
+          "precondition": "Only an admin can perform this action.",
+          "not_found": "That record no longer exists."
+        }
+      },
+      "description": "Admin edit a page: change its key (cascading to its comments), its title, or the admin-only flag. Fails if the page id does not exist or the new key is already taken in the site."
+    },
+    {
+      "tool": "page_delete",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "Page",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "input_schema": {
+        "id": "int"
+      },
+      "_evidence": {
+        "locator": "server/handler/page_delete.go:26",
+        "id_local": "Page.delete",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/v2/pages/{id}",
+          "locator": "server/handler/page_delete.go:26"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "page := FindPageByID(id); if page.IsEmpty(){404}\napp.Dao().DelPage(&page)  // deletes Page + all Comments(page_key,site_name) + page Votes",
+        "edges": [
+          "common.AdminGuard (server/common/check.go:14) via route registration in server/server.go admin()"
+        ]
+      },
+      "entity": "Page",
+      "_binds": {
+        "id": "Page.id"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "is_admin",
+                      "op": "eq",
+                      "value": true
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must sign in as an admin.",
+          "precondition": "Only an admin can perform this action.",
+          "not_found": "That record no longer exists."
+        }
+      },
+      "description": "Delete a page and every comment and page-vote under it. Admin-only. Fails if the page id does not exist."
+    },
+    {
+      "tool": "sign_in",
+      "op": "action",
+      "family": "guard.auth",
+      "exec_spec": {
+        "verify": {
+          "entity": "User",
+          "username_col": "email",
+          "password_col": "password"
+        }
+      },
+      "input_schema": {
+        "name": "text",
+        "email": "text",
+        "password": "text"
+      },
+      "_evidence": {
+        "locator": "server/handler/user_login.go:56",
+        "id_local": "User.login",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/v2/user/access_token",
+          "locator": "server/handler/user_login.go:56"
+        },
+        "entity_why": "primary effect auth lands on this table",
+        "ref_code": "if p.Name == \"\" { users := FindUsersByEmail(p.Email); if len==1 user=users[0]; else if >1 {400 need_name_select} }\nelse { user = FindUser(p.Name, p.Email) }; if user.IsEmpty(){401}\nif !user.CheckPassword(p.Password) {401};\njwtToken,_ := common.LoginGetUserToken(user, AppKey, LoginTimeout)",
+        "edges": [
+          "user found by email/name, password verified (user_login.go)"
+        ]
+      },
+      "entity": "User",
+      "_binds": {
+        "email": "User.email"
+      },
+      "_output_schema": {
+        "token": "JWT",
+        "user": "cooked User"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "email",
+                  "op": "eq",
+                  "value": {
+                    "arg": "email"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "email",
+          "password"
+        ],
+        "messages": {
+          "precondition": "No account has that email.",
+          "auth": "Sign-in failed: check your password."
+        }
+      },
+      "description": "Sign in with an account email and password. Every admin tool requires this first; the session it opens is what $actor resolves to. Fails if no account has that email or the password is wrong."
+    },
+    {
+      "tool": "user_create",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "User",
+        "fields": [
+          "name",
+          "email",
+          "link",
+          "is_admin",
+          "receive_email",
+          "badge_name",
+          "badge_color"
+        ],
+        "set_on_create": {
+          "password": {
+            "$arg": "password"
+          }
+        }
+      },
+      "input_schema": {
+        "name": "text",
+        "email": "text",
+        "password": "text",
+        "link": "text",
+        "is_admin": "bool",
+        "receive_email": "bool",
+        "badge_name": "text",
+        "badge_color": "text"
+      },
+      "_evidence": {
+        "locator": "server/handler/user_create.go:53",
+        "id_local": "User.create",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/v2/users",
+          "locator": "server/handler/user_create.go:53"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "if !FindUser(p.Name, p.Email).IsEmpty() { 400 exists }\nuser := entity.User{ Name:p.Name, Email:p.Email, Link:p.Link, IsAdmin:p.IsAdmin, ReceiveEmail:p.ReceiveEmail, BadgeName, BadgeColor }\nif p.Password != \"\" { user.SetPasswordEncrypt(p.Password) } // sets password + token_valid_from=now\napp.Dao().CreateUser(&user)",
+        "edges": [
+          "common.AdminGuard (server/common/check.go:14) via route registration in server/server.go admin()",
+          "duplicate name+email rejected (user_create.go) / login requires existing user"
+        ]
+      },
+      "entity": "User",
+      "_binds": {
+        "name": "User.name",
+        "email": "User.email",
+        "link": "User.link",
+        "is_admin": "User.is_admin",
+        "receive_email": "User.receive_email",
+        "badge_name": "User.badge_name",
+        "badge_color": "User.badge_color"
+      },
+      "_output_schema": {
+        "user": "cooked User for admin"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "is_admin",
+                      "op": "eq",
+                      "value": true
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "name",
+          "email",
+          "is_admin",
+          "receive_email"
+        ],
+        "messages": {
+          "auth": "You must sign in as an admin.",
+          "precondition": "Only an admin can perform this action.",
+          "unique": "That name (or name+email) is already taken."
+        }
+      },
+      "description": "Admin create a user account, optionally promoting it to admin or setting email/badge fields; a password enables that user to sign in. Fails if a user with the same name+email already exists."
+    },
+    {
+      "tool": "user_list",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "User",
+        "search_fields": [
+          "name",
+          "email",
+          "badge_name",
+          "last_ip"
+        ],
+        "rank": {
+          "method": "substring",
+          "fields": [
+            "name",
+            "email",
+            "badge_name",
+            "last_ip"
+          ]
+        },
+        "pagination": {
+          "default_limit": 20
+        }
+      },
+      "input_schema": {
+        "type": "text",
+        "limit": "int",
+        "offset": "int",
+        "search": "text"
+      },
+      "_evidence": {
+        "locator": "server/handler/user_list.go:49",
+        "id_local": "User.list",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v2/users/{type}",
+          "locator": "server/handler/user_list.go:49"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "q := DB().Model(&entity.User{}).Order(\"created_at DESC\")\nif listType==\"admin\" { q=q.Where(\"is_admin = ?\", true) } else if \"in_conf\" { q=q.Where(\"is_in_conf = ?\", true) }\nif p.Search != \"\" { q = q.Where(\"LOWER(name) LIKE ? OR LOWER(email) LIKE ? OR badge_name = ? OR last_ip = ?\", ...) }",
+        "edges": [
+          "common.AdminGuard (server/common/check.go:14) via route registration in server/server.go admin()"
+        ]
+      },
+      "entity": "User",
+      "_output_schema": {
+        "count": "int",
+        "users": "list of cooked Users for admin"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "is_admin",
+                      "op": "eq",
+                      "value": true
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in as an admin.",
+          "precondition": "Only an admin can perform this action."
+        }
+      },
+      "description": "List users, filtered to admins or conf-flag users, with free-text search. Admin-only."
+    },
+    {
+      "tool": "user_update",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "User",
+        "row_key": {
+          "id": {
+            "$arg": "id"
+          }
+        },
+        "fields": [
+          "name",
+          "email",
+          "link",
+          "is_admin",
+          "receive_email",
+          "badge_name",
+          "badge_color"
+        ]
+      },
+      "input_schema": {
+        "id": "int",
+        "name": "text",
+        "email": "text",
+        "password": "text",
+        "link": "text",
+        "is_admin": "bool",
+        "receive_email": "bool",
+        "badge_name": "text",
+        "badge_color": "text"
+      },
+      "_evidence": {
+        "locator": "server/handler/user_update.go:62",
+        "id_local": "User.update",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /api/v2/users/{id}",
+          "locator": "server/handler/user_update.go:62"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "user := FindUserByID(id); if user.IsEmpty(){404}\nif modifyName && modifyEmail && !FindUser(p.Name,p.Email).IsEmpty() { 400 exists }\nuser.Name=p.Name; user.Email=p.Email\nif p.Password != \"\" { user.SetPasswordEncrypt(p.Password) }\nuser.Link=p.Link; user.IsAdmin=p.IsAdmin; user.ReceiveEmail=p.ReceiveEmail; user.BadgeName; user.BadgeColor\napp.Dao().UpdateUser(&user)",
+        "edges": [
+          "common.AdminGuard (server/common/check.go:14) via route registration in server/server.go admin()"
+        ]
+      },
+      "entity": "User",
+      "_binds": {
+        "id": "User.id",
+        "name": "User.name",
+        "email": "User.email",
+        "link": "User.link",
+        "is_admin": "User.is_admin",
+        "receive_email": "User.receive_email",
+        "badge_name": "User.badge_name",
+        "badge_color": "User.badge_color"
+      },
+      "_output_schema": {
+        "user": "cooked User for admin"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "is_admin",
+                      "op": "eq",
+                      "value": true
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "id",
+          "name",
+          "email",
+          "is_admin",
+          "receive_email"
+        ],
+        "messages": {
+          "auth": "You must sign in as an admin.",
+          "precondition": "Only an admin can perform this action.",
+          "not_found": "That record no longer exists."
+        }
+      },
+      "description": "Admin edit a user's name, email, link, is_admin, email preference or badge; optionally reset the password. Fails if a different user already holds the new name+email, or the id does not exist."
+    },
+    {
+      "tool": "user_delete",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "User",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        },
+        "on_child": "detach"
+      },
+      "input_schema": {
+        "id": "int"
+      },
+      "_evidence": {
+        "locator": "server/handler/user_delete.go:26",
+        "id_local": "User.delete",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/v2/users/{id}",
+          "locator": "server/handler/user_delete.go:26"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "user := FindUserByID(id); if user.IsEmpty(){404}\napp.Dao().DelUser(&user)  // delete User + all its Comments (+children) + its AuthIdentities",
+        "edges": [
+          "common.AdminGuard (server/common/check.go:14) via route registration in server/server.go admin()"
+        ]
+      },
+      "entity": "User",
+      "_binds": {
+        "id": "User.id"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "is_admin",
+                      "op": "eq",
+                      "value": true
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must sign in as an admin.",
+          "precondition": "Only an admin can perform this action.",
+          "not_found": "That record no longer exists."
+        }
+      },
+      "description": "Delete a user and everything they own: their comments (with replies) and auth identities. Admin-only. Fails if the id does not exist."
+    },
+    {
+      "tool": "user_self",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "User",
+        "lookup_by": {
+          "id": {
+            "$session": "account_id"
+          }
+        },
+        "scope": {
+          "owner_col": "id"
+        }
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "server/handler/user_info.go:48",
+        "id_local": "User.info",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v2/user",
+          "locator": "server/handler/user_info.go:48"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "user, err := common.GetUserByReq(app, c); isLogin := !user.IsEmpty()\nif ErrTokenNotProvided { user = FindUser(p.Name, p.Email) }; if user.IsEmpty(){ return nil }\nunreadNotifies := CookAllNotifies(FindUnreadNotifies(user.ID))"
+      },
+      "entity": "Notify",
+      "_output_schema": {
+        "user": "cooked User or null",
+        "is_login": "bool",
+        "notifies": "list of cooked unread Notifies",
+        "notifies_count": "int"
+      },
+      "description": "Fetch the signed-in user's own account row. Fails if you are not signed in.",
+      "_defaulted": [
+        "family (retyped: user_info is a self-fetch crud.read, not a search; pre-pass entity was wrongly Notify)"
+      ],
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in to view your own account."
+        }
+      }
+    },
+    {
+      "tool": "user_self_update",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "User",
+        "row_key": {
+          "id": {
+            "$session": "account_id"
+          }
+        },
+        "fields": [
+          "name",
+          "email",
+          "link"
+        ]
+      },
+      "input_schema": {
+        "email": {
+          "type": "text",
+          "required": true,
+          "description": "The user's new email. Changing it requires a matching email-verify code (obtained via auth_send_email_code)."
+        },
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "The user's new display name."
+        },
+        "link": {
+          "type": "text",
+          "required": false,
+          "description": "The user's website URL."
+        },
+        "code": {
+          "type": "text",
+          "required": false,
+          "description": "Email-verify code for the address; required only when changing email."
+        }
+      },
+      "_evidence": {
+        "locator": "server/handler/user_info_update.go:48",
+        "id_local": "User.info_update",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/v2/user",
+          "locator": "server/handler/user_info_update.go:48"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "if p.Name != user.Name { check exists; user.Name = p.Name }\nif p.Email != user.Email { CheckEmailVerifyCode(app,c,p.Email,p.Code); user.Email = p.Email }\nif p.Link != \"\" { user.Link = p.Link }; app.Dao().UpdateUser(&user)",
+        "edges": [
+          "common.LoginGuard (server/common/check.go:24) via route registration",
+          "CheckEmailVerifyCode required to change email (user_info_update.go:96)"
+        ]
+      },
+      "entity": "User",
+      "_binds": {
+        "email": "User.email",
+        "name": "User.name",
+        "link": "User.link"
+      },
+      "_output_schema": {
+        "user": "cooked User"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "email",
+          "name"
+        ],
+        "messages": {
+          "auth": "You must be signed in to edit your account.",
+          "precondition": "A valid email-verify code is required to change your email.",
+          "not_found": "You do not have an account."
+        }
+      },
+      "description": "The signed-in user edits their own name, email and link. Changing the email requires a matching email-verify code (from auth_send_email_code). Fails if the new name is taken or the verify code is missing/invalid."
+    },
+    {
+      "tool": "user_status",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "User",
+        "lookup_by": {
+          "id": {
+            "$session": "account_id"
+          }
+        },
+        "scope": {
+          "owner_col": "id"
+        }
+      },
+      "input_schema": {
+        "name": "text",
+        "email": "text"
+      },
+      "_evidence": {
+        "locator": "server/handler/user_status.go:38",
+        "id_local": "User.status",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v2/user/status",
+          "locator": "server/handler/user_status.go:38"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "if p.Email != \"\" && p.Name != \"\" { isAdmin = dao.IsAdminUserByNameEmail(p.Name, p.Email) }\nreturn {IsAdmin: isAdmin, IsLogin: CheckIsAdminReq(app, c)}"
+      },
+      "entity": "User",
+      "_output_schema": {
+        "is_admin": "bool",
+        "is_login": "bool"
+      },
+      "description": "Report whether the request is signed in and whether the named user is an admin. Public."
+    },
+    {
+      "tool": "notify_list",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Notify",
+        "scope": {
+          "owner_col": "user_id"
+        },
+        "search_fields": [
+          "user_id",
+          "is_read"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "user_id",
+            "is_read"
+          ]
+        }
+      },
+      "input_schema": {
+        "name": "text",
+        "email": "text"
+      },
+      "_evidence": {
+        "locator": "server/handler/notify_list.go:36",
+        "id_local": "Notify.list",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v2/notifies",
+          "locator": "server/handler/notify_list.go:36"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "if p.Name != \"\" && p.Email != \"\" { user = FindUser(p.Name, p.Email) }\nif !user.IsEmpty() { notifies = CookAllNotifies(FindUnreadNotifies(user.ID)) }"
+      },
+      "entity": "Notify",
+      "_output_schema": {
+        "notifies": "list of cooked unread Notifies",
+        "count": "int"
+      },
+      "description": "List the signed-in (or name/email-identified) user's unread notifications. Public."
+    },
+    {
+      "tool": "notify_read",
+      "op": "update",
+      "family": "update.status_transition",
+      "exec_spec": {
+        "entity": "Notify",
+        "row_key": {
+          "comment_id": {
+            "$arg": "comment_id"
+          },
+          "key": {
+            "$arg": "notify_key"
+          }
+        },
+        "status_col": "is_read",
+        "from": [
+          false
+        ],
+        "to": true
+      },
+      "input_schema": {
+        "comment_id": "int",
+        "notify_key": "text"
+      },
+      "_evidence": {
+        "locator": "server/handler/notify_read.go:35",
+        "id_local": "Notify.read",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/v2/notifies/{comment_id}/{notify_key}",
+          "locator": "server/handler/notify_read.go:35"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "notify := app.Dao().FindNotifyForComment(uint(commentID), notifyKey)\nif notify.IsEmpty(){404}; if notify.IsRead { return }\napp.Dao().NotifySetRead(&notify) // is_read=true, read_at=now"
+      },
+      "entity": "Notify",
+      "_binds": {
+        "comment_id": "Notify.comment_id",
+        "notify_key": "Notify.key"
+      },
+      "_output_schema": {},
+      "guards": {
+        "required": [
+          "comment_id",
+          "notify_key"
+        ]
+      },
+      "description": "Mark a single notification as read (is_read true, read_at now), addressed by its comment and notify key. Public. A no-op if the notification is already read."
+    },
+    {
+      "tool": "vote_get",
+      "op": "read",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Vote",
+        "search_fields": [
+          "ip",
+          "target_id",
+          "type"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "ip",
+            "target_id",
+            "type"
+          ]
+        }
+      },
+      "input_schema": {
+        "target_name": "text",
+        "target_id": "int"
+      },
+      "_evidence": {
+        "locator": "server/handler/vote.go:49",
+        "id_local": "Vote.get",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v2/votes/{target_name}/{target_id}",
+          "locator": "server/handler/vote.go:49"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "switch targetName { case \"comment\": if FindComment(tid).IsEmpty(){404}; case \"page\": if FindPageByID(tid).IsEmpty(){404} }\nresult.Up, result.Down = GetVoteNumUpDown(targetName, tid)\nexists := getExistsVotesByIP(dao, c.IP(), targetName, tid)  // type LIKE targetName% AND target_id AND ip",
+        "edges": [
+          "vote.go:55 FindComment empty -> 404"
+        ]
+      },
+      "entity": "Vote",
+      "_output_schema": {
+        "up": "int",
+        "down": "int",
+        "is_up": "bool",
+        "is_down": "bool"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Comment",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "target_id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "target_name",
+          "target_id"
+        ],
+        "messages": {
+          "precondition": "That comment or page does not exist — pass a target_id that resolves to a real comment or page."
+        }
+      },
+      "description": "Read the current up/down tally for a comment or page, plus whether this visitor already voted each way. Public. Fails if the target does not exist."
+    },
+    {
+      "tool": "vote_create",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Vote",
+        "fields": [
+          "target_id",
+          "type",
+          "ip",
+          "ua"
+        ],
+        "set_on_create": {
+          "user_id": {
+            "$ref": {
+              "entity": "User",
+              "where": {
+                "name": {
+                  "$arg": "name"
+                },
+                "email": {
+                  "$arg": "email"
+                }
+              },
+              "col": "id"
+            }
+          }
+        }
+      },
+      "input_schema": {
+        "type": {
+          "type": "text",
+          "required": true,
+          "description": "The vote type, one of comment_up, comment_down, page_up, page_down."
+        },
+        "target_id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the comment or page being voted on."
+        },
+        "name": {
+          "type": "text",
+          "required": false,
+          "description": "Optional account name; when given with email, attributes the vote to that user."
+        },
+        "email": {
+          "type": "text",
+          "required": false,
+          "description": "Optional account email for vote attribution."
+        },
+        "ua": {
+          "type": "text",
+          "required": false,
+          "description": "User agent string recorded on the vote."
+        },
+        "ip": {
+          "type": "text",
+          "required": false,
+          "description": "IP address recorded on the vote."
+        }
+      },
+      "_evidence": {
+        "locator": "server/handler/vote.go:105",
+        "id_local": "Vote.create",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/v2/votes/{target_name}/{target_id}/{choice}",
+          "locator": "server/handler/vote.go:105"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "err := tx.Transaction(func(tx){\n  tx.Clauses(Locking UPDATE).First(&comment|&page, targetID) // lock target row\n  find existingVotes (type IN ... AND target_id AND ip)\n  if len>0 { tx.Unscoped().Delete(&existingVotes); if selectedChoice==existingChoice { selectedChoice=\"\" } }  // toggle\n  if selectedChoice!=\"\" { tx.Create(&vote{TargetID, Type: targetName+\"_\"+selectedChoice, UserID, UA, IP}) }\n  recount up/down; tx.Model(&comment|&page).Updates(vote_up, vote_down)\n})",
+        "edges": [
+          "vote.go:126 FindComment(targetID) empty -> 404",
+          "vote.go:128 FindPageByID empty -> 404"
+        ]
+      },
+      "entity": "Vote",
+      "_output_schema": {
+        "up": "int",
+        "down": "int",
+        "is_up": "bool",
+        "is_down": "bool"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Comment",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "target_id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Page",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "target_id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "type",
+          "target_id"
+        ],
+        "messages": {
+          "precondition": "That comment or page does not exist.",
+          "fk": "The target comment or page does not exist."
+        }
+      },
+      "_defaulted": [
+        "argument invented from the write column",
+        "fields"
+      ],
+      "description": "Cast up or down on a comment or page, toggling the vote off if you repeat the same choice, and recount the tally. Fails if the target does not exist. The runtime returns the new tally."
+    },
+    {
+      "tool": "register",
+      "op": "create",
+      "family": "auth.register",
+      "exec_spec": {
+        "entity": "User",
+        "fields": [
+          "name",
+          "email",
+          "link"
+        ],
+        "set_on_create": {
+          "password": {
+            "$arg": "password"
+          }
+        },
+        "prechecks": [
+          {
+            "entity": "UserEmailVerify",
+            "where": {
+              "email": {
+                "$arg": "email"
+              }
+            },
+            "message": "That email has no valid verify code. Send one with auth_send_email_code first."
+          }
+        ],
+        "side_inserts": [
+          {
+            "entity": "AuthIdentity",
+            "fields": {
+              "provider": "local",
+              "remote_uid": {
+                "$arg": "email"
+              }
+            },
+            "link_col": "user_id"
+          }
+        ]
+      },
+      "input_schema": {
+        "code": "text",
+        "email": "text",
+        "name": "text",
+        "link": "text",
+        "password": "text"
+      },
+      "_evidence": {
+        "locator": "server/handler/auth_email_register.go:43",
+        "id_local": "Auth.register_email",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/v2/auth/email/register",
+          "locator": "server/handler/auth_email_register.go:43"
+        },
+        "entity_why": "primary effect row_upsert lands on this table",
+        "ref_code": "CheckEmailVerifyCode(app,c,p.Email,p.Code) // validates code, then deletes the UserEmailVerify row\nuser,_ := FindCreateUser(p.Name, p.Email, p.Link); user.SetPasswordEncrypt(p.Password); if p.Link!=\"\"{user.Link=p.Link}; UpdateUser(&user)\njwt,_ := LoginGetUserToken(user, AppKey, LoginTimeout)"
+      },
+      "entity": "User",
+      "_binds": {
+        "email": "User.email",
+        "name": "User.name",
+        "link": "User.link"
+      },
+      "_output_schema": {
+        "token": "JWT",
+        "user": "cooked User"
+      },
+      "guards": {
+        "required": [
+          "email",
+          "password",
+          "code"
+        ],
+        "messages": {
+          "register": "Your email-verify code is missing or invalid. Send one with auth_send_email_code first.",
+          "precondition": "Your email-verify code is missing or invalid.",
+          "not_found": "The email-verify code does not match or has expired."
+        }
+      },
+      "description": "Create an account from an email address, password and the 6-digit email-verify code previously sent to that address by auth_send_email_code; it stores the user so that email can sign in. Email and password are required; name and link optional. Fails if the verify code is missing/invalid or the address has no outstanding code."
+    },
+    {
+      "tool": "auth_send_email_code",
+      "op": "upsert",
+      "family": "crud.upsert",
+      "entity": "UserEmailVerify",
+      "description": "Send a 6-digit email-verify code to an address (stored keyed by that email), the prerequisite for registering a new account or changing an account's email. Public. Fails if a code was already sent to this address in the last minute.",
+      "input_schema": {
+        "email": {
+          "type": "text",
+          "required": true,
+          "description": "The email address to send the verify code to."
+        },
+        "code": {
+          "type": "text",
+          "required": true,
+          "description": "The 6-digit code sent to that address. Supplied here so downstream registration can be verified."
+        },
+        "expires_at": {
+          "type": "datetime",
+          "required": false,
+          "description": "When the code expires (e.g. 5 minutes from sending)."
+        },
+        "ip": {
+          "type": "text",
+          "required": false,
+          "description": "Requesting client IP, recorded on the code row."
+        },
+        "ua": {
+          "type": "text",
+          "required": false,
+          "description": "Requesting user agent, recorded on the code row."
+        }
+      },
+      "exec_spec": {
+        "entity": "UserEmailVerify",
+        "key": {
+          "email": {
+            "$arg": "email"
+          }
+        },
+        "insert_fields": [
+          "email",
+          "code",
+          "expires_at",
+          "ip",
+          "ua"
+        ],
+        "set_on_exists": {
+          "code": {
+            "$arg": "code"
+          }
+        }
+      },
+      "guards": {
+        "required": [
+          "email",
+          "code"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "UserEmailVerify",
+                "where": {
+                  "node": "field",
+                  "col": "email",
+                  "op": "eq",
+                  "value": {
+                    "arg": "email"
+                  }
+                }
+              },
+              "op": "eq",
+              "n": 0
+            }
+          ]
+        ],
+        "messages": {
+          "precondition": "A verify code was already sent to this address within the last minute — wait before resending."
+        }
+      },
+      "_evidence": {
+        "locator": "server/handler/auth_email_send.go:52",
+        "id_local": "Auth.send_email_code",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/v2/auth/email/send",
+          "locator": "server/handler/auth_email_send.go:52"
+        },
+        "entity_why": "primary effect row_upsert lands on this table",
+        "ref_code": "if recent UserEmailVerify in last 1min for email/ip { 400 too frequent }\ncode := RandomStringWithAlphabet(6, ...)\nAssign({Code: code, ExpiresAt: now+5m, IP, UA}).FirstOrCreate(&emailVerify)\nemailService.AsyncSendTo(subject, body, p.Email)",
+        "edges": [
+          "a recent code (updated_at within 1min) blocks resend (auth_email_send.go:83)"
+        ]
+      },
+      "_binds": {
+        "email": "UserEmailVerify.email"
+      }
+    }
+  ],
+  "seed_state": {
+    "Site": [
+      {
+        "id": 1,
+        "name": "example",
+        "urls": "https://example.com,https://www.example.com"
+      },
+      {
+        "id": 2,
+        "name": "docs",
+        "urls": "https://docs.example.com"
+      }
+    ],
+    "Page": [
+      {
+        "id": 1,
+        "key": "/about",
+        "title": "About Us",
+        "admin_only": false,
+        "site_name": "example",
+        "vote_up": 0,
+        "vote_down": 0,
+        "pv": 10
+      },
+      {
+        "id": 2,
+        "key": "/blog/hello",
+        "title": "Hello World",
+        "admin_only": false,
+        "site_name": "example",
+        "vote_up": 1,
+        "vote_down": 0,
+        "pv": 25
+      },
+      {
+        "id": 3,
+        "key": "/admin",
+        "title": "Admin Guide",
+        "admin_only": true,
+        "site_name": "docs",
+        "vote_up": 0,
+        "vote_down": 0,
+        "pv": 3
+      }
+    ],
+    "User": [
+      {
+        "id": 1,
+        "name": "admin",
+        "email": "ops@artalk.example",
+        "password": "pw-operations",
+        "is_admin": true,
+        "receive_email": true
+      },
+      {
+        "id": 2,
+        "name": "alice",
+        "email": "member@artalk.example",
+        "password": "pw-member",
+        "is_admin": false,
+        "receive_email": true
+      }
+    ],
+    "AuthIdentity": [
+      {
+        "id": 1,
+        "provider": "local",
+        "remote_uid": "admin@example.com",
+        "user_id": 1
+      }
+    ],
+    "Comment": [
+      {
+        "id": 1,
+        "content": "First post!",
+        "page_key": "/blog/hello",
+        "site_name": "example",
+        "user_id": 2,
+        "rid": 0,
+        "root_id": 0,
+        "is_verified": true,
+        "is_pending": false,
+        "is_collapsed": false,
+        "is_pinned": false,
+        "vote_up": 1,
+        "vote_down": 0
+      },
+      {
+        "id": 2,
+        "content": "Nice reply",
+        "page_key": "/blog/hello",
+        "site_name": "example",
+        "user_id": 1,
+        "rid": 1,
+        "root_id": 1,
+        "is_verified": true,
+        "is_pending": false,
+        "is_collapsed": false,
+        "is_pinned": false,
+        "vote_up": 0,
+        "vote_down": 0
+      },
+      {
+        "id": 3,
+        "content": "Awaiting moderation",
+        "page_key": "/about",
+        "site_name": "example",
+        "user_id": 2,
+        "rid": 0,
+        "root_id": 0,
+        "is_verified": true,
+        "is_pending": true,
+        "is_collapsed": false,
+        "is_pinned": false,
+        "vote_up": 0,
+        "vote_down": 0
+      }
+    ],
+    "Notify": [
+      {
+        "id": 1,
+        "user_id": 2,
+        "comment_id": 2,
+        "key": "reply",
+        "is_read": false,
+        "read_at": null,
+        "is_emailed": false,
+        "email_at": null
+      },
+      {
+        "id": 2,
+        "user_id": 2,
+        "comment_id": 3,
+        "key": "reply",
+        "is_read": true,
+        "read_at": "2026-01-01T00:00:00",
+        "is_emailed": false,
+        "email_at": null
+      }
+    ],
+    "Vote": [
+      {
+        "id": 1,
+        "target_id": 1,
+        "type": "comment_up",
+        "user_id": 2,
+        "ip": "127.0.0.1"
+      },
+      {
+        "id": 2,
+        "target_id": 1,
+        "type": "page_up",
+        "user_id": 2,
+        "ip": "127.0.0.1"
+      }
+    ],
+    "UserEmailVerify": [
+      {
+        "id": 1,
+        "email": "new@example.com",
+        "code": "123456",
+        "expires_at": "2026-01-01T00:05:00",
+        "ip": "127.0.0.1",
+        "ua": ""
+      }
+    ]
+  },
+  "summary": "Artalk is a Go self-hosted comment system (GORM + Fiber): sites host pages, users post comments with replies/votes, notifies track unread/emailed reply alerts, plus auth identities and email-verify codes; full CRUD over 8 persisted entities.",
+  "_auth_candidates": [
+    {
+      "entity": "User",
+      "username_col": "email",
+      "password_col": "password"
+    }
+  ],
+  "_fk_gravity": {
+    "entity": "User",
+    "fk_count": 4
+  },
+  "_read_denied": "not_found",
+  "_no_edges": [
+    {
+      "id_local": "Comment.get",
+      "why": "public GET by id, no auth and no pre-checks beyond 404 (comment_get.go)"
+    },
+    {
+      "id_local": "User.info",
+      "why": "public GET; reads own identity from token, no auth (user_info.go)"
+    },
+    {
+      "id_local": "User.status",
+      "why": "public GET, no auth (user_status.go)"
+    },
+    {
+      "id_local": "Notify.list",
+      "why": "public GET; user resolved from name+email params, no auth (notify_list.go)"
+    },
+    {
+      "id_local": "Notify.read",
+      "why": "public POST; identified by notify_key, no auth (notify_read.go)"
+    },
+    {
+      "id_local": "Notify.read_all",
+      "why": "public POST; user from name+email body, no auth (notify_read_all.go)"
+    },
+    {
+      "id_local": "Auth.register_email",
+      "why": "public, gated only by email code + LimiterGuard, no auth wall (auth_email_register.go)"
+    },
+    {
+      "id_local": "Auth.social_login",
+      "why": "OAuth callback, gated by SocialLoginGuard(config), no DB auth wall (auth_social_login.go:86)"
+    },
+    {
+      "id_local": "Auth.sso_exchange",
+      "why": "public; trusts external IdP /userinfo, no DB auth wall (auth_sso_exchange.go:66)"
+    }
+  ],
+  "auth": {
+    "account_entity": "User",
+    "username_col": "email",
+    "password_col": "password"
+  }
+}

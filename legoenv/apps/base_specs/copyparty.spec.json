@@ -1,0 +1,1587 @@
+{
+  "env_id": "copyparty",
+  "_prep_version": 3,
+  "entities": [
+    {
+      "name": "File",
+      "columns": [
+        {
+          "name": "name",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "immutable": true
+        },
+        {
+          "name": "size",
+          "type": "int",
+          "nullable": false
+        },
+        {
+          "name": "mtime",
+          "type": "datetime",
+          "nullable": false,
+          "audit": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "name"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Folder",
+      "columns": [
+        {
+          "name": "path",
+          "type": "text",
+          "pk": true,
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "name": "Up",
+      "columns": [
+        {
+          "name": "w",
+          "type": "text",
+          "pk": true,
+          "nullable": true,
+          "immutable": true
+        },
+        {
+          "name": "mt",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "sz",
+          "type": "int",
+          "nullable": true
+        },
+        {
+          "name": "rd",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "fn",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "ip",
+          "type": "text",
+          "nullable": true,
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "at",
+          "type": "datetime",
+          "nullable": true,
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "un",
+          "type": "text",
+          "nullable": true,
+          "audit": true,
+          "immutable": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "rd",
+            "fn"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Mt",
+      "columns": [
+        {
+          "name": "w",
+          "type": "text",
+          "pk": true,
+          "nullable": true,
+          "immutable": true,
+          "fk_to": "Up.w"
+        }
+      ],
+      "_agent_note": "kept w only; dropped k/v (tag key/value) -- written only by the async tag-extraction worker, never by a user operation. w prefix kept so the Search -> Mt join is expressible."
+    },
+    {
+      "name": "Ds",
+      "columns": [
+        {
+          "name": "rd",
+          "type": "text",
+          "pk": true,
+          "nullable": true
+        },
+        {
+          "name": "sz",
+          "type": "int",
+          "nullable": true
+        },
+        {
+          "name": "nf",
+          "type": "int",
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "name": "Iu",
+      "columns": [
+        {
+          "name": "c",
+          "type": "int",
+          "nullable": true,
+          "immutable": true
+        },
+        {
+          "name": "w",
+          "type": "text",
+          "pk": true,
+          "nullable": true,
+          "immutable": true,
+          "fk_to": "Up.w"
+        },
+        {
+          "name": "rd",
+          "type": "text",
+          "nullable": true,
+          "immutable": true
+        },
+        {
+          "name": "fn",
+          "type": "text",
+          "nullable": true,
+          "immutable": true
+        }
+      ]
+    },
+    {
+      "name": "Cv",
+      "columns": [
+        {
+          "name": "rd",
+          "type": "text",
+          "pk": true,
+          "nullable": true
+        },
+        {
+          "name": "dn",
+          "type": "text",
+          "pk": true,
+          "nullable": true
+        },
+        {
+          "name": "fn",
+          "type": "text",
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "name": "Dh",
+      "columns": [
+        {
+          "name": "d",
+          "type": "text",
+          "pk": true,
+          "nullable": true
+        },
+        {
+          "name": "h",
+          "type": "text",
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "name": "Kv",
+      "columns": [
+        {
+          "name": "k",
+          "type": "text",
+          "pk": true,
+          "nullable": true
+        },
+        {
+          "name": "v",
+          "type": "int",
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "name": "Share",
+      "columns": [
+        {
+          "name": "k",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "immutable": true
+        },
+        {
+          "name": "pw",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "vp",
+          "type": "text",
+          "nullable": false,
+          "immutable": true
+        },
+        {
+          "name": "pr",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "r",
+            "w",
+            "m",
+            "d",
+            "g",
+            "."
+          ]
+        },
+        {
+          "name": "st",
+          "type": "int",
+          "nullable": false
+        },
+        {
+          "name": "un",
+          "type": "text",
+          "nullable": false,
+          "immutable": true
+        },
+        {
+          "name": "t0",
+          "type": "datetime",
+          "nullable": false,
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "t1",
+          "type": "datetime",
+          "nullable": false,
+          "default": 0
+        }
+      ]
+    },
+    {
+      "name": "ShareFile",
+      "columns": [
+        {
+          "name": "k",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "immutable": true,
+          "fk_to": "Share.k",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "vp",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "immutable": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "k",
+            "vp"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Session",
+      "columns": [
+        {
+          "name": "un",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "immutable": true
+        },
+        {
+          "name": "si",
+          "type": "text",
+          "nullable": false,
+          "immutable": true
+        },
+        {
+          "name": "t0",
+          "type": "datetime",
+          "nullable": false,
+          "audit": true,
+          "immutable": true
+        }
+      ]
+    },
+    {
+      "name": "IdpUser",
+      "columns": [
+        {
+          "name": "un",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "immutable": true
+        },
+        {
+          "name": "gs",
+          "type": "text",
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "name": "Account",
+      "columns": [
+        {
+          "name": "uname",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "immutable": true
+        },
+        {
+          "name": "password_hash",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "id",
+          "type": "id",
+          "nullable": false
+        }
+      ]
+    }
+  ],
+  "tools": [
+    {
+      "tool": "sign_in",
+      "op": "action",
+      "family": "guard.auth",
+      "exec_spec": {
+        "verify": {
+          "entity": "Account",
+          "username_col": "uname",
+          "password_col": "password_hash"
+        }
+      },
+      "input_schema": {
+        "uname": {
+          "type": "text",
+          "required": true,
+          "description": "The account username (the auth credential)."
+        },
+        "password_hash": {
+          "type": "text",
+          "required": false,
+          "description": "The account password as hashed server-side; on a fresh install this is effectively the plaintext you type at login."
+        },
+        "password": {
+          "type": "text",
+          "required": false,
+          "description": "Runtime credential alias; verification still required."
+        }
+      },
+      "_evidence": {
+        "locator": "copyparty/httpcli.py:3687",
+        "id_local": "Session.login",
+        "entry": {
+          "kind": "http",
+          "route": "POST ?act=login or GET with pwd cookie",
+          "locator": "copyparty/httpcli.py:3112-3113"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "uname = self.asrv.sesa.get(pwd)\nif not uname:\n    hpwd = self.asrv.ah.hash(pwd)\n    uname = self.asrv.iacct.get(hpwd)\n    if uname:\n        pwd = self.asrv.ases.get(uname) or pwd\nif uname and self.conn.hsrv.ipr:\n    ..."
+      },
+      "entity": "Account",
+      "_output_schema": {
+        "continue url": "redirect on success"
+      },
+      "guards": {
+        "required": [
+          "uname"
+        ],
+        "messages": {
+          "auth": "Sign in with your account before continuing.",
+          "required": "A username and password are required to sign in."
+        }
+      },
+      "description": "Sign in with an account username and a password. Establishes your session as that account; operations that track who acted (upload confirmation, shares, password change, sign out) require this first."
+    },
+    {
+      "tool": "sign_out",
+      "op": "action",
+      "family": "guard.logout",
+      "exec_spec": {
+        "entity": "Account"
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "copyparty/httpcli.py:3672",
+        "id_local": "Session.logout",
+        "entry": {
+          "kind": "http",
+          "route": "POST ?act=logout",
+          "locator": "copyparty/httpcli.py:3134-3135"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "self.log(\"logout \" + self.uname)\nif not self.uname.startswith(\"s_\"):\n    self.asrv.forget_session(self.conn.hsrv.broker, self.uname)\nself.get_pwd_cookie(\"x\")",
+        "edges": [
+          "copyparty/authsrv.py:3513"
+        ]
+      },
+      "entity": "Account",
+      "_output_schema": {
+        "message": "ok bye"
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in to sign out."
+        }
+      },
+      "description": "End the current session, dropping the password cookie / session row for this account."
+    },
+    {
+      "tool": "upload_begin",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "File",
+        "fields": [
+          "name",
+          "size"
+        ],
+        "unique_on": [
+          "name"
+        ],
+        "messages": {
+          "unique": "A file with that name already exists at this path."
+        }
+      },
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "Destination file path under a volume."
+        },
+        "size": {
+          "type": "int",
+          "required": true,
+          "description": "The file size in bytes."
+        }
+      },
+      "_evidence": {
+        "locator": "copyparty/httpcli.py:3898",
+        "id_local": "File.upload_multipart",
+        "entry": {
+          "kind": "http",
+          "route": "POST <vpath> multipart act=bput/uput",
+          "locator": "copyparty/httpcli.py:3100-3101 (handle_post_multipart dispatch)"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "files.append((sz, sha_hex, sha_b64, p_file, fname, abspath))\ndbv, vrem = vfs.get_dbv(rem)\nself.conn.hsrv.broker.say(\"up2k.hash_file\", dbv.realpath, vfs.vpath, dbv.flags, vrem, fname, self.ip, at, self.uname, True)"
+      },
+      "entity": "File",
+      "_output_schema": {
+        "status": "OK/ERROR",
+        "sz": "bytes received",
+        "files": "list of uploaded file urls",
+        "mbps": "rate"
+      },
+      "guards": {
+        "required": [
+          "name",
+          "size"
+        ],
+        "messages": {
+          "required": "A destination name and a byte size are required to begin an upload."
+        }
+      },
+      "description": "Create a new file in a volume by name; the bytes are hashed asynchronously and the file becomes listed once the index worker finishes. Supplies the destination name and the file's byte size.",
+      "_agent_note": "replaces file_upload_multipart; name+size bound to File; unique_on name."
+    },
+    {
+      "tool": "upload_check_chunks",
+      "op": "action",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Up",
+        "search_fields": [
+          "w",
+          "rd",
+          "fn"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "w",
+            "rd",
+            "fn"
+          ]
+        }
+      },
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "Destination filename (shapes the dedup query)."
+        },
+        "size": {
+          "type": "int",
+          "required": true,
+          "description": "Expected file size in bytes, part of the wark identity."
+        },
+        "lmod": {
+          "type": "int",
+          "required": true,
+          "description": "Expected last-modified unix time, part of the wark identity."
+        },
+        "hash": {
+          "type": "json",
+          "required": true,
+          "description": "List of chunk content-hashes to derive the content wark key."
+        }
+      },
+      "_evidence": {
+        "locator": "copyparty/up2k.py:3097",
+        "id_local": "File.upload_checkchunks",
+        "entry": {
+          "kind": "http",
+          "route": "POST <vpath> content-type application/json or text/plain (up2k chunk handshake)",
+          "locator": "copyparty/httpcli.py:3201-3260 (handle_post_json)"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "if self.no_expr_idx:\n    q = r\"select * from up where w = ?\"\nelse:\n    q = r\"select * from up where substr(w,1,16)=? and +w=?\"\nc2 = cur.execute(q, tuple(argv))\nfor _, dtime, dsize, dp_dir, dp_fn, ip, at, _ in c2:"
+      },
+      "entity": "Up",
+      "_output_schema": {
+        "wark": "content key",
+        "hash": "needed chunks",
+        "purl": "upload path",
+        "size": "bytes",
+        "sprs": "sparse supported"
+      },
+      "guards": {
+        "required": [
+          "name",
+          "size",
+          "lmod",
+          "hash"
+        ],
+        "messages": {
+          "required": "A filename, size, mtime and chunk hashlist are required for the chunk handshake."
+        }
+      },
+      "description": "Chunked-upload handshake: given a content hashlist, look up whether any indexed file already has identical content, so the client can deduplicate (hard-link) instead of re-uploading. Returns matching indexed files, if any."
+    },
+    {
+      "tool": "upload_confirm",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Up",
+        "fields": {
+          "mt": {
+            "$arg": "mt"
+          },
+          "sz": {
+            "$arg": "sz"
+          },
+          "rd": {
+            "$arg": "rd"
+          },
+          "fn": {
+            "$arg": "fn"
+          }
+        },
+        "set_on_create": {
+          "w": {
+            "$arg": "wark"
+          }
+        },
+        "unique_on": [
+          "rd",
+          "fn"
+        ]
+      },
+      "input_schema": {
+        "wark": {
+          "type": "text",
+          "required": true,
+          "description": "The upload job / content-hash key returned by the chunk handshake."
+        },
+        "chunks": {
+          "type": "json",
+          "required": true,
+          "description": "The hashes of written chunks, confirming the transfer."
+        },
+        "rd": {
+          "type": "text",
+          "required": true,
+          "description": "Relative directory of the uploaded file."
+        },
+        "fn": {
+          "type": "text",
+          "required": true,
+          "description": "Filename of the uploaded file."
+        },
+        "mt": {
+          "type": "datetime",
+          "required": false,
+          "description": "Uploaded file's last-modified time."
+        },
+        "sz": {
+          "type": "int",
+          "required": false,
+          "description": "Uploaded file's size in bytes."
+        }
+      },
+      "_evidence": {
+        "locator": "copyparty/up2k.py:3859",
+        "id_local": "File.upload_confirm",
+        "entry": {
+          "kind": "http",
+          "route": "POST <vpath> chunk data then POST confirm",
+          "locator": "copyparty/httpcli.py:3531-3550"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "atomic_move(self.log, src, dst, vflags)\nbos.utime_c(self.log, dst, times[1], False)\nzs = \"prel name lmod size ptop vtop wark dwrk host user addr\"\nz2 = [job[x] for x in zs.split()]\nif self.idx_wark(vflags, *z2):\n    del self.registry[ptop][wark]"
+      },
+      "entity": "Up",
+      "_output_schema": {
+        "result": "ok"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "wark",
+          "chunks",
+          "rd",
+          "fn"
+        ],
+        "messages": {
+          "auth": "You must be signed in to confirm an upload.",
+          "required": "A wark, the written-chunk hashes, and the destination rd/fn are required to confirm an upload.",
+          "unique": "A file is already indexed at that relative path."
+        }
+      },
+      "description": "Finalize a chunked upload: record the new file's index row under its content hash (wark), after the client has written all its chunks. Takes the destination relative path. Fails if a file at the same relative path is already indexed.",
+      "_agent_note": "Writes the path identity (rd/fn) and the wark key only; the audit columns ip/at/un (uploader provenance) are server-derived from the request and left untouched in this agent-facing panel."
+    },
+    {
+      "tool": "file_delete",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "File",
+        "lookup_by": {
+          "name": {
+            "$arg": "vpath"
+          }
+        }
+      },
+      "input_schema": {
+        "vpath": {
+          "type": "text",
+          "required": true,
+          "description": "Full virtual path of the file to delete."
+        }
+      },
+      "_evidence": {
+        "locator": "copyparty/httpcli.py:6802",
+        "id_local": "File.delete",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE <vpath> or POST ?delete=",
+          "locator": "copyparty/httpcli.py:941-942, 2500"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "self._forget_file(ptop, volpath, dbv.flags, cur, wark, True, st.st_size, xlink)\nwunlink(self.log, abspath, dbv.flags)\nif xad:\n    runhook(...)"
+      },
+      "entity": "File",
+      "_output_schema": {
+        "msg": "deleted N files (and X/Y folders)"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "vpath"
+        ],
+        "messages": {
+          "auth": "You must be signed in to delete files.",
+          "required": "A vpath is required to delete a file.",
+          "not_found": "No file exists at that vpath."
+        }
+      },
+      "description": "Delete a file by its full virtual path: unlinks it from disk and removes it from the file index. Fails if no file exists at that path.",
+      "_agent_note": "lookup_by switched from $session.vpath to $arg.vpath so it resolves. Index metadata (Up/Ds) updates asynchronously via reindex, not declared here."
+    },
+    {
+      "tool": "file_list",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "File",
+        "search_fields": [
+          "name"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "name"
+          ]
+        },
+        "filter": {
+          "col": "name",
+          "mode": "substring",
+          "val": {
+            "$arg": "q"
+          },
+          "optional": true
+        }
+      },
+      "input_schema": {
+        "ls": {
+          "type": "text",
+          "required": true,
+          "description": "Listing format selector (the view mode of the directory browser)."
+        },
+        "q": {
+          "type": "text",
+          "required": false
+        }
+      },
+      "_evidence": {
+        "locator": "copyparty/httpcli.py:7022",
+        "id_local": "File.list",
+        "entry": {
+          "kind": "http",
+          "route": "GET <vpath>?ls=",
+          "locator": "copyparty/httpcli.py:1513 (tx_ls_vols), 7313 (tx_browser listing)"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "fsroot, vfs_ls, vfs_virt = vn.ls(rem, self.uname, ...PERMS_rwh...)\n...\ntx_ls(ls): renders dirs/files"
+      },
+      "entity": "File",
+      "_output_schema": {
+        "dirs": "list of folder rows",
+        "files": "list of file rows",
+        "acct": "account info",
+        "perms": "perms string"
+      },
+      "guards": {
+        "required": [
+          "ls"
+        ],
+        "messages": {
+          "required": "A listing format is required."
+        }
+      },
+      "description": "List the files in a directory / volume that the calling account may read. Scans the on-disk tree; results are limited by the caller's read permission on each volume.",
+      "_agent_note": "permission enforced in the VFS config layer (no DB table); genuinely global read scope -- no per-row ownership (collect no_guards)."
+    },
+    {
+      "tool": "file_download",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "File",
+        "lookup_by": {
+          "name": {
+            "$arg": "vpath"
+          }
+        }
+      },
+      "input_schema": {
+        "vpath": {
+          "type": "text",
+          "required": true,
+          "description": "Full virtual path of the file to download."
+        }
+      },
+      "_evidence": {
+        "locator": "copyparty/httpcli.py:4840",
+        "id_local": "File.download",
+        "entry": {
+          "kind": "http",
+          "route": "GET <file-vpath> (?dl=/raw forced, ?th= thumbnail)",
+          "locator": "copyparty/httpcli.py:7240"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "fs_path, file_sz = editions[selected_edition]\nif self.ouparam.get(\"dl\") or ...:\n    ... Content-Disposition ...\nsendfile..."
+      },
+      "entity": "File",
+      "_output_schema": {
+        "body": "file bytes streamed, Range/206 support"
+      },
+      "guards": {
+        "required": [
+          "vpath"
+        ],
+        "messages": {
+          "required": "A vpath is required to download a file.",
+          "not_found": "No file exists at that vpath."
+        }
+      },
+      "description": "Fetch a single file's metadata (serves the GET <file>/?dl= route) by its full virtual path. Fails if no file exists at that path.",
+      "_agent_note": "lookup_by switched from $session.vpath to $arg.vpath so it resolves."
+    },
+    {
+      "tool": "file_rename",
+      "op": "update",
+      "family": "crud.upsert",
+      "exec_spec": {
+        "entity": "Up",
+        "key": {
+          "rd": {
+            "$arg": "move"
+          },
+          "fn": {
+            "$arg": "move"
+          }
+        },
+        "insert_fields": {
+          "rd": {
+            "$arg": "move"
+          },
+          "fn": {
+            "$arg": "move"
+          },
+          "sz": {
+            "$arg": "sz"
+          }
+        }
+      },
+      "input_schema": {
+        "move": {
+          "type": "text",
+          "required": true,
+          "description": "Destination virtual path for the renamed file."
+        },
+        "rd": {
+          "type": "text",
+          "required": false,
+          "description": "Relative directory of the destination."
+        },
+        "fn": {
+          "type": "text",
+          "required": false,
+          "description": "Filename of the destination."
+        },
+        "sz": {
+          "type": "int",
+          "required": false,
+          "description": "File size in bytes (carried into the new index row)."
+        }
+      },
+      "_evidence": {
+        "locator": "copyparty/httpcli.py:6833",
+        "id_local": "File.move",
+        "entry": {
+          "kind": "http",
+          "route": "POST ?move= or WebDAV MOVE",
+          "locator": "copyparty/httpcli.py:2495, 951-952"
+        },
+        "entity_why": "primary effect row_upsert lands on this table",
+        "ref_code": "if w:\n    ... self._forget_file(svn.realpath, srem, svn.flags, c1, w, is_xvol, fsize_ or fsize, xlink)\n    ... self.db_add(c2, {}, drd, dfn, ftime, fsize, dvn.realpath, dvn.vpath, w, w, \"\", un or \"\", ip or \"\", at or 0)",
+        "edges": [
+          "copyparty/httpcli.py:6848-6851"
+        ]
+      },
+      "entity": "Up",
+      "_output_schema": {
+        "result": "k"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "move"
+        ],
+        "messages": {
+          "auth": "You must be signed in to move files.",
+          "required": "A destination vpath is required to move a file."
+        }
+      },
+      "description": "Move/rename a file on disk to a new destination path, updating the file index row. The destination is the new rd+fn key.",
+      "_agent_note": "replaces file_move (was crud.upsert on Up with $session.vpath keys). Keyed on destination rd+fn. The 'source exists' edge is dropped (vpath is not an input)."
+    },
+    {
+      "tool": "file_copy",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "File",
+        "fields": [
+          "size"
+        ],
+        "set_on_create": {
+          "name": {
+            "$arg": "copy"
+          }
+        },
+        "unique_on": [
+          "name"
+        ],
+        "messages": {
+          "unique": "A file already exists at the destination name."
+        }
+      },
+      "input_schema": {
+        "copy": {
+          "type": "text",
+          "required": true,
+          "description": "Destination virtual path the file is copied to."
+        },
+        "size": {
+          "type": "int",
+          "required": false,
+          "description": "Byte size carried into the new index row."
+        }
+      },
+      "_evidence": {
+        "locator": "copyparty/httpcli.py:6866",
+        "id_local": "File.copy",
+        "entry": {
+          "kind": "http",
+          "route": "POST ?copy= or WebDAV COPY",
+          "locator": "copyparty/httpcli.py:2498, 951-952"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "if c2:\n    self.db_add(c2, {}, drd, dfn, ftime, fsize, dvn.realpath, dvn.vpath, w, w, \"\", un or \"\", ip or \"\", at or 0)",
+        "edges": [
+          "copyparty/httpcli.py:6882-6883"
+        ]
+      },
+      "entity": "File",
+      "_output_schema": {
+        "result": "k"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "copy"
+        ],
+        "messages": {
+          "auth": "You must be signed in to copy files.",
+          "required": "A destination vpath is required to copy a file."
+        }
+      },
+      "description": "Copy a file on disk to a new destination path; the new file's index row is added under the destination name.",
+      "_agent_note": "was crud.insert into File with fields [size]; name set from args via set_on_create. Source-exists precondition dropped (vpath not an input in this panel)."
+    },
+    {
+      "tool": "search_files",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Up",
+        "search_fields": [
+          "fn",
+          "rd",
+          "w",
+          "sz",
+          "mt",
+          "at"
+        ],
+        "rank": {
+          "method": "keyword",
+          "fields": [
+            "fn",
+            "rd",
+            "w",
+            "sz",
+            "mt",
+            "at"
+          ]
+        },
+        "sort": {
+          "col": "fn",
+          "dir": "asc"
+        }
+      },
+      "input_schema": {
+        "q": {
+          "type": "text",
+          "required": false,
+          "description": "Free-text keyword query against filename, path, tag key or wark."
+        },
+        "n": {
+          "type": "int",
+          "required": false,
+          "description": "Maximum number of hits to return."
+        }
+      },
+      "_evidence": {
+        "locator": "copyparty/httpcli.py:3281",
+        "id_local": "Search.search",
+        "entry": {
+          "kind": "http",
+          "route": "POST <vpath> JSON with srch (keyword) or hash (hashlist)",
+          "locator": "copyparty/httpcli.py:3198-3199"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "elif v == \"w\":\n    v = \"substr(up.w,1,16)\"\n    is_wark = True\nelif v == \"tags\" or ptn_mt.match(v):\n    have_mt = True\n    ... v = \"exists(select 1 from mt where mt.w = mtw and \" + vq"
+      },
+      "entity": "Up",
+      "_output_schema": {
+        "hits": "list of {ts,sz,rp,tags}",
+        "tag_order": "tags by priority",
+        "trunc": "bool"
+      },
+      "description": "Keyword search over the file index: matches filename, relative path, content-hash key, size, modified time and upload time, across every volume you hold read permission on. Returns one row per matching indexed file.",
+      "guards": {},
+      "_agent_note": "replaces search_search; dropped hash param (write-bound to the upload family). No row-ownership scope: visibility is a config-level volume read permission, so the search is genuinely global across readable volumes."
+    },
+    {
+      "tool": "folder_create",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Folder",
+        "fields": [
+          "path"
+        ],
+        "set_on_create": {
+          "path": {
+            "$arg": "name"
+          }
+        }
+      },
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "Full virtual path of the new folder."
+        }
+      },
+      "_evidence": {
+        "locator": "copyparty/httpcli.py:3753",
+        "id_local": "Folder.create",
+        "entry": {
+          "kind": "http",
+          "route": "POST ?act=mkdir or WebDAV MKCOL",
+          "locator": "copyparty/httpcli.py:3115-3116"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "if bos.path.isdir(fn):\n    raise Pebkac(405, 'folder \"%s\" already exists' % (vpath,))\n\nbos.makedirs(fn, vf=vfs.flags)",
+        "edges": [
+          "copyparty/httpcli.py:3777"
+        ]
+      },
+      "entity": "Folder",
+      "_output_schema": {
+        "X-New-Dir": "new folder path"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "name"
+        ],
+        "messages": {
+          "auth": "You must be signed in to create folders.",
+          "required": "A folder path is required.",
+          "not_found": "Cannot create a folder here.",
+          "unique": "A folder already exists at that path."
+        },
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Folder",
+                "where": {
+                  "node": "field",
+                  "col": "path",
+                  "op": "eq",
+                  "value": {
+                    "arg": "name"
+                  }
+                }
+              },
+              "op": "eq",
+              "n": 0,
+              "_msg": "A folder already exists at that path."
+            }
+          ]
+        ]
+      },
+      "description": "Create a new directory under a volume path. Fails if a folder already exists at that path.",
+      "_agent_note": "name bound to Folder.path; kept the 'must not exist' wall as a precondition."
+    },
+    {
+      "tool": "share_create",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Share",
+        "fields": {
+          "pw": {
+            "$arg": "pw"
+          },
+          "vp": {
+            "$arg": "vp"
+          },
+          "pr": {
+            "$arg": "perms"
+          },
+          "t1": {
+            "$arg": "exp"
+          }
+        },
+        "set_on_create": {
+          "un": {
+            "$session": "account_name"
+          },
+          "st": {
+            "$arg": "perms"
+          }
+        },
+        "unique_on": [
+          "k"
+        ],
+        "side_inserts": [
+          {
+            "entity": "ShareFile",
+            "fields": {
+              "k": {
+                "$arg": "k"
+              },
+              "vp": {
+                "$arg": "vp"
+              }
+            }
+          }
+        ]
+      },
+      "input_schema": {
+        "k": {
+          "type": "text",
+          "required": true,
+          "description": "The chosen share key (alphanumeric / - / _)."
+        },
+        "pw": {
+          "type": "text",
+          "required": false,
+          "description": "Optional share password; the server hashes it."
+        },
+        "vp": {
+          "type": "json",
+          "required": true,
+          "description": "List of source virtual paths / selection to share."
+        },
+        "perms": {
+          "type": "json",
+          "required": true,
+          "description": "Requested permission string, one of r w m d g ."
+        },
+        "exp": {
+          "type": "int",
+          "required": true,
+          "description": "Expiry offset in minutes from now (0 = never)."
+        }
+      },
+      "_evidence": {
+        "locator": "copyparty/httpcli.py:6671",
+        "id_local": "Share.create",
+        "entry": {
+          "kind": "http",
+          "route": "POST <vpath> JSON with share param",
+          "locator": "copyparty/httpcli.py:3201"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "q = \"insert into sh values (?,?,?,?,?,?,?,?)\"\ncur.execute(q, (skey, pw, vp, pr, len(fns), self.uname, now, exp))\nq = \"insert into sf values (?,?)\"\nfor fn in fns:\n    cur.execute(q, (skey, fn))\ncur.connection.commit()",
+        "edges": [
+          "copyparty/httpcli.py:6735-6749",
+          "copyparty/httpcli.py:6751-6758"
+        ]
+      },
+      "entity": "Share",
+      "_binds": {
+        "k": "Share.k",
+        "vp": "Share.vp",
+        "pw": "Share.pw",
+        "perms": "Share.pr",
+        "exp": "Share.t1"
+      },
+      "_output_schema": {
+        "url": "created share url (status 201)"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "k",
+          "vp",
+          "perms",
+          "exp"
+        ],
+        "messages": {
+          "auth": "You must be signed in to create a share.",
+          "required": "A share key, the source paths, the permissions and an expiry are all required.",
+          "unique": "That share key is already taken."
+        }
+      },
+      "description": "Create a share of one or more files/directories, returning its share key. You must be signed in. Records the included share-file paths and applies the requested permission level.",
+      "_agent_note": "Session-owned, owner-scoped by account_id. Share.pk 'k' is caller-supplied (its unique key). t0 stays audit. sf rows inserted via side_inserts."
+    },
+    {
+      "tool": "share_extend",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Share",
+        "row_key": {
+          "k": {
+            "$arg": "skey"
+          }
+        },
+        "set": {
+          "t1": {
+            "$arg": "minutes"
+          }
+        }
+      },
+      "input_schema": {
+        "skey": {
+          "type": "text",
+          "required": true,
+          "description": "The share key to extend."
+        },
+        "minutes": {
+          "type": "int",
+          "required": true,
+          "description": "Extension, in minutes from now."
+        }
+      },
+      "_evidence": {
+        "locator": "copyparty/httpcli.py:6621",
+        "id_local": "Share.extend",
+        "entry": {
+          "kind": "http",
+          "route": "POST ?eshare=<minutes>",
+          "locator": "copyparty/httpcli.py:2504"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "now = time.time()\nif expiry < now:\n    expiry = now\n    reload = True\nexpiry += int(act) * 60\ncur.execute(\"update sh set t1 = ? where k = ?\", (expiry, skey))",
+        "edges": [
+          "copyparty/httpcli.py:6637-6647"
+        ]
+      },
+      "entity": "Share",
+      "_binds": {
+        "skey": "Share.k",
+        "minutes": "Share.t1"
+      },
+      "_output_schema": {},
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "skey",
+          "minutes"
+        ],
+        "messages": {
+          "auth": "You must be signed in to extend a share.",
+          "required": "A share key and minutes are required.",
+          "not_found": "No share exists with that key."
+        }
+      },
+      "description": "Extend a share's expiry by a number of minutes. Fails if no share exists with the given key.",
+      "_agent_note": "real repo: expiry = max(now,expiry) + minutes*60; collapsed here to t1 = minutes (absolute). Only-owner/admin-extends edge stays as description text."
+    },
+    {
+      "tool": "share_delete",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "Share",
+        "lookup_by": {
+          "k": {
+            "$arg": "skey"
+          }
+        },
+        "on_child": "cascade"
+      },
+      "input_schema": {
+        "skey": {
+          "type": "text",
+          "required": true,
+          "description": "The share key to delete."
+        }
+      },
+      "_evidence": {
+        "locator": "copyparty/httpcli.py:6621",
+        "id_local": "Share.delete",
+        "entry": {
+          "kind": "http",
+          "route": "POST ?eshare=rm",
+          "locator": "copyparty/httpcli.py:2504"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "act = self.uparam[\"eshare\"]\nif act == \"rm\":\n    cur.execute(\"delete from sh where k = ?\", (skey,))\n    if skey in self.asrv.vfs.nodes[self.args.shr.strip(\"/\")].nodes:\n        reload = True",
+        "edges": [
+          "copyparty/httpcli.py:6637-6647"
+        ]
+      },
+      "entity": "Share",
+      "_output_schema": {},
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "skey"
+        ],
+        "messages": {
+          "auth": "You must be signed in to delete a share.",
+          "required": "A share key is required to delete a share.",
+          "not_found": "No share exists with that key.",
+          "on_child": "Deleting this share also removes its included file rows."
+        }
+      },
+      "description": "Delete a share by its key, removing it and its included share-file rows. Fails if no share exists with that key.",
+      "_agent_note": "real repo leaves sf rows to the expiry daemon; declared cascade so the FK doesn't orphan."
+    },
+    {
+      "tool": "download_list",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "File",
+        "search_fields": [
+          "name"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "name"
+          ]
+        },
+        "filter": {
+          "col": "name",
+          "mode": "substring",
+          "val": {
+            "$arg": "q"
+          },
+          "optional": true
+        }
+      },
+      "input_schema": {
+        "q": {
+          "type": "text",
+          "required": false
+        }
+      },
+      "_evidence": {
+        "locator": "copyparty/httpcli.py:6224",
+        "id_local": "Download.list",
+        "entry": {
+          "kind": "http",
+          "route": "GET ?dls=",
+          "locator": "copyparty/httpcli.py:1563-1564"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "for dl_id, (t0, sz, vn, vp, uname) in self.conn.hsrv.tdli.items():\n    ...\n    if self.uname not in vn.axs.uread:\n        vp = \"\""
+      },
+      "entity": "File",
+      "_output_schema": {
+        "list": "download activity: t0,t1,sent,size,path,conn,uname"
+      },
+      "description": "List the currently running downloads tracked by the server (the download-activity monitor). File paths are only shown for volumes the calling account may read.",
+      "guards": {},
+      "_agent_note": "was crud.fetch with lookup_by $session.vpath (nonsense). Replaced with a global search over File so it does not address a single row. Mirrors the in-memory tdli tracker on the File table."
+    },
+    {
+      "tool": "change_password",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Account",
+        "row_key": {
+          "uname": {
+            "$session": "account_name"
+          }
+        },
+        "set": {
+          "password_hash": {
+            "$arg": "newpwd"
+          }
+        }
+      },
+      "input_schema": {
+        "newpwd": {
+          "type": "text",
+          "required": true,
+          "description": "The new password (hashed server-side)."
+        }
+      },
+      "_evidence": {
+        "locator": "copyparty/httpcli.py:3609",
+        "id_local": "Account.change_password",
+        "entry": {
+          "kind": "http",
+          "route": "POST ?act=chpw",
+          "locator": "copyparty/httpcli.py:3131-3132"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "pwdb = [x for x in pwdb if x[0] != uname]\npwdb.append((uname, self.defpw[uname], hpw))\nwith open(ap, \"w\", encoding=\"utf-8\") as f:\n    json.dump(pwdb, f, separators=(\",\\n\", \": \"))",
+        "edges": [
+          "copyparty/authsrv.py:3528-3532"
+        ]
+      },
+      "entity": "Account",
+      "_binds": {
+        "newpwd": "Account.password_hash"
+      },
+      "_output_schema": {
+        "message": "new password OK"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "newpwd"
+        ],
+        "messages": {
+          "auth": "You must be signed in to change your password.",
+          "required": "A new password is required.",
+          "not_found": "Your account row could not be found."
+        }
+      },
+      "description": "Change your own account's password. You must be signed in; the change applies to the calling account.",
+      "_agent_note": "replaces account_change_password; dropped cppwd (config-gated current-password check, not a DB wall). row_key = calling account's uname."
+    }
+  ],
+  "seed_state": {
+    "Account": [
+      {
+        "uname": "ops@copyparty.example",
+        "password_hash": "pw-operations",
+        "id": 1
+      },
+      {
+        "uname": "colleague@copyparty.example",
+        "password_hash": "pw-colleague",
+        "id": 2
+      }
+    ],
+    "File": [
+      {
+        "name": "docs/report.pdf",
+        "size": 20480,
+        "id": 1
+      },
+      {
+        "name": "docs/notes.txt",
+        "size": 1024,
+        "id": 2
+      }
+    ],
+    "Folder": [
+      {
+        "path": "docs",
+        "id": 1
+      },
+      {
+        "path": "media",
+        "id": 2
+      }
+    ],
+    "Up": [
+      {
+        "w": "w01",
+        "mt": "2026-01-01T10:00:00",
+        "sz": 20480,
+        "rd": "docs",
+        "fn": "report.pdf",
+        "un": "ada@example.com",
+        "id": 1
+      },
+      {
+        "w": "w02",
+        "mt": "2026-01-02T11:00:00",
+        "sz": 1024,
+        "rd": "docs",
+        "fn": "notes.txt",
+        "un": "grace@example.com",
+        "id": 2
+      }
+    ],
+    "Share": [
+      {
+        "k": "S1",
+        "pw": "pw-s1",
+        "vp": "docs/report.pdf",
+        "pr": "r",
+        "st": 1,
+        "un": "ada@example.com",
+        "t0": "2026-01-01T00:00:00",
+        "t1": "2026-02-01T00:00:00",
+        "id": 1
+      }
+    ],
+    "ShareFile": [
+      {
+        "k": "S1",
+        "vp": "docs/report.pdf",
+        "id": 1
+      }
+    ]
+  },
+  "summary": "copyparty is a Python self-hosted file sharing/upload server: a virtual filesystem over host directories, a per-volume SQLite file index (up/mt/ds/iu/cv/dh/kv tables) built by rescan and updated on every upload/delete/move/copy, a sessions DB, a share DB (Sh/Sf), a chpw password store, HTTP multipart/json/binary upload plus WebDAV/WebSocket interfaces",
+  "_auth_candidates": [
+    {
+      "entity": "Account",
+      "username_col": "uname",
+      "password_col": "password_hash"
+    }
+  ],
+  "_fk_gravity": {
+    "entity": "Up",
+    "fk_count": 2
+  },
+  "_read_denied": "forbidden",
+  "_no_edges": [
+    {
+      "id_local": "File.upload_abort",
+      "why": "aborts an in-flight broker copy/move by akey (up2k.handle_fs_abrt); persists no row, only cancellation flag; config-toggled --no_fs_abrt, no DB wall, calls nothing"
+    },
+    {
+      "id_local": "File.reindex",
+      "why": "system-internal background rescan reindex driven by the upload/change pipeline (up2k._hasher); permission-less internal worker; its tag enqueue feed the same tagged worker rather than a separate user op"
+    }
+  ],
+  "auth": {
+    "account_entity": "Account",
+    "username_col": "uname",
+    "password_col": "password_hash",
+    "session_fields": {
+      "account_name": "uname"
+    }
+  }
+}

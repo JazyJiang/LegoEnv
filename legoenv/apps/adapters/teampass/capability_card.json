@@ -1,0 +1,190 @@
+{
+  "app": "teampass",
+  "role": "shared credential vault and access-review record management (TeamPass-style)",
+  "domains": [
+    "credential_operations",
+    "access_management"
+  ],
+  "kinds": {
+    "create_record": [
+      "items_create",
+      "nestedtree_create",
+      "laprpolicy_create",
+      "accessreview_create"
+    ],
+    "update_record": [
+      "items_update",
+      "items_move",
+      "nestedtree_update",
+      "kb_save",
+      "laprpolicy_update",
+      "accessreviewitem_decide",
+      "accessreview_close"
+    ],
+    "create_or_update_doc": [
+      "kb_save"
+    ],
+    "attach_note_or_task": [
+      "kbcomment_add"
+    ],
+    "delete_or_archive_row": [
+      "items_delete",
+      "kb_delete",
+      "laprpolicy_delete"
+    ]
+  },
+  "check_kinds": [
+    "record_exists",
+    "record_not_exists",
+    "record_field_equals",
+    "record_field_contains",
+    "record_field_unchanged",
+    "note_or_task_exists",
+    "note_or_task_not_exists",
+    "doc_exists_with",
+    "row_deleted_or_archived",
+    "action_done",
+    "action_not_done"
+  ],
+  "carriers": {
+    "notes_field": {
+      "entity": "Misc",
+      "field": "valeur"
+    }
+  },
+  "login": {
+    "tool": "sign_in",
+    "user_field": "login",
+    "persona_entity": "User"
+  },
+  "content_entities": [
+    "DefusePassword",
+    "Notification",
+    "SharekeyItem",
+    "SharekeyLog",
+    "SharekeyField",
+    "SharekeySuggestion",
+    "SharekeyFile",
+    "Items",
+    "LogItem",
+    "Misc",
+    "NestedTree",
+    "Right",
+    "Tag",
+    "LogSystem",
+    "File",
+    "Cache",
+    "RoleTitle",
+    "RoleValue",
+    "Kb",
+    "KbCategory",
+    "KbItem",
+    "KbComment",
+    "KbEdition",
+    "RestrictionToRole",
+    "Email",
+    "AutomaticDel",
+    "ItemEdition",
+    "Category",
+    "CategoryItem",
+    "CategoryFolder",
+    "Otv",
+    "Suggestion",
+    "Export",
+    "ItemChange",
+    "Template",
+    "CacheTree",
+    "BackgroundSubtask",
+    "BackgroundTask",
+    "BackgroundTasksLog",
+    "ItemCorruption",
+    "ItemHealth",
+    "UserNotification",
+    "RotationFlag",
+    "AccessReview",
+    "AccessReviewItem",
+    "DataClassification",
+    "UserNudge",
+    "LaprEndpoint",
+    "LaprAccount",
+    "LaprPolicy",
+    "LaprAuditLog",
+    "LaprRateLimit",
+    "LdapGroupsRole",
+    "ItemsOtp",
+    "ItemsImportation",
+    "ImportTracking",
+    "UserGroup",
+    "UserGroupForbidden",
+    "UserRole",
+    "UserFavorite",
+    "UserLatestItem",
+    "UsersOptionsFavorite",
+    "EncryptionMigrationStat",
+    "WebsocketEvent",
+    "NetworkAcl",
+    "EmailsTemplate",
+    "ItemRevision",
+    "Process",
+    "ProcessTask",
+    "ProcessLog"
+  ],
+  "seed_helpers": [
+    "add_users",
+    "vault",
+    "items",
+    "knowledge_base",
+    "access_review",
+    "policy"
+  ],
+  "tool_families_to_keep": [
+    "sign_in",
+    "items_create",
+    "items_update",
+    "items_move",
+    "items_delete",
+    "items_getpassword",
+    "nestedtree_create",
+    "nestedtree_update",
+    "apifolder_list",
+    "apiuser_list",
+    "apimisc_refreshsettings",
+    "kb_save",
+    "kb_delete",
+    "kbcomment_add",
+    "laprpolicy_create",
+    "laprpolicy_update",
+    "laprpolicy_delete",
+    "accessreview_",
+    "accessreviewitem_decide"
+  ],
+  "obs_reads": [
+    "apifolder_list",
+    "apiuser_list",
+    "apimisc_refreshsettings",
+    "accessreview_export"
+  ],
+  "known_patches": [
+    "env_id teampass",
+    "Integer User.id=1 admin persona with known login/pw, plus persona ApiSession fixture required by original REST-list guard",
+    "Optional search/limit filters on apifolder_list,apiuser_list,apimisc_refreshsettings,accessreview_export",
+    "Remove apifolder_list erroneous folder-id equals actor-id scope; preserve its original ApiSession guard"
+  ],
+  "known_limitations": [
+    "No Items list/search tool exists; do not invent item discovery. Known ids can be read with items_getpassword when share keys are seeded.",
+    "items_create does not create SharekeyItem grants for a new item, so the original share-key-gated password read may be refused after creation.",
+    "items_create read-only guard is an OR with folder existence; read-only users may create in existing folders. Item update/delete/move guards also do not implement full folder permission checks.",
+    "ApiSession guards test global row existence, not the current actor/session. Preseeded persona session enables original REST reads but is not a JWT/session-isolation guarantee.",
+    "Credential pw values are stored and read as supplied by the deterministic executor; no actual encryption/decryption or external password rotation is implemented.",
+    "kb_save does not resolve/create category_id from category text; only updates to seeded KB records are advertised.",
+    "accessreview_create creates metadata without snapshotting grants; accessreviewitem_decide records decision without removing the underlying grant.",
+    "items_copy does not copy a source row/share keys; no full copy capability is advertised. Export returns records rather than formatted CSV."
+  ],
+  "smoke": {
+    "passed": true,
+    "date": "2026-10-24",
+    "report": "ok"
+  },
+  "register_file": "pack/newspecs3/teampass/register.py",
+  "base_spec": "pack/base_specs/teampass.spec.json"
+}

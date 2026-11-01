@@ -1,0 +1,92 @@
+{
+  "app": "wagtail",
+  "role": "CMS page metadata flags, scalar revisions and collection records",
+  "domains": [
+    "operations",
+    "marketing",
+    "it_ops"
+  ],
+  "kinds": {
+    "create_record": [
+      "page_edit_save_draft",
+      "collection_create"
+    ],
+    "update_record": [
+      "collection_edit"
+    ],
+    "record_status_change": [
+      "page_lock",
+      "page_unlock",
+      "page_unpublish",
+      "page_bulk_publish"
+    ],
+    "delete_or_archive_row": [
+      "page_delete",
+      "collection_delete"
+    ]
+  },
+  "check_kinds": [
+    "record_exists",
+    "record_not_exists",
+    "record_field_equals",
+    "record_field_contains",
+    "record_field_unchanged"
+  ],
+  "carriers": {
+    "notes_field": {
+      "entity": "Page",
+      "field": "search_description"
+    }
+  },
+  "login": {
+    "tool": "sign_in",
+    "user_field": "username",
+    "persona_entity": "User"
+  },
+  "content_entities": [
+    "Page",
+    "Revision",
+    "Collection"
+  ],
+  "seed_helpers": [
+    "pages",
+    "revisions",
+    "collections"
+  ],
+  "tool_families_to_keep": [
+    ""
+  ],
+  "obs_reads": [
+    "page_search",
+    "page_edit_get",
+    "collection_index"
+  ],
+  "known_patches": [
+    "Neutral wagtail env_id",
+    "Integer source identity argument schemas including shorthand forms",
+    "Synthetic User1/2/3; original groups/staff/superuser retained",
+    "Actual page/collection substring and revision-page exact filters; no write/guard changes"
+  ],
+  "missing_tools": [
+    "Correct complete page tree creation/movement",
+    "Complete publish/revision pointer workflow",
+    "Comment creation interface",
+    "Binary image/document transfer"
+  ],
+  "limitations": [
+    "All 96 source tools remain; only nine listed scalar write tools are certified.",
+    "page_edit_save_draft creates Revision content but does not update Page title/latest-revision pointers or full draft content. page_edit_publish also only inserts Revision; full publishing is not claimed.",
+    "page_bulk_publish is verified for a scalar id and live=true only, not list/all/descendant batching. Lock/unlock are flags and do not fully prevent later edits or clear lock metadata.",
+    "page_create incorrectly uses parent_page_id for path/depth/url/locale; page_move/tree descendants and collection parent/path handling are incomplete. Collection writes certify scalar name records only.",
+    "Original page ACLs are largely authentication-only; locks do not prevent source draft insertion. page_delete protects depth1 but does not establish path-based descendant cascades or complete deletion logs.",
+    "Revision.object_id has a text schema but source draft insert writes numeric page_id; helpers/filtered revision reads use the producer numeric representation. Raw string-id legacy revisions require matching normalization upstream.",
+    "Media tools contain metadata/size placeholders and do not transfer binary data. No complete CMS publication, moderation, search ranking or security workflow is certified."
+  ],
+  "smoke": {
+    "passed": true,
+    "date": "2026-10-24",
+    "report": "ok"
+  },
+  "register_file": "pack/newspecs3/wagtail/register.py",
+  "base_spec": "pack/base_specs/wagtail.spec.json"
+}

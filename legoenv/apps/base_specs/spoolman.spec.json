@@ -1,0 +1,3410 @@
+{
+  "env_id": "spoolman",
+  "_prep_version": 3,
+  "entities": [
+    {
+      "name": "Vendor",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "registered",
+          "type": "datetime",
+          "nullable": false,
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false,
+          "max": 64
+        },
+        {
+          "name": "empty_spool_weight",
+          "type": "float",
+          "nullable": true,
+          "min": 0
+        },
+        {
+          "name": "comment",
+          "type": "text",
+          "nullable": true,
+          "max": 1024
+        },
+        {
+          "name": "external_id",
+          "type": "text",
+          "nullable": true,
+          "max": 256
+        },
+        {
+          "name": "extra",
+          "type": "json",
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "name": "Filament",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "registered",
+          "type": "datetime",
+          "nullable": false,
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": true,
+          "max": 64
+        },
+        {
+          "name": "vendor_id",
+          "type": "id",
+          "nullable": true,
+          "fk_to": "Vendor.id",
+          "on_delete": "set_null"
+        },
+        {
+          "name": "material",
+          "type": "text",
+          "nullable": true,
+          "max": 64
+        },
+        {
+          "name": "price",
+          "type": "float",
+          "nullable": true,
+          "min": 0
+        },
+        {
+          "name": "density",
+          "type": "float",
+          "nullable": false,
+          "min": 0
+        },
+        {
+          "name": "diameter",
+          "type": "float",
+          "nullable": false,
+          "min": 0
+        },
+        {
+          "name": "weight",
+          "type": "float",
+          "nullable": true,
+          "min": 0
+        },
+        {
+          "name": "spool_weight",
+          "type": "float",
+          "nullable": true,
+          "min": 0
+        },
+        {
+          "name": "article_number",
+          "type": "text",
+          "nullable": true,
+          "max": 64
+        },
+        {
+          "name": "comment",
+          "type": "text",
+          "nullable": true,
+          "max": 1024
+        },
+        {
+          "name": "settings_extruder_temp",
+          "type": "int",
+          "nullable": true,
+          "min": 0
+        },
+        {
+          "name": "settings_bed_temp",
+          "type": "int",
+          "nullable": true,
+          "min": 0
+        },
+        {
+          "name": "color_hex",
+          "type": "text",
+          "nullable": true,
+          "max": 8
+        },
+        {
+          "name": "multi_color_hexes",
+          "type": "text",
+          "nullable": true,
+          "max": 128
+        },
+        {
+          "name": "multi_color_direction",
+          "type": "text",
+          "nullable": true,
+          "enum": [
+            "coaxial",
+            "longitudinal"
+          ],
+          "max": 16
+        },
+        {
+          "name": "external_id",
+          "type": "text",
+          "nullable": true,
+          "max": 256
+        },
+        {
+          "name": "extra",
+          "type": "json",
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "name": "Spool",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "registered",
+          "type": "datetime",
+          "nullable": false,
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "first_used",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "last_used",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "price",
+          "type": "float",
+          "nullable": true,
+          "min": 0
+        },
+        {
+          "name": "filament_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Filament.id"
+        },
+        {
+          "name": "initial_weight",
+          "type": "float",
+          "nullable": true,
+          "min": 0
+        },
+        {
+          "name": "spool_weight",
+          "type": "float",
+          "nullable": true,
+          "min": 0
+        },
+        {
+          "name": "used_weight",
+          "type": "float",
+          "nullable": false,
+          "min": 0
+        },
+        {
+          "name": "location",
+          "type": "text",
+          "nullable": true,
+          "max": 64
+        },
+        {
+          "name": "lot_nr",
+          "type": "text",
+          "nullable": true,
+          "max": 64
+        },
+        {
+          "name": "comment",
+          "type": "text",
+          "nullable": true,
+          "max": 1024
+        },
+        {
+          "name": "archived",
+          "type": "bool",
+          "nullable": true,
+          "default": false
+        }
+      ]
+    },
+    {
+      "name": "Setting",
+      "columns": [
+        {
+          "name": "key",
+          "type": "text",
+          "pk": true,
+          "max": 64
+        },
+        {
+          "name": "value",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "last_updated",
+          "type": "datetime",
+          "nullable": false,
+          "audit": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "key"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "VendorField",
+      "columns": [
+        {
+          "name": "vendor_id",
+          "type": "id",
+          "pk": true,
+          "fk_to": "Vendor.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "key",
+          "type": "text",
+          "pk": true,
+          "max": 64
+        },
+        {
+          "name": "value",
+          "type": "text",
+          "nullable": false
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "vendor_id",
+            "key"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "FilamentField",
+      "columns": [
+        {
+          "name": "filament_id",
+          "type": "id",
+          "pk": true,
+          "fk_to": "Filament.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "key",
+          "type": "text",
+          "pk": true,
+          "max": 64
+        },
+        {
+          "name": "value",
+          "type": "text",
+          "nullable": false
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "filament_id",
+            "key"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "SpoolField",
+      "columns": [
+        {
+          "name": "spool_id",
+          "type": "id",
+          "pk": true,
+          "fk_to": "Spool.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "key",
+          "type": "text",
+          "pk": true,
+          "max": 64
+        },
+        {
+          "name": "value",
+          "type": "text",
+          "nullable": false
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "spool_id",
+            "key"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Tag",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "uid",
+          "type": "text",
+          "nullable": false,
+          "max": 64
+        },
+        {
+          "name": "target_type",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "spool",
+            "filament",
+            "location"
+          ],
+          "max": 16
+        },
+        {
+          "name": "spool_id",
+          "type": "id",
+          "nullable": true,
+          "fk_to": "Spool.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "filament_id",
+          "type": "id",
+          "nullable": true,
+          "fk_to": "Filament.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "target_value",
+          "type": "text",
+          "nullable": true,
+          "max": 64
+        },
+        {
+          "name": "format",
+          "type": "text",
+          "nullable": true,
+          "max": 32
+        },
+        {
+          "name": "added",
+          "type": "datetime",
+          "nullable": false,
+          "audit": true,
+          "immutable": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "uid"
+          ]
+        }
+      ]
+    }
+  ],
+  "tools": [
+    {
+      "tool": "vendor_find",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Vendor",
+        "search_fields": [
+          "name",
+          "external_id"
+        ],
+        "rank": {
+          "method": "substring",
+          "fields": [
+            "name",
+            "external_id"
+          ]
+        },
+        "pagination": {
+          "default_limit": 20
+        },
+        "filter": {
+          "and": [
+            {
+              "col": "name",
+              "mode": "exact",
+              "val": {
+                "$arg": "name"
+              },
+              "optional": true
+            },
+            {
+              "col": "external_id",
+              "mode": "exact",
+              "val": {
+                "$arg": "external_id"
+              },
+              "optional": true
+            }
+          ]
+        }
+      },
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "description": "Filter to vendors whose name matches (optional; omit for all)."
+        },
+        "external_id": {
+          "type": "text",
+          "description": "Filter by external id (optional)."
+        },
+        "sort": {
+          "type": "text",
+          "description": "Sort column."
+        },
+        "limit": {
+          "type": "int",
+          "description": "Max rows (enables total-count)."
+        },
+        "offset": {
+          "type": "int",
+          "description": "Row offset."
+        }
+      },
+      "_evidence": {
+        "locator": "spoolman/database/vendor.py:59",
+        "id_local": "Vendor.find",
+        "entry": {
+          "kind": "http",
+          "route": "GET /vendor",
+          "locator": "spoolman/api/v1/vendor.py:67"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "stmt = select(models.Vendor)\nstmt = add_where_clause_str(stmt, models.Vendor.name, name)\nstmt = add_where_clause_str_opt(stmt, models.Vendor.external_id, external_id)\nstmt = await apply_extra_field_filters_and_sort(db=db, stmt=stmt, base_obj=models.Vendor, entity_type=EntityType.vendor, extra_field_filters=extra_field_filters, sort_by=sort_by)\nif limit is not None:\n    total_count_stmt = stmt.with_only_columns(func.count(), maintain_column_froms=True).order_by(None)\n    total_count = (await db.execute(total_count_stmt)).scalar()\n    stmt = stmt.offset(offset).limit(limit)",
+        "scope_why": "Public inventory directory; no accounts or tenant boundary in Spoolman."
+      },
+      "entity": "Vendor",
+      "_binds": {
+        "external_id": "Vendor.external_id"
+      },
+      "_output_schema": {
+        "": "list of Vendor rows",
+        "x-total-count": "int or absent"
+      },
+      "description": "Find vendors by name or external id, optionally sorted and paginated. Returns a list of matching Vendor rows plus an x-total-count header when a limit is given."
+    },
+    {
+      "tool": "vendor_create",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Vendor",
+        "fields": [
+          "name",
+          "comment",
+          "empty_spool_weight",
+          "external_id"
+        ],
+        "set_on_create": {
+          "registered": "2026-01-01T00:00:00"
+        }
+      },
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "description": "Required vendor display name (max 64)."
+        },
+        "comment": {
+          "type": "text",
+          "description": "Free-text note."
+        },
+        "empty_spool_weight": {
+          "type": "float",
+          "description": "Empty-spool weight default used for new filaments."
+        },
+        "external_id": {
+          "type": "text",
+          "description": "Optional external identifier."
+        },
+        "extra": {
+          "type": "json",
+          "description": "JSON of custom extra-field key/value pairs."
+        }
+      },
+      "_evidence": {
+        "locator": "spoolman/database/vendor.py:27",
+        "id_local": "Vendor.create",
+        "entry": {
+          "kind": "http",
+          "route": "POST /vendor",
+          "locator": "spoolman/api/v1/vendor.py:213"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "vendor = models.Vendor(\n    name=name, registered=datetime.utcnow().replace(microsecond=0),\n    comment=comment, empty_spool_weight=empty_spool_weight, external_id=external_id,\n    extra=[models.VendorField(key=k, value=v) for k, v in (extra or {}).items() if v is not None],\n)\ndb.add(vendor)\nawait db.commit()\nawait vendor_changed(vendor, EventType.ADDED)"
+      },
+      "entity": "Vendor",
+      "_binds": {
+        "name": "Vendor.name",
+        "comment": "Vendor.comment",
+        "empty_spool_weight": "Vendor.empty_spool_weight",
+        "external_id": "Vendor.external_id"
+      },
+      "_output_schema": {
+        "": "the created Vendor row"
+      },
+      "guards": {
+        "required": [
+          "name"
+        ],
+        "messages": {
+          "required": "A vendor needs a name.",
+          "not_found": "That vendor does not exist.",
+          "unique": "A vendor with that name already exists.",
+          "fk": "A referenced id does not exist."
+        }
+      },
+      "description": "Create a new filament vendor. The vendor name is required; all other fields are optional and patchable later. Returns the created Vendor row."
+    },
+    {
+      "tool": "vendor_get",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Vendor",
+        "lookup_by": {
+          "id": {
+            "$arg": "vendor_id"
+          }
+        }
+      },
+      "input_schema": {
+        "vendor_id": {
+          "type": "int",
+          "description": "Id of the vendor to fetch."
+        }
+      },
+      "_evidence": {
+        "locator": "spoolman/database/vendor.py:51",
+        "id_local": "Vendor.get",
+        "entry": {
+          "kind": "http",
+          "route": "GET /vendor/{vendor_id}",
+          "locator": "spoolman/api/v1/vendor.py:176"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "async def get_by_id(db, vendor_id):\n    vendor = await db.get(models.Vendor, vendor_id)\n    if vendor is None:\n        raise ItemNotFoundError(f\"No vendor with ID {vendor_id} found.\")\n    return vendor"
+      },
+      "entity": "Vendor",
+      "_binds": {
+        "vendor_id": "Vendor.id"
+      },
+      "_output_schema": {
+        "": "the Vendor row"
+      },
+      "guards": {
+        "required": [
+          "vendor_id"
+        ],
+        "messages": {
+          "required": "Provide the id of the vendor to fetch.",
+          "not_found": "No vendor with that id exists."
+        }
+      },
+      "description": "Fetch a single vendor by id. Returns the Vendor row, or fails not-found if no vendor has that id."
+    },
+    {
+      "tool": "vendor_update",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Vendor",
+        "row_key": {
+          "id": {
+            "$arg": "vendor_id"
+          }
+        },
+        "fields": [
+          "name",
+          "comment",
+          "empty_spool_weight",
+          "external_id"
+        ],
+        "set": {}
+      },
+      "input_schema": {
+        "vendor_id": {
+          "type": "int",
+          "description": "Id of the vendor to update."
+        },
+        "name": {
+          "type": "text",
+          "description": "New vendor name."
+        },
+        "comment": {
+          "type": "text",
+          "description": "New comment."
+        },
+        "empty_spool_weight": {
+          "type": "float",
+          "description": "New empty-spool weight."
+        },
+        "external_id": {
+          "type": "text",
+          "description": "New external id."
+        },
+        "extra": {
+          "type": "json",
+          "description": "Use vendor_extra_field_set instead."
+        }
+      },
+      "_evidence": {
+        "locator": "spoolman/database/vendor.py:114",
+        "id_local": "Vendor.update",
+        "entry": {
+          "kind": "http",
+          "route": "PATCH /vendor/{vendor_id}",
+          "locator": "spoolman/api/v1/vendor.py:244"
+        },
+        "entity_why": "primary effect link lands on this table",
+        "ref_code": "for k, v in data.items():\n    if k == \"extra\":\n        vendor.extra = [f for f in vendor.extra if f.key not in v]\n        vendor.extra.extend([models.VendorField(key=k, value=v) for k, v in v.items() if v is not None])\n    else:\n        setattr(vendor, k, v)\nawait db.commit()\nawait vendor_changed(vendor, EventType.UPDATED)"
+      },
+      "entity": "VendorField",
+      "_binds": {
+        "vendor_id": "Vendor.id",
+        "name": "Vendor.name",
+        "comment": "Vendor.comment",
+        "empty_spool_weight": "Vendor.empty_spool_weight",
+        "external_id": "Vendor.external_id"
+      },
+      "_output_schema": {
+        "": "the updated Vendor row"
+      },
+      "guards": {
+        "required": [
+          "vendor_id"
+        ],
+        "messages": {
+          "required": "Provide the id of the vendor to update.",
+          "not_found": "No vendor with that id exists to update."
+        }
+      },
+      "description": "Update a vendor's basic fields (name, comment, empty spool weight, external id). Extra-fields are managed via vendor_extra_field_set. Fails if the vendor does not exist."
+    },
+    {
+      "tool": "vendor_delete",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "Vendor",
+        "lookup_by": {
+          "id": {
+            "$arg": "vendor_id"
+          }
+        }
+      },
+      "input_schema": {
+        "vendor_id": "int"
+      },
+      "_evidence": {
+        "locator": "spoolman/database/vendor.py:137",
+        "id_local": "Vendor.delete",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /vendor/{vendor_id}",
+          "locator": "spoolman/api/v1/vendor.py:281"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "async def delete(db, vendor_id):\n    vendor = await get_by_id(db, vendor_id)\n    await db.delete(vendor)\n    await db.commit()\n    await vendor_changed(vendor, EventType.DELETED)"
+      },
+      "entity": "Vendor",
+      "_binds": {
+        "vendor_id": "Vendor.id"
+      },
+      "_output_schema": {
+        "": "Message success"
+      },
+      "guards": {
+        "required": [
+          "vendor_id"
+        ],
+        "messages": {
+          "required": "Provide the id of the vendor to delete.",
+          "not_found": "No vendor with that id exists to delete."
+        }
+      },
+      "description": "Delete a vendor. Filaments that reference it are detached (vendor_id set to null), mirroring the ORM's behaviour. Fails if the vendor does not exist."
+    },
+    {
+      "tool": "filament_find",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Filament",
+        "search_fields": [
+          "name",
+          "material",
+          "article_number",
+          "external_id",
+          "comment"
+        ],
+        "rank": {
+          "method": "substring",
+          "fields": [
+            "name",
+            "material",
+            "article_number",
+            "external_id",
+            "comment"
+          ]
+        },
+        "pagination": {
+          "default_limit": 20
+        }
+      },
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "description": "Filter by name."
+        },
+        "vendor.name": {
+          "type": "text",
+          "description": "Filter by vendor name."
+        },
+        "vendor.id": {
+          "type": "text",
+          "description": "Filter by vendor id."
+        },
+        "material": {
+          "type": "text",
+          "description": "Filter by material."
+        },
+        "article_number": {
+          "type": "text",
+          "description": "Filter by article number."
+        },
+        "color_hex": {
+          "type": "text",
+          "description": "Filter by colour similarity."
+        },
+        "color_similarity_threshold": {
+          "type": "float",
+          "description": "Similarity threshold for color_hex."
+        },
+        "external_id": {
+          "type": "text",
+          "description": "Filter by external id."
+        },
+        "sort": {
+          "type": "text",
+          "description": "Sort column."
+        },
+        "limit": {
+          "type": "int",
+          "description": "Max rows."
+        },
+        "offset": {
+          "type": "int",
+          "description": "Row offset."
+        }
+      },
+      "_evidence": {
+        "locator": "spoolman/database/filament.py:98",
+        "id_local": "Filament.find",
+        "entry": {
+          "kind": "http",
+          "route": "GET /filament",
+          "locator": "spoolman/api/v1/filament.py:197"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "stmt = select(models.Filament).options(contains_eager(models.Filament.vendor)).join(models.Filament.vendor, isouter=True)\nstmt = add_where_clause_int_in(stmt, models.Filament.id, ids)\nstmt = add_where_clause_int_opt(stmt, models.Filament.vendor_id, vendor_id)\nstmt = add_where_clause_str(stmt, models.Vendor.name, vendor_name)\nstmt = add_where_clause_str_opt(stmt, models.Filament.name, name)\nstmt = add_where_clause_str_opt(stmt, models.Filament.material, material)\nstmt = add_where_clause_str_opt(stmt, models.Filament.article_number, article_number)",
+        "scope_why": "Globally visible: Spoolman is a single-user/self-hosted inventory app with no accounts or tenant boundary — vendor/filament/spool searches are public to the whole app."
+      },
+      "entity": "Filament",
+      "_binds": {
+        "external_id": "Filament.external_id"
+      },
+      "_output_schema": {
+        "": "list of Filament rows",
+        "x-total-count": "int or absent"
+      },
+      "description": "Find filament types by name, material, article number, external id or vendor. Each row embeds its vendor. Returns a list with an x-total-count header when paginated."
+    },
+    {
+      "tool": "filament_create",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Filament",
+        "fields": [
+          "name",
+          "material",
+          "price",
+          "density",
+          "diameter",
+          "weight",
+          "spool_weight",
+          "article_number",
+          "comment",
+          "settings_extruder_temp",
+          "settings_bed_temp",
+          "color_hex",
+          "multi_color_hexes",
+          "multi_color_direction",
+          "external_id",
+          "vendor_id"
+        ],
+        "set_on_create": {
+          "registered": "2026-01-01T00:00:00"
+        }
+      },
+      "input_schema": {
+        "density": {
+          "type": "float",
+          "description": "Required density in g/cm3."
+        },
+        "diameter": {
+          "type": "float",
+          "description": "Required diameter in mm."
+        },
+        "name": {
+          "type": "text",
+          "description": "Filament display name."
+        },
+        "vendor_id": {
+          "type": "int",
+          "description": "Id of the maker."
+        },
+        "material": {
+          "type": "text",
+          "description": "Material, e.g. PLA."
+        },
+        "price": {
+          "type": "float",
+          "description": "Price per spool."
+        },
+        "weight": {
+          "type": "float",
+          "description": "Nominal spool weight (default initial weight)."
+        },
+        "spool_weight": {
+          "type": "float",
+          "description": "Empty spool weight."
+        },
+        "article_number": {
+          "type": "text",
+          "description": "Article number."
+        },
+        "comment": {
+          "type": "text",
+          "description": "Free-text note."
+        },
+        "settings_extruder_temp": {
+          "type": "int",
+          "description": "Suggested extruder temp (C)."
+        },
+        "settings_bed_temp": {
+          "type": "int",
+          "description": "Suggested bed temp (C)."
+        },
+        "color_hex": {
+          "type": "text",
+          "description": "Single colour hex."
+        },
+        "multi_color_hexes": {
+          "type": "text",
+          "description": "Comma-separated hexes."
+        },
+        "multi_color_direction": {
+          "type": "text",
+          "description": "coaxial or longitudinal."
+        },
+        "external_id": {
+          "type": "text",
+          "description": "External id."
+        },
+        "extra": {
+          "type": "json",
+          "description": "JSON of custom extra-fields."
+        }
+      },
+      "_evidence": {
+        "locator": "spoolman/database/filament.py:31",
+        "id_local": "Filament.create",
+        "entry": {
+          "kind": "http",
+          "route": "POST /filament",
+          "locator": "spoolman/api/v1/filament.py:444"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "prefix = ''\n    vendor_item = await vendor.get_by_id(db, vendor_id)\n    if spool_weight is None and vendor_item.empty_spool_weight is not None:\n        spool_weight = vendor_item.empty_spool_weight\nfilament = models.Filament(name=name, registered=datetime.utcnow().replace(microsecond=0), vendor=vendor_item, material=material, density=density, diameter=diameter,\n    extra=[models.FilamentField(key=k, value=v) for k, v in (extra or {}).items() if v is not None])\ndb.add(filament)\nawait db.commit()\nawait filament_changed(filament, EventType.ADDED)",
+        "edges": [
+          "spoolman/database/filament.py:33 (if vendor_id: vendor_item = await vendor.get_by_id(db, vendor_id)"
+        ]
+      },
+      "entity": "Filament",
+      "_binds": {
+        "density": "Filament.density",
+        "diameter": "Filament.diameter",
+        "name": "Filament.name",
+        "vendor_id": "Filament.vendor_id",
+        "material": "Filament.material",
+        "price": "Filament.price",
+        "weight": "Filament.weight",
+        "spool_weight": "Filament.spool_weight",
+        "article_number": "Filament.article_number",
+        "comment": "Filament.comment",
+        "settings_extruder_temp": "Filament.settings_extruder_temp",
+        "settings_bed_temp": "Filament.settings_bed_temp",
+        "color_hex": "Filament.color_hex",
+        "multi_color_hexes": "Filament.multi_color_hexes",
+        "multi_color_direction": "Filament.multi_color_direction",
+        "external_id": "Filament.external_id"
+      },
+      "_output_schema": {
+        "": "the created Filament row"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Vendor",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "vendor_id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "density",
+          "diameter"
+        ],
+        "messages": {
+          "required": "density and diameter are required to create a filament.",
+          "fk": "That vendor does not exist.",
+          "fk_missing": "density and diameter are required.",
+          "not_found": "That vendor does not exist.",
+          "precondition": "You can only create a filament for a vendor that already exists — create or pick the vendor first."
+        }
+      },
+      "description": "Create a new filament type. density and diameter are required; a vendor may be attached and default spool/initial weights come from it. Returns the created Filament row."
+    },
+    {
+      "tool": "filament_get",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Filament",
+        "lookup_by": {
+          "id": {
+            "$arg": "filament_id"
+          }
+        }
+      },
+      "input_schema": {
+        "filament_id": {
+          "type": "int",
+          "description": "Id of the filament to fetch."
+        }
+      },
+      "_evidence": {
+        "locator": "spoolman/database/filament.py:86",
+        "id_local": "Filament.get",
+        "entry": {
+          "kind": "http",
+          "route": "GET /filament/{filament_id}",
+          "locator": "spoolman/api/v1/filament.py:407"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "async def get_by_id(db, filament_id):\n    filament = await db.get(models.Filament, filament_id, options=[joinedload('*')])\n    if filament is None:\n        raise ItemNotFoundError(f\"No filament with ID {filament_id} found.\")\n    return filament"
+      },
+      "entity": "Filament",
+      "_binds": {
+        "filament_id": "Filament.id"
+      },
+      "_output_schema": {
+        "": "the Filament row incl. its vendor"
+      },
+      "guards": {
+        "required": [
+          "filament_id"
+        ],
+        "messages": {
+          "required": "Provide the id of the filament to fetch.",
+          "not_found": "No filament with that id exists."
+        }
+      },
+      "description": "Fetch a single filament type by id, including its vendor. Fails not-found if the id is unknown."
+    },
+    {
+      "tool": "filament_update",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Filament",
+        "row_key": {
+          "id": {
+            "$arg": "filament_id"
+          }
+        },
+        "fields": [
+          "name",
+          "material",
+          "price",
+          "density",
+          "diameter",
+          "weight",
+          "spool_weight",
+          "article_number",
+          "comment",
+          "settings_extruder_temp",
+          "settings_bed_temp",
+          "color_hex",
+          "multi_color_hexes",
+          "multi_color_direction",
+          "external_id",
+          "vendor_id"
+        ],
+        "set": {}
+      },
+      "input_schema": {
+        "filament_id": {
+          "type": "int",
+          "description": "Id of the filament to update."
+        },
+        "name": "text",
+        "vendor_id": {
+          "type": "int",
+          "description": "New vendor id (null to detach)."
+        },
+        "material": "text",
+        "price": "float",
+        "density": "float",
+        "diameter": "float",
+        "weight": "float",
+        "spool_weight": "float",
+        "article_number": "text",
+        "comment": "text",
+        "settings_extruder_temp": "int",
+        "settings_bed_temp": "int",
+        "color_hex": "text",
+        "multi_color_hexes": "text",
+        "multi_color_direction": "text",
+        "external_id": "text",
+        "extra": "json"
+      },
+      "_evidence": {
+        "locator": "spoolman/database/filament.py:170",
+        "id_local": "Filament.update",
+        "entry": {
+          "kind": "http",
+          "route": "PATCH /filament/{filament_id}",
+          "locator": "spoolman/api/v1/filament.py:487"
+        },
+        "entity_why": "primary effect link lands on this table",
+        "ref_code": "for k, v in data.items():\n    if k == \"vendor_id\":\n        if v is None: filament.vendor = None\n        else: filament.vendor = await vendor.get_by_id(db, v)\n    elif k == \"extra\":\n        filament.extra = [f for f in filament.extra if f.key not in v]\n        filament.extra.extend([models.FilamentField(key=k, value=v) for k, v in v.items() if v is not None])\n    elif k == \"multi_color_direction\":\n        filament.multi_color_direction = v.value if v is not None else None\n    else:\n        setattr(filament, k, v)\nawait db.commit()\nawait filament_changed(filament, EventType.UPDATED)",
+        "edges": [
+          "spoolman/database/filament.py:174 (elif k=='vendor_id': then filament.vendor = await vendor.get_by_id(db, v))"
+        ]
+      },
+      "entity": "FilamentField",
+      "_binds": {
+        "filament_id": "Filament.id",
+        "name": "Filament.name",
+        "vendor_id": "Filament.vendor_id",
+        "material": "Filament.material",
+        "price": "Filament.price",
+        "density": "Filament.density",
+        "diameter": "Filament.diameter",
+        "weight": "Filament.weight",
+        "spool_weight": "Filament.spool_weight",
+        "article_number": "Filament.article_number",
+        "comment": "Filament.comment",
+        "settings_extruder_temp": "Filament.settings_extruder_temp",
+        "settings_bed_temp": "Filament.settings_bed_temp",
+        "color_hex": "Filament.color_hex",
+        "multi_color_hexes": "Filament.multi_color_hexes",
+        "multi_color_direction": "Filament.multi_color_direction",
+        "external_id": "Filament.external_id"
+      },
+      "_output_schema": {
+        "": "the updated Filament row"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Vendor",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "vendor_id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "filament_id"
+        ],
+        "messages": {
+          "required": "Provide the id of the filament to update.",
+          "not_found": "No filament with that id exists.",
+          "fk": "That vendor does not exist.",
+          "precondition": "You can only move a filament to a vendor that already exists."
+        }
+      },
+      "description": "Update a filament's basic fields, including vendor, colour and print settings. Extra-fields use filament_extra_field_set. Fails if the filament or new vendor does not exist."
+    },
+    {
+      "tool": "filament_delete",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "Filament",
+        "lookup_by": {
+          "id": {
+            "$arg": "filament_id"
+          }
+        }
+      },
+      "input_schema": {
+        "filament_id": "int"
+      },
+      "_evidence": {
+        "locator": "spoolman/database/filament.py:215",
+        "id_local": "Filament.delete",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /filament/{filament_id}",
+          "locator": "spoolman/api/v1/filament.py:524"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "async def delete(db, filament_id):\n    filament = await get_by_id(db, filament_id)\n    await db.delete(filament)\n    try:\n        await db.commit()\n        await filament_changed(filament, EventType.DELETED)\n    except IntegrityError as exc:\n        await db.rollback()\n        raise ItemDeleteError(\"Failed to delete filament.\") from exc",
+        "edges": [
+          "spoolman/database/filament.py:220-225 (IntegrityError on commit -> ItemDeleteError -> 403)"
+        ]
+      },
+      "entity": "Filament",
+      "_binds": {
+        "filament_id": "Filament.id"
+      },
+      "_output_schema": {
+        "": "Message success or 403 Message"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Spool",
+                "where": {
+                  "node": "field",
+                  "col": "filament_id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "filament_id"
+                  }
+                }
+              },
+              "op": "eq",
+              "n": 0
+            }
+          ]
+        ],
+        "required": [
+          "filament_id"
+        ],
+        "messages": {
+          "required": "Provide the id of the filament to delete.",
+          "not_found": "No filament with that id exists.",
+          "on_child": "This filament still has spools — delete or reassign them first.",
+          "precondition": "This filament still has spools. Move or delete those spools before removing the filament."
+        }
+      },
+      "description": "Delete a filament type. Its spools are NOT deleted; deleting a filament that still has spools (or referenced fields) fails with a conflict. Returns success on removal."
+    },
+    {
+      "tool": "spool_find",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Spool",
+        "search_fields": [
+          "location",
+          "lot_nr",
+          "comment"
+        ],
+        "rank": {
+          "method": "substring",
+          "fields": [
+            "location",
+            "lot_nr",
+            "comment"
+          ]
+        },
+        "pagination": {
+          "default_limit": 20
+        },
+        "filter": {
+          "and": [
+            {
+              "col": "location",
+              "mode": "exact",
+              "val": {
+                "$arg": "location"
+              },
+              "optional": true
+            },
+            {
+              "col": "lot_nr",
+              "mode": "exact",
+              "val": {
+                "$arg": "lot_nr"
+              },
+              "optional": true
+            }
+          ]
+        }
+      },
+      "input_schema": {
+        "filament.name": {
+          "type": "text",
+          "description": "Filter by filament name."
+        },
+        "filament.id": {
+          "type": "text",
+          "description": "Filter by filament id."
+        },
+        "filament.material": {
+          "type": "text",
+          "description": "Filter by material."
+        },
+        "filament.vendor.name": {
+          "type": "text",
+          "description": "Filter by vendor name."
+        },
+        "filament.vendor.id": {
+          "type": "text",
+          "description": "Filter by vendor id."
+        },
+        "location": {
+          "type": "text",
+          "description": "Exact filter by location."
+        },
+        "lot_nr": {
+          "type": "text",
+          "description": "Exact filter by lot number."
+        },
+        "tag": {
+          "type": "text",
+          "description": "Filter to spools carrying a tag with this uid."
+        },
+        "allow_archived": {
+          "type": "bool",
+          "description": "When false (default) archived spools are excluded."
+        },
+        "first_used": {
+          "type": "text",
+          "description": "Earliest first-use date."
+        },
+        "last_used": {
+          "type": "text",
+          "description": "Earliest last-use date."
+        },
+        "registered": {
+          "type": "text",
+          "description": "Earliest registration date."
+        },
+        "sort": {
+          "type": "text",
+          "description": "Sort column."
+        },
+        "limit": {
+          "type": "int",
+          "description": "Max rows."
+        },
+        "offset": {
+          "type": "int",
+          "description": "Row offset."
+        }
+      },
+      "_evidence": {
+        "locator": "spoolman/database/spool.py:132",
+        "id_local": "Spool.find",
+        "entry": {
+          "kind": "http",
+          "route": "GET /spool",
+          "locator": "spoolman/api/v1/spool.py:183"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "stmt = _apply_spool_filters(sqlalchemy.select(models.Spool), filament_name=..., location=location, lot_nr=lot_nr, tag=tag, allow_archived=allow_archived, first_used=..., last_used=..., registered=...)\n# _apply_spool_filters joins Spool.filament and Filament.vendor outer; when tag given:\n#   stmt = stmt.join(models.Tag, models.Tag.spool_id == models.Spool.id).where(models.Tag.uid == normalize_uid(tag))\n#   archived: if not allow_archived: stmt = stmt.where(or_(archived.is_(False), archived.is_(None)))",
+        "scope_why": "Globally visible: Spoolman is a single-user/self-hosted inventory app with no accounts or tenant boundary — vendor/filament/spool searches are public to the whole app."
+      },
+      "entity": "Spool",
+      "_output_schema": {
+        "": "list of Spool rows (each embeds its filament & vendor)",
+        "x-total-count": "int or absent"
+      },
+      "description": "Find spools by location, lot number, tag, filament or usage dates. By default archived spools are excluded. Each row embeds its nested filament and vendor."
+    },
+    {
+      "tool": "spool_create",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Spool",
+        "fields": [
+          "filament_id",
+          "price",
+          "initial_weight",
+          "spool_weight",
+          "used_weight",
+          "first_used",
+          "last_used",
+          "location",
+          "lot_nr",
+          "comment",
+          "archived"
+        ],
+        "set_on_create": {
+          "registered": "2026-01-01T00:00:00"
+        }
+      },
+      "input_schema": {
+        "filament_id": {
+          "type": "int",
+          "description": "Required filament type id."
+        },
+        "price": {
+          "type": "float",
+          "description": "Price of this spool."
+        },
+        "initial_weight": {
+          "type": "float",
+          "description": "Full-spool weight (defaults from filament)."
+        },
+        "spool_weight": {
+          "type": "float",
+          "description": "Empty-spool weight (defaults from filament)."
+        },
+        "remaining_weight": {
+          "type": "float",
+          "description": "Remaining weight; used to derive used_weight."
+        },
+        "used_weight": {
+          "type": "float",
+          "description": "Weight already used."
+        },
+        "first_used": {
+          "type": "datetime",
+          "description": "Override first-use time."
+        },
+        "last_used": {
+          "type": "datetime",
+          "description": "Override last-use time."
+        },
+        "location": {
+          "type": "text",
+          "description": "Storage location."
+        },
+        "lot_nr": {
+          "type": "text",
+          "description": "Lot number."
+        },
+        "comment": {
+          "type": "text",
+          "description": "Free-text note."
+        },
+        "archived": {
+          "type": "bool",
+          "description": "Start archived?"
+        },
+        "extra": {
+          "type": "json",
+          "description": "JSON of custom extra-fields."
+        }
+      },
+      "_evidence": {
+        "locator": "spoolman/database/spool.py:49",
+        "id_local": "Spool.create",
+        "entry": {
+          "kind": "http",
+          "route": "POST /spool",
+          "locator": "spoolman/api/v1/spool.py:730"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "filament_item = await filament.get_by_id(db, filament_id)\nif spool_weight is None and filament_item.spool_weight is not None:\n    spool_weight = filament_item.spool_weight\nif initial_weight is None and filament_item.weight is not None:\n    initial_weight = filament_item.weight\nif used_weight is None:\n    if remaining_weight is not None:\n        if initial_weight is None or initial_weight == 0:\n            raise ItemCreateError(\"remaining_weight can only be used if the initial_weight is defined...\")\n        used_weight = max(initial_weight - remaining_weight, 0)\n    else:\n        used_weight = ",
+        "edges": [
+          "spoolman/database/spool.py:67 (filament_item = await filament.get_by_id(db, filament_id)"
+        ]
+      },
+      "entity": "Spool",
+      "_binds": {
+        "filament_id": "Spool.filament_id",
+        "price": "Spool.price",
+        "initial_weight": "Spool.initial_weight",
+        "spool_weight": "Spool.spool_weight",
+        "used_weight": "Spool.used_weight",
+        "first_used": "Spool.first_used",
+        "last_used": "Spool.last_used",
+        "location": "Spool.location",
+        "lot_nr": "Spool.lot_nr",
+        "comment": "Spool.comment",
+        "archived": "Spool.archived"
+      },
+      "_output_schema": {
+        "": "the created Spool row"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Filament",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "filament_id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "filament_id"
+        ],
+        "messages": {
+          "required": "filament_id is required.",
+          "fk": "That filament does not exist.",
+          "fk_missing": "A spool must reference an existing filament.",
+          "not_found": "That filament does not exist.",
+          "precondition": "You can only register a spool of a filament that already exists."
+        }
+      },
+      "description": "Register a new filament spool. filament_id is required; weights default from the filament and used_weight may derive from remaining_weight. Returns the created Spool row."
+    },
+    {
+      "tool": "spool_get",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Spool",
+        "lookup_by": {
+          "id": {
+            "$arg": "spool_id"
+          }
+        }
+      },
+      "input_schema": {
+        "spool_id": {
+          "type": "int",
+          "description": "Id of the spool to fetch."
+        }
+      },
+      "_evidence": {
+        "locator": "spoolman/database/spool.py:120",
+        "id_local": "Spool.get",
+        "entry": {
+          "kind": "http",
+          "route": "GET /spool/{spool_id}",
+          "locator": "spoolman/api/v1/spool.py:693"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "async def get_by_id(db, spool_id):\n    spool = await db.get(models.Spool, spool_id, options=[joinedload('*')])\n    if spool is None:\n        raise ItemNotFoundError(f\"No spool with ID {spool_id} found.\")\n    return spool"
+      },
+      "entity": "Spool",
+      "_binds": {
+        "spool_id": "Spool.id"
+      },
+      "_output_schema": {
+        "": "the Spool row incl. nested filament/vendor/tags"
+      },
+      "guards": {
+        "required": [
+          "spool_id"
+        ],
+        "messages": {
+          "required": "Provide the id of the spool to fetch.",
+          "not_found": "No spool with that id exists."
+        }
+      },
+      "description": "Fetch a single spool by id, with nested filament, vendor and tags. Fails not-found if the id is unknown."
+    },
+    {
+      "tool": "spool_update",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Spool",
+        "row_key": {
+          "id": {
+            "$arg": "spool_id"
+          }
+        },
+        "fields": [
+          "filament_id",
+          "price",
+          "initial_weight",
+          "spool_weight",
+          "used_weight",
+          "first_used",
+          "last_used",
+          "location",
+          "lot_nr",
+          "comment",
+          "archived"
+        ],
+        "set": {}
+      },
+      "input_schema": {
+        "spool_id": {
+          "type": "int",
+          "description": "Id of the spool to update."
+        },
+        "filament_id": {
+          "type": "int",
+          "description": "New filament id."
+        },
+        "price": "float",
+        "initial_weight": "float",
+        "spool_weight": "float",
+        "remaining_weight": {
+          "type": "float",
+          "description": "Used to derive used_weight."
+        },
+        "used_weight": "float",
+        "first_used": "datetime",
+        "last_used": "datetime",
+        "location": "text",
+        "lot_nr": "text",
+        "comment": "text",
+        "archived": "bool",
+        "extra": "json"
+      },
+      "_evidence": {
+        "locator": "spoolman/database/spool.py:724",
+        "id_local": "Spool.update",
+        "entry": {
+          "kind": "http",
+          "route": "PATCH /spool/{spool_id}",
+          "locator": "spoolman/api/v1/spool.py:787"
+        },
+        "entity_why": "primary effect link lands on this table",
+        "ref_code": "spool = await get_by_id(db, spool_id)\nfor k, v in data.items():\n    if k == \"filament_id\":\n        spool.filament = await filament.get_by_id(db, v)\n        if spool.initial_weight is None and spool.filament.weight is not None:\n            spool.initial_weight = spool.filament.weight\n    elif k == \"remaining_weight\":\n        if spool.initial_weight is None: raise ItemCreateError(...)\n        spool.used_weight = max(spool.initial_weight - v, 0)\n    elif k == \"extra\":\n        spool.extra = [f for f in spool.extra if f.key not in v]\n        spool.extra.extend([models.SpoolField(key=k, value=v) for",
+        "edges": [
+          "spoolman/database/spool.py:733 (if k=='filament_id': spool.filament = await filament.get_by_id(db, v))"
+        ]
+      },
+      "entity": "SpoolField",
+      "_binds": {
+        "spool_id": "Spool.id",
+        "filament_id": "Spool.filament_id",
+        "price": "Spool.price",
+        "initial_weight": "Spool.initial_weight",
+        "spool_weight": "Spool.spool_weight",
+        "used_weight": "Spool.used_weight",
+        "first_used": "Spool.first_used",
+        "last_used": "Spool.last_used",
+        "location": "Spool.location",
+        "lot_nr": "Spool.lot_nr",
+        "comment": "Spool.comment",
+        "archived": "Spool.archived"
+      },
+      "_output_schema": {
+        "": "the updated Spool row"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Filament",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "filament_id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "spool_id"
+        ],
+        "messages": {
+          "required": "Provide the id of the spool to update.",
+          "not_found": "No spool with that id exists.",
+          "fk": "That filament does not exist.",
+          "precondition": "You can only move a spool to a filament that already exists."
+        }
+      },
+      "description": "Update a spool's fields (weights, price, location, lot number, archive flag, or which filament it holds). Changing the filament re-derives initial_weight from the new filament when unset. Fails if the spool or new filament does not exist."
+    },
+    {
+      "tool": "spool_delete",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "Spool",
+        "lookup_by": {
+          "id": {
+            "$arg": "spool_id"
+          }
+        }
+      },
+      "input_schema": {
+        "spool_id": "int"
+      },
+      "_evidence": {
+        "locator": "spoolman/database/spool.py:759",
+        "id_local": "Spool.delete",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /spool/{spool_id}",
+          "locator": "spoolman/api/v1/spool.py:839"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "async def delete(db, spool_id):\n    spool = await get_by_id(db, spool_id)\n    await db.delete(spool)\n    await db.commit()\n    await spool_changed(spool, EventType.DELETED)"
+      },
+      "entity": "Spool",
+      "_binds": {
+        "spool_id": "Spool.id"
+      },
+      "_output_schema": {
+        "": "Message success"
+      },
+      "guards": {
+        "required": [
+          "spool_id"
+        ],
+        "messages": {
+          "required": "Provide the id of the spool to delete.",
+          "not_found": "No spool with that id exists.",
+          "on_child": "This spool cannot be deleted because child rows still reference it."
+        }
+      },
+      "description": "Delete a spool and its associated tags and extra-fields (delete-orphan). Fails if the spool does not exist."
+    },
+    {
+      "tool": "spool_use_weight",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Spool",
+        "row_key": {
+          "id": {
+            "$arg": "spool_id"
+          }
+        },
+        "fields": [
+          "used_weight",
+          "first_used",
+          "last_used"
+        ],
+        "set": {
+          "first_used": {
+            "$const": "2026-01-01T00:00:00Z"
+          },
+          "last_used": {
+            "$const": "2026-01-01T00:00:00Z"
+          }
+        }
+      },
+      "input_schema": {
+        "spool_id": {
+          "type": "int",
+          "description": "Id of the spool to record use against.",
+          "required": true
+        },
+        "use_weight": {
+          "type": "float",
+          "description": "The delta of weight used from the spool (as the real repo would add)."
+        },
+        "used_weight": {
+          "type": "float",
+          "description": "NEW absolute used_weight to store; the runtime applies it directly (real repo does used_weight += delta)."
+        }
+      },
+      "_evidence": {
+        "locator": "spoolman/database/spool.py:798",
+        "id_local": "Spool.use_weight",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /spool/{spool_id}/use",
+          "locator": "spoolman/api/v1/spool.py:941"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "await use_weight_safe(db, spool_id, weight)\nspool = await get_by_id(db, spool_id)\nif spool.first_used is None:\n    spool.first_used = datetime.utcnow().replace(microsecond=0)\nspool.last_used = datetime.utcnow().replace(microsecond=0)\nawait db.commit()\n# use_weight_safe:\n#   sqlalchemy.update(models.Spool).where(id==spool_id).values(\n#     used_weight=case((used_weight + weight >= 0.0, used_weight + weight), else_=0.0))",
+        "edges": [
+          "spoolman/database/spool.py:815 (spool = await get_by_id(db, spool_id) raises ItemNotFoundError)"
+        ],
+        "runtime_note": "no_op root cause in probe 0: use_weight/weight mapped to no Spool column, so nothing changed. Fixed by putting used_weight on the panel."
+      },
+      "entity": "Spool",
+      "_binds": {
+        "spool_id": "Spool.id"
+      },
+      "_output_schema": {
+        "": "the updated Spool row"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Spool",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "spool_id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "spool_id"
+        ],
+        "messages": {
+          "required": "spool_id is required.",
+          "not_found": "No spool with that id exists.",
+          "precondition": "You can only record filament use on a spool that already exists."
+        }
+      },
+      "description": "Record that filament weight was used from a spool, stamping first_used/last_used. The real repo ADDS the given weight to used_weight (floored at 0); the runtime has no row-relative arithmetic here, so used_weight holds the new absolute total you want stored."
+    },
+    {
+      "tool": "spool_measure",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Spool",
+        "row_key": {
+          "id": {
+            "$arg": "spool_id"
+          }
+        },
+        "fields": [
+          "used_weight",
+          "first_used",
+          "last_used"
+        ],
+        "set": {
+          "first_used": {
+            "$const": "2026-01-01T00:00:00Z"
+          },
+          "last_used": {
+            "$const": "2026-01-01T00:00:00Z"
+          }
+        }
+      },
+      "input_schema": {
+        "spool_id": {
+          "type": "int",
+          "description": "Id of the spool to measure.",
+          "required": true
+        },
+        "weight": {
+          "type": "float",
+          "description": "Measured gross weight of the spool in grams.",
+          "required": true
+        },
+        "used_weight": {
+          "type": "float",
+          "description": "New absolute used_weight (runtime applies directly; real repo derives from the measurement)."
+        }
+      },
+      "_evidence": {
+        "locator": "spoolman/database/spool.py:872",
+        "id_local": "Spool.measure",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /spool/{spool_id}/measure",
+          "locator": "spoolman/api/v1/spool.py:979"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "initial_gross_weight = initial_weight + spool_weight\nif weight > initial_gross_weight:\n    return await reset_initial_weight(db, spool_id, weight - spool_weight)\ncurrent_use = initial_gross_weight - spool_info[1]\nweight_to_use = current_use - weight\nif (initial_gross_weight - weight_to_use) < spool_weight:\n    weight_to_use = current_use - spool_weight\nreturn await use_weight(db, spool_id, weight_to_use)",
+        "edges": [
+          "spoolman/database/spool.py:887-919 (NoResultFound -> SpoolMeasureError; 'Initial weight is not set.' if initial_weight is None/0)"
+        ]
+      },
+      "entity": "Spool",
+      "_binds": {
+        "spool_id": "Spool.id"
+      },
+      "_output_schema": {
+        "": "the updated Spool row"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Spool",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "spool_id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "initial_weight",
+                      "op": "is_not_null"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "spool_id",
+          "weight"
+        ],
+        "messages": {
+          "required": "spool_id and weight are required.",
+          "not_found": "No spool with that id exists.",
+          "precondition": "This spool has no initial_weight set, so it cannot be measured. Set initial_weight first."
+        }
+      },
+      "description": "Update a spool to a measured gross weight (weigh the spool and report the reading). The runtime stores used_weight as the new absolute value; the real repo converts the measurement into a used_weight delta. Requires initial_weight to be set."
+    },
+    {
+      "tool": "spool_find_groups",
+      "op": "search",
+      "family": "search.aggregate",
+      "exec_spec": {
+        "entity": "Spool",
+        "group_by": [
+          "location"
+        ],
+        "aggregate": [
+          {
+            "fn": "count",
+            "as": "spool_count"
+          },
+          {
+            "fn": "count_distinct",
+            "col": "id",
+            "as": "_dist"
+          },
+          {
+            "fn": "sum",
+            "col": "initial_weight",
+            "as": "_s"
+          },
+          {
+            "fn": "max",
+            "col": "last_used",
+            "as": "_m"
+          }
+        ],
+        "filter": {
+          "col": "archived",
+          "mode": "exact",
+          "val": false
+        }
+      },
+      "input_schema": {
+        "group_by": {
+          "type": "text",
+          "description": "Axis to group by (location or lot_nr in the real API; this build groups by location)."
+        },
+        "filament.name": "text",
+        "filament.id": "text",
+        "filament.material": "text",
+        "filament.vendor.name": "text",
+        "filament.vendor.id": "text",
+        "location": {
+          "type": "text",
+          "description": "Filter to spools at this location before grouping."
+        },
+        "lot_nr": "text",
+        "allow_archived": {
+          "type": "bool",
+          "description": "When false (default) archived spools are excluded."
+        },
+        "include_empty": "bool",
+        "first_used": "text",
+        "last_used": "text",
+        "registered": "text",
+        "sort": "text",
+        "limit": "int",
+        "offset": "int"
+      },
+      "_evidence": {
+        "locator": "spoolman/database/spool.py:551",
+        "id_local": "Spool.find_groups",
+        "entry": {
+          "kind": "http",
+          "route": "GET /spool/group",
+          "locator": "spoolman/api/v1/spool.py:445"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "stmt = _apply_spool_filters(sqlalchemy.select(group_col.label('group_key'), *aggregates), ...)\nstmt = stmt.group_by(group_col)\n# aggregates (spool.py:444):\n#   count(Spool.id) spool_count, count(case(used_weight>0, Spool.id)) in_use_count,\n#   coalesce(sum(coalesce(initial_weight, Filament.weight)-used_weight clamped >=0), 0.0) total_remaining_weight,\n#   max(Spool.last_used) last_used",
+        "scope_why": "Globally visible: Spoolman is a single-user/self-hosted inventory app with no accounts or tenant boundary — vendor/filament/spool searches are public to the whole app."
+      },
+      "entity": "Spool",
+      "_output_schema": {
+        "": "list of SpoolGroup (group_by, key, spool_count, in_use_count, total_remaining_weight, last_used, filament, vendor)",
+        "x-total-count": "int"
+      },
+      "guards": {
+        "required": [
+          "group_by"
+        ]
+      },
+      "description": "Group spools by location (or another axis) and return per-group counts and totals. The real endpoint groups by a caller-chosen column with SQL aggregates; here group_by is location and the aggregate columns are synthetic — the meaningful output is the set of distinct group keys. Fails if group_by is missing."
+    },
+    {
+      "tool": "spool_rename_field_value",
+      "op": "update",
+      "family": "action.trigger",
+      "exec_spec": {
+        "target": {
+          "entity": "Spool",
+          "lookup_by": {
+            "location": {
+              "$arg": "value"
+            }
+          }
+        },
+        "set": {
+          "location": {
+            "$arg": "new_value"
+          }
+        }
+      },
+      "input_schema": {
+        "field": {
+          "type": "text",
+          "description": "The field to rename — location in this build (extra.<key> keys are not re-targetable here).",
+          "required": true
+        },
+        "value": {
+          "type": "text",
+          "description": "Current location value to match (old name).",
+          "required": true
+        },
+        "new_value": {
+          "type": "text",
+          "description": "New location value (new name).",
+          "required": true
+        }
+      },
+      "_evidence": {
+        "locator": "spoolman/database/spool.py:1008",
+        "id_local": "Spool.rename_field_value",
+        "entry": {
+          "kind": "http",
+          "route": "PATCH /spool/field/{field}",
+          "locator": "spoolman/api/v1/spool.py:649"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "if field == \"location\":\n    if len(new_value) > LOCATION_MAX_LENGTH: raise ValueError(...)\n    stmt = sqlalchemy.update(models.Spool).where(models.Spool.location == value).values(location=new_value)\nelif field.startswith(EXTRA_FIELD_PREFIX):\n    field_key = _extra_field_key(...)\n    stmt = sqlalchemy.update(models.SpoolField).where(and_(SpoolField.key==field_key, extra_field_value_text(SpoolField.value)==value)).values(value=json.dumps(new_value, ensure_ascii=False))\nresult = await db.execute(stmt); await db.commit()\nreturn result.rowcount",
+        "family_note": "converted from update.field_set for the same locator-vs-set collision as spool_rename_location. The real endpoint also handles extra.<key> field renames (a SpoolField write) which this build maps onto the location rename shape."
+      },
+      "entity": "Spool",
+      "_binds": {
+        "field": "SpoolField.key",
+        "value": "Spool.location"
+      },
+      "_output_schema": {
+        "spools_updated": "int"
+      },
+      "guards": {
+        "required": [
+          "field",
+          "value",
+          "new_value"
+        ],
+        "messages": {
+          "required": "field, value and new_value are required.",
+          "not_found": "No spool has a location with that value."
+        }
+      },
+      "description": "Rename a shared value across many spools at once: every spool whose location equals value is updated to new_value. (The real API also renames extra.<key> field values; those are not re-targetable in this build.)"
+    },
+    {
+      "tool": "spool_link_tag",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Tag",
+        "fields": [
+          "uid",
+          "target_type",
+          "spool_id",
+          "filament_id",
+          "target_value",
+          "format"
+        ],
+        "set_on_create": {
+          "uid": {
+            "$arg": "uid"
+          },
+          "target_type": "spool",
+          "spool_id": {
+            "$arg": "spool_id"
+          },
+          "format": {
+            "$arg": "format"
+          },
+          "added": "2026-01-01T00:00:00"
+        },
+        "unique_on": [
+          "uid"
+        ]
+      },
+      "input_schema": {
+        "spool_id": {
+          "type": "int",
+          "description": "Id of the spool to tag."
+        },
+        "uid": {
+          "type": "text",
+          "description": "The tag uid, normalized."
+        },
+        "format": {
+          "type": "text",
+          "description": "Output format the tag is written in."
+        },
+        "target_value": {
+          "type": "text",
+          "description": "Reserved; not stored for spool tags."
+        }
+      },
+      "_evidence": {
+        "locator": "spoolman/database/tag.py:57",
+        "id_local": "Spool.link_tag",
+        "entry": {
+          "kind": "http",
+          "route": "POST /spool/{spool_id}/tag",
+          "locator": "spoolman/api/v1/spool.py:875"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "uid = normalize_uid(uid); tag_format = normalize_format(tag_format)\ndb_spool = await spool.get_by_id(db, spool_id)\nexisting = await _get_tag_by_uid(db, uid)\nif existing is not None:\n    if existing.spool_id != spool_id: raise _conflict(uid, existing)\n    if tag_format is not None and existing.format != tag_format: existing.format = tag_format; await db.commit()\n    return existing\ntag = models.Tag(uid=uid, target_type=TARGET_SPOOL, format=tag_format, added=datetime.utcnow().replace(microsecond=0))\ndb_spool.tags.append(tag)\nawait db.commit()",
+        "edges": [
+          "spoolman/database/tag.py:70 (db_spool = await spool.get_by_id(db, spool_id)",
+          "spoolman/database/tag.py:66-87 (existing-uid conflict check; unique index on tag.uid; TagConflictError -> 409)"
+        ]
+      },
+      "entity": "Tag",
+      "_binds": {
+        "spool_id": "Spool.id",
+        "format": "Tag.format"
+      },
+      "_output_schema": {
+        "": "the created or existing Tag row (SpoolTag)"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Spool",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "spool_id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Tag",
+                "where": {
+                  "node": "field",
+                  "col": "uid",
+                  "op": "eq",
+                  "value": {
+                    "arg": "uid"
+                  }
+                }
+              },
+              "op": "eq",
+              "n": 0
+            }
+          ]
+        ],
+        "required": [
+          "spool_id",
+          "uid"
+        ],
+        "messages": {
+          "required": "spool_id and uid are required.",
+          "fk": "That spool does not exist.",
+          "not_found": "That spool does not exist.",
+          "unique": "That tag uid is already linked to a different spool.",
+          "precondition": "You can only tag a spool that already exists, and that tag uid cannot already be bound to a different spool."
+        }
+      },
+      "description": "Attach an NFC/RFID tag (by its normalized uid) to a spool. Re-linking an already-linked uid to the same spool is idempotent; linking a uid already bound to a different spool fails with a conflict."
+    },
+    {
+      "tool": "spool_unlink_tag",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "Tag",
+        "lookup_by": {
+          "spool_id": {
+            "$arg": "spool_id"
+          },
+          "uid": {
+            "$arg": "uid"
+          }
+        }
+      },
+      "input_schema": {
+        "spool_id": {
+          "type": "int",
+          "description": "Id of the spool to un-tag."
+        },
+        "uid": {
+          "type": "text",
+          "description": "The tag uid to remove."
+        }
+      },
+      "_evidence": {
+        "locator": "spoolman/database/tag.py:123",
+        "id_local": "Spool.unlink_tag",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /spool/{spool_id}/tag/{uid}",
+          "locator": "spoolman/api/v1/spool.py:911"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "uid = normalize_uid(uid)\ndb_spool = await spool.get_by_id(db, spool_id)\nfor tag in db_spool.tags:\n    if tag.uid == uid:\n        db_spool.tags.remove(tag); break\nelse:\n    raise ItemNotFoundError(f\"Spool {spool_id} has no tag with UID {uid}.\")\nawait db.commit()",
+        "edges": [
+          "spoolman/database/tag.py:126-137 (db_spool = await spool.get_by_id(...); loop over tags, else ItemNotFoundError)"
+        ]
+      },
+      "entity": "Tag",
+      "_binds": {
+        "spool_id": "Spool.id",
+        "uid": "Tag.uid"
+      },
+      "_output_schema": {
+        "": "204 No Content"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Spool",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "spool_id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "spool_id",
+          "uid"
+        ],
+        "messages": {
+          "required": "spool_id and uid are required.",
+          "not_found": "That spool has no tag with that uid.",
+          "precondition": "You can only untag a spool that already exists."
+        }
+      },
+      "description": "Remove a tag (by uid) from a spool. Fails not-found if the spool has no such tag."
+    },
+    {
+      "tool": "setting_update",
+      "op": "update",
+      "family": "crud.upsert",
+      "exec_spec": {
+        "entity": "Setting",
+        "key": {
+          "key": {
+            "$arg": "key"
+          }
+        },
+        "insert_fields": [
+          "value"
+        ],
+        "set_on_exists": {
+          "last_updated": "2026-01-01T00:00:00"
+        }
+      },
+      "input_schema": {
+        "key": {
+          "type": "text",
+          "description": "The setting key to update."
+        },
+        "value": {
+          "type": "text",
+          "description": "The new value (omit or empty to reset to default)."
+        }
+      },
+      "_evidence": {
+        "locator": "spoolman/database/setting.py:17",
+        "id_local": "Setting.update",
+        "entry": {
+          "kind": "http",
+          "route": "POST /setting/{key}",
+          "locator": "spoolman/api/v1/setting.py:176"
+        },
+        "entity_why": "primary effect row_upsert lands on this table",
+        "ref_code": "try:\n    definition = parse_setting(key)\nexcept ValueError:\n    return 404\nif body and body != \"null\":\n    definition.validate_type(body); validate_extra_field_setting(key, body)\n    await setting.update(db=db, definition=definition, value=body)\nelse:\n    await setting.delete(db=db, definition=definition)\n# setting.update: db.merge(models.Setting(key=definition.key, value=value, last_updated=now))"
+      },
+      "entity": "Setting",
+      "_binds": {
+        "key": "Setting.key",
+        "value": "Setting.value"
+      },
+      "_output_schema": {
+        "": "SettingResponse {value, is_set, type}"
+      },
+      "guards": {
+        "required": [
+          "key"
+        ],
+        "messages": {
+          "required": "key is required.",
+          "not_found": "That setting key is not registered.",
+          "unique": "This setting already exists."
+        }
+      },
+      "description": "Set a value for a registered setting key. If the key is unknown the setting is not registered; passing an empty value resets the setting to its default (deletes the row). Returns the resulting setting response."
+    },
+    {
+      "tool": "setting_get",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Setting",
+        "lookup_by": {
+          "key": {
+            "$arg": "key"
+          }
+        }
+      },
+      "input_schema": {
+        "key": {
+          "type": "text",
+          "description": "The setting key to read."
+        }
+      },
+      "_evidence": {
+        "locator": "spoolman/database/setting.py:39",
+        "id_local": "Setting.get",
+        "entry": {
+          "kind": "http",
+          "route": "GET /setting/{key}",
+          "locator": "spoolman/api/v1/setting.py:77"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "db_item = await setting.get(db, definition)\n# get: setting = await db.get(models.Setting, definition.key)\n#      if setting is None: raise ItemNotFoundError\nvalue = db_item.value; is_set = True  # except ItemNotFoundError: value = definition.default; is_set = False"
+      },
+      "entity": "Setting",
+      "_binds": {
+        "key": "Setting.key"
+      },
+      "_output_schema": {
+        "value": "the setting value or its default",
+        "is_set": "bool",
+        "type": "string"
+      },
+      "guards": {
+        "required": [
+          "key"
+        ],
+        "messages": {
+          "required": "key is required.",
+          "not_found": "No setting with that key is registered."
+        }
+      },
+      "description": "Read a registered setting by key, returning its value or the key's default when unset. Fails not-found if the key is not a registered setting."
+    },
+    {
+      "tool": "setting_find",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Setting",
+        "search_fields": [
+          "key"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "key"
+          ]
+        }
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "spoolman/database/setting.py:47",
+        "id_local": "Setting.find",
+        "entry": {
+          "kind": "http",
+          "route": "GET /setting/",
+          "locator": "spoolman/api/v1/setting.py:113"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "db_items = await setting.get_all(db)\nfor db_item in db_items:\n    defn = parse_setting(db_item.key)\n    settings[db_item.key] = SettingResponse(value=db_item.value, is_set=True, type=defn.type)\nfor settingdef in SETTINGS.values():\n    if settingdef.key not in settings:\n        settings[settingdef.key] = SettingResponse(value=settingdef.default, is_set=False, type=settingdef.type)",
+        "scope_why": "Globally visible: Spoolman is a single-user/self-hosted inventory app with no accounts or tenant boundary — vendor/filament/spool searches are public to the whole app."
+      },
+      "entity": "Setting",
+      "_output_schema": {
+        "": "map of every registered setting key -> SettingResponse (set ones from the store, unset ones with defaults)"
+      },
+      "description": "List every registered setting with its current value (unset ones show their default). Returns a map of setting key to value/is_set/type."
+    },
+    {
+      "tool": "extrafield_upsert",
+      "op": "update",
+      "family": "crud.upsert",
+      "exec_spec": {
+        "entity": "Setting",
+        "key": {
+          "key": {
+            "$arg": "key"
+          }
+        },
+        "insert_fields": [
+          "value"
+        ],
+        "set_on_exists": {
+          "value": "<serialized list of extra fields>",
+          "last_updated": "2026-01-01T00:00:00"
+        }
+      },
+      "input_schema": {
+        "entity_type": {
+          "type": "text",
+          "description": "Which entity owns the field: spool, filament or vendor.",
+          "required": true
+        },
+        "key": {
+          "type": "text",
+          "description": "Field key.",
+          "required": true
+        },
+        "name": {
+          "type": "text",
+          "description": "Human-readable field name.",
+          "required": true
+        },
+        "order": {
+          "type": "int",
+          "description": "Display order.",
+          "required": false
+        },
+        "unit": {
+          "type": "text",
+          "description": "Unit suffix shown for the value.",
+          "required": false
+        },
+        "field_type": {
+          "type": "text",
+          "description": "Value type: string, integer, number, boolean, date or color.",
+          "required": true
+        },
+        "default_value": {
+          "type": "text",
+          "description": "Default value.",
+          "required": false
+        },
+        "choices": {
+          "type": "json",
+          "description": "Allowed choices (for choice-type fields).",
+          "required": false
+        },
+        "multi_choice": {
+          "type": "bool",
+          "description": "Whether multiple choices are allowed.",
+          "required": false
+        }
+      },
+      "_evidence": {
+        "locator": "spoolman/extra_field_registry.py:287",
+        "id_local": "ExtraField.upsert",
+        "entry": {
+          "kind": "http",
+          "route": "POST /field/{entity_type}/{key}",
+          "locator": "spoolman/api/v1/field.py:69"
+        },
+        "entity_why": "primary effect row_upsert lands on this table",
+        "ref_code": "extra_fields = [field for field in extra_fields if field.key != extra_field.key]\nif len(extra_fields) >= MAX_EXTRA_FIELDS_PER_ENTITY: raise ValueError(...)\nextra_fields.append(extra_field)\nsetting_def = parse_setting(f\"extra_fields_{entity_type.name}\")\nawait db_setting.update(db=db, definition=setting_def, value=json.dumps(jsonable_encoder(extra_fields)))\nextra_field_cache[entity_type] = extra_fields"
+      },
+      "entity": "Setting",
+      "_binds": {
+        "key": "Setting.key"
+      },
+      "_output_schema": {
+        "": "the full list of ExtraField for that entity type"
+      },
+      "guards": {
+        "required": [
+          "entity_type",
+          "key",
+          "name",
+          "field_type"
+        ],
+        "messages": {
+          "required": "entity_type, key, name and field_type are required.",
+          "not_found": "That entity type is not supported."
+        }
+      },
+      "description": "Define or redefine a custom extra-field for a given entity type. The extra-field registry for that entity is stored in a single Setting row; an existing field's type/choices are immutable. Returns the full extra-field list for the entity."
+    },
+    {
+      "tool": "extrafield_delete",
+      "op": "delete",
+      "family": "crud.upsert",
+      "exec_spec": {
+        "entity": "Setting",
+        "key": {
+          "key": {
+            "$arg": "key"
+          }
+        },
+        "insert_fields": [
+          "value"
+        ],
+        "set_on_exists": {
+          "value": "<serialized list minus the removed field>",
+          "last_updated": "2026-01-01T00:00:00"
+        }
+      },
+      "input_schema": {
+        "entity_type": {
+          "type": "text",
+          "description": "Which entity owns the field: spool, filament or vendor.",
+          "required": true
+        },
+        "key": {
+          "type": "text",
+          "description": "The field key to remove.",
+          "required": true
+        }
+      },
+      "_evidence": {
+        "locator": "spoolman/extra_fields.py:30",
+        "id_local": "ExtraField.delete",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /field/{entity_type}/{key}",
+          "locator": "spoolman/api/v1/field.py:99"
+        },
+        "entity_why": "primary effect row_upsert lands on this table",
+        "ref_code": "extra_fields = [field for field in extra_fields if field.key != key]\nawait db_setting.update(db=db, definition=parse_setting(f\"extra_fields_{entity_type.name}\"), value=json.dumps(jsonable_encoder(extra_fields)))\nif entity_type == EntityType.vendor: await db_vendor.clear_extra_field(db, key)\nelif entity_type == EntityType.filament: await db_filament.clear_extra_field(db, key)\nelif entity_type == EntityType.spool: await db_spool.clear_extra_field(db, key)",
+        "edges": [
+          "spoolman/extra_fields.py:34 (if not any(field.key==key ...): raise ItemNotFoundError; registry stored in extra_fields_<entity> Setting row)"
+        ]
+      },
+      "entity": "Setting",
+      "_binds": {
+        "key": "Setting.key"
+      },
+      "_output_schema": {
+        "": "the full list of ExtraField for that entity type"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Setting",
+                "where": {
+                  "node": "field",
+                  "col": "key",
+                  "op": "eq",
+                  "value": "<extra_fields_<entity>>"
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "entity_type",
+          "key"
+        ],
+        "messages": {
+          "required": "entity_type and key are required.",
+          "not_found": "No extra-field with that key exists for that entity.",
+          "precondition": "That extra-field is not defined for this entity type, so there is nothing to remove."
+        }
+      },
+      "description": "Remove a custom extra-field from an entity type and delete its values from every row that used it. Fails not-found if no such field exists. Returns the remaining extra-field list."
+    },
+    {
+      "tool": "tag_scan",
+      "op": "action",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Tag",
+        "lookup_by": {
+          "uid": {
+            "$arg": "uid"
+          }
+        }
+      },
+      "input_schema": {
+        "uid": {
+          "type": "text",
+          "description": "The scanned tag uid, normalized."
+        },
+        "reader_id": {
+          "type": "text",
+          "description": "Id of the scanning reader."
+        },
+        "name": {
+          "type": "text",
+          "description": "Reader display name."
+        },
+        "format": {
+          "type": "text",
+          "description": "Tag format reported by the reader."
+        },
+        "payload_b64": {
+          "type": "text",
+          "description": "Raw payload, base64."
+        }
+      },
+      "_evidence": {
+        "locator": "spoolman/api/v1/tag.py:96",
+        "id_local": "Tag.scan",
+        "entry": {
+          "kind": "http",
+          "route": "POST /tag/scan",
+          "locator": "spoolman/api/v1/tag.py:80"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "uid = normalize_uid(body.uid)\ndb_spool = await tag_db.find_spool_by_uid(db, uid)\nscan_relay.register(reader_id, body.name, uid)\nresult = TagScan(uid=uid, reader_id=reader_id, name=body.name, format=body.format, payload_b64=body.payload_b64, matched_spool_id=db_spool.id if db_spool is not None else None, spool=Spool.from_db(db_spool) if db_spool is not None else None)\nif scan_relay.should_broadcast(uid, reader_id, result.matched_spool_id):\n    await _broadcast(result)",
+        "edges": [
+          "spoolman/database/tag.py:153 (find_spool_by_uid: reads tag by normalized uid; match only when tag.spool_id is not null)"
+        ],
+        "note": "removed the spool_id-not-null precondition: the mined wall was wrong — a scan returns matched_spool_id=null when the tag is unlinked; it is not a required precondition."
+      },
+      "entity": "Tag",
+      "_binds": {
+        "uid": "Tag.uid"
+      },
+      "_output_schema": {
+        "": "TagScan {uid, reader_id, matched_spool_id (null when no link), spool}"
+      },
+      "guards": {
+        "preconditions": [],
+        "required": [
+          "uid"
+        ],
+        "messages": {
+          "required": "uid is required.",
+          "not_found": "No tag with that uid is registered."
+        }
+      },
+      "description": "Report a tag scan from an RFID/NFC reader. Looks up the spool the uid is linked to and returns the match (matched_spool_id is null when the tag is not linked to any spool). Succeeds even with no match."
+    },
+    {
+      "tool": "spool_rename_location",
+      "op": "action",
+      "family": "action.trigger",
+      "exec_spec": {
+        "target": {
+          "entity": "Spool",
+          "lookup_by": {
+            "location": {
+              "$arg": "location"
+            }
+          }
+        },
+        "set": {
+          "location": {
+            "$arg": "name"
+          }
+        }
+      },
+      "input_schema": {
+        "location": {
+          "type": "text",
+          "description": "The current location name to match.",
+          "required": true
+        },
+        "name": {
+          "type": "text",
+          "description": "The new location name to apply.",
+          "required": true
+        }
+      },
+      "_evidence": {
+        "locator": "spoolman/database/spool.py:995",
+        "id_local": "Spool.rename_location",
+        "entry": {
+          "kind": "http",
+          "route": "PATCH /location/{location}",
+          "locator": "spoolman/api/v1/other.py:133"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "await db.execute(sqlalchemy.update(models.Spool).where(models.Spool.location == current_name).values(location=new_name))\nawait db.commit()",
+        "family_note": "converted from update.field_set: the locator column (location) is also the written column, and field_set merges args over set, so the locator value overwrote the new name and the tool was a permanent no-op. action.trigger resolves set without that collision."
+      },
+      "entity": "Spool",
+      "_binds": {
+        "location": "Spool.location"
+      },
+      "_output_schema": {
+        "": "the new location name"
+      },
+      "guards": {
+        "required": [
+          "location",
+          "name"
+        ],
+        "messages": {
+          "required": "location and name are required.",
+          "not_found": "No spool uses that location."
+        }
+      },
+      "description": "Rename a storage location across every spool that currently uses it: all spools whose location equals location get location set to name."
+    },
+    {
+      "tool": "filament_find_materials",
+      "op": "search",
+      "family": "search.aggregate",
+      "exec_spec": {
+        "entity": "Filament",
+        "group_by": [
+          "material"
+        ],
+        "aggregate": [
+          {
+            "fn": "count",
+            "as": "count"
+          }
+        ]
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "spoolman/database/filament.py:238",
+        "id_local": "Filament.find_materials",
+        "entry": {
+          "kind": "http",
+          "route": "GET /material",
+          "locator": "spoolman/api/v1/other.py:23"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "stmt = select(models.Filament.material).distinct()\nrows = await db.execute(stmt)\nreturn [row[0] for row in rows.all() if row[0] is not None]",
+        "agg_note": "real op is SELECT DISTINCT material — modelled as a GROUP BY aggregate so the set of distinct values is the verifiable output (each returned group is one distinct material value). The count is synthetic; the distinct material values are the real output.",
+        "scope_why": "Globally visible: Spoolman is a single-user/self-hosted inventory app with no accounts or tenant boundary — vendor/filament/spool searches are public to the whole app."
+      },
+      "entity": "Filament",
+      "_output_schema": {
+        "": "list of distinct filament material strings"
+      },
+      "description": "List every distinct filament material string in use (e.g. PLA, PETG). Returns one group per distinct material."
+    },
+    {
+      "tool": "filament_find_article_numbers",
+      "op": "search",
+      "family": "search.aggregate",
+      "exec_spec": {
+        "entity": "Filament",
+        "group_by": [
+          "article_number"
+        ],
+        "aggregate": [
+          {
+            "fn": "count",
+            "as": "count"
+          }
+        ]
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "spoolman/database/filament.py:248",
+        "id_local": "Filament.find_article_numbers",
+        "entry": {
+          "kind": "http",
+          "route": "GET /article-number",
+          "locator": "spoolman/api/v1/other.py:50"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "stmt = select(models.Filament.article_number).distinct()\nrows = await db.execute(stmt)\nreturn [row[0] for row in rows.all() if row[0] is not None]",
+        "agg_note": "real op is SELECT DISTINCT article_number — modelled as a GROUP BY aggregate so the set of distinct values is the verifiable output (each returned group is one distinct article_number value). The count is synthetic; the distinct article-number values are the real output.",
+        "scope_why": "Globally visible: Spoolman is a single-user/self-hosted inventory app with no accounts or tenant boundary — vendor/filament/spool searches are public to the whole app."
+      },
+      "entity": "Filament",
+      "_output_schema": {
+        "": "list of distinct article numbers"
+      },
+      "description": "List every distinct filament article number in use. Returns one group per distinct article number."
+    },
+    {
+      "tool": "spool_find_lot_numbers",
+      "op": "search",
+      "family": "search.aggregate",
+      "exec_spec": {
+        "entity": "Spool",
+        "group_by": [
+          "lot_nr"
+        ],
+        "aggregate": [
+          {
+            "fn": "count",
+            "as": "count"
+          }
+        ]
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "spoolman/database/spool.py:957",
+        "id_local": "Spool.find_lot_numbers",
+        "entry": {
+          "kind": "http",
+          "route": "GET /lot-number",
+          "locator": "spoolman/api/v1/other.py:76"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "stmt = sqlalchemy.select(models.Spool.lot_nr).distinct()\nrows = await db.execute(stmt)\nreturn [row[0] for row in rows.all() if row[0] is not None]",
+        "agg_note": "real op is SELECT DISTINCT lot_nr — modelled as a GROUP BY aggregate so the set of distinct values is the verifiable output (each returned group is one distinct lot_nr value). The count is synthetic; the distinct lot-number values are the real output.",
+        "scope_why": "Globally visible: Spoolman is a single-user/self-hosted inventory app with no accounts or tenant boundary — vendor/filament/spool searches are public to the whole app."
+      },
+      "entity": "Spool",
+      "_output_schema": {
+        "": "list of distinct lot numbers"
+      },
+      "description": "List every distinct spool lot number in use. Returns one group per distinct lot number."
+    },
+    {
+      "tool": "spool_find_locations",
+      "op": "search",
+      "family": "search.aggregate",
+      "exec_spec": {
+        "entity": "Spool",
+        "group_by": [
+          "location"
+        ],
+        "aggregate": [
+          {
+            "fn": "count",
+            "as": "count"
+          }
+        ]
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "spoolman/database/spool.py:947",
+        "id_local": "Spool.find_locations",
+        "entry": {
+          "kind": "http",
+          "route": "GET /location",
+          "locator": "spoolman/api/v1/other.py:102"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "stmt = sqlalchemy.select(models.Spool.location).distinct()\nrows = await db.execute(stmt)\nreturn [row[0] for row in rows.all() if row[0] is not None]",
+        "agg_note": "real op is SELECT DISTINCT location — modelled as a GROUP BY aggregate so the set of distinct values is the verifiable output (each returned group is one distinct location value). The count is synthetic; the distinct location values are the real output.",
+        "scope_why": "Globally visible: Spoolman is a single-user/self-hosted inventory app with no accounts or tenant boundary — vendor/filament/spool searches are public to the whole app."
+      },
+      "entity": "Spool",
+      "_output_schema": {
+        "": "list of distinct locations"
+      },
+      "description": "List every distinct storage location in use. Returns one group per distinct location."
+    },
+    {
+      "tool": "spool_export",
+      "op": "action",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Spool",
+        "rank": {
+          "method": "exact"
+        }
+      },
+      "input_schema": {
+        "fmt": {
+          "type": "text",
+          "description": "Export format: json or csv."
+        },
+        "allow_archived": {
+          "type": "bool",
+          "description": "When false (default) archived spools are excluded."
+        }
+      },
+      "_evidence": {
+        "locator": "spoolman/api/v1/export.py:165",
+        "id_local": "Spool.export",
+        "entry": {
+          "kind": "http",
+          "route": "GET /export/spools",
+          "locator": "spoolman/api/v1/export.py:28"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "all_spools, _ = await spool.find(db=db, allow_archived=allow_archived)\nreturn await _export(all_spools, fmt, \"spools\")",
+        "scope_why": "Globally visible: Spoolman is a single-user/self-hosted inventory app with no accounts or tenant boundary — vendor/filament/spool searches are public to the whole app."
+      },
+      "entity": "Spool",
+      "_output_schema": {
+        "": "file download (csv or json) of all matching spools with filament+vendor data"
+      },
+      "guards": {
+        "required": [
+          "fmt"
+        ],
+        "messages": {
+          "required": "fmt is required."
+        }
+      },
+      "description": "Export all matching spools (with nested filament and vendor data) as a file download in CSV or JSON. Returns the exported document; the real API streams the file."
+    },
+    {
+      "tool": "filament_export",
+      "op": "action",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Filament",
+        "rank": {
+          "method": "exact"
+        }
+      },
+      "input_schema": {
+        "fmt": {
+          "type": "text",
+          "description": "Export format: json or csv."
+        }
+      },
+      "_evidence": {
+        "locator": "spoolman/api/v1/export.py:183",
+        "id_local": "Filament.export",
+        "entry": {
+          "kind": "http",
+          "route": "GET /export/filaments",
+          "locator": "spoolman/api/v1/export.py:46"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "all_filaments, _ = await filament.find(db=db)\nreturn await _export(all_filaments, fmt, \"filaments\")",
+        "scope_why": "Globally visible: Spoolman is a single-user/self-hosted inventory app with no accounts or tenant boundary — vendor/filament/spool searches are public to the whole app."
+      },
+      "entity": "Filament",
+      "_output_schema": {
+        "": "file download of all filaments with vendor data"
+      },
+      "guards": {
+        "required": [
+          "fmt"
+        ],
+        "messages": {
+          "required": "fmt is required."
+        }
+      },
+      "description": "Export all filaments (with vendor data) as a CSV or JSON file download."
+    },
+    {
+      "tool": "vendor_export",
+      "op": "action",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Vendor",
+        "rank": {
+          "method": "exact"
+        }
+      },
+      "input_schema": {
+        "fmt": {
+          "type": "text",
+          "description": "Export format: json or csv."
+        }
+      },
+      "_evidence": {
+        "locator": "spoolman/api/v1/export.py:202",
+        "id_local": "Vendor.export",
+        "entry": {
+          "kind": "http",
+          "route": "GET /export/vendors",
+          "locator": "spoolman/api/v1/export.py:60"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "all_vendors, _ = await vendor.find(db=db)\nreturn await _export(all_vendors, fmt, \"vendors\")",
+        "scope_why": "Globally visible: Spoolman is a single-user/self-hosted inventory app with no accounts or tenant boundary — vendor/filament/spool searches are public to the whole app."
+      },
+      "entity": "Vendor",
+      "_output_schema": {
+        "": "file download of all vendors"
+      },
+      "guards": {
+        "required": [
+          "fmt"
+        ],
+        "messages": {
+          "required": "fmt is required."
+        }
+      },
+      "description": "Export all vendors as a CSV or JSON file download."
+    },
+    {
+      "tool": "spool_search_all",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Spool",
+        "search_fields": [
+          "comment",
+          "location",
+          "lot_nr"
+        ],
+        "rank": {
+          "method": "substring",
+          "fields": [
+            "comment",
+            "location",
+            "lot_nr"
+          ]
+        }
+      },
+      "input_schema": {
+        "q": {
+          "type": "text",
+          "description": "The free-text search query."
+        },
+        "color_similarity_threshold": {
+          "type": "float",
+          "description": "Colour similarity threshold for colour queries."
+        },
+        "limit": {
+          "type": "int",
+          "description": "Max results per group."
+        },
+        "allow_archived": {
+          "type": "bool",
+          "description": "When false archived spools are excluded."
+        },
+        "spools_per_filament": {
+          "type": "int",
+          "description": "Max spools shown per filament result."
+        }
+      },
+      "_evidence": {
+        "locator": "spoolman/database/search.py:307",
+        "id_local": "Spool.search_all",
+        "entry": {
+          "kind": "http",
+          "route": "GET /search",
+          "locator": "spoolman/api/v1/search.py:32"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "terms = _split_terms(q)\ncolor_hex = resolve_color(q); is_color_query = color_hex is not None\ncolor_hits = await _color_matches(db, color_hex, color_similarity_threshold, limit) if color_hex else []\nspools = await _search_spools(db, terms, limit, allow_archived=allow_archived)\nfilaments = await _search_filaments(db, terms, limit, color_hits)\nvendors = await _search_vendors(db, terms, limit)\n# substring: col.ilike(f'%{escape_like(term)}%', escape=LIKE_ESCAPE)",
+        "scope_why": "Globally visible: Spoolman is a single-user/self-hosted inventory app with no accounts or tenant boundary — vendor/filament/spool searches are public to the whole app."
+      },
+      "entity": "Spool",
+      "_output_schema": {
+        "spools": "list of SearchResultSpool {spool, match_field}",
+        "filaments": "list of SearchResultFilament {filament, match_field, spools, spool_count}",
+        "vendors": "list of SearchResultVendor",
+        "is_color_query": "bool"
+      },
+      "guards": {
+        "required": [
+          "q"
+        ],
+        "messages": {
+          "required": "q is required."
+        }
+      },
+      "description": "Full-text search across spools, filaments and vendors for a query string. Returns matches grouped by kind (spools, filaments, vendors); a colour-like query also matches by colour similarity. Returns the search result set."
+    },
+    {
+      "tool": "system_info",
+      "op": "action",
+      "family": "action.emit",
+      "exec_spec": {
+        "channel": "event",
+        "record": {
+          "table": "DispatchLog"
+        },
+        "_record_undeclared": true
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "spoolman/api/v1/router.py:49",
+        "id_local": "System.info",
+        "entry": {
+          "kind": "http",
+          "route": "GET /info",
+          "locator": "spoolman/api/v1/router.py:48"
+        },
+        "entity_why": "cannot determine the entity",
+        "ref_code": "return models.Info(version=env.get_version(), debug_mode=..., data_dir=..., db_type=..., external_db_name=get_external_db_name(), ...)",
+        "note": "system_info is a pure read of env/config with no persisted state — kept as an action.emit with a DispatchLog record for consistency; no auth.",
+        "record_undeclared": true
+      },
+      "_output_schema": {
+        "": "general info (version, data_dir, db_type, external_db_name, ...)"
+      },
+      "description": "Report general Spoolman server info: version, debug mode, data dir, database type and the external database name. Read-only."
+    },
+    {
+      "tool": "system_health",
+      "op": "action",
+      "family": "action.emit",
+      "exec_spec": {
+        "channel": "event",
+        "record": {
+          "table": "DispatchLog"
+        },
+        "_record_undeclared": true
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "spoolman/api/v1/router.py:67",
+        "id_local": "System.health",
+        "entry": {
+          "kind": "http",
+          "route": "GET /health",
+          "locator": "spoolman/api/v1/router.py:66"
+        },
+        "entity_why": "cannot determine the entity",
+        "ref_code": "return models.HealthCheck(status=\"healthy\")",
+        "note": "system_health is a liveness probe with no state; the DispatchLog record is synthetic.",
+        "record_undeclared": true
+      },
+      "_output_schema": {
+        "status": "healthy"
+      },
+      "description": "Liveness probe: returns healthy when the server is up. Read-only."
+    },
+    {
+      "tool": "system_backup",
+      "op": "action",
+      "family": "action.emit",
+      "exec_spec": {
+        "channel": "event",
+        "record": {
+          "table": "Setting"
+        }
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "spoolman/api/v1/router.py:74",
+        "id_local": "System.backup",
+        "entry": {
+          "kind": "http",
+          "route": "POST /backup",
+          "locator": "spoolman/api/v1/router.py:73"
+        },
+        "entity_why": "primary effect external lands on this table",
+        "ref_code": "result = await backup_global_db()\nif result.path is None: return 500\nreturn models.BackupResponse(path=str(result.path), created=result.created)\n# backup_and_rotate writes spoolman.db + rotates to .1.. .N in the backups dir",
+        "note": "system_backup performs a filesystem backup, not a DB-row write; the Setting record is a placeholder."
+      },
+      "entity": "Setting",
+      "_output_schema": {
+        "path": "path of the newest backup",
+        "created": "bool"
+      },
+      "description": "Trigger a backup of the global SQLite database, rotating older backups. Returns the path and creation flag of the newest backup."
+    }
+  ],
+  "seed_state": {
+    "Vendor": [
+      {
+        "id": 1,
+        "name": "Prusament",
+        "comment": "Prague-based filament maker",
+        "empty_spool_weight": 140.0
+      },
+      {
+        "id": 2,
+        "name": "Polymaker",
+        "comment": "PolyLite series",
+        "empty_spool_weight": 150.0
+      }
+    ],
+    "Filament": [
+      {
+        "id": 1,
+        "name": "PLA Galaxy Black",
+        "vendor_id": 1,
+        "material": "PLA",
+        "density": 1.24,
+        "diameter": 1.75,
+        "weight": 1000,
+        "spool_weight": 140,
+        "price": 25.0,
+        "color_hex": "#000000"
+      },
+      {
+        "id": 2,
+        "name": "PETG Clear",
+        "vendor_id": 2,
+        "material": "PETG",
+        "density": 1.27,
+        "diameter": 1.75,
+        "weight": 750,
+        "spool_weight": 150,
+        "price": 22.0,
+        "color_hex": "#FFFFFF"
+      },
+      {
+        "id": 3,
+        "name": "PLA Silk Silver",
+        "vendor_id": 1,
+        "material": "PLA",
+        "density": 1.24,
+        "diameter": 1.75,
+        "weight": 1000,
+        "spool_weight": 140,
+        "price": 26.0,
+        "color_hex": "#C0C0C0"
+      }
+    ],
+    "FilamentField": [
+      {
+        "filament_id": 1,
+        "key": "refillable",
+        "value": "true",
+        "id": 1
+      },
+      {
+        "filament_id": 2,
+        "key": "refillable",
+        "value": "false",
+        "id": 2
+      }
+    ],
+    "Spool": [
+      {
+        "id": 1,
+        "filament_id": 1,
+        "initial_weight": 1000,
+        "spool_weight": 140,
+        "used_weight": 0,
+        "location": "Shelf A",
+        "lot_nr": "LOT-001",
+        "archived": false
+      },
+      {
+        "id": 2,
+        "filament_id": 1,
+        "initial_weight": 1000,
+        "spool_weight": 140,
+        "used_weight": 200,
+        "location": "Shelf A",
+        "lot_nr": "LOT-001",
+        "archived": false
+      },
+      {
+        "id": 3,
+        "filament_id": 2,
+        "initial_weight": 750,
+        "spool_weight": 150,
+        "used_weight": 0,
+        "location": "Shelf B",
+        "lot_nr": "LOT-002",
+        "archived": true
+      }
+    ],
+    "SpoolField": [
+      {
+        "spool_id": 1,
+        "key": "purchased",
+        "value": "2026-01-02",
+        "id": 1
+      }
+    ],
+    "Tag": [
+      {
+        "id": 1,
+        "uid": "E00401014BED",
+        "target_type": "spool",
+        "spool_id": 1,
+        "format": "ntag215",
+        "added": "2026-01-02T00:00:00"
+      },
+      {
+        "id": 2,
+        "uid": "E0040101ABCD",
+        "target_type": "spool",
+        "spool_id": 2,
+        "format": "ntag215",
+        "added": "2026-01-03T00:00:00"
+      }
+    ]
+  },
+  "summary": "Spoolman is a self-hosted filament & spool inventory manager for 3D printing (FastAPI + SQLAlchemy/Alembic; no auth by design, guarded by origin/host middleware). Persists vendors, filament types, spools, user settings, per-entity custom extra-field values and NFC/RFID tag->spool links; exposes CRUD, tag scan, backup and export endpoints.",
+  "_auth_candidates": [],
+  "_fk_gravity": {
+    "entity": "Filament",
+    "fk_count": 3
+  },
+  "_read_denied": "not_found",
+  "_no_edges": [
+    {
+      "id_local": "Spool.export",
+      "why": "reads all spools via spool.find, serializes to file; no pre-checks, no downstream business op calls; only CSRF origin middleware (export.py:165)"
+    },
+    {
+      "id_local": "Filament.export",
+      "why": "reads all filaments via filament.find, serializes; no pre-checks or downstream calls (export.py:183)"
+    },
+    {
+      "id_local": "Vendor.export",
+      "why": "reads all vendors via vendor.find, serializes; no pre-checks or downstream calls (export.py:202)"
+    },
+    {
+      "id_local": "System.info",
+      "why": "returns version/config from env vars; no persisted state read, no pre-checks, no downstream calls (router.py:49)"
+    },
+    {
+      "id_local": "System.backup",
+      "why": "triggers filesystem SQLite backup; rate-limited by backoff, but no pre-checks beyond that; no downstream business op calls (router.py:74)"
+    },
+    {
+      "id_local": "ExtraField.upsert",
+      "why": "rewrites the extra_fields_<entity> Setting row via db_setting.update; no pre-check beyond field format validation (not a database-state requires); no downstream business op calls; only CSRF guard (field.py:69, extra_field_registry.py:287)"
+    },
+    {
+      "id_local": "Setting.update",
+      "why": "upserts/unsets a Setting row; no pre-check beyond key registration and type validation; no downstream business op calls; only CSRF guard (setting.py:176, database/setting.py:17)"
+    },
+    {
+      "id_local": "Spool.delete",
+      "why": "deletes a spool; Tag/SpoolField cascade is delete-orphan on the ORM, not a call to another op; no pre-checks; only CSRF guard (spool.py:839, database/spool.py:759)"
+    },
+    {
+      "id_local": "Spool.rename_field_value",
+      "why": "batch UPDATE on Spool.location or SpoolField.value; no pre-checks beyond field key validity; no downstream calls; only CSRF guard (spool.py:649, database/spool.py:1008)"
+    },
+    {
+      "id_local": "Spool.rename_location",
+      "why": "batch UPDATE on Spool.location; no pre-checks; no downstream calls; only CSRF guard (other.py:133, database/spool.py:995)"
+    },
+    {
+      "id_local": "Vendor.create",
+      "why": "inserts a vendor row; no pre-checks beyond optional extra-field validation; calls no other business op; only CSRF guard (vendor.py:213, database/vendor.py:27)"
+    },
+    {
+      "id_local": "Vendor.delete",
+      "why": "deletes a vendor; ORM nullifies references on Filament.vendor_id implicitly (not a call to a Filament op); no pre-checks; only CSRF guard (vendor.py:281, database/vendor.py:137)"
+    },
+    {
+      "id_local": "Vendor.update",
+      "why": "patches a vendor row; no pre-checks beyond optional extra-field validation; calls no other business op; only CSRF guard (vendor.py:244, database/vendor.py:114)"
+    },
+    {
+      "id_local": "System.health",
+      "why": "liveness probe: returns status='healthy', reads no persisted state, calls nothing, no auth (router.py:66)"
+    }
+  ]
+}

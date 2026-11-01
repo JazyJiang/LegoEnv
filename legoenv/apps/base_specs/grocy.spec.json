@@ -1,0 +1,6663 @@
+{
+  "env_id": "grocy",
+  "_prep_version": 3,
+  "entities": [
+    {
+      "name": "User",
+      "columns": [
+        {
+          "name": "id",
+          "type": "int",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "username",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "first_name",
+          "type": "text"
+        },
+        {
+          "name": "last_name",
+          "type": "text"
+        },
+        {
+          "name": "password",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "row_created_timestamp",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true,
+          "default": "(datetime('now"
+        },
+        {
+          "name": "picture_file_name",
+          "type": "text"
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "username"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "UserSetting",
+      "columns": [
+        {
+          "name": "id",
+          "type": "int",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "user_id",
+          "type": "int",
+          "nullable": false,
+          "fk_to": "User.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "key",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "value",
+          "type": "text"
+        },
+        {
+          "name": "row_created_timestamp",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true,
+          "default": "(datetime('now"
+        },
+        {
+          "name": "row_updated_timestamp",
+          "type": "datetime",
+          "audit": true,
+          "default": "(datetime('now"
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "user_id",
+            "key"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "UserPermission",
+      "columns": [
+        {
+          "name": "id",
+          "type": "int",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "permission_id",
+          "type": "int",
+          "nullable": false,
+          "fk_to": "PermissionHierarchy.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "user_id",
+          "type": "int",
+          "nullable": false,
+          "fk_to": "User.id",
+          "on_delete": "cascade"
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "user_id",
+            "permission_id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "PermissionHierarchy",
+      "columns": [
+        {
+          "name": "id",
+          "type": "int",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "parent",
+          "type": "int",
+          "fk_to": "PermissionHierarchy.id",
+          "on_delete": "no_action"
+        },
+        {
+          "name": "the",
+          "type": "text"
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "name"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Session",
+      "columns": [
+        {
+          "name": "id",
+          "type": "int",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "user_id",
+          "type": "int",
+          "nullable": false,
+          "fk_to": "User.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "token_type",
+          "type": "int",
+          "nullable": false,
+          "enum": [
+            1,
+            2
+          ]
+        },
+        {
+          "name": "token_hash",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "expires",
+          "type": "datetime",
+          "nullable": false
+        },
+        {
+          "name": "last_used",
+          "type": "datetime"
+        },
+        {
+          "name": "client_info",
+          "type": "text"
+        },
+        {
+          "name": "row_created_timestamp",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true,
+          "default": "(datetime('now"
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "token_hash"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ApiKey",
+      "columns": [
+        {
+          "name": "id",
+          "type": "int",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "api_key",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "user_id",
+          "type": "int",
+          "nullable": false,
+          "fk_to": "User.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "expires",
+          "type": "datetime"
+        },
+        {
+          "name": "last_used",
+          "type": "datetime"
+        },
+        {
+          "name": "row_created_timestamp",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true,
+          "default": "(datetime('now"
+        },
+        {
+          "name": "key_type",
+          "type": "text",
+          "nullable": false,
+          "default": "default"
+        },
+        {
+          "name": "description",
+          "type": "text"
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "api_key"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Product",
+      "columns": [
+        {
+          "name": "id",
+          "type": "int",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "description",
+          "type": "text"
+        },
+        {
+          "name": "product_group_id",
+          "type": "int",
+          "fk_to": "ProductGroup.id",
+          "on_delete": "set_null",
+          "nullable": true
+        },
+        {
+          "name": "active",
+          "type": "int",
+          "nullable": false,
+          "enum": [
+            0,
+            1
+          ]
+        },
+        {
+          "name": "location_id",
+          "type": "int",
+          "nullable": false,
+          "fk_to": "Location.id",
+          "on_delete": "restrict"
+        },
+        {
+          "name": "shopping_location_id",
+          "type": "int",
+          "fk_to": "ShoppingLocation.id",
+          "on_delete": "set_null",
+          "nullable": true
+        },
+        {
+          "name": "qu_id_purchase",
+          "type": "int",
+          "nullable": false,
+          "fk_to": "QuantityUnit.id",
+          "on_delete": "restrict"
+        },
+        {
+          "name": "qu_id_stock",
+          "type": "int",
+          "nullable": false,
+          "fk_to": "QuantityUnit.id",
+          "on_delete": "restrict"
+        },
+        {
+          "name": "min_stock_amount",
+          "type": "int",
+          "nullable": false,
+          "default": 0
+        },
+        {
+          "name": "default_best_before_days",
+          "type": "int",
+          "nullable": false,
+          "default": 0
+        },
+        {
+          "name": "default_best_before_days_after_open",
+          "type": "int",
+          "nullable": false,
+          "default": 0
+        },
+        {
+          "name": "default_best_before_days_after_freezing",
+          "type": "int",
+          "nullable": false,
+          "default": 0
+        },
+        {
+          "name": "default_best_before_days_after_thawing",
+          "type": "int",
+          "nullable": false,
+          "default": 0
+        },
+        {
+          "name": "picture_file_name",
+          "type": "text"
+        },
+        {
+          "name": "enable_tare_weight_handling",
+          "type": "int",
+          "nullable": false,
+          "enum": [
+            0,
+            1
+          ],
+          "default": 0
+        },
+        {
+          "name": "tare_weight",
+          "type": "float",
+          "nullable": false,
+          "default": 0
+        },
+        {
+          "name": "not_check_stock_fulfillment_for_recipes",
+          "type": "int",
+          "enum": [
+            0,
+            1
+          ],
+          "default": 0
+        },
+        {
+          "name": "parent_product_id",
+          "type": "int",
+          "fk_to": "Product.id",
+          "on_delete": "set_null",
+          "nullable": true
+        },
+        {
+          "name": "calories",
+          "type": "int"
+        },
+        {
+          "name": "cumulate_min_stock_amount_of_sub_products",
+          "type": "int",
+          "enum": [
+            0,
+            1
+          ],
+          "default": 0
+        },
+        {
+          "name": "due_type",
+          "type": "int",
+          "nullable": false,
+          "enum": [
+            "1",
+            "2"
+          ]
+        },
+        {
+          "name": "quick_consume_amount",
+          "type": "float",
+          "nullable": false,
+          "default": 1
+        },
+        {
+          "name": "hide_on_stock_overview",
+          "type": "int",
+          "nullable": false,
+          "enum": [
+            0,
+            1
+          ]
+        },
+        {
+          "name": "default_stock_label_type",
+          "type": "int",
+          "nullable": false,
+          "default": 0
+        },
+        {
+          "name": "should_not_be_frozen",
+          "type": "int",
+          "nullable": false,
+          "enum": [
+            0,
+            1
+          ]
+        },
+        {
+          "name": "treat_opened_as_out_of_stock",
+          "type": "int",
+          "nullable": false,
+          "enum": [
+            0,
+            1
+          ]
+        },
+        {
+          "name": "no_own_stock",
+          "type": "int",
+          "nullable": false,
+          "enum": [
+            0,
+            1
+          ]
+        },
+        {
+          "name": "default_consume_location_id",
+          "type": "int",
+          "fk_to": "Location.id",
+          "on_delete": "set_null",
+          "nullable": true
+        },
+        {
+          "name": "move_on_open",
+          "type": "int",
+          "nullable": false,
+          "enum": [
+            0,
+            1
+          ]
+        },
+        {
+          "name": "row_created_timestamp",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true,
+          "default": "(datetime('now"
+        },
+        {
+          "name": "qu_id_consume",
+          "type": "int",
+          "fk_to": "QuantityUnit.id",
+          "on_delete": "restrict"
+        },
+        {
+          "name": "auto_reprint_stock_label",
+          "type": "int",
+          "nullable": false,
+          "enum": [
+            0,
+            1
+          ]
+        },
+        {
+          "name": "quick_open_amount",
+          "type": "float",
+          "nullable": false,
+          "default": 1
+        },
+        {
+          "name": "qu_id_price",
+          "type": "int",
+          "fk_to": "QuantityUnit.id",
+          "on_delete": "restrict"
+        },
+        {
+          "name": "disable_open",
+          "type": "int",
+          "nullable": false,
+          "enum": [
+            0,
+            1
+          ]
+        },
+        {
+          "name": "default_purchase_price_type",
+          "type": "int",
+          "nullable": false
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "name"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ProductGroup",
+      "columns": [
+        {
+          "name": "id",
+          "type": "int",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "description",
+          "type": "text"
+        },
+        {
+          "name": "row_created_timestamp",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true,
+          "default": "(datetime('now"
+        },
+        {
+          "name": "active",
+          "type": "int",
+          "nullable": false,
+          "enum": [
+            0,
+            1
+          ]
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "name"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ProductBarcode",
+      "columns": [
+        {
+          "name": "id",
+          "type": "int",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "product_id",
+          "type": "int",
+          "nullable": false,
+          "fk_to": "Product.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "barcode",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "qu_id",
+          "type": "int"
+        },
+        {
+          "name": "amount",
+          "type": "float"
+        },
+        {
+          "name": "shopping_location_id",
+          "type": "int"
+        },
+        {
+          "name": "last_price",
+          "type": "float"
+        },
+        {
+          "name": "row_created_timestamp",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true,
+          "default": "(datetime('now"
+        },
+        {
+          "name": "note",
+          "type": "text"
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "barcode"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "QuantityUnit",
+      "columns": [
+        {
+          "name": "id",
+          "type": "int",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "description",
+          "type": "text"
+        },
+        {
+          "name": "row_created_timestamp",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true,
+          "default": "(datetime('now"
+        },
+        {
+          "name": "name_plural",
+          "type": "text"
+        },
+        {
+          "name": "plural_forms",
+          "type": "text"
+        },
+        {
+          "name": "active",
+          "type": "int",
+          "nullable": false,
+          "enum": [
+            0,
+            1
+          ]
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "name"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "QuantityUnitConversion",
+      "columns": [
+        {
+          "name": "id",
+          "type": "int",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "from_qu_id",
+          "type": "int",
+          "nullable": false,
+          "fk_to": "QuantityUnit.id",
+          "on_delete": "restrict"
+        },
+        {
+          "name": "to_qu_id",
+          "type": "int",
+          "nullable": false,
+          "fk_to": "QuantityUnit.id",
+          "on_delete": "restrict"
+        },
+        {
+          "name": "factor",
+          "type": "float",
+          "nullable": false
+        },
+        {
+          "name": "product_id",
+          "type": "int",
+          "fk_to": "Product.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "row_created_timestamp",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true,
+          "default": "(datetime('now"
+        }
+      ]
+    },
+    {
+      "name": "Location",
+      "columns": [
+        {
+          "name": "id",
+          "type": "int",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "description",
+          "type": "text"
+        },
+        {
+          "name": "row_created_timestamp",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true,
+          "default": "(datetime('now"
+        },
+        {
+          "name": "is_freezer",
+          "type": "int",
+          "nullable": false,
+          "enum": [
+            0,
+            1
+          ],
+          "default": 0
+        },
+        {
+          "name": "active",
+          "type": "int",
+          "nullable": false,
+          "enum": [
+            0,
+            1
+          ]
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "name"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ShoppingLocation",
+      "columns": [
+        {
+          "name": "id",
+          "type": "int",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "description",
+          "type": "text"
+        },
+        {
+          "name": "row_created_timestamp",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true,
+          "default": "(datetime('now"
+        },
+        {
+          "name": "active",
+          "type": "int",
+          "nullable": false,
+          "enum": [
+            0,
+            1
+          ]
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "name"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Stock",
+      "columns": [
+        {
+          "name": "id",
+          "type": "int",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "product_id",
+          "type": "int",
+          "nullable": false,
+          "fk_to": "Product.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "amount",
+          "type": "float"
+        },
+        {
+          "name": "best_before_date",
+          "type": "datetime"
+        },
+        {
+          "name": "purchased_date",
+          "type": "datetime",
+          "default": "(datetime('now"
+        },
+        {
+          "name": "stock_id",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "price",
+          "type": "float"
+        },
+        {
+          "name": "open",
+          "type": "int",
+          "nullable": false,
+          "enum": [
+            0,
+            1
+          ]
+        },
+        {
+          "name": "opened_date",
+          "type": "datetime"
+        },
+        {
+          "name": "row_created_timestamp",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true,
+          "default": "(datetime('now"
+        },
+        {
+          "name": "location_id",
+          "type": "int",
+          "fk_to": "Location.id",
+          "on_delete": "set_null",
+          "nullable": true
+        },
+        {
+          "name": "shopping_location_id",
+          "type": "int",
+          "fk_to": "ShoppingLocation.id",
+          "on_delete": "set_null",
+          "nullable": true
+        },
+        {
+          "name": "note",
+          "type": "text"
+        }
+      ]
+    },
+    {
+      "name": "StockLog",
+      "columns": [
+        {
+          "name": "id",
+          "type": "int",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "product_id",
+          "type": "int",
+          "nullable": false,
+          "fk_to": "Product.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "amount",
+          "type": "float"
+        },
+        {
+          "name": "best_before_date",
+          "type": "datetime"
+        },
+        {
+          "name": "purchased_date",
+          "type": "datetime"
+        },
+        {
+          "name": "used_date",
+          "type": "datetime"
+        },
+        {
+          "name": "spoiled",
+          "type": "int",
+          "nullable": false,
+          "enum": [
+            0,
+            1
+          ],
+          "default": 0
+        },
+        {
+          "name": "stock_id",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "transaction_type",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "consume",
+            "inventory-correction",
+            "product-opened",
+            "purchase",
+            "self-production",
+            "stock-edit-new",
+            "stock-edit-old",
+            "transfer_from",
+            "transfer_to"
+          ]
+        },
+        {
+          "name": "price",
+          "type": "float"
+        },
+        {
+          "name": "undone",
+          "type": "int",
+          "nullable": false,
+          "enum": [
+            0,
+            1
+          ]
+        },
+        {
+          "name": "undone_timestamp",
+          "type": "datetime"
+        },
+        {
+          "name": "opened_date",
+          "type": "datetime"
+        },
+        {
+          "name": "location_id",
+          "type": "int",
+          "fk_to": "Location.id",
+          "on_delete": "set_null",
+          "nullable": true
+        },
+        {
+          "name": "recipe_id",
+          "type": "int",
+          "fk_to": "Recipe.id",
+          "on_delete": "set_null",
+          "nullable": true
+        },
+        {
+          "name": "correlation_id",
+          "type": "text"
+        },
+        {
+          "name": "transaction_id",
+          "type": "text"
+        },
+        {
+          "name": "stock_row_id",
+          "type": "int"
+        },
+        {
+          "name": "shopping_location_id",
+          "type": "int",
+          "fk_to": "ShoppingLocation.id",
+          "on_delete": "set_null",
+          "nullable": true
+        },
+        {
+          "name": "user_id",
+          "type": "int",
+          "nullable": false,
+          "fk_to": "User.id",
+          "on_delete": "restrict"
+        },
+        {
+          "name": "row_created_timestamp",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true,
+          "default": "(datetime('now"
+        },
+        {
+          "name": "note",
+          "type": "text"
+        }
+      ]
+    },
+    {
+      "name": "ShoppingList",
+      "columns": [
+        {
+          "name": "id",
+          "type": "int",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "product_id",
+          "type": "int",
+          "fk_to": "Product.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "note",
+          "type": "text"
+        },
+        {
+          "name": "amount",
+          "type": "float"
+        },
+        {
+          "name": "row_created_timestamp",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true,
+          "default": "(datetime('now"
+        },
+        {
+          "name": "shopping_list_id",
+          "type": "int",
+          "fk_to": "ShoppingLists.id",
+          "default": 1,
+          "on_delete": "cascade"
+        },
+        {
+          "name": "done",
+          "type": "int",
+          "enum": [
+            0,
+            1
+          ],
+          "default": 0
+        },
+        {
+          "name": "qu_id",
+          "type": "int"
+        }
+      ]
+    },
+    {
+      "name": "ShoppingLists",
+      "columns": [
+        {
+          "name": "id",
+          "type": "int",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "description",
+          "type": "text"
+        },
+        {
+          "name": "row_created_timestamp",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true,
+          "default": "(datetime('now"
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "name"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Recipe",
+      "columns": [
+        {
+          "name": "id",
+          "type": "int",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "description",
+          "type": "text"
+        },
+        {
+          "name": "row_created_timestamp",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true,
+          "default": "(datetime('now"
+        },
+        {
+          "name": "picture_file_name",
+          "type": "text"
+        },
+        {
+          "name": "base_servings",
+          "type": "int",
+          "default": 1
+        },
+        {
+          "name": "desired_servings",
+          "type": "int",
+          "default": 1
+        },
+        {
+          "name": "not_check_shoppinglist",
+          "type": "int",
+          "nullable": false,
+          "default": 0
+        },
+        {
+          "name": "type",
+          "type": "text",
+          "enum": [
+            "normal",
+            "mealplan-day",
+            "mealplan-week",
+            "mealplan-shadow"
+          ],
+          "default": "normal"
+        },
+        {
+          "name": "product_id",
+          "type": "int",
+          "fk_to": "Product.id",
+          "on_delete": "set_null",
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "name": "RecipePos",
+      "columns": [
+        {
+          "name": "id",
+          "type": "int",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "recipe_id",
+          "type": "int",
+          "nullable": false,
+          "fk_to": "Recipe.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "product_id",
+          "type": "int",
+          "nullable": false,
+          "fk_to": "Product.id",
+          "on_delete": "restrict"
+        },
+        {
+          "name": "amount",
+          "type": "float",
+          "nullable": false,
+          "default": 0
+        },
+        {
+          "name": "note",
+          "type": "text"
+        },
+        {
+          "name": "qu_id",
+          "type": "int",
+          "fk_to": "QuantityUnit.id",
+          "on_delete": "set_null",
+          "nullable": true
+        },
+        {
+          "name": "only_check_single_unit_in_stock",
+          "type": "int",
+          "nullable": false,
+          "default": 0
+        },
+        {
+          "name": "ingredient_group",
+          "type": "text"
+        },
+        {
+          "name": "not_check_stock_fulfillment",
+          "type": "int",
+          "nullable": false,
+          "default": 0
+        },
+        {
+          "name": "row_created_timestamp",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true,
+          "default": "(datetime('now"
+        },
+        {
+          "name": "variable_amount",
+          "type": "text"
+        },
+        {
+          "name": "price_factor",
+          "type": "float",
+          "nullable": false,
+          "default": 1
+        },
+        {
+          "name": "round_up",
+          "type": "int",
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "name": "RecipeNesting",
+      "columns": [
+        {
+          "name": "id",
+          "type": "int",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "recipe_id",
+          "type": "int",
+          "nullable": false,
+          "fk_to": "Recipe.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "includes_recipe_id",
+          "type": "int",
+          "nullable": false,
+          "fk_to": "Recipe.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "row_created_timestamp",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true,
+          "default": "(datetime('now"
+        },
+        {
+          "name": "servings",
+          "type": "int",
+          "default": 1
+        }
+      ]
+    },
+    {
+      "name": "MealPlan",
+      "columns": [
+        {
+          "name": "id",
+          "type": "int",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "day",
+          "type": "datetime",
+          "nullable": false
+        },
+        {
+          "name": "type",
+          "type": "text",
+          "enum": [
+            "recipe",
+            "product"
+          ],
+          "default": "recipe"
+        },
+        {
+          "name": "recipe_id",
+          "type": "int",
+          "fk_to": "Recipe.id",
+          "on_delete": "set_null",
+          "nullable": true
+        },
+        {
+          "name": "recipe_servings",
+          "type": "int",
+          "default": 1
+        },
+        {
+          "name": "note",
+          "type": "text"
+        },
+        {
+          "name": "product_id",
+          "type": "int",
+          "fk_to": "Product.id",
+          "on_delete": "set_null",
+          "nullable": true
+        },
+        {
+          "name": "product_amount",
+          "type": "float",
+          "default": 0
+        },
+        {
+          "name": "product_qu_id",
+          "type": "int",
+          "fk_to": "QuantityUnit.id",
+          "on_delete": "set_null",
+          "nullable": true
+        },
+        {
+          "name": "row_created_timestamp",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true,
+          "default": "(datetime('now"
+        },
+        {
+          "name": "done",
+          "type": "int",
+          "nullable": false,
+          "enum": [
+            0,
+            1
+          ]
+        },
+        {
+          "name": "section_id",
+          "type": "int",
+          "nullable": false,
+          "fk_to": "MealPlanSection.id",
+          "default": -1,
+          "on_delete": "cascade"
+        }
+      ]
+    },
+    {
+      "name": "MealPlanSection",
+      "columns": [
+        {
+          "name": "id",
+          "type": "int",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "sort_number",
+          "type": "int"
+        },
+        {
+          "name": "row_created_timestamp",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true,
+          "default": "(datetime('now"
+        },
+        {
+          "name": "time_info",
+          "type": "text"
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "name"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Chore",
+      "columns": [
+        {
+          "name": "id",
+          "type": "int",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "description",
+          "type": "text"
+        },
+        {
+          "name": "period_type",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "hourly",
+            "daily",
+            "manually",
+            "monthly",
+            "weekly",
+            "yearly",
+            "adaptive"
+          ]
+        },
+        {
+          "name": "period_days",
+          "type": "int"
+        },
+        {
+          "name": "row_created_timestamp",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true,
+          "default": "(datetime('now"
+        },
+        {
+          "name": "period_config",
+          "type": "text"
+        },
+        {
+          "name": "track_date_only",
+          "type": "int",
+          "enum": [
+            0,
+            1
+          ],
+          "default": 0
+        },
+        {
+          "name": "rollover",
+          "type": "int",
+          "enum": [
+            0,
+            1
+          ],
+          "default": 0
+        },
+        {
+          "name": "assignment_type",
+          "type": "text",
+          "enum": [
+            "in-alphabetical-order",
+            "no-assignment",
+            "random",
+            "who-least-did-first"
+          ]
+        },
+        {
+          "name": "assignment_config",
+          "type": "text"
+        },
+        {
+          "name": "next_execution_assigned_to_user_id",
+          "type": "int"
+        },
+        {
+          "name": "consume_product_on_execution",
+          "type": "int",
+          "nullable": false,
+          "enum": [
+            0,
+            1
+          ],
+          "default": 0
+        },
+        {
+          "name": "product_id",
+          "type": "int"
+        },
+        {
+          "name": "product_amount",
+          "type": "float"
+        },
+        {
+          "name": "period_interval",
+          "type": "int",
+          "nullable": false
+        },
+        {
+          "name": "active",
+          "type": "int",
+          "nullable": false,
+          "enum": [
+            0,
+            1
+          ]
+        },
+        {
+          "name": "start_date",
+          "type": "datetime"
+        },
+        {
+          "name": "rescheduled_date",
+          "type": "datetime"
+        },
+        {
+          "name": "rescheduled_next_execution_assigned_to_user_id",
+          "type": "int"
+        }
+      ]
+    },
+    {
+      "name": "ChoresLog",
+      "columns": [
+        {
+          "name": "id",
+          "type": "int",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "chore_id",
+          "type": "int",
+          "nullable": false,
+          "fk_to": "Chore.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "tracked_time",
+          "type": "datetime"
+        },
+        {
+          "name": "done_by_user_id",
+          "type": "int",
+          "fk_to": "User.id",
+          "on_delete": "set_null",
+          "nullable": true
+        },
+        {
+          "name": "row_created_timestamp",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true,
+          "default": "(datetime('now"
+        },
+        {
+          "name": "undone",
+          "type": "int",
+          "nullable": false,
+          "enum": [
+            0,
+            1
+          ]
+        },
+        {
+          "name": "undone_timestamp",
+          "type": "datetime"
+        },
+        {
+          "name": "skipped",
+          "type": "int",
+          "nullable": false,
+          "enum": [
+            0,
+            1
+          ]
+        },
+        {
+          "name": "scheduled_execution_time",
+          "type": "datetime"
+        }
+      ]
+    },
+    {
+      "name": "Battery",
+      "columns": [
+        {
+          "name": "id",
+          "type": "int",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "description",
+          "type": "text"
+        },
+        {
+          "name": "used_in",
+          "type": "text"
+        },
+        {
+          "name": "charge_interval_days",
+          "type": "int",
+          "nullable": false,
+          "default": 0
+        },
+        {
+          "name": "row_created_timestamp",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true,
+          "default": "(datetime('now"
+        },
+        {
+          "name": "active",
+          "type": "int",
+          "nullable": false,
+          "enum": [
+            0,
+            1
+          ]
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "name"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "BatteryChargeCycle",
+      "columns": [
+        {
+          "name": "id",
+          "type": "int",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "battery_id",
+          "type": "int",
+          "nullable": false,
+          "fk_to": "Battery.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "tracked_time",
+          "type": "datetime"
+        },
+        {
+          "name": "undone",
+          "type": "int",
+          "nullable": false,
+          "enum": [
+            0,
+            1
+          ]
+        },
+        {
+          "name": "undone_timestamp",
+          "type": "datetime"
+        },
+        {
+          "name": "row_created_timestamp",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true,
+          "default": "(datetime('now"
+        }
+      ]
+    },
+    {
+      "name": "Task",
+      "columns": [
+        {
+          "name": "id",
+          "type": "int",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "description",
+          "type": "text"
+        },
+        {
+          "name": "due_date",
+          "type": "datetime"
+        },
+        {
+          "name": "done",
+          "type": "int",
+          "nullable": false,
+          "enum": [
+            0,
+            1
+          ]
+        },
+        {
+          "name": "done_timestamp",
+          "type": "datetime"
+        },
+        {
+          "name": "category_id",
+          "type": "int",
+          "fk_to": "TaskCategory.id",
+          "on_delete": "set_null",
+          "nullable": true
+        },
+        {
+          "name": "assigned_to_user_id",
+          "type": "int",
+          "fk_to": "User.id",
+          "on_delete": "set_null",
+          "nullable": true
+        },
+        {
+          "name": "row_created_timestamp",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true,
+          "default": "(datetime('now"
+        }
+      ]
+    },
+    {
+      "name": "TaskCategory",
+      "columns": [
+        {
+          "name": "id",
+          "type": "int",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "description",
+          "type": "text"
+        },
+        {
+          "name": "row_created_timestamp",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true,
+          "default": "(datetime('now"
+        },
+        {
+          "name": "active",
+          "type": "int",
+          "nullable": false,
+          "enum": [
+            0,
+            1
+          ]
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "name"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Equipment",
+      "columns": [
+        {
+          "name": "id",
+          "type": "int",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "description",
+          "type": "text"
+        },
+        {
+          "name": "instruction_manual_file_name",
+          "type": "text"
+        },
+        {
+          "name": "row_created_timestamp",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true,
+          "default": "(datetime('now"
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "name"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Userfield",
+      "columns": [
+        {
+          "name": "id",
+          "type": "int",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "entity",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "caption",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "type",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "checkbox",
+            "date",
+            "datetime",
+            "number-integral",
+            "number-decimal",
+            "number-currency",
+            "file",
+            "image",
+            "link",
+            "link-with-title",
+            "preset-checklist",
+            "preset-list",
+            "text-single-line",
+            "text-multi-line"
+          ]
+        },
+        {
+          "name": "show_as_column_in_tables",
+          "type": "int",
+          "nullable": false,
+          "enum": [
+            0,
+            1
+          ],
+          "default": 0
+        },
+        {
+          "name": "row_created_timestamp",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true,
+          "default": "(datetime('now"
+        },
+        {
+          "name": "config",
+          "type": "text"
+        },
+        {
+          "name": "sort_number",
+          "type": "int"
+        },
+        {
+          "name": "input_required",
+          "type": "int",
+          "nullable": false,
+          "enum": [
+            0,
+            1
+          ]
+        },
+        {
+          "name": "default_value",
+          "type": "text"
+        }
+      ]
+    },
+    {
+      "name": "UserfieldValue",
+      "columns": [
+        {
+          "name": "id",
+          "type": "int",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "field_id",
+          "type": "int",
+          "nullable": false,
+          "fk_to": "Userfield.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "object_id",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "value",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "row_created_timestamp",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true,
+          "default": "(datetime('now"
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "field_id",
+            "object_id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Userentity",
+      "columns": [
+        {
+          "name": "id",
+          "type": "int",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "caption",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "description",
+          "type": "text"
+        },
+        {
+          "name": "show_in_sidebar_menu",
+          "type": "int",
+          "nullable": false,
+          "enum": [
+            0,
+            1
+          ],
+          "default": 1
+        },
+        {
+          "name": "icon_css_class",
+          "type": "text"
+        },
+        {
+          "name": "row_created_timestamp",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true,
+          "default": "(datetime('now"
+        }
+      ]
+    },
+    {
+      "name": "Userobject",
+      "columns": [
+        {
+          "name": "id",
+          "type": "int",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "userentity_id",
+          "type": "int",
+          "nullable": false,
+          "fk_to": "Userentity.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "row_created_timestamp",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true,
+          "default": "(datetime('now"
+        }
+      ]
+    },
+    {
+      "name": "DynamicObject",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "entity",
+          "type": "text"
+        },
+        {
+          "name": "data",
+          "type": "json"
+        }
+      ]
+    },
+    {
+      "name": "StoredFile",
+      "columns": [
+        {
+          "name": "group",
+          "type": "text",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "fileName",
+          "type": "text",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "content",
+          "type": "json"
+        },
+        {
+          "name": "mime_type",
+          "type": "text"
+        },
+        {
+          "name": "size_bytes",
+          "type": "int"
+        }
+      ]
+    }
+  ],
+  "tools": [
+    {
+      "tool": "sign_in",
+      "op": "action",
+      "family": "guard.auth",
+      "exec_spec": {
+        "verify": {
+          "entity": "User",
+          "username_col": "username",
+          "password_col": "password"
+        }
+      },
+      "input_schema": {
+        "username": {
+          "type": "text",
+          "required": true,
+          "description": "The account username to sign in with."
+        },
+        "password": {
+          "type": "text",
+          "required": true,
+          "description": "The account password."
+        },
+        "remember_me": {
+          "type": "bool",
+          "required": false,
+          "description": "If true, also issue a long-lived remember-me token (optional)."
+        }
+      },
+      "_evidence": {
+        "locator": "controllers/LoginController.php:27",
+        "id_local": "Auth.login",
+        "entry": {
+          "kind": "http",
+          "route": "POST /login",
+          "locator": "routes.php:43"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "$user = $db->users()->where('username', $postParams['username'])->fetch();\n$inputPassword = $postParams['password'];\nif ($user !== null && password_verify($inputPassword, $user->password)) {\n  $token = SessionService::GetInstance()->CreateToken(SESSION_TOKEN_TYPE_ACCESS, $user->id, GetClientUserAgent());\n  self::SetSessionCookie(ACCESS, $token);\n  if ($rememberMe) { $token = ...CreateToken(REMEMBER_ME, $user->id,...); ... }\n  if (password_needs_rehash($user->password, PASSWORD_ARGON2ID)) { $user->update(['password'=>password_hash($inputPassword, PASSWORD_ARGON2ID)]); }\n  return true;\n}"
+      },
+      "entity": "Session",
+      "_binds": {
+        "username": "User.username"
+      },
+      "_output_schema": {
+        "ok": "bool"
+      },
+      "guards": {
+        "required": [
+          "username",
+          "password"
+        ],
+        "messages": {
+          "required": "Both username and password are required to sign in."
+        }
+      },
+      "description": "Sign in with a username and password, opening the session that `$actor` resolves to. Almost every other tool requires it first. Fails if the username is unknown or the password does not match."
+    },
+    {
+      "tool": "auth_logout",
+      "op": "action",
+      "family": "guard.logout",
+      "exec_spec": {
+        "entity": "Session"
+      },
+      "input_schema": {
+        "access_token": {
+          "type": "text",
+          "required": true,
+          "description": "The access token for the session to close."
+        },
+        "remember_me_token": {
+          "type": "text",
+          "required": false,
+          "description": "Optional remember-me token to revoke too."
+        }
+      },
+      "_evidence": {
+        "locator": "controllers/LoginController.php:16",
+        "id_local": "Auth.logout",
+        "entry": {
+          "kind": "http",
+          "route": "GET /logout",
+          "locator": "routes.php:44"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "SessionService::GetInstance()->DeleteToken(SESSION_TOKEN_TYPE_ACCESS, $_COOKIE[access]);\nif (isset($_COOKIE[remember])) DeleteToken(REMEMBER_ME, $_COOKIE[remember]);\nreturn $response->withRedirect(ConstructUrl('/'));"
+      },
+      "entity": "Session",
+      "_output_schema": {
+        "redirect": "URL"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "access_token"
+        ],
+        "messages": {
+          "auth": "You must be signed in to sign out.",
+          "required": "The access token is required to sign out."
+        }
+      },
+      "description": "Sign out the current user by deleting their access session token; the session closes and `$actor` stops resolving."
+    },
+    {
+      "tool": "user_create",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "User",
+        "fields": [
+          "username",
+          "first_name",
+          "last_name",
+          "picture_file_name"
+        ],
+        "unique_on": [
+          "username"
+        ],
+        "messages": {
+          "unique": "That username is already taken; pick a different one."
+        }
+      },
+      "input_schema": {
+        "username": {
+          "type": "text",
+          "required": true,
+          "description": "Unique username for the new account."
+        },
+        "first_name": {
+          "type": "text",
+          "required": false,
+          "description": "Given name (optional)."
+        },
+        "last_name": {
+          "type": "text",
+          "required": false,
+          "description": "Family name (optional)."
+        },
+        "password": {
+          "type": "text",
+          "required": true,
+          "description": "Plaintext password; stored hashed."
+        },
+        "picture_file_name": {
+          "type": "text",
+          "required": false,
+          "description": "Avatar file name (optional)."
+        },
+        "password_base64": {
+          "type": "text",
+          "required": false,
+          "description": "Base64 of the password, an alternative to the password field (optional)."
+        }
+      },
+      "_evidence": {
+        "locator": "services/UsersService.php:9",
+        "id_local": "Users.create",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/users",
+          "locator": "routes.php:181"
+        },
+        "entity_why": "primary effect spawn lands on this table",
+        "ref_code": "$newUserRow = $this->DB->users()->createRow(['username'=>$username,'first_name'=>$firstName,'last_name'=>$lastName,'password'=>password_hash($password, PASSWORD_ARGON2ID),'picture_file_name'=>$pictureFileName])->save();\n$permList=[];\nforeach ($this->DB->permission_hierarchy()->where('name', GROCY_DEFAULT_PERMISSIONS)->fetchAll() as $perm) { $permList[]=['user_id'=>$newUserRow->id,'permission_id'=>$perm->id]; }\n$this->DB->user_permissions()->insert($permList);",
+        "edges": [
+          "USERS_CREATE via User::CheckPermission (controllers/Api/UsersApiController.php:37)"
+        ]
+      },
+      "entity": "User",
+      "_binds": {
+        "username": "User.username",
+        "first_name": "User.first_name",
+        "last_name": "User.last_name",
+        "picture_file_name": "User.picture_file_name"
+      },
+      "_output_schema": {
+        "created_user": "the new User row"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "username",
+          "password"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "UserPermission",
+                "where": {
+                  "node": "field",
+                  "col": "user_id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must sign in to create a user.",
+          "precondition": "You need the Users.create permission.",
+          "unique": "That username is already taken.",
+          "required": "A username and password are required.",
+          "not_found": "The user could not be created because a referenced value is invalid."
+        }
+      },
+      "description": "Create a new user account with a username and password and grant it the default permission set. Fails if the username is already taken or you lack the Users.create permission."
+    },
+    {
+      "tool": "users_edit",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "User",
+        "row_key": {
+          "id": {
+            "$arg": "userId"
+          }
+        },
+        "fields": [
+          "username",
+          "first_name",
+          "last_name",
+          "picture_file_name"
+        ]
+      },
+      "input_schema": {
+        "userId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the user to edit."
+        },
+        "username": {
+          "type": "text",
+          "required": true,
+          "description": "New username."
+        },
+        "first_name": {
+          "type": "text",
+          "required": false,
+          "description": "Given name (optional)."
+        },
+        "last_name": {
+          "type": "text",
+          "required": false,
+          "description": "Family name (optional)."
+        },
+        "password": {
+          "type": "text",
+          "required": false,
+          "description": "If non-empty, resets the password hash (optional)."
+        },
+        "picture_file_name": {
+          "type": "text",
+          "required": false,
+          "description": "Avatar file name (optional)."
+        }
+      },
+      "_evidence": {
+        "locator": "services/UsersService.php:40",
+        "id_local": "Users.edit",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /api/users/{userId}",
+          "locator": "routes.php:182"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "if ($password == null || empty($password)) { $user->update(['username','first_name','last_name','picture_file_name']); }\nelse { $user->update(['username','first_name','last_name','password'=>password_hash($password,ARGON2ID),'picture_file_name']); }",
+        "edges": [
+          "USERS_EDIT / USERS_EDIT_SELF (if editing self) via User::CheckPermission (controllers/Api/UsersApiController.php:78-85)"
+        ]
+      },
+      "entity": "User",
+      "_binds": {
+        "userId": "User.id",
+        "username": "User.username",
+        "first_name": "User.first_name",
+        "last_name": "User.last_name",
+        "picture_file_name": "User.picture_file_name"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "UserPermission",
+                "where": {
+                  "node": "field",
+                  "col": "user_id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "userId",
+          "username"
+        ],
+        "messages": {
+          "not_found": "No such user exists to edit.",
+          "unique": "That new username is already taken by another account.",
+          "precondition": "Only an authorised user with admin rights can edit accounts."
+        }
+      },
+      "description": "Edit a user's username, name fields or avatar, or reset their password. Fails if you lack the Users.edit permission or the user does not exist."
+    },
+    {
+      "tool": "users_delete",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "User",
+        "lookup_by": {
+          "id": {
+            "$arg": "userId"
+          }
+        }
+      },
+      "input_schema": {
+        "userId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the user to delete."
+        }
+      },
+      "_evidence": {
+        "locator": "services/UsersService.php:34",
+        "id_local": "Users.delete",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/users/{userId}",
+          "locator": "routes.php:183"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "$row = $this->DB->users($userId); $row->delete();",
+        "edges": [
+          "USERS_EDIT via User::CheckPermission (controllers/Api/UsersApiController.php:64)"
+        ]
+      },
+      "entity": "User",
+      "_binds": {
+        "userId": "User.id"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "UserPermission",
+                "where": {
+                  "node": "field",
+                  "col": "user_id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "userId"
+        ],
+        "messages": {
+          "not_found": "No such user exists to delete.",
+          "on_child": "This user still owns records (e.g. stock entries) and cannot be deleted while they reference it.",
+          "precondition": "Only an authorised user with admin rights can delete accounts."
+        }
+      },
+      "description": "Delete a user account. Fails if the user does not exist, is still referenced, or you lack the permission."
+    },
+    {
+      "tool": "users_list",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "User",
+        "rank": {
+          "method": "exact"
+        }
+      },
+      "input_schema": {
+        "query": {
+          "type": "json",
+          "required": false,
+          "description": "Optional filter object (optional)."
+        }
+      },
+      "_evidence": {
+        "locator": "controllers/Api/UsersApiController.php:131",
+        "id_local": "Users.list",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/users",
+          "locator": "routes.php:180"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "return $this->FilteredApiResponse($response, UsersService::GetInstance()->GetUsersAsDto(), $request->getQueryParams());",
+        "edges": [
+          "USERS_READ via User::CheckPermission (controllers/Api/UsersApiController.php:133)"
+        ],
+        "scope": "global: single-household app; stock/chores/tasks are shared household data, not per-user. No owner column applies."
+      },
+      "entity": "User",
+      "_output_schema": {
+        "results": "list of User DTO rows"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "UserPermission",
+                "where": {
+                  "node": "field",
+                  "col": "user_id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in to list users.",
+          "precondition": "Only an authorised user with admin rights can list accounts."
+        }
+      },
+      "description": "List user accounts (admins only). Returns the matching user rows."
+    },
+    {
+      "tool": "users_current",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "User",
+        "lookup_by": {
+          "id": {
+            "$session": "account_id"
+          }
+        },
+        "scope": {
+          "owner_col": "id"
+        }
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "controllers/Api/UsersApiController.php:144",
+        "id_local": "Users.current",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/user",
+          "locator": "routes.php:189"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "return $this->ApiResponse($response, UsersService::GetInstance()->GetUsersAsDto()->where('id', GROCY_USER_ID));",
+        "scope": "global: single-household app; stock/chores/tasks are shared household data, not per-user. No owner column applies."
+      },
+      "entity": "User",
+      "_output_schema": {
+        "me": "the current user DTO row"
+      },
+      "description": "Read your own account row.",
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in to access this."
+        }
+      }
+    },
+    {
+      "tool": "userpermission_add",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "UserPermission",
+        "fields": {
+          "user_id": {
+            "$arg": "userId"
+          },
+          "permission_id": {
+            "$arg": "permission_id"
+          }
+        },
+        "unique_on": [
+          "user_id",
+          "permission_id"
+        ],
+        "messages": {
+          "unique": "That permission is already granted to this user."
+        }
+      },
+      "input_schema": {
+        "userId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the user to grant the permission to."
+        },
+        "permission_id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the permission from the hierarchy."
+        }
+      },
+      "_evidence": {
+        "locator": "controllers/Api/UsersApiController.php:12",
+        "id_local": "UserPermission.add",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/users/{userId}/permissions",
+          "locator": "routes.php:185"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "$this->DB->user_permissions()->createRow(['user_id'=>$args['userId'],'permission_id'=>$requestBody['permission_id']])->save();",
+        "edges": [
+          "ADMIN via User::CheckPermission (controllers/Api/UsersApiController.php:16)"
+        ]
+      },
+      "entity": "UserPermission",
+      "_binds": {
+        "userId": "UserPermission.user_id",
+        "permission_id": "UserPermission.permission_id"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "UserPermission",
+                "where": {
+                  "node": "field",
+                  "col": "user_id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "userId",
+          "permission_id"
+        ],
+        "messages": {
+          "unique": "That permission is already granted to this user.",
+          "fk": "The user or the permission you referenced does not exist.",
+          "fk_missing": "You must provide both a user and a permission to grant.",
+          "precondition": "Only an administrator can grant permissions to a user."
+        }
+      },
+      "description": "Grant a specific permission from the hierarchy to a user (admins only). Fails if already held or you are not an admin."
+    },
+    {
+      "tool": "userpermission_list",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "UserPermission",
+        "search_fields": [
+          "user_id"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "user_id"
+          ]
+        }
+      },
+      "input_schema": {
+        "userId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the user whose permissions to list."
+        }
+      },
+      "_evidence": {
+        "locator": "controllers/Api/UsersApiController.php:156",
+        "id_local": "UserPermission.list",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/users/{userId}/permissions",
+          "locator": "routes.php:184"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "return $this->ApiResponse($response, $this->DB->user_permissions()->where('user_id', $args['userId']));",
+        "edges": [
+          "ADMIN via User::CheckPermission (controllers/Api/UsersApiController.php:160)"
+        ]
+      },
+      "entity": "UserPermission",
+      "_binds": {
+        "userId": "UserPermission.user_id"
+      },
+      "_output_schema": {
+        "results": "list of UserPermission rows"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "UserPermission",
+                "where": {
+                  "node": "field",
+                  "col": "user_id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "userId"
+        ],
+        "messages": {
+          "auth": "You must sign in to view user permissions.",
+          "precondition": "Only an authorised user with admin rights can view another user's permissions.",
+          "required": "You must specify which user's permissions to view."
+        }
+      },
+      "description": "List the permissions a user holds (admins only)."
+    },
+    {
+      "tool": "usersetting_set",
+      "op": "update",
+      "family": "crud.upsert",
+      "exec_spec": {
+        "entity": "UserSetting",
+        "key": {
+          "user_id": {
+            "$session": "account_id"
+          },
+          "key": {
+            "$arg": "settingKey"
+          }
+        },
+        "insert_fields": [
+          "value"
+        ],
+        "set_on_exists": {
+          "value": {
+            "$arg": "value"
+          }
+        }
+      },
+      "input_schema": {
+        "settingKey": {
+          "type": "text",
+          "required": true,
+          "description": "Name of the setting."
+        },
+        "value": {
+          "type": "text",
+          "required": true,
+          "description": "Value to store."
+        },
+        "user_id": {
+          "type": "int",
+          "required": false,
+          "description": "Owner user id (optional; defaults to current user)."
+        },
+        "key": {
+          "type": "text",
+          "required": false,
+          "description": "Setting key (alternative to settingKey)."
+        }
+      },
+      "_evidence": {
+        "locator": "services/UsersService.php:122",
+        "id_local": "UserSetting.set",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /api/user/settings/{settingKey}",
+          "locator": "routes.php:192"
+        },
+        "entity_why": "primary effect row_upsert lands on this table",
+        "ref_code": "$settingRow = ...where('user_id = :1 AND key = :2', $userId, $settingKey)->fetch();\nif ($settingRow !== null) { $settingRow->update(['value'=>$settingValue,'row_updated_timestamp'=>date('Y-m-d H:i:s')]); }\nelse { $this->DB->user_settings()->createRow(['user_id'=>$userId,'key'=>$settingKey,'value'=>$settingValue])->save(); }",
+        "scope": "owner-scoped by user_id from session; the probe reads own rows only."
+      },
+      "entity": "UserSetting",
+      "_binds": {
+        "settingKey": "UserSetting.key",
+        "value": "UserSetting.value"
+      },
+      "_output_schema": {},
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "settingKey",
+          "value"
+        ],
+        "messages": {
+          "auth": "You must sign in to save a setting.",
+          "required": "settingKey and value are both required."
+        }
+      },
+      "description": "Save a user-preference key/value on your own account. Creates the setting if missing, updates it otherwise."
+    },
+    {
+      "tool": "usersetting_get",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "UserSetting",
+        "lookup_by": {
+          "user_id": {
+            "$session": "account_id"
+          },
+          "key": {
+            "$arg": "settingKey"
+          }
+        },
+        "scope": {
+          "owner_col": "user_id"
+        }
+      },
+      "input_schema": {
+        "settingKey": {
+          "type": "text",
+          "required": true,
+          "description": "Name of the setting to read."
+        }
+      },
+      "_evidence": {
+        "locator": "services/UsersService.php:71",
+        "id_local": "UserSetting.get",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/user/settings/{settingKey}",
+          "locator": "routes.php:191"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "$settingRow = ...where('user_id = :1 AND key = :2', $userId, $settingKey)->fetch(); if ($settingRow !== null) $value=$settingRow->value; else $value=$GROCY_DEFAULT_USER_SETTINGS[$settingKey] ?? null;",
+        "scope": "owner-scoped by user_id from session; the probe reads own rows only."
+      },
+      "entity": "UserSetting",
+      "_binds": {
+        "settingKey": "UserSetting.key"
+      },
+      "_output_schema": {
+        "value": "the setting value, or configured default"
+      },
+      "guards": {
+        "required": [
+          "settingKey"
+        ],
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in to access this."
+        }
+      },
+      "description": "Read one of your own settings by key."
+    },
+    {
+      "tool": "usersetting_list",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "UserSetting",
+        "scope": {
+          "owner_col": "user_id"
+        },
+        "search_fields": [
+          "user_id"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "user_id"
+          ]
+        }
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "services/UsersService.php:103",
+        "id_local": "UserSetting.list",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/user/settings",
+          "locator": "routes.php:190"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "$settingRows = ...where('user_id = :1', $userId)->fetchAll(); foreach ($settingRows as $row) $settings[$row->key]=$row->value; return array_merge($GROCY_DEFAULT_USER_SETTINGS, $settings);",
+        "scope": "owner-scoped by user_id from session; the probe reads own rows only."
+      },
+      "entity": "UserSetting",
+      "_output_schema": {
+        "settings": "map of key->value merged over defaults"
+      },
+      "description": "List all of your own stored settings as key/value pairs.",
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in to access this."
+        }
+      }
+    },
+    {
+      "tool": "usersetting_delete",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "UserSetting",
+        "lookup_by": {
+          "user_id": {
+            "$session": "account_id"
+          },
+          "key": {
+            "$arg": "settingKey"
+          }
+        }
+      },
+      "input_schema": {
+        "settingKey": {
+          "type": "text",
+          "required": true,
+          "description": "Name of the setting to delete."
+        }
+      },
+      "_evidence": {
+        "locator": "services/UsersService.php:149",
+        "id_local": "UserSetting.delete",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/user/settings/{settingKey}",
+          "locator": "routes.php:193"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "$this->DB->user_settings()->where('user_id = :1 AND key = :2', $userId, $settingKey)->delete();",
+        "scope": "owner-scoped by user_id from session; the probe reads own rows only."
+      },
+      "entity": "UserSetting",
+      "_binds": {
+        "settingKey": "UserSetting.key"
+      },
+      "_output_schema": {},
+      "guards": {
+        "required": [
+          "settingKey"
+        ],
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in to access this.",
+          "not_found": "No such setting exists on your account to delete."
+        }
+      },
+      "description": "Delete one of your own settings by key."
+    },
+    {
+      "tool": "stock_add",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "StockLog",
+        "fields": [
+          "amount",
+          "best_before_date",
+          "purchased_date",
+          "transaction_type",
+          "price",
+          "location_id",
+          "shopping_location_id",
+          "note"
+        ],
+        "set_on_create": {
+          "product_id": {
+            "$arg": "productId"
+          },
+          "stock_id": "uniqid()",
+          "transaction_id": "uniqid()",
+          "user_id": {
+            "$session": "account_id"
+          }
+        }
+      },
+      "input_schema": {
+        "productId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the product being stocked."
+        },
+        "amount": {
+          "type": "float",
+          "required": true,
+          "description": "Quantity to add (in purchase unit)."
+        },
+        "best_before_date": {
+          "type": "datetime",
+          "required": false,
+          "description": "Best-before date (optional)."
+        },
+        "purchased_date": {
+          "type": "datetime",
+          "required": false,
+          "description": "Date purchased (optional)."
+        },
+        "price": {
+          "type": "float",
+          "required": false,
+          "description": "Purchase price (optional)."
+        },
+        "location_id": {
+          "type": "int",
+          "required": false,
+          "description": "Id of the stock location (optional)."
+        },
+        "shopping_location_id": {
+          "type": "int",
+          "required": false,
+          "description": "Id of the shopping location (optional)."
+        },
+        "transaction_type": {
+          "type": "text",
+          "required": false,
+          "description": "Booking type; defaults to purchase (optional)."
+        },
+        "stock_label_type": {
+          "type": "int",
+          "required": false,
+          "description": "Stock label type (optional)."
+        },
+        "note": {
+          "type": "text",
+          "required": false,
+          "description": "Free-text note (optional)."
+        }
+      },
+      "_evidence": {
+        "locator": "services/StockService.php:112",
+        "id_local": "Stock.add",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/stock/products/{productId}/add",
+          "locator": "routes.php:204"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "$amount = ...tare handling...;\n$stockId = uniqid();\n$logRow = $this->DB->stock_log()->createRow(['product_id'=>$productId,'amount'=>$amount,'best_before_date'=>$bestBeforeDate,'purchased_date'=>$purchasedDate,'stock_id'=>$stockId,'transaction_type'=>$transactionType,'price'=>$price,'location_id'=>$locationId,'transaction_id'=>$transactionId,'shopping_location_id'=>$shoppingLocationId,'user_id'=>GROCY_USER_ID,'note'=>$note]); $logRow->save();\n$stockRow = $this->DB->stock()->createRow(['product_id'=>$productId,'amount'=>$amount,'best_before_date'=>$bestBeforeDate,'purchased_date'=>$purchasedDate",
+        "edges": [
+          "STOCK_PURCHASE via User::CheckPermission (controllers/Api/StockApiController.php:87)",
+          "services/StockService.php:114-117 ProductExists"
+        ]
+      },
+      "entity": "StockLog",
+      "_binds": {
+        "productId": "Product.id",
+        "amount": "Stock.amount",
+        "best_before_date": "Stock.best_before_date",
+        "purchased_date": "Stock.purchased_date",
+        "price": "Stock.price",
+        "location_id": "Stock.location_id",
+        "shopping_location_id": "Stock.shopping_location_id",
+        "transaction_type": "StockLog.transaction_type",
+        "note": "Stock.note"
+      },
+      "_output_schema": {
+        "transaction_id": "correlation id of the created bookings"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "UserPermission",
+                "where": {
+                  "node": "field",
+                  "col": "user_id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            },
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Product",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "productId"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "productId",
+          "amount"
+        ],
+        "messages": {
+          "not_found": "The stock operation could not be recorded for the given product or location.",
+          "fk": "The product or location you referenced does not exist.",
+          "fk_missing": "A purchase needs a product to add stock for.",
+          "precondition": "You need the stock permission to add stock."
+        }
+      },
+      "description": "Record a stock increase for a product, journaling a stock_log purchase entry and raising the on-hand amount. Fails if the product does not exist or you lack the stock permission."
+    },
+    {
+      "tool": "stock_consume",
+      "op": "update",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "StockLog",
+        "fields": [
+          "amount",
+          "transaction_type",
+          "recipe_id",
+          "location_id",
+          "spoiled"
+        ],
+        "set_on_create": {
+          "product_id": {
+            "$arg": "productId"
+          },
+          "used_date": "2026-01-01T00:00:00",
+          "transaction_id": "uniqid()",
+          "user_id": {
+            "$session": "account_id"
+          }
+        }
+      },
+      "input_schema": {
+        "productId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the product being consumed."
+        },
+        "amount": {
+          "type": "float",
+          "required": true,
+          "description": "Quantity to consume."
+        },
+        "spoiled": {
+          "type": "bool",
+          "required": false,
+          "description": "Whether the amount was spoiled (optional)."
+        },
+        "transaction_type": {
+          "type": "text",
+          "required": false,
+          "description": "Booking type (optional)."
+        },
+        "stock_entry_id": {
+          "type": "text",
+          "required": false,
+          "description": "Consume a specific stock entry (optional)."
+        },
+        "recipe_id": {
+          "type": "int",
+          "required": false,
+          "description": "Related recipe id (optional)."
+        },
+        "location_id": {
+          "type": "int",
+          "required": false,
+          "description": "Id of the location (optional)."
+        },
+        "exact_amount": {
+          "type": "bool",
+          "required": false,
+          "description": "Consume exactly this amount, no substitution (optional)."
+        },
+        "allow_subproduct_substitution": {
+          "type": "bool",
+          "required": false,
+          "description": "Allow substituting sub-products (optional)."
+        }
+      },
+      "_evidence": {
+        "locator": "services/StockService.php:365",
+        "id_local": "Stock.consume",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/stock/products/{productId}/consume",
+          "locator": "routes.php:205"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "foreach ($potentialStockEntries as $stockEntry) {\n  if ($amount >= $stockEntry->amount) { // take whole entry\n    $logRow = ...createRow(['amount'=>$stockEntry->amount*-1,'used_date'=>date('Y-m-d'),'spoiled'=>$spoiled,'transaction_type'=>$transactionType,'transaction_id'=>$transactionId,'user_id'=>GROCY_USER_ID,...]); $logRow->save(); $stockEntry->delete(); $amount -= $stockEntry->amount;\n  } else { // split\n    $logRow=...createRow([...negative amount...]); $logRow->save(); $stockEntry->update(['amount'=>$stockEntry->amount-$amount]); $amount=0;\n  }\n}",
+        "edges": [
+          "STOCK_CONSUME via User::CheckPermission (controllers/Api/StockApiController.php:259)",
+          "services/StockService.php:215 (get product, throws if gone)"
+        ]
+      },
+      "entity": "StockLog",
+      "_binds": {
+        "productId": "Product.id",
+        "amount": "Stock.amount",
+        "spoiled": "StockLog.spoiled",
+        "transaction_type": "StockLog.transaction_type",
+        "stock_entry_id": "Stock.stock_id",
+        "recipe_id": "StockLog.recipe_id",
+        "location_id": "Stock.location_id"
+      },
+      "_output_schema": {
+        "transaction_id": "correlation id of the bookings"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "UserPermission",
+                "where": {
+                  "node": "field",
+                  "col": "user_id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            },
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Product",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "productId"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "productId",
+          "amount"
+        ],
+        "messages": {
+          "not_found": "The consumption could not be recorded.",
+          "fk": "The product or location you referenced does not exist.",
+          "fk_missing": "A consumption needs a product to remove stock from.",
+          "precondition": "You need the stock permission to consume stock."
+        }
+      },
+      "description": "Record consuming an amount of a product from stock, journaling a consumption and lowering on-hand stock. Fails if the product does not exist, stock is insufficient, or you lack permission."
+    },
+    {
+      "tool": "stock_transfer",
+      "op": "update",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "StockLog",
+        "fields": {
+          "amount": {
+            "$arg": "amount"
+          },
+          "location_id": {
+            "$arg": "location_id_to"
+          }
+        },
+        "set_on_create": {
+          "product_id": {
+            "$arg": "productId"
+          },
+          "transaction_type": "transfer_from",
+          "transaction_id": "uniqid()",
+          "user_id": {
+            "$session": "account_id"
+          }
+        }
+      },
+      "input_schema": {
+        "productId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the product being moved."
+        },
+        "amount": {
+          "type": "float",
+          "required": true,
+          "description": "Quantity to transfer."
+        },
+        "location_id_from": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the source location."
+        },
+        "location_id_to": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the destination location."
+        },
+        "stock_entry_id": {
+          "type": "text",
+          "required": false,
+          "description": "Transfer a specific stock entry (optional)."
+        },
+        "location_id": {
+          "type": "int",
+          "required": false,
+          "description": "Destination location id (alternative to location_id_to)."
+        }
+      },
+      "_evidence": {
+        "locator": "services/StockService.php:1267",
+        "id_local": "Stock.transfer",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/stock/products/{productId}/transfer",
+          "locator": "routes.php:206"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "$correlationId=uniqid();\n$logFrom = ...createRow(['amount'=>$stockEntry->amount*-1,'transaction_type'=>TRANSFER_FROM,'location_id'=>$stockEntry->location_id,'correlation_id'=>$correlationId,'transaction_Id'=>$transactionId,'user_id'=>GROCY_USER_ID]); $logFrom->save();\n$logTo = ...createRow(['amount'=>$stockEntry->amount,'transaction_type'=>TRANSFER_TO,'location_id'=>$locationIdTo,'correlation_id'=>$correlationId,'transaction_Id'=>$transactionId,'user_id'=>GROCY_USER_ID]); $logTo->save();\n$stockEntry->update(['location_id'=>$locationIdTo,'best_before_date'=>$newBestBeforeDate]);\n// or split: ke",
+        "edges": [
+          "STOCK_TRANSFER via User::CheckPermission (controllers/Api/StockApiController.php:812)"
+        ]
+      },
+      "entity": "StockLog",
+      "_binds": {
+        "productId": "Product.id",
+        "amount": "Stock.amount",
+        "location_id_from": "Stock.location_id",
+        "location_id_to": "Location.id",
+        "stock_entry_id": "Stock.stock_id"
+      },
+      "_output_schema": {
+        "transaction_id": "correlation id of the transfer bookings"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "UserPermission",
+                "where": {
+                  "node": "field",
+                  "col": "user_id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "productId",
+          "amount",
+          "location_id_from",
+          "location_id_to"
+        ],
+        "messages": {
+          "not_found": "The transfer could not be recorded.",
+          "fk": "The product or location you referenced does not exist.",
+          "precondition": "You need the stock permission to move stock."
+        }
+      },
+      "description": "Move stock of a product from one location to another, journaling transfer_from and transfer_to entries. Fails if you lack permission."
+    },
+    {
+      "tool": "stock_open",
+      "op": "update",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "StockLog",
+        "fields": [
+          "amount"
+        ],
+        "set_on_create": {
+          "product_id": {
+            "$arg": "productId"
+          },
+          "transaction_type": "product-opened",
+          "opened_date": "2026-01-01T00:00:00",
+          "transaction_id": "uniqid()",
+          "user_id": {
+            "$session": "account_id"
+          }
+        }
+      },
+      "input_schema": {
+        "productId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the product."
+        },
+        "amount": {
+          "type": "float",
+          "required": true,
+          "description": "Amount being opened (optional)."
+        },
+        "stock_entry_id": {
+          "type": "text",
+          "required": false,
+          "description": "Specific stock entry to open (optional)."
+        }
+      },
+      "_evidence": {
+        "locator": "services/StockService.php:981",
+        "id_local": "Stock.open",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/stock/products/{productId}/open",
+          "locator": "routes.php:208"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "$logRow = ...createRow(['amount'=>$stockEntry->amount,'transaction_type'=>PRODUCT_OPENED,'opened_date'=>date('Y-m-d'),'transaction_id'=>$transactionId,'user_id'=>GROCY_USER_ID,...]); $logRow->save();\n$stockEntry->update(['open'=>1,'opened_date'=>date('Y-m-d'),'best_before_date'=>$newBestBeforeDate]);\n// or split: new unopened stock row + mark current opened",
+        "edges": [
+          "STOCK_OPEN via User::CheckPermission (controllers/Api/StockApiController.php:542)"
+        ]
+      },
+      "entity": "StockLog",
+      "_binds": {
+        "productId": "Product.id",
+        "amount": "Stock.amount",
+        "stock_entry_id": "Stock.stock_id"
+      },
+      "_output_schema": {
+        "transaction_id": "correlation id"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "UserPermission",
+                "where": {
+                  "node": "field",
+                  "col": "user_id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "productId",
+          "amount"
+        ],
+        "messages": {
+          "not_found": "The open operation could not be recorded.",
+          "fk": "The product or location you referenced does not exist.",
+          "precondition": "You need the stock permission to open a stock entry."
+        }
+      },
+      "description": "Mark a stock entry as opened, journaling the product-open event and updating its open flag."
+    },
+    {
+      "tool": "stock_inventory",
+      "op": "update",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "StockLog",
+        "fields": [
+          "amount",
+          "best_before_date",
+          "purchased_date",
+          "price",
+          "location_id",
+          "shopping_location_id",
+          "note"
+        ],
+        "set_on_create": {
+          "product_id": {
+            "$arg": "productId"
+          },
+          "transaction_type": "inventory-correction",
+          "user_id": {
+            "$session": "account_id"
+          },
+          "stock_id": "uniqid()"
+        }
+      },
+      "input_schema": {
+        "productId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the product."
+        },
+        "new_amount": {
+          "type": "float",
+          "required": true,
+          "description": "The corrected on-hand amount."
+        },
+        "best_before_date": {
+          "type": "datetime",
+          "required": false,
+          "description": "Best-before date (optional)."
+        },
+        "location_id": {
+          "type": "int",
+          "required": false,
+          "description": "Id of the location (optional)."
+        },
+        "price": {
+          "type": "float",
+          "required": false,
+          "description": "Price (optional)."
+        },
+        "shopping_location_id": {
+          "type": "int",
+          "required": false,
+          "description": "Id of shopping location (optional)."
+        },
+        "purchased_date": {
+          "type": "datetime",
+          "required": false,
+          "description": "Purchased date (optional)."
+        },
+        "stock_label_type": {
+          "type": "int",
+          "required": false,
+          "description": "Label type (optional)."
+        },
+        "note": {
+          "type": "text",
+          "required": false,
+          "description": "Note (optional)."
+        },
+        "amount": {
+          "type": "float",
+          "required": false,
+          "description": "Internal target amount (optional)."
+        }
+      },
+      "_evidence": {
+        "locator": "services/StockService.php:917",
+        "id_local": "Stock.inventory",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/stock/products/{productId}/inventory",
+          "locator": "routes.php:207"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "if ($newAmount > $productDetails->stock_amount + $containerWeight) return $this->AddProduct($productId, $newAmount-$productDetails->stock_amount, $bestBeforeDate, INVENTORY_CORRECTION,...);\nelseif ($newAmount < ...) return $this->ConsumeProduct($productId, $productDetails->stock_amount-$newAmount, false, INVENTORY_CORRECTION);\nreturn null;",
+        "edges": [
+          "STOCK_INVENTORY via User::CheckPermission (controllers/Api/StockApiController.php:459)"
+        ]
+      },
+      "entity": "StockLog",
+      "_binds": {
+        "productId": "Product.id",
+        "new_amount": "Stock.amount",
+        "best_before_date": "Stock.best_before_date",
+        "location_id": "Stock.location_id",
+        "price": "Stock.price",
+        "shopping_location_id": "Stock.shopping_location_id",
+        "purchased_date": "Stock.purchased_date",
+        "note": "StockLog.note"
+      },
+      "_output_schema": {
+        "transaction_id": "correlation id or null if no change"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "UserPermission",
+                "where": {
+                  "node": "field",
+                  "col": "user_id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "productId",
+          "new_amount"
+        ],
+        "messages": {
+          "not_found": "The inventory correction could not be recorded.",
+          "fk": "The product or location you referenced does not exist.",
+          "precondition": "You need the stock permission to correct stock levels."
+        }
+      },
+      "description": "Correct a product's on-hand amount to a target, journaling the difference as an inventory correction (adding or consuming as needed)."
+    },
+    {
+      "tool": "stock_editentry",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Stock",
+        "row_key": {
+          "id": {
+            "$arg": "entryId"
+          }
+        },
+        "fields": [
+          "amount",
+          "best_before_date",
+          "purchased_date",
+          "price",
+          "location_id",
+          "shopping_location_id",
+          "open",
+          "note"
+        ],
+        "unique_on": []
+      },
+      "input_schema": {
+        "entryId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the stock entry to edit."
+        },
+        "amount": {
+          "type": "float",
+          "required": true,
+          "description": "New amount."
+        },
+        "best_before_date": {
+          "type": "datetime",
+          "required": true,
+          "description": "New best-before date."
+        },
+        "location_id": {
+          "type": "int",
+          "required": true,
+          "description": "New location id."
+        },
+        "shopping_location_id": {
+          "type": "int",
+          "required": true,
+          "description": "New shopping location id."
+        },
+        "price": {
+          "type": "float",
+          "required": true,
+          "description": "New price."
+        },
+        "open": {
+          "type": "bool",
+          "required": true,
+          "description": "Whether the entry is open."
+        },
+        "purchased_date": {
+          "type": "datetime",
+          "required": true,
+          "description": "New purchase date."
+        },
+        "note": {
+          "type": "text",
+          "required": false,
+          "description": "Note (optional)."
+        }
+      },
+      "_evidence": {
+        "locator": "services/StockService.php:528",
+        "id_local": "Stock.editEntry",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /api/stock/entry/{entryId}",
+          "locator": "routes.php:198"
+        },
+        "entity_why": "primary effect row_update lands on Stock (PUT /api/stock/entry/{entryId}); StockLog journal entries are server-derived side effects",
+        "ref_code": "$correlationId=uniqid(); $transactionId=uniqid();\n$logOld=...createRow(['amount'=>$stockRow->amount,'transaction_type'=>STOCK_EDIT_OLD,'stock_id'=>$stockRow->stock_id,'correlation_id'=>$correlationId,'transaction_id'=>$transactionId,'stock_row_id'=>$stockRow->id,'user_id'=>GROCY_USER_ID]); $logOld->save();\n$stockRow->update(['amount'=>$amount,'price'=>$price,'best_before_date'=>$bestBeforeDate,'location_id'=>$locationId,'shopping_location_id'=>$shoppingLocationId,'opened_date'=>$openedDate,'open'=>BoolToInt($open),'purchased_date'=>$purchasedDate,'note'=>$note]);\n$logNew=...createRow(['amount'",
+        "edges": [
+          "STOCK_EDIT via User::CheckPermission (controllers/Api/StockApiController.php:381)"
+        ]
+      },
+      "entity": "Stock",
+      "_binds": {
+        "entryId": "Stock.id",
+        "amount": "Stock.amount",
+        "best_before_date": "Stock.best_before_date",
+        "location_id": "Stock.location_id",
+        "shopping_location_id": "Stock.shopping_location_id",
+        "price": "Stock.price",
+        "open": "Stock.open",
+        "purchased_date": "Stock.purchased_date",
+        "note": "Stock.note"
+      },
+      "_output_schema": {
+        "transaction_id": "correlation id"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "UserPermission",
+                "where": {
+                  "node": "field",
+                  "col": "user_id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "entryId",
+          "amount",
+          "best_before_date",
+          "location_id",
+          "shopping_location_id",
+          "price",
+          "open",
+          "purchased_date"
+        ],
+        "messages": {
+          "not_found": "The stock entry could not be edited.",
+          "fk": "The product or location you referenced does not exist.",
+          "precondition": "You need the stock permission to change a stock entry."
+        }
+      },
+      "description": "Edit a stock entry's amount, dates, location, price and open state, journaling both the old and new values."
+    },
+    {
+      "tool": "stock_addproducttoshoppinglist",
+      "op": "create",
+      "family": "crud.upsert",
+      "exec_spec": {
+        "entity": "ShoppingList",
+        "key": {
+          "product_id": {
+            "$arg": "product_id"
+          },
+          "shopping_list_id": {
+            "$arg": "list_id"
+          }
+        },
+        "insert_fields": {
+          "amount": {
+            "$arg": "product_amount"
+          },
+          "note": {
+            "$arg": "note"
+          },
+          "qu_id": {
+            "$arg": "qu_id"
+          }
+        },
+        "set_on_exists": {
+          "product_id": {
+            "$arg": "product_id"
+          },
+          "shopping_list_id": {
+            "$arg": "list_id"
+          }
+        }
+      },
+      "input_schema": {
+        "product_id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the product to add."
+        },
+        "product_amount": {
+          "type": "float",
+          "required": false,
+          "description": "Quantity to add (optional)."
+        },
+        "qu_id": {
+          "type": "int",
+          "required": false,
+          "description": "Quantity unit id (optional)."
+        },
+        "note": {
+          "type": "text",
+          "required": false,
+          "description": "Note (optional)."
+        },
+        "list_id": {
+          "type": "int",
+          "required": false,
+          "description": "Id of the shopping list (optional)."
+        },
+        "shopping_list_id": {
+          "type": "int",
+          "required": false,
+          "description": "Id of the shopping list (alternative to list_id)."
+        }
+      },
+      "_evidence": {
+        "locator": "services/StockService.php:307",
+        "id_local": "Stock.addProductToShoppingList",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/stock/shoppinglist/add-product",
+          "locator": "routes.php:230"
+        },
+        "entity_why": "primary effect row_upsert lands on this table",
+        "ref_code": "if ($alreadyExistingEntry) { $alreadyExistingEntry->update(['amount'=>($alreadyExistingEntry->amount+$amount),'shopping_list_id'=>$listId,'note'=>$note]); }\nelse { $shoppinglistRow = ...createRow(['product_id'=>$productId,'amount'=>$amount,'qu_id'=>$quId,'shopping_list_id'=>$listId,'note'=>$note])->save(); }",
+        "edges": [
+          "SHOPPINGLIST_ITEMS_ADD via User::CheckPermission (controllers/Api/StockApiController.php:177)",
+          "services/StockService.php:309 ShoppingListExists"
+        ]
+      },
+      "entity": "ShoppingList",
+      "_binds": {
+        "product_id": "Product.id",
+        "product_amount": "ShoppingList.amount",
+        "qu_id": "ShoppingList.qu_id",
+        "note": "ShoppingList.note",
+        "list_id": "ShoppingLists.id"
+      },
+      "_output_schema": {
+        "created_list_item": "the ShoppingList row"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "UserPermission",
+                "where": {
+                  "node": "field",
+                  "col": "user_id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            },
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "ShoppingLists",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "list_id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "product_id"
+        ],
+        "messages": {
+          "not_found": "The shopping list you referenced does not exist.",
+          "fk": "The product or shopping list you referenced does not exist.",
+          "precondition": "You need the stock permission to add a product to the shopping list."
+        }
+      },
+      "description": "Add a product to a shopping list, or bump its amount if it is already present."
+    },
+    {
+      "tool": "stock_removeproductfromshoppinglist",
+      "op": "update",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "ShoppingList",
+        "lookup_by": {
+          "product_id": {
+            "$arg": "product_id"
+          },
+          "shopping_list_id": {
+            "$arg": "list_id"
+          }
+        }
+      },
+      "input_schema": {
+        "product_id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the product to remove."
+        },
+        "product_amount": {
+          "type": "float",
+          "required": false,
+          "description": "Optional amount hint (optional)."
+        },
+        "list_id": {
+          "type": "int",
+          "required": false,
+          "description": "Id of the shopping list (optional)."
+        }
+      },
+      "_evidence": {
+        "locator": "services/StockService.php:1158",
+        "id_local": "Stock.removeProductFromShoppingList",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/stock/shoppinglist/remove-product",
+          "locator": "routes.php:231"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "$productRow = ...where('product_id = :1', $productId)->fetch(); if ($productRow) { $newAmount=$productRow->amount-$amount; if($newAmount<epsilon) $productRow->delete(); else $productRow->update(['amount'=>$newAmount]); }",
+        "edges": [
+          "SHOPPINGLIST_ITEMS_DELETE via User::CheckPermission (controllers/Api/StockApiController.php:729)"
+        ]
+      },
+      "entity": "ShoppingList",
+      "_binds": {
+        "product_id": "Product.id",
+        "product_amount": "ShoppingList.amount",
+        "list_id": "ShoppingLists.id"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "UserPermission",
+                "where": {
+                  "node": "field",
+                  "col": "user_id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "product_id"
+        ],
+        "messages": {
+          "not_found": "That item is not on the shopping list you referenced.",
+          "fk": "The shopping list you referenced does not exist.",
+          "precondition": "You need the stock permission to remove a product from the shopping list."
+        }
+      },
+      "description": "Remove a product entry from a shopping list."
+    },
+    {
+      "tool": "stock_clearshoppinglist",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "ShoppingList",
+        "lookup_by": {
+          "shopping_list_id": {
+            "$arg": "list_id"
+          }
+        }
+      },
+      "input_schema": {
+        "list_id": {
+          "type": "int",
+          "required": false,
+          "description": "Id of the shopping list to clear."
+        },
+        "done_only": {
+          "type": "bool",
+          "required": false,
+          "description": "Only clear completed items if true (optional)."
+        }
+      },
+      "_evidence": {
+        "locator": "services/StockService.php:348",
+        "id_local": "Stock.clearShoppingList",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/stock/shoppinglist/clear",
+          "locator": "routes.php:229"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "if ($doneOnly) $this->DB->shopping_list()->where('shopping_list_id = :1 AND IFNULL(done,0)=1', $listId)->delete();\nelse $this->DB->shopping_list()->where('shopping_list_id = :1', $listId)->delete();",
+        "edges": [
+          "SHOPPINGLIST_ITEMS_DELETE via User::CheckPermission (controllers/Api/StockApiController.php:230)"
+        ]
+      },
+      "entity": "ShoppingList",
+      "_binds": {
+        "list_id": "ShoppingLists.id"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "UserPermission",
+                "where": {
+                  "node": "field",
+                  "col": "user_id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "messages": {
+          "not_found": "The shopping list you referenced does not exist.",
+          "fk": "The shopping list you referenced does not exist.",
+          "precondition": "You need the stock permission to clear the shopping list."
+        }
+      },
+      "description": "Clear the items of a shopping list, optionally only the completed ones."
+    },
+    {
+      "tool": "stock_addmissingproductstoshoppinglist",
+      "op": "action",
+      "family": "crud.upsert",
+      "exec_spec": {
+        "entity": "ShoppingList",
+        "key": {
+          "product_id": "<missing product>",
+          "shopping_list_id": {
+            "$arg": "list_id"
+          }
+        },
+        "insert_fields": [
+          "product_id",
+          "note",
+          "amount",
+          "shopping_list_id",
+          "done",
+          "qu_id"
+        ],
+        "set_on_exists": {
+          "amount": "<missing amount>",
+          "shopping_list_id": {
+            "$arg": "list_id"
+          }
+        }
+      },
+      "input_schema": {
+        "list_id": {
+          "type": "int",
+          "required": false,
+          "description": "Id of the shopping list to fill."
+        },
+        "product_id": {
+          "type": "int",
+          "required": false,
+          "description": "Restrict the fill to this product (optional)."
+        },
+        "shopping_list_id": {
+          "type": "int",
+          "required": false,
+          "description": "Id of the shopping list to fill (alternative to list_id)."
+        },
+        "note": {
+          "type": "text",
+          "required": false,
+          "description": "Note to set on the added items (optional)."
+        },
+        "done": {
+          "type": "int",
+          "required": false,
+          "description": "Whether the added items count as done (optional)."
+        },
+        "qu_id": {
+          "type": "int",
+          "required": false,
+          "description": "Quantity unit to use for the added items (optional)."
+        }
+      },
+      "_evidence": {
+        "locator": "services/StockService.php:21",
+        "id_local": "Stock.addMissingProductsToShoppingList",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/stock/shoppinglist/add-missing-products",
+          "locator": "routes.php:226"
+        },
+        "entity_why": "primary effect row_upsert lands on this table",
+        "ref_code": "$missingProducts = $this->GetMissingProducts(); foreach(...) { $product=...products(...); $amountToAdd=round($missingProduct->amount_missing,2); if($alreadyExistingEntry){ if($alreadyExistingEntry->amount<$amountToAdd) $alreadyExistingEntry->update(['amount'=>$amountToAdd,'shopping_list_id'=>$listId]); } else { ...createRow(['product_id'=>$id,'amount'=>$amountToAdd,'shopping_list_id'=>$listId,'qu_id'=>$product->qu_id_purchase])->save(); } }",
+        "edges": [
+          "SHOPPINGLIST_ITEMS_ADD via User::CheckPermission (controllers/Api/StockApiController.php:17)"
+        ]
+      },
+      "entity": "ShoppingList",
+      "_binds": {
+        "list_id": "ShoppingLists.id"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "UserPermission",
+                "where": {
+                  "node": "field",
+                  "col": "user_id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "messages": {
+          "not_found": "The shopping list you referenced does not exist.",
+          "precondition": "You need the stock permission to add missing products to the shopping list."
+        }
+      },
+      "description": "Auto-add every product whose on-hand stock is below its minimum to a shopping list."
+    },
+    {
+      "tool": "stock_addoverdueproductstoshoppinglist",
+      "op": "action",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "ShoppingList",
+        "fields": [
+          "product_id",
+          "note",
+          "amount",
+          "shopping_list_id",
+          "done",
+          "qu_id"
+        ],
+        "set_on_create": {
+          "amount": 1,
+          "shopping_list_id": {
+            "$arg": "list_id"
+          }
+        }
+      },
+      "input_schema": {
+        "list_id": {
+          "type": "int",
+          "required": false,
+          "description": "Id of the shopping list to fill."
+        },
+        "product_id": {
+          "type": "int",
+          "required": false,
+          "description": "Restrict the fill to this product (optional)."
+        },
+        "note": {
+          "type": "text",
+          "required": false,
+          "description": "Note to set on the added items (optional)."
+        },
+        "done": {
+          "type": "int",
+          "required": false,
+          "description": "Whether the added items count as done (optional)."
+        },
+        "qu_id": {
+          "type": "int",
+          "required": false,
+          "description": "Quantity unit to use for the added items (optional)."
+        }
+      },
+      "_evidence": {
+        "locator": "services/StockService.php:60",
+        "id_local": "Stock.addOverdueProductsToShoppingList",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/stock/shoppinglist/add-overdue-products",
+          "locator": "routes.php:227"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "$overdueProducts=$this->GetDueProducts(-1); foreach(...){ $product=...; if(!$alreadyExistingEntry){ ...createRow(['product_id'=>$overdueProduct->product_id,'amount'=>1,'shopping_list_id'=>$listId,'qu_id'=>$product->qu_id_purchase])->save(); } }",
+        "edges": [
+          "SHOPPINGLIST_ITEMS_ADD via User::CheckPermission (controllers/Api/StockApiController.php:41)"
+        ]
+      },
+      "entity": "ShoppingList",
+      "_binds": {
+        "list_id": "ShoppingLists.id"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "UserPermission",
+                "where": {
+                  "node": "field",
+                  "col": "user_id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "messages": {
+          "not_found": "The shopping list you referenced does not exist.",
+          "precondition": "You need the stock permission to add overdue products to the shopping list."
+        }
+      },
+      "description": "Auto-add every product whose stock is overdue (past its best-before) to a shopping list."
+    },
+    {
+      "tool": "stock_getcurrent",
+      "op": "read",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Stock",
+        "rank": {
+          "method": "exact"
+        }
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "services/StockService.php:694",
+        "id_local": "Stock.getCurrent",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/stock",
+          "locator": "routes.php:196"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "$sql='SELECT * FROM stock_current '.$customWhere; $currentStockMapped=ExecuteDbQuery($sql)->fetchAll(...); foreach relevant products attach ->product; return array_column($currentStockMapped,0);",
+        "scope": "global: single-household app; stock/chores/tasks are shared household data, not per-user. No owner column applies."
+      },
+      "entity": "Stock",
+      "_output_schema": {
+        "results": "list of stock_current rows, each with its product object"
+      },
+      "description": "List the current on-hand stock overview, each entry with its product.",
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in to access this."
+        }
+      }
+    },
+    {
+      "tool": "stock_getproductdetails",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Product",
+        "lookup_by": {
+          "id": {
+            "$arg": "productId"
+          }
+        }
+      },
+      "input_schema": {
+        "productId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the product to inspect."
+        }
+      },
+      "_evidence": {
+        "locator": "services/StockService.php:757",
+        "id_local": "Stock.getProductDetails",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/stock/products/{productId}",
+          "locator": "routes.php:200"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "if (!$this->ProductExists($productId)) throw 'Product does not exist or is inactive';\n$stockCurrentRow=FindObjectInArrayByPropertyValue($this->GetCurrentStock(),'product_id',$productId);\n$product=$this->DB->products($productId); return ['product'=>$product,'product_barcodes'=>...,'stock_amount'=>$stockCurrentRow->amount,...];",
+        "scope": "global: single-household app; stock/chores/tasks are shared household data, not per-user. No owner column applies."
+      },
+      "entity": "Product",
+      "_binds": {
+        "productId": "Product.id"
+      },
+      "_output_schema": {
+        "object": "product, barcodes, stock_amount, stock_value, quantity_unit_stock, last_price, ..."
+      },
+      "guards": {
+        "required": [
+          "productId"
+        ],
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in to access this."
+        }
+      },
+      "description": "Read a product's full detail view: barcodes, current stock amount and value, quantity unit and last price."
+    },
+    {
+      "tool": "stock_getproductstockentries",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Stock",
+        "search_fields": [
+          "product_id",
+          "open"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "product_id",
+            "open"
+          ]
+        }
+      },
+      "input_schema": {
+        "productId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the product."
+        }
+      },
+      "_evidence": {
+        "locator": "services/StockService.php:868",
+        "id_local": "Stock.getProductStockEntries",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/stock/products/{productId}/entries",
+          "locator": "routes.php:201"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "return $this->DB->stock_next_use()->where($sqlWhereProductId.' '.$sqlWhereAndOpen);",
+        "scope": "global: single-household app; stock/chores/tasks are shared household data, not per-user. No owner column applies."
+      },
+      "entity": "Stock",
+      "_binds": {
+        "productId": "Product.id"
+      },
+      "_output_schema": {
+        "results": "list of stock entries"
+      },
+      "guards": {
+        "required": [
+          "productId"
+        ],
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in to access this."
+        }
+      },
+      "description": "List the individual stock entries currently held for a product."
+    },
+    {
+      "tool": "stock_getstockentry",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Stock",
+        "lookup_by": {
+          "id": {
+            "$arg": "entryId"
+          }
+        }
+      },
+      "input_schema": {
+        "entryId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the stock entry to read."
+        }
+      },
+      "_evidence": {
+        "locator": "services/StockService.php:912",
+        "id_local": "Stock.getStockEntry",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/stock/entry/{entryId}",
+          "locator": "routes.php:197"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "return $this->DB->stock()->where('id', $entryId)->fetch();",
+        "scope": "global: single-household app; stock/chores/tasks are shared household data, not per-user. No owner column applies."
+      },
+      "entity": "Stock",
+      "_binds": {
+        "entryId": "Stock.id"
+      },
+      "_output_schema": {
+        "stock": "the stock row"
+      },
+      "guards": {
+        "required": [
+          "entryId"
+        ],
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in to access this."
+        }
+      },
+      "description": "Read a single stock entry by its id."
+    },
+    {
+      "tool": "chores_track",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "ChoresLog",
+        "fields": {
+          "tracked_time": {
+            "$arg": "tracked_time"
+          },
+          "done_by_user_id": {
+            "$arg": "done_by"
+          }
+        },
+        "set_on_create": {
+          "chore_id": {
+            "$arg": "choreId"
+          },
+          "scheduled_execution_time": "<next from chores_current>"
+        }
+      },
+      "input_schema": {
+        "choreId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the chore being tracked."
+        },
+        "tracked_time": {
+          "type": "datetime",
+          "required": false,
+          "description": "When it was done (optional)."
+        },
+        "skipped": {
+          "type": "bool",
+          "required": false,
+          "description": "Mark as skipped if true (optional)."
+        },
+        "done_by": {
+          "type": "int",
+          "required": false,
+          "description": "Id of the user who did it (optional)."
+        }
+      },
+      "_evidence": {
+        "locator": "services/ChoresService.php:163",
+        "id_local": "Chores.track",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/chores/{choreId}/execute",
+          "locator": "routes.php:245"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "$chore=$this->DB->chores($choreId);\nif($chore->track_date_only==1) $trackedTime=substr($trackedTime,0,10).' 00:00:00';\nif($skipped && $chore->period_type==MANUALLY) throw 'Chores without a schedule can\\'t be skipped';\n$scheduledExecutionTime=...chores_current(...)->fetch()->next_estimated_execution_time;\n$logRow=$this->DB->chores_log()->createRow(['chore_id'=>$choreId,'tracked_time'=>$trackedTime,'done_by_user_id'=>$doneBy,'skipped'=>BoolToInt($skipped),'scheduled_execution_time'=>$scheduledExecutionTime]); $logRow->save();\nif($chore->consume_product_on_execution==1 && !empty($chore->product_i",
+        "edges": [
+          "CHORE_TRACK_EXECUTION via User::CheckPermission (controllers/Api/ChoresApiController.php:70)",
+          "services/ChoresService.php:165 ChoreExists",
+          "services/ChoresService.php:170-174"
+        ]
+      },
+      "entity": "ChoresLog",
+      "_binds": {
+        "choreId": "Chore.id",
+        "tracked_time": "ChoresLog.tracked_time",
+        "skipped": "ChoresLog.skipped",
+        "done_by": "ChoresLog.done_by_user_id"
+      },
+      "_output_schema": {
+        "log": "the inserted chores_log row"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "UserPermission",
+                "where": {
+                  "node": "field",
+                  "col": "user_id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            },
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Chore",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "choreId"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            },
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "done_by"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "choreId"
+        ],
+        "messages": {
+          "not_found": "The chore execution could not be recorded.",
+          "fk": "The chore or the user you referenced does not exist.",
+          "fk_missing": "A chore execution needs a chore to track.",
+          "precondition": "You need the chores permission to record a chore execution."
+        }
+      },
+      "description": "Record that a chore was executed (or skipped), logging a chores_log row and recomputing its next assignment."
+    },
+    {
+      "tool": "chores_undo",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "ChoresLog",
+        "row_key": {
+          "id": {
+            "$arg": "executionId"
+          }
+        },
+        "fields": [
+          "chore_id",
+          "tracked_time",
+          "done_by_user_id",
+          "undone",
+          "undone_timestamp",
+          "skipped",
+          "scheduled_execution_time"
+        ],
+        "set": {
+          "undone": 1,
+          "undone_timestamp": "2026-01-01T00:00:00"
+        }
+      },
+      "input_schema": {
+        "executionId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the chore execution to undo."
+        },
+        "chore_id": {
+          "type": "int",
+          "required": false,
+          "description": "The chore this execution belongs to (set automatically)."
+        },
+        "tracked_time": {
+          "type": "datetime",
+          "required": false,
+          "description": "The tracked time (set automatically)."
+        },
+        "done_by_user_id": {
+          "type": "int",
+          "required": false,
+          "description": "Who performed the execution (set automatically)."
+        },
+        "skipped": {
+          "type": "int",
+          "required": false,
+          "description": "Whether the execution was a skip (set automatically)."
+        },
+        "scheduled_execution_time": {
+          "type": "datetime",
+          "required": false,
+          "description": "When the next execution is scheduled (set automatically)."
+        }
+      },
+      "_evidence": {
+        "locator": "services/ChoresService.php:226",
+        "id_local": "Chores.undo",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/chores/executions/{executionId}/undo",
+          "locator": "routes.php:246"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "$logRow=...where('id = :1 AND undone = 0', $executionId)->fetch(); if($logRow==null) throw 'Execution does not exist or was already undone';\n$logRow->update(['undone'=>1,'undone_timestamp'=>date('Y-m-d H:i:s')]);\n$this->CalculateNextExecutionAssignment($logRow->chore_id);",
+        "edges": [
+          "CHORE_UNDO_EXECUTION via User::CheckPermission (controllers/Api/ChoresApiController.php:108)"
+        ]
+      },
+      "entity": "ChoresLog",
+      "_binds": {
+        "executionId": "ChoresLog.id"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "UserPermission",
+                "where": {
+                  "node": "field",
+                  "col": "user_id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "executionId"
+        ],
+        "messages": {
+          "not_found": "No such chore execution exists, or it was already undone.",
+          "precondition": "You need the chores permission to undo a chore execution."
+        }
+      },
+      "description": "Undo a previously tracked chore execution, marking the log entry undone and recomputing the next assignment."
+    },
+    {
+      "tool": "chores_details",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Chore",
+        "lookup_by": {
+          "id": {
+            "$arg": "choreId"
+          }
+        }
+      },
+      "input_schema": {
+        "choreId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the chore."
+        }
+      },
+      "_evidence": {
+        "locator": "services/ChoresService.php:104",
+        "id_local": "Chores.details",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/chores/{choreId}",
+          "locator": "routes.php:244"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "if(!$this->ChoreExists($choreId)) throw 'Chore does not exist'; ... return ['chore'=>$chore,'last_tracked'=>...,'tracked_count'=>...];"
+      },
+      "entity": "Chore",
+      "_binds": {
+        "choreId": "Chore.id"
+      },
+      "_output_schema": {
+        "object": "chore, last_tracked, tracked_count, next_estimated_execution_time, ..."
+      },
+      "guards": {
+        "required": [
+          "choreId"
+        ],
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in to access this."
+        }
+      },
+      "description": "Read a chore's detail view including last tracked time, tracked count and next estimated execution."
+    },
+    {
+      "tool": "chores_current",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Chore",
+        "rank": {
+          "method": "exact"
+        }
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "services/ChoresService.php:143",
+        "id_local": "Chores.current",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/chores",
+          "locator": "routes.php:243"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "$chores=$this->DB->chores_current(); foreach($chores as $chore){ $chore->next_execution_assigned_user=FindObjectInArrayByPropertyValue($users,'id',$chore->next_execution_assigned_to_user_id); } return $chores;",
+        "scope": "global: single-household app; stock/chores/tasks are shared household data, not per-user. No owner column applies."
+      },
+      "entity": "Chore",
+      "_output_schema": {
+        "results": "list of current chores"
+      },
+      "description": "List the current chores and their next expected execution.",
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in to access this."
+        }
+      }
+    },
+    {
+      "tool": "batteries_track",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "BatteryChargeCycle",
+        "fields": [
+          "tracked_time"
+        ],
+        "set_on_create": {
+          "battery_id": {
+            "$arg": "batteryId"
+          }
+        }
+      },
+      "input_schema": {
+        "batteryId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the battery."
+        },
+        "tracked_time": {
+          "type": "datetime",
+          "required": false,
+          "description": "When it was charged (optional)."
+        }
+      },
+      "_evidence": {
+        "locator": "services/BatteriesService.php:39",
+        "id_local": "Batteries.track",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/batteries/{batteryId}/charge",
+          "locator": "routes.php:257"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "if(!$this->BatteryExists($batteryId)) throw 'Battery does not exist';\n$logRow=$this->DB->battery_charge_cycles()->createRow(['battery_id'=>$batteryId,'tracked_time'=>$trackedTime]); $logRow->save(); return $this->DB->lastInsertId();",
+        "edges": [
+          "BATTERIES_TRACK_CHARGE_CYCLE via User::CheckPermission (controllers/Api/BatteriesApiController.php:33)",
+          "services/BatteriesService.php:41 BatteryExists"
+        ]
+      },
+      "entity": "BatteryChargeCycle",
+      "_binds": {
+        "batteryId": "Battery.id",
+        "tracked_time": "BatteryChargeCycle.tracked_time"
+      },
+      "_output_schema": {
+        "cycle": "the inserted charge cycle row"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "UserPermission",
+                "where": {
+                  "node": "field",
+                  "col": "user_id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            },
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Battery",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "batteryId"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "batteryId"
+        ],
+        "messages": {
+          "not_found": "The charge cycle could not be recorded.",
+          "fk": "The battery or the user you referenced does not exist.",
+          "fk_missing": "A charge cycle needs a battery to track.",
+          "precondition": "You need the batteries permission to track a battery charge."
+        }
+      },
+      "description": "Record a battery charge cycle, logging a BatteryChargeCycle row."
+    },
+    {
+      "tool": "batteries_undo",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "BatteryChargeCycle",
+        "row_key": {
+          "id": {
+            "$arg": "chargeCycleId"
+          }
+        },
+        "fields": [
+          "battery_id",
+          "tracked_time",
+          "undone",
+          "undone_timestamp"
+        ],
+        "set": {
+          "undone": 1,
+          "undone_timestamp": "2026-01-01T00:00:00"
+        }
+      },
+      "input_schema": {
+        "chargeCycleId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the charge cycle to undo."
+        },
+        "battery_id": {
+          "type": "int",
+          "required": false,
+          "description": "The battery this charge cycle belongs to (set automatically)."
+        },
+        "tracked_time": {
+          "type": "datetime",
+          "required": false,
+          "description": "The tracked charge time (set automatically)."
+        }
+      },
+      "_evidence": {
+        "locator": "services/BatteriesService.php:55",
+        "id_local": "Batteries.undo",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/batteries/charge-cycles/{chargeCycleId}/undo",
+          "locator": "routes.php:258"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "$logRow=...where('id = :1 AND undone = 0', $chargeCycleId)->fetch(); if($logRow==null) throw 'Charge cycle does not exist or was already undone';\n$logRow->update(['undone'=>1,'undone_timestamp'=>date('Y-m-d H:i:s')]);",
+        "edges": [
+          "BATTERIES_UNDO_CHARGE_CYCLE via User::CheckPermission (controllers/Api/BatteriesApiController.php:56)"
+        ]
+      },
+      "entity": "BatteryChargeCycle",
+      "_binds": {
+        "chargeCycleId": "BatteryChargeCycle.id"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "UserPermission",
+                "where": {
+                  "node": "field",
+                  "col": "user_id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "chargeCycleId"
+        ],
+        "messages": {
+          "not_found": "No such charge cycle exists, or it was already undone.",
+          "precondition": "You need the batteries permission to undo a battery charge cycle."
+        }
+      },
+      "description": "Undo a recorded battery charge cycle, marking it undone."
+    },
+    {
+      "tool": "batteries_details",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Battery",
+        "lookup_by": {
+          "id": {
+            "$arg": "batteryId"
+          }
+        }
+      },
+      "input_schema": {
+        "batteryId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the battery."
+        }
+      },
+      "_evidence": {
+        "locator": "services/BatteriesService.php:7",
+        "id_local": "Batteries.details",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/batteries/{batteryId}",
+          "locator": "routes.php:256"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "if(!$this->BatteryExists($batteryId)) throw 'Battery does not exist'; ... return ['battery'=>$battery,'last_charged'=>...];"
+      },
+      "entity": "Battery",
+      "_binds": {
+        "batteryId": "Battery.id"
+      },
+      "_output_schema": {
+        "object": "battery, last_charged, charge_cycles_count, next_estimated_charge_time"
+      },
+      "guards": {
+        "required": [
+          "batteryId"
+        ],
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in to access this."
+        }
+      },
+      "description": "Read a battery's detail view: last charged time, charge cycle count, next estimated charge."
+    },
+    {
+      "tool": "batteries_current",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Battery",
+        "search_fields": [
+          "active"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "active"
+          ]
+        }
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "services/BatteriesService.php:27",
+        "id_local": "Batteries.current",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/batteries",
+          "locator": "routes.php:255"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "$batteries=$this->DB->batteries()->where('active = 1')->orderBy('name','COLLATE NOCASE'); ... return $currentBatteries;",
+        "scope": "global: single-household app; stock/chores/tasks are shared household data, not per-user. No owner column applies."
+      },
+      "entity": "Battery",
+      "_output_schema": {
+        "results": "list of active batteries"
+      },
+      "description": "List the batteries currently due to be charged.",
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in to access this."
+        }
+      }
+    },
+    {
+      "tool": "tasks_markcomplete",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Task",
+        "row_key": {
+          "id": {
+            "$arg": "taskId"
+          }
+        },
+        "fields": {
+          "name": {
+            "$arg": "name"
+          },
+          "description": {
+            "$arg": "description"
+          },
+          "due_date": {
+            "$arg": "due_date"
+          },
+          "done": {
+            "$arg": "done"
+          },
+          "done_timestamp": {
+            "$arg": "done_time"
+          },
+          "category_id": {
+            "$arg": "category_id"
+          },
+          "assigned_to_user_id": {
+            "$arg": "assigned_to_user_id"
+          }
+        },
+        "set": {
+          "done": 1,
+          "done_timestamp": {
+            "$arg": "done_time"
+          }
+        }
+      },
+      "input_schema": {
+        "taskId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the task to complete."
+        },
+        "done_time": {
+          "type": "datetime",
+          "required": false,
+          "description": "When it was completed (optional)."
+        }
+      },
+      "_evidence": {
+        "locator": "services/TasksService.php:39",
+        "id_local": "Tasks.markComplete",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/tasks/{taskId}/complete",
+          "locator": "routes.php:263"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "if(!$this->TaskExists($taskId)) throw 'Task does not exist';\n$taskRow=$this->DB->tasks()->where('id = :1', $taskId)->fetch();\n$taskRow->update(['done'=>1,'done_timestamp'=>$doneTime]); return true;",
+        "edges": [
+          "TASKS_MARK_COMPLETED via User::CheckPermission (controllers/Api/TasksApiController.php:19)",
+          "services/TasksService.php:41 TaskExists"
+        ]
+      },
+      "entity": "Task",
+      "_binds": {
+        "taskId": "Task.id",
+        "done_time": "Task.done_timestamp"
+      },
+      "_output_schema": {
+        "ok": "bool"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "UserPermission",
+                "where": {
+                  "node": "field",
+                  "col": "user_id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            },
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Task",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "taskId"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "taskId"
+        ],
+        "messages": {
+          "auth": "You must sign in to manage tasks.",
+          "required": "A taskId is required.",
+          "precondition": "The task does not exist or you lack permission.",
+          "not_found": "No such task exists to mark complete.",
+          "fk": "The category or assignee you referenced does not exist."
+        }
+      },
+      "description": "Mark a task as done, stamping its completion time. Fails if the task does not exist or you lack permission."
+    },
+    {
+      "tool": "tasks_undo",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Task",
+        "row_key": {
+          "id": {
+            "$arg": "taskId"
+          }
+        },
+        "fields": [
+          "name",
+          "description",
+          "due_date",
+          "done",
+          "done_timestamp",
+          "category_id",
+          "assigned_to_user_id"
+        ],
+        "set": {
+          "done": 0,
+          "done_timestamp": null
+        }
+      },
+      "input_schema": {
+        "taskId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the task to reopen."
+        },
+        "name": {
+          "type": "text",
+          "required": false,
+          "description": "Renamed task name (optional)."
+        },
+        "description": {
+          "type": "text",
+          "required": false,
+          "description": "New description (optional)."
+        },
+        "due_date": {
+          "type": "datetime",
+          "required": false,
+          "description": "New due date (optional)."
+        },
+        "category_id": {
+          "type": "int",
+          "required": false,
+          "description": "New category (optional)."
+        },
+        "assigned_to_user_id": {
+          "type": "int",
+          "required": false,
+          "description": "New assignee (optional)."
+        }
+      },
+      "_evidence": {
+        "locator": "services/TasksService.php:55",
+        "id_local": "Tasks.undo",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/tasks/{taskId}/undo",
+          "locator": "routes.php:264"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "if(!$this->TaskExists($taskId)) throw 'Task does not exist';\n$taskRow->update(['done'=>0,'done_timestamp'=>null]); return true;",
+        "edges": [
+          "TASKS_UNDO_EXECUTION via User::CheckPermission (controllers/Api/TasksApiController.php:43)"
+        ]
+      },
+      "entity": "Task",
+      "_binds": {
+        "taskId": "Task.id"
+      },
+      "_output_schema": {
+        "ok": "bool"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "UserPermission",
+                "where": {
+                  "node": "field",
+                  "col": "user_id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "taskId"
+        ],
+        "messages": {
+          "not_found": "No such task exists to reopen.",
+          "precondition": "You need the tasks permission to reopen a task."
+        }
+      },
+      "description": "Re-open a completed task by clearing its done flag and timestamp."
+    },
+    {
+      "tool": "tasks_current",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Task",
+        "rank": {
+          "method": "exact"
+        }
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "services/TasksService.php:9",
+        "id_local": "Tasks.current",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/tasks",
+          "locator": "routes.php:262"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "$tasks=$this->DB->tasks_current(); foreach($tasks as $task){ $task->assigned_to_user=...; $task->category=...; } return $tasks;",
+        "scope": "global: single-household app; stock/chores/tasks are shared household data, not per-user. No owner column applies."
+      },
+      "entity": "Task",
+      "_output_schema": {
+        "results": "list of current tasks"
+      },
+      "description": "List the current (open) tasks.",
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in to access this."
+        }
+      }
+    },
+    {
+      "tool": "recipes_copy",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Recipe",
+        "fields": [
+          "name",
+          "description",
+          "picture_file_name",
+          "base_servings",
+          "desired_servings",
+          "not_check_shoppinglist",
+          "type",
+          "product_id"
+        ],
+        "set_on_create": {
+          "name": "Copy of <orig name>"
+        }
+      },
+      "input_schema": {
+        "recipeId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the recipe to copy."
+        },
+        "description": {
+          "type": "text",
+          "required": false,
+          "description": "New description (optional)."
+        },
+        "picture_file_name": {
+          "type": "text",
+          "required": false,
+          "description": "New picture (optional)."
+        },
+        "base_servings": {
+          "type": "int",
+          "required": false,
+          "description": "New base servings (optional)."
+        },
+        "desired_servings": {
+          "type": "int",
+          "required": false,
+          "description": "New desired servings (optional)."
+        },
+        "not_check_shoppinglist": {
+          "type": "int",
+          "required": false,
+          "description": "Skip shopping-list check (optional)."
+        },
+        "type": {
+          "type": "text",
+          "required": false,
+          "description": "Recipe type (optional)."
+        },
+        "product_id": {
+          "type": "int",
+          "required": false,
+          "description": "Output product id (optional)."
+        }
+      },
+      "_evidence": {
+        "locator": "services/RecipesService.php:152",
+        "id_local": "Recipes.copy",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/recipes/{recipeId}/copy",
+          "locator": "routes.php:238"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "if(!$this->RecipeExists($recipeId)) throw 'Recipe does not exist';\nExecuteDbStatement('INSERT INTO recipes (...) SELECT :new_name,... FROM recipes WHERE id = :recipe_id');\n$lastInsertId=...; ExecuteDbStatement('INSERT INTO recipes_pos (...) SELECT :last_insert_id,...'); ExecuteDbStatement('INSERT INTO recipes_nestings (...) SELECT :last_insert_id,...');\nreturn $lastInsertId;",
+        "edges": [
+          "services/RecipesService.php:154 RecipeExists"
+        ]
+      },
+      "entity": "Recipe",
+      "_binds": {
+        "recipeId": "Recipe.id"
+      },
+      "_output_schema": {
+        "created_object_id": "the new recipe id"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Recipe",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "recipeId"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "recipeId"
+        ],
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in to copy a recipe.",
+          "precondition": "You lack permission or the source recipe does not exist.",
+          "not_found": "The recipe you tried to copy does not exist.",
+          "fk": "The source recipe does not exist."
+        }
+      },
+      "description": "Duplicate a recipe including its ingredient positions and nestings. Fails if the source recipe does not exist or you lack permission."
+    },
+    {
+      "tool": "recipes_getfulfillment",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Recipe",
+        "search_fields": [
+          "id"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "id"
+          ]
+        }
+      },
+      "input_schema": {
+        "recipeId": {
+          "type": "int",
+          "required": false,
+          "description": "Id of the recipe."
+        }
+      },
+      "_evidence": {
+        "locator": "controllers/Api/RecipesApiController.php:45",
+        "id_local": "Recipes.getFulfillment",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/recipes/{recipeId}/fulfillment",
+          "locator": "routes.php:235"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "$recipeResolved=FindObjectInArrayByPropertyValue(GetRecipesResolved(),'recipe_id',$args['recipeId']);",
+        "scope": "global: single-household app; stock/chores/tasks are shared household data, not per-user. No owner column applies."
+      },
+      "entity": "Recipe",
+      "_binds": {
+        "recipeId": "Recipe.id"
+      },
+      "_output_schema": {
+        "results": "list of recipe fulfillment rows"
+      },
+      "description": "Check how much of a recipe's ingredients are currently in stock (fulfillment view).",
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in to access this."
+        }
+      }
+    },
+    {
+      "tool": "genericentity_add",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "DynamicObject",
+        "fields": {
+          "data": {
+            "$arg": "body"
+          }
+        }
+      },
+      "input_schema": {
+        "entity": {
+          "type": "text",
+          "required": true,
+          "description": "Name of the exposed entity/table to add a row to."
+        },
+        "body": {
+          "type": "json",
+          "required": true,
+          "description": "JSON object of the columns for the new row."
+        }
+      },
+      "_evidence": {
+        "locator": "controllers/Api/GenericEntityApiController.php:14",
+        "id_local": "GenericEntity.add",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/objects/{entity}",
+          "locator": "routes.php:168"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "$newRow=$this->DB->{$args['entity']}()->createRow($requestBody); $newRow->save();\n$newObjectId=$this->DB->lastInsertId();\nif($entity=='products' && auto_add_setting){ StockService::AddMissingProductsToShoppingList(...); }\nreturn ['created_object_id'=>$newObjectId];",
+        "edges": [
+          "MASTER_DATA_EDIT (or per-entity: SHOPPINGLIST_ITEMS_ADD/RECIPES/RECIPES_MEALPLAN/EQUIPMENT) via User::CheckPermission (controllers/Api/GenericEntityApiController.php:15-35)"
+        ]
+      },
+      "entity": "DynamicObject",
+      "_binds": {
+        "body": "DynamicObject.data"
+      },
+      "_output_schema": {
+        "created_object_id": "id of the created row"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "UserPermission",
+                "where": {
+                  "node": "field",
+                  "col": "user_id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "entity",
+          "body"
+        ],
+        "messages": {
+          "not_found": "The exposed entity you named is not valid.",
+          "precondition": "You need the master-data permission to add a row to this entity."
+        }
+      },
+      "description": "Add a row to any of the ~30 exposed entities (products, product groups, locations, quantity units, ...) by naming the entity and passing a body of columns. Fails if you lack the master-data permission."
+    },
+    {
+      "tool": "genericentity_edit",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "DynamicObject",
+        "row_key": {
+          "id": {
+            "$arg": "objectId"
+          }
+        },
+        "set": {
+          "data": {
+            "$arg": "body"
+          }
+        }
+      },
+      "input_schema": {
+        "entity": {
+          "type": "text",
+          "required": true,
+          "description": "Name of the exposed entity."
+        },
+        "objectId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the row to update."
+        },
+        "body": {
+          "type": "json",
+          "required": true,
+          "description": "JSON object of the fields to set."
+        }
+      },
+      "_evidence": {
+        "locator": "controllers/Api/GenericEntityApiController.php:128",
+        "id_local": "GenericEntity.edit",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /api/objects/{entity}/{objectId}",
+          "locator": "routes.php:169"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "$row=$this->DB->{$args['entity']}($args['objectId']); if($row==null) return 'Object not found' 400;\n$row->update($requestBody);\nif($entity=='products' && auto_add_setting){ StockService::AddMissingProductsToShoppingList(...); }",
+        "edges": [
+          "MASTER_DATA_EDIT (or per-entity) via User::CheckPermission (controllers/Api/GenericEntityApiController.php:128-149)"
+        ]
+      },
+      "entity": "DynamicObject",
+      "_binds": {
+        "objectId": "DynamicObject.id",
+        "body": "DynamicObject.data"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "UserPermission",
+                "where": {
+                  "node": "field",
+                  "col": "user_id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "entity",
+          "objectId",
+          "body"
+        ],
+        "messages": {
+          "not_found": "The row you tried to update does not exist.",
+          "precondition": "You need the master-data permission to edit this row."
+        }
+      },
+      "description": "Update a row in any exposed entity by entity name and row id. Fails if the row does not exist or you lack permission."
+    },
+    {
+      "tool": "genericentity_delete",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "DynamicObject",
+        "lookup_by": {
+          "id": {
+            "$arg": "objectId"
+          }
+        }
+      },
+      "input_schema": {
+        "entity": {
+          "type": "text",
+          "required": true,
+          "description": "Name of the exposed entity."
+        },
+        "objectId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the row to delete."
+        }
+      },
+      "_evidence": {
+        "locator": "controllers/Api/GenericEntityApiController.php:78",
+        "id_local": "GenericEntity.delete",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/objects/{entity}/{objectId}",
+          "locator": "routes.php:170"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "$row=$this->DB->{$args['entity']}($args['objectId']); if($row==null) return 'Object not found' 400;\n$row->delete(); return EmptyApiResponse;",
+        "edges": [
+          "MASTER_DATA_EDIT (or per-entity); api_keys always allowed via User::CheckPermission (controllers/Api/GenericEntityApiController.php:78-103)"
+        ]
+      },
+      "entity": "DynamicObject",
+      "_binds": {
+        "objectId": "DynamicObject.id"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "UserPermission",
+                "where": {
+                  "node": "field",
+                  "col": "user_id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "entity",
+          "objectId"
+        ],
+        "messages": {
+          "not_found": "The row you tried to delete does not exist.",
+          "on_child": "This row is still referenced by other records and cannot be deleted.",
+          "precondition": "You need the master-data permission to delete this row."
+        }
+      },
+      "description": "Delete a row from any exposed entity by entity name and row id. Fails if the row does not exist or is referenced."
+    },
+    {
+      "tool": "genericentity_get",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "DynamicObject",
+        "lookup_by": {
+          "id": {
+            "$arg": "objectId"
+          }
+        }
+      },
+      "input_schema": {
+        "entity": {
+          "type": "text",
+          "required": true,
+          "description": "Name of the exposed entity."
+        },
+        "objectId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the row to fetch."
+        }
+      },
+      "_evidence": {
+        "locator": "controllers/Api/GenericEntityApiController.php:194",
+        "id_local": "GenericEntity.get",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/objects/{entity}/{objectId}",
+          "locator": "routes.php:167"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "$object=$this->DB->{$args['entity']}($args['objectId']); if($object==null) return 'Object not found' 404;\n$object['userfields']=UserfieldsService::GetValues($entity,$referencingId); return ApiResponse($object);",
+        "scope": "global: single-household app; stock/chores/tasks are shared household data, not per-user. No owner column applies."
+      },
+      "entity": "DynamicObject",
+      "_binds": {
+        "objectId": "DynamicObject.id"
+      },
+      "_output_schema": {
+        "object": "the row plus its userfields"
+      },
+      "guards": {
+        "required": [
+          "entity",
+          "objectId"
+        ],
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in to access this."
+        }
+      },
+      "description": "Fetch a single row from any exposed entity by entity name and row id, with its userfield values attached."
+    },
+    {
+      "tool": "genericentity_list",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "DynamicObject",
+        "rank": {
+          "method": "exact"
+        }
+      },
+      "input_schema": {
+        "entity": {
+          "type": "text",
+          "required": true,
+          "description": "Name of the exposed entity."
+        },
+        "query": {
+          "type": "json",
+          "required": false,
+          "description": "Optional filter object (optional)."
+        },
+        "limit": {
+          "type": "int",
+          "required": false,
+          "description": "Max rows to return (optional)."
+        },
+        "offset": {
+          "type": "int",
+          "required": false,
+          "description": "Rows to skip (optional)."
+        },
+        "order": {
+          "type": "text",
+          "required": false,
+          "description": "Order specification (optional)."
+        }
+      },
+      "_evidence": {
+        "locator": "controllers/Api/GenericEntityApiController.php:223",
+        "id_local": "GenericEntity.list",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/objects/{entity}",
+          "locator": "routes.php:166"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "$objects=$this->QueryData($this->DB->{$args['entity']}(), $request->getQueryParams());\n$userfields=UserfieldsService::GetFields($entity); ... attach userfield values ... return ApiResponse($objects);",
+        "scope": "global: single-household app; stock/chores/tasks are shared household data, not per-user. No owner column applies."
+      },
+      "entity": "DynamicObject",
+      "_output_schema": {
+        "results": "list of rows for the entity"
+      },
+      "guards": {
+        "required": [
+          "entity"
+        ],
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in to access this."
+        }
+      },
+      "description": "List rows from any exposed entity, optionally filtered, limited or ordered."
+    },
+    {
+      "tool": "files_upload",
+      "op": "create",
+      "family": "action.emit",
+      "exec_spec": {
+        "channel": "filesystem",
+        "record": {
+          "table": "StoredFile"
+        }
+      },
+      "input_schema": {
+        "group": {
+          "type": "text",
+          "required": true,
+          "description": "Storage group directory."
+        },
+        "fileName": {
+          "type": "text",
+          "required": true,
+          "description": "File name within the group."
+        },
+        "content": {
+          "type": "json",
+          "required": true,
+          "description": "File content (JSON-encoded)."
+        }
+      },
+      "_evidence": {
+        "locator": "controllers/Api/FilesApiController.php:82",
+        "id_local": "Files.upload",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /api/files/{group}/{fileName}",
+          "locator": "routes.php:175"
+        },
+        "entity_why": "primary effect external lands on this table",
+        "ref_code": "$fileName=CheckFileName($args['fileName']);\n$fileHandle=fopen(GetFilePath($group,$fileName),'xb'); if($fileHandle===false) throw 'Error while creating file';\nwhile($data=$requestBody->read(1048576)){ if(fwrite($fileHandle,$data)===false) throw 'Error while writing'; }\nfclose($fileHandle); return EmptyApiResponse;"
+      },
+      "entity": "StoredFile",
+      "_output_schema": {},
+      "guards": {
+        "required": [
+          "group",
+          "fileName",
+          "content"
+        ],
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in.",
+          "required": "group, fileName and content are all required.",
+          "not_found": "The storage group is not valid."
+        }
+      },
+      "description": "Upload a file into a storage group under the given file name, overwriting any existing file at that path. Fails if the file name is invalid."
+    },
+    {
+      "tool": "files_delete",
+      "op": "delete",
+      "family": "action.emit",
+      "exec_spec": {
+        "channel": "filesystem",
+        "record": {
+          "table": "StoredFile"
+        }
+      },
+      "input_schema": {
+        "group": {
+          "type": "text",
+          "required": true,
+          "description": "Storage group directory."
+        },
+        "fileName": {
+          "type": "text",
+          "required": true,
+          "description": "File name to delete."
+        }
+      },
+      "_evidence": {
+        "locator": "controllers/Api/FilesApiController.php:13",
+        "id_local": "Files.delete",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/files/{group}/{fileName}",
+          "locator": "routes.php:177"
+        },
+        "entity_why": "primary effect external lands on this table",
+        "ref_code": "$fileName=CheckFileName($args['fileName']);\nFilesService::DeleteFile($group,$fileName); return EmptyApiResponse;\n// DeleteFile: if image, unlink all name__downscaledto* siblings; then unlink(filePath)"
+      },
+      "entity": "StoredFile",
+      "_output_schema": {},
+      "guards": {
+        "required": [
+          "group",
+          "fileName"
+        ],
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in.",
+          "required": "group and fileName are both required.",
+          "not_found": "No such file exists in that group to delete."
+        }
+      },
+      "description": "Delete a file from a storage group, removing downscaled image siblings too. Fails if it does not exist."
+    },
+    {
+      "tool": "files_serve",
+      "op": "read",
+      "family": "action.emit",
+      "exec_spec": {
+        "channel": "filesystem",
+        "record": {
+          "table": "StoredFile"
+        }
+      },
+      "input_schema": {
+        "group": {
+          "type": "text",
+          "required": true,
+          "description": "Storage group directory."
+        },
+        "fileName": {
+          "type": "text",
+          "required": true,
+          "description": "File name to read."
+        },
+        "force_serve_as": {
+          "type": "text",
+          "required": false,
+          "description": "Force a content type (optional)."
+        },
+        "best_fit_width": {
+          "type": "int",
+          "required": false,
+          "description": "Downscale width for images (optional)."
+        },
+        "best_fit_height": {
+          "type": "int",
+          "required": false,
+          "description": "Downscale height for images (optional)."
+        }
+      },
+      "_evidence": {
+        "locator": "controllers/Api/FilesApiController.php:41",
+        "id_local": "Files.serve",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/files/{group}/{fileName}",
+          "locator": "routes.php:176"
+        },
+        "entity_why": "primary effect external lands on this table",
+        "ref_code": "$filePath=GetFilePath($group,$fileName,$queryParams); if(file_exists($filePath)){ return $response->withBody(new Stream(fopen($filePath,'rb'))); } throw NotFound;"
+      },
+      "entity": "StoredFile",
+      "_output_schema": {
+        "file": "file bytes"
+      },
+      "guards": {
+        "required": [
+          "group",
+          "fileName"
+        ],
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in.",
+          "required": "group and fileName are both required.",
+          "not_found": "No such file exists in that group to serve."
+        }
+      },
+      "description": "Read a file's bytes back from a storage group, optionally downscaling an image. Fails with not_found if absent."
+    },
+    {
+      "tool": "apikey_create",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "ApiKey",
+        "fields": [
+          "api_key",
+          "user_id",
+          "expires",
+          "last_used",
+          "key_type",
+          "description"
+        ],
+        "set_on_create": {
+          "api_key": {
+            "$auto": "1+max(id)+1"
+          },
+          "user_id": {
+            "$session": "account_id"
+          },
+          "expires": "2999-12-31 23:59:59",
+          "key_type": {
+            "$arg": "key_type"
+          }
+        },
+        "unique_on": [
+          "api_key"
+        ],
+        "messages": {
+          "unique": "That API key value already exists."
+        }
+      },
+      "input_schema": {
+        "key_type": {
+          "type": "text",
+          "required": false,
+          "description": "Type of key: default or special-purpose-calendar-ical (optional)."
+        },
+        "last_used": {
+          "type": "datetime",
+          "required": false,
+          "description": "Last-used timestamp (optional)."
+        },
+        "description": {
+          "type": "text",
+          "required": false,
+          "description": "Human-readable description (optional)."
+        }
+      },
+      "_evidence": {
+        "locator": "services/ApiKeyService.php",
+        "id_local": "ApiKey.create",
+        "entry": {
+          "kind": "http",
+          "route": "POST /manageapikeys/new",
+          "locator": "routes.php:149"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "$newApiKey=bin2hex(random_bytes(24));\n$row=$this->DB->api_keys()->createRow(['api_key'=>$newApiKey,'user_id'=>GROCY_USER_ID,'expires'=>'2999-12-31 23:59:59','key_type'=>$keyType,'description'=>$description]); $row->save(); return $newApiKey;"
+      },
+      "entity": "ApiKey",
+      "_output_schema": {
+        "api_key": "the raw api key (shown once)"
+      },
+      "description": "Create a new API key for your own account with a key type and description, and return the raw key (shown once).",
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in to create an API key.",
+          "unique": "That API key value already exists."
+        }
+      }
+    },
+    {
+      "tool": "apikey_delete",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "ApiKey",
+        "lookup_by": {
+          "id": {
+            "$arg": "objectId"
+          }
+        }
+      },
+      "input_schema": {
+        "objectId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the API key to delete."
+        }
+      },
+      "_evidence": {
+        "locator": "services/ApiKeyService.php",
+        "id_local": "ApiKey.delete",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/objects/api_keys/{objectId}",
+          "locator": "routes.php:170"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "RemoveApiKey: $this->DB->api_keys()->where('api_key', $apiKey)->delete();"
+      },
+      "entity": "ApiKey",
+      "_binds": {
+        "objectId": "ApiKey.id"
+      },
+      "_output_schema": {},
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "objectId"
+        ],
+        "messages": {
+          "auth": "You must sign in.",
+          "required": "An objectId is required.",
+          "not_found": "No such API key exists to delete."
+        }
+      },
+      "description": "Delete an API key by its id. Fails if it does not exist."
+    },
+    {
+      "tool": "stock_addexpiredproductstoshoppinglist",
+      "op": "action",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "ShoppingList",
+        "fields": [
+          "product_id",
+          "note",
+          "amount",
+          "shopping_list_id",
+          "done",
+          "qu_id"
+        ],
+        "set_on_create": {
+          "amount": 1,
+          "shopping_list_id": {
+            "$arg": "list_id"
+          }
+        }
+      },
+      "input_schema": {
+        "list_id": {
+          "type": "int",
+          "required": false,
+          "description": "Id of the shopping list to fill."
+        },
+        "product_id": {
+          "type": "int",
+          "required": false,
+          "description": "Restrict the fill to this product (optional)."
+        },
+        "note": {
+          "type": "text",
+          "required": false,
+          "description": "Note to set on the added items (optional)."
+        },
+        "done": {
+          "type": "int",
+          "required": false,
+          "description": "Whether the added items count as done (optional)."
+        },
+        "qu_id": {
+          "type": "int",
+          "required": false,
+          "description": "Quantity unit to use for the added items (optional)."
+        }
+      },
+      "_evidence": {
+        "locator": "services/StockService.php:86",
+        "id_local": "Stock.addExpiredProductsToShoppingList",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/stock/shoppinglist/add-expired-products",
+          "locator": "routes.php:228"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "$expiredProducts=$this->GetExpiredProducts();\nforeach($expiredProducts as $expiredProduct){ $product=...products(...); if(!$alreadyExistingEntry){ ...createRow(['product_id'=>$expiredProduct->product_id,'amount'=>1,'shopping_list_id'=>$listId,'qu_id'=>$product->qu_id_purchase])->save(); } }",
+        "edges": [
+          "SHOPPINGLIST_ITEMS_ADD via User::CheckPermission (controllers/Api/StockApiController.php:64)"
+        ]
+      },
+      "entity": "ShoppingList",
+      "_binds": {
+        "list_id": "ShoppingLists.id"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "UserPermission",
+                "where": {
+                  "node": "field",
+                  "col": "user_id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "messages": {
+          "not_found": "The shopping list you referenced does not exist.",
+          "precondition": "You need the stock permission to add expired products to the shopping list."
+        }
+      },
+      "description": "Auto-add every expired product to a shopping list."
+    }
+  ],
+  "seed_state": {
+    "User": [
+      {
+        "id": 1,
+        "username": "ops@grocy.example",
+        "first_name": "Ada",
+        "last_name": "Lovelace",
+        "password": "pw-operations",
+        "picture_file_name": null
+      },
+      {
+        "id": 2,
+        "username": "member@grocy.example",
+        "first_name": "Bob",
+        "last_name": "Builder",
+        "password": "pw-member",
+        "picture_file_name": null
+      }
+    ],
+    "PermissionHierarchy": [
+      {
+        "id": 1,
+        "name": "admin",
+        "parent": null,
+        "the": ""
+      }
+    ],
+    "UserPermission": [
+      {
+        "id": 1,
+        "user_id": 1,
+        "permission_id": 1
+      }
+    ],
+    "UserSetting": [
+      {
+        "id": 1,
+        "user_id": 1,
+        "key": "locale",
+        "value": "en"
+      }
+    ],
+    "ProductGroup": [
+      {
+        "id": 1,
+        "name": "Pantry",
+        "description": "Stored goods",
+        "active": 1
+      }
+    ],
+    "Location": [
+      {
+        "id": 1,
+        "name": "Fridge",
+        "description": "Main fridge",
+        "is_freezer": 0,
+        "active": 1
+      },
+      {
+        "id": 2,
+        "name": "Freezer",
+        "description": "Chest freezer",
+        "is_freezer": 1,
+        "active": 1
+      }
+    ],
+    "ShoppingLocation": [
+      {
+        "id": 1,
+        "name": "Supermarket",
+        "description": "Local store",
+        "active": 1
+      }
+    ],
+    "QuantityUnit": [
+      {
+        "id": 1,
+        "name": "Piece",
+        "name_plural": "Pieces",
+        "active": 1
+      },
+      {
+        "id": 2,
+        "name": "Kilogram",
+        "name_plural": "Kilograms",
+        "active": 1
+      }
+    ],
+    "Product": [
+      {
+        "id": 1,
+        "name": "Milk",
+        "description": "Whole milk",
+        "product_group_id": 1,
+        "active": 1,
+        "location_id": 1,
+        "qu_id_purchase": 1,
+        "qu_id_stock": 1,
+        "min_stock_amount": 0,
+        "due_type": "1",
+        "default_best_before_days": 0,
+        "default_best_before_days_after_open": 0,
+        "default_best_before_days_after_freezing": 0,
+        "default_best_before_days_after_thawing": 0,
+        "enable_tare_weight_handling": 0,
+        "tare_weight": 0.0,
+        "quick_consume_amount": 1.0,
+        "hide_on_stock_overview": 0,
+        "default_stock_label_type": 0,
+        "should_not_be_frozen": 0,
+        "treat_opened_as_out_of_stock": 0,
+        "no_own_stock": 0,
+        "move_on_open": 0,
+        "auto_reprint_stock_label": 0,
+        "quick_open_amount": 1.0,
+        "disable_open": 0,
+        "default_purchase_price_type": 0
+      }
+    ],
+    "ShoppingLists": [
+      {
+        "id": 1,
+        "name": "Weekly",
+        "description": "Weekly shops"
+      }
+    ],
+    "ShoppingList": [
+      {
+        "id": 1,
+        "product_id": 1,
+        "amount": 2.0,
+        "shopping_list_id": 1,
+        "done": 0,
+        "qu_id": 1
+      }
+    ],
+    "Stock": [
+      {
+        "id": 1,
+        "product_id": 1,
+        "amount": 5.0,
+        "best_before_date": "2026-03-01T00:00:00",
+        "stock_id": "stock-1",
+        "price": 1.5,
+        "open": 0,
+        "location_id": 1
+      }
+    ],
+    "Recipe": [
+      {
+        "id": 1,
+        "name": "Pancakes",
+        "base_servings": 2,
+        "desired_servings": 2,
+        "type": "normal",
+        "not_check_shoppinglist": 0
+      }
+    ],
+    "Task": [
+      {
+        "id": 1,
+        "name": "Take out trash",
+        "done": 0
+      }
+    ],
+    "Chore": [
+      {
+        "id": 1,
+        "name": "Water plants",
+        "period_type": "weekly",
+        "period_interval": 1,
+        "active": 1,
+        "consume_product_on_execution": 0
+      }
+    ],
+    "Battery": [
+      {
+        "id": 1,
+        "name": "TV Remote",
+        "charge_interval_days": 30,
+        "active": 1
+      }
+    ],
+    "ChoresLog": [
+      {
+        "id": 1,
+        "chore_id": 1,
+        "tracked_time": "2026-01-02T00:00:00",
+        "done_by_user_id": 1,
+        "undone": 0,
+        "skipped": 0
+      }
+    ],
+    "BatteryChargeCycle": [
+      {
+        "id": 1,
+        "battery_id": 1,
+        "tracked_time": "2026-01-05T00:00:00",
+        "undone": 0
+      }
+    ]
+  },
+  "summary": "Grocy is a self-hosted household groceries/supplies management app (PHP/Slim + SQLite). It tracks stock inventory, products, shopping lists, recipes and meal plans, chores, batteries, tasks and equipment. Users authenticate via session tokens or API keys and are granted permissions through a role hierarchy. Persisted entities: User/UserPermission/UserSetting/Session/ApiKey, Product/ProductGroup/ProductBarcode/QuantityUnit/QuantityUnitConversion/Location/ShoppingLocation, Stock + StockLog (append-only journal), ShoppingList/ShoppingLists, Recipe/RecipePos/RecipeNesting/MealPlan/MealPlanSection, Chore/ChoresLog, Battery/BatteryChargeCycle, Task/TaskCategory, Equipment, plus custom Userfield/UserfieldValue/Userentity/Userobject and on-disk StoredFile. Operations: purchase/consume/transfer/open/inventory/edit stock (each journaled in stock_log with undo), shopping-list auto-fill, chore execution & assignment, battery charging, task completion, recipe consumption/copy, generic CRUD over ~30 exposed entities, plus user/session/API-key management.",
+  "_auth_candidates": [
+    {
+      "entity": "User",
+      "username_col": "username",
+      "password_col": "password"
+    }
+  ],
+  "_read_denied": "forbidden",
+  "_no_edges": [
+    {
+      "id_local": "Stock.getCurrent",
+      "why": "pure list read over stock_current view; no pre-checks, calls nothing (services/StockService.php:694)"
+    },
+    {
+      "id_local": "Stock.getProductDetails",
+      "why": "pure detail read; no auth beyond app middleware, calls nothing (services/StockService.php:757)"
+    },
+    {
+      "id_local": "Stock.getStockEntry",
+      "why": "pure single-row read; no guards (services/StockService.php:912)"
+    },
+    {
+      "id_local": "Stock.getProductStockEntries",
+      "why": "pure list read; no guards (services/StockService.php:868)"
+    },
+    {
+      "id_local": "Chores.current",
+      "why": "pure list read; no permission check (services/ChoresService.php:143)"
+    },
+    {
+      "id_local": "Chores.details",
+      "why": "pure detail read; no permission check (services/ChoresService.php:104)"
+    },
+    {
+      "id_local": "Batteries.current",
+      "why": "pure list read; no permission check (services/BatteriesService.php:27)"
+    },
+    {
+      "id_local": "Batteries.details",
+      "why": "pure detail read; no permission check (services/BatteriesService.php:7)"
+    },
+    {
+      "id_local": "Tasks.current",
+      "why": "pure list read; no permission check (services/TasksService.php:9)"
+    },
+    {
+      "id_local": "Recipes.getFulfillment",
+      "why": "read of resolved view; no permission check in controller (controllers/Api/RecipesApiController.php:45)"
+    },
+    {
+      "id_local": "Users.current",
+      "why": "auth-only (No permission check but all app routes require authentication via BaseAuthMiddleware); reads own row (controllers/Api/UsersApiController.php:144)"
+    },
+    {
+      "id_local": "UserSetting.get",
+      "why": "auth-only; reads own setting by user_id from session, no explicit permission (controllers/Api/UsersApiController.php:106)"
+    },
+    {
+      "id_local": "UserSetting.list",
+      "why": "auth-only; reads own settings, no explicit permission (controllers/Api/UsersApiController.php:119)"
+    },
+    {
+      "id_local": "UserSetting.set",
+      "why": "auth-only; upserts own setting, no explicit permission (controllers/Api/UsersApiController.php:222)"
+    },
+    {
+      "id_local": "UserSetting.delete",
+      "why": "auth-only; deletes own setting, no explicit permission (controllers/Api/UsersApiController.php:237)"
+    },
+    {
+      "id_local": "Files.upload",
+      "why": "only validates the FileGroups enum, no permission check; writes to disk (controllers/Api/FilesApiController.php:82)"
+    },
+    {
+      "id_local": "Files.delete",
+      "why": "only validates the FileGroups enum, no permission check (controllers/Api/FilesApiController.php:13)"
+    },
+    {
+      "id_local": "Files.serve",
+      "why": "only validates the FileGroups enum, no permission check; reads from disk (controllers/Api/FilesApiController.php:41)"
+    },
+    {
+      "id_local": "Recipes.copy",
+      "why": "no permission check in controller; copies recipe rows, calls nothing (controllers/Api/RecipesApiController.php:71)"
+    },
+    {
+      "id_local": "Session.validate",
+      "why": "internal auth helper; itself a guard, no own wall (services/SessionService.php:51)"
+    },
+    {
+      "id_local": "ApiKey.create",
+      "why": "creates an api_key via manageapikeys UI; no explicit per-op permission besides app auth (services/ApiKeyService.php)"
+    },
+    {
+      "id_local": "ApiKey.delete",
+      "why": "api_keys delete is 'always allowed' in GenericEntityApiController DeleteObject (controllers/Api/GenericEntityApiController.php:96-99); calls nothing (services/ApiKeyService.php)"
+    },
+    {
+      "id_local": "Auth.login",
+      "why": "public login route (routes.php:43, no auth middleware); verifies credentials itself, calls no other op; nothing to guard"
+    },
+    {
+      "id_local": "Auth.logout",
+      "why": "public logout route (routes.php:44); deletes session token by cookie, calls nothing, no permission wall"
+    }
+  ],
+  "auth": {
+    "account_entity": "User",
+    "username_col": "username",
+    "password_col": "password"
+  }
+}

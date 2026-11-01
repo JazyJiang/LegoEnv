@@ -1,0 +1,75 @@
+{
+  "app": "gokapi",
+  "role": "Upload request and file scalar metadata",
+  "domains": [
+    "operations"
+  ],
+  "kinds": {
+    "create_record": [
+      "filerequest_create",
+      "file_upload"
+    ],
+    "update_record": [
+      "file_edit"
+    ],
+    "record_status_change": [
+      "file_delete",
+      "file_restore"
+    ],
+    "delete_or_archive_row": [
+      "filerequest_delete"
+    ]
+  },
+  "check_kinds": [
+    "record_exists",
+    "record_not_exists",
+    "record_field_equals",
+    "record_field_contains",
+    "record_field_unchanged"
+  ],
+  "carriers": {
+    "notes_field": {
+      "entity": "UploadRequest",
+      "field": "note"
+    }
+  },
+  "login": {
+    "tool": "sign_in",
+    "user_field": "username",
+    "persona_entity": "User"
+  },
+  "content_entities": [
+    "UploadRequest",
+    "File"
+  ],
+  "seed_helpers": [
+    "records"
+  ],
+  "tool_families_to_keep": [
+    ""
+  ],
+  "obs_reads": [
+    "filerequest_list",
+    "file_list"
+  ],
+  "known_patches": [
+    "Neutral prefix",
+    "Integer identity schemas and synthetic source persona",
+    "Original source semantics bounded by actual probes"
+  ],
+  "missing_tools": [],
+  "limitations": [
+    "All 33 source tools retained; six declared tools certify metadata only.",
+    "file_upload creates metadata without bytes and stores expiryDays directly; file_edit newPassword is plaintext scalar, not hashing. No E2E encryption/download effects.",
+    "file_delete sets expiry zero without deleting row or PendingDeletion; restore only clears PendingDeletion. No actual file trash/retention recovery.",
+    "filerequest_edit existing-row branch ignores replacement notes/name; not claimed as note update.",
+    "Admin alternatives use UserLevel!=2; no comprehensive permission bitmask, expired-key, sharing or request-limit enforcement claim."
+  ],
+  "smoke": {
+    "passed": true,
+    "date": "2026-10-24",
+    "report": "ok"
+  },
+  "register_file": "pack/newspecs3/gokapi/register.py",
+  "base_spec": "pack/base_specs/gokapi.spec.json"
+}

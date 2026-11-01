@@ -1,0 +1,7 @@
+# FoodCoopShop local onboarding
+
+`make_base.py` copies the compiler release spec and changes only `env_id` to `foodcoopshop_ab`. No tool, guard, or global runtime behavior is changed.
+
+The strict smoke uses real `customer_login`, `product_edit_quantity`, `product_edit_status`, `product_edit_name`, and `product_add` calls. It verifies four selected catalog/stock effects and two untouched near misses. A builder can seed item records, stock rows, and a product-description policy carrier; `catalog_product_search` and `catalog_product_detail` expose those records.
+
+These tools manage catalog records and the `StockAvailable.quantity` value. `product_add` creates an inactive draft Product but does not create its StockAvailable row. `product_edit_status` hides or shows a listing; it does not physically quarantine goods. `product_edit_quantity` does not record the supplied change reason in a separate audit trail. The release `product_edit_purchase_price` does not update the existing price on its upsert path, and `orderdetail_edit_product_amount` changes quantity without recalculating totals or its unit row. Do not use this card to claim purchase-order issuance, physical stock movements, invoice reconciliation, payment, or consistent order-price edits. Its write guards only establish a signed-in customer, not a role-specific catalog administrator; builders must not use it for permission tests.

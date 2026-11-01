@@ -1,0 +1,4478 @@
+{
+  "env_id": "node_red",
+  "_prep_version": 3,
+  "entities": [
+    {
+      "name": "Flow",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "immutable": true
+        },
+        {
+          "name": "type",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "tab",
+            "subflow"
+          ],
+          "default": "tab"
+        },
+        {
+          "name": "label",
+          "type": "text"
+        },
+        {
+          "name": "info",
+          "type": "text"
+        },
+        {
+          "name": "disabled",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "env",
+          "type": "json"
+        },
+        {
+          "name": "nodes",
+          "type": "json"
+        },
+        {
+          "name": "configs",
+          "type": "json"
+        },
+        {
+          "name": "groups",
+          "type": "json"
+        },
+        {
+          "name": "subflows",
+          "type": "json"
+        },
+        {
+          "name": "g",
+          "type": "id"
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Node",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "immutable": true
+        },
+        {
+          "name": "type",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "z",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Flow.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "name",
+          "type": "text"
+        },
+        {
+          "name": "wires",
+          "type": "json"
+        },
+        {
+          "name": "d",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "g",
+          "type": "id",
+          "fk_to": "Group.id"
+        },
+        {
+          "name": "x",
+          "type": "int"
+        },
+        {
+          "name": "y",
+          "type": "int"
+        },
+        {
+          "name": "env",
+          "type": "json"
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Group",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "immutable": true
+        },
+        {
+          "name": "g",
+          "type": "id",
+          "fk_to": "Group.id"
+        },
+        {
+          "name": "z",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Flow.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "name",
+          "type": "text"
+        },
+        {
+          "name": "env",
+          "type": "json"
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Credentials",
+      "columns": [
+        {
+          "name": "node_id",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "immutable": true,
+          "fk_to": "Node.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "creds",
+          "type": "json",
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "name": "Module",
+      "columns": [
+        {
+          "name": "name",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "immutable": true
+        },
+        {
+          "name": "version",
+          "type": "text"
+        },
+        {
+          "name": "local",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "user",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "path",
+          "type": "text"
+        },
+        {
+          "name": "dependencies",
+          "type": "json"
+        },
+        {
+          "name": "pending_version",
+          "type": "text"
+        },
+        {
+          "name": "nodes",
+          "type": "json"
+        },
+        {
+          "name": "used_by",
+          "type": "json"
+        }
+      ]
+    },
+    {
+      "name": "NodeSet",
+      "columns": [
+        {
+          "name": "name",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "immutable": true
+        },
+        {
+          "name": "module",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Module.name",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "types",
+          "type": "json",
+          "nullable": false
+        },
+        {
+          "name": "enabled",
+          "type": "bool",
+          "default": true
+        },
+        {
+          "name": "file",
+          "type": "text"
+        },
+        {
+          "name": "err",
+          "type": "text"
+        },
+        {
+          "name": "loaded",
+          "type": "bool",
+          "default": false
+        }
+      ]
+    },
+    {
+      "name": "Session",
+      "columns": [
+        {
+          "name": "token",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "immutable": true
+        },
+        {
+          "name": "user",
+          "type": "json",
+          "nullable": false
+        },
+        {
+          "name": "client",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "scope",
+          "type": "json"
+        },
+        {
+          "name": "access_token",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "expires",
+          "type": "datetime",
+          "nullable": false
+        },
+        {
+          "name": "exchange_code",
+          "type": "text"
+        },
+        {
+          "name": "exchange_code_expires",
+          "type": "datetime"
+        }
+      ]
+    },
+    {
+      "name": "User",
+      "columns": [
+        {
+          "name": "username",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "immutable": true
+        },
+        {
+          "name": "password",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "permissions",
+          "type": "json",
+          "nullable": false
+        },
+        {
+          "name": "token",
+          "type": "text"
+        },
+        {
+          "name": "image",
+          "type": "text"
+        },
+        {
+          "name": "id",
+          "type": "id",
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "name": "Project",
+      "columns": [
+        {
+          "name": "name",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "immutable": true
+        },
+        {
+          "name": "root_path",
+          "type": "text"
+        },
+        {
+          "name": "summary",
+          "type": "text"
+        },
+        {
+          "name": "version",
+          "type": "text"
+        },
+        {
+          "name": "description",
+          "type": "text"
+        },
+        {
+          "name": "empty",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "dependencies",
+          "type": "json"
+        },
+        {
+          "name": "credential_secret",
+          "type": "text"
+        },
+        {
+          "name": "git",
+          "type": "json"
+        },
+        {
+          "name": "branch",
+          "type": "text"
+        },
+        {
+          "name": "merging",
+          "type": "bool",
+          "default": false
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "name"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "SSHKey",
+      "columns": [
+        {
+          "name": "name",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "immutable": true
+        },
+        {
+          "name": "username",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "comment",
+          "type": "text"
+        },
+        {
+          "name": "size",
+          "type": "int",
+          "default": 2048
+        },
+        {
+          "name": "password",
+          "type": "text"
+        }
+      ]
+    },
+    {
+      "name": "LibraryEntry",
+      "columns": [
+        {
+          "name": "path",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "immutable": true
+        },
+        {
+          "name": "type",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "body",
+          "type": "text"
+        },
+        {
+          "name": "meta",
+          "type": "json"
+        }
+      ]
+    },
+    {
+      "name": "ContextValue",
+      "columns": [
+        {
+          "name": "scope",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "immutable": true
+        },
+        {
+          "name": "key",
+          "type": "text",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "value",
+          "type": "json"
+        }
+      ]
+    },
+    {
+      "name": "UserSettings",
+      "columns": [
+        {
+          "name": "username",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "immutable": true
+        },
+        {
+          "name": "settings",
+          "type": "json",
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "name": "RuntimeSettings",
+      "columns": [
+        {
+          "name": "key",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "immutable": true
+        },
+        {
+          "name": "value",
+          "type": "json"
+        }
+      ]
+    },
+    {
+      "name": "GitCommit",
+      "columns": [
+        {
+          "name": "sha",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "immutable": true
+        },
+        {
+          "name": "project",
+          "type": "id",
+          "nullable": false,
+          "immutable": true,
+          "fk_to": "Project.name",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "author",
+          "type": "text"
+        },
+        {
+          "name": "email",
+          "type": "text"
+        },
+        {
+          "name": "message",
+          "type": "text"
+        },
+        {
+          "name": "timestamp",
+          "type": "datetime"
+        }
+      ]
+    }
+  ],
+  "tools": [
+    {
+      "tool": "flow_getall",
+      "op": "read",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Flow",
+        "search_fields": [
+          "id"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "id"
+          ]
+        }
+      },
+      "input_schema": {
+        "apiVersion": {
+          "type": "text",
+          "required": false,
+          "description": "Node-RED-API-Version: omit or 'v1' for a plain flows array, 'v2' to also get the {rev, flows} wrapper."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/node_modules/@node-red/editor-api/lib/admin/flows.js:34",
+        "id_local": "Flow.getAll",
+        "entry": {
+          "kind": "http",
+          "route": "GET /flows",
+          "locator": "packages/node_modules/@node-red/editor-api/lib/admin/index.js:43"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "function get(req,res) {\n  var version = req.get(\"Node-RED-API-Version\")||\"v1\";\n  var opts = { user: req.user, req: apiUtils.getRequestLogObject(req) }\n  runtimeAPI.flows.getFlows(opts).then(function(result) {\n    if (version === \"v1\") { res.json(result.flows); } else { res.json(result); }\n  })",
+        "edges": [
+          "needsPermission(\"flows.read\") on admin/index.js:43; permissions.hasPermission(req.authInfo.scope,permission) (auth/index.js:68)"
+        ]
+      },
+      "entity": "Flow",
+      "_output_schema": {
+        "flows": "list of node config objects",
+        "rev": "string (v2)"
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in before listing flows."
+        }
+      },
+      "description": "List every flow tab and node currently defined in the active runtime configuration. Returns the full flow list (v2 also returns the current revision). Requires the flows.read permission."
+    },
+    {
+      "tool": "flow_deploy",
+      "op": "update",
+      "family": "crud.upsert",
+      "exec_spec": {
+        "entity": "Flow",
+        "key": {
+          "id": {
+            "$arg": "id"
+          }
+        },
+        "insert_fields": [
+          "type",
+          "label",
+          "info",
+          "disabled",
+          "env",
+          "nodes",
+          "configs",
+          "groups",
+          "subflows"
+        ]
+      },
+      "input_schema": {
+        "flows": {
+          "type": "json",
+          "required": true,
+          "description": "The full replacement flow configuration: an array of flow-tab and node objects. Entirely replaces the active configuration."
+        },
+        "credentials": {
+          "type": "json",
+          "required": false,
+          "description": "Credential values to store for the deployed nodes, keyed by node id."
+        },
+        "deploymentType": {
+          "type": "text",
+          "required": false,
+          "description": "How to apply the change: 'full' (default) or 'reload'."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/node_modules/@node-red/runtime/lib/api/flows.js:66",
+        "id_local": "Flow.deploy",
+        "entry": {
+          "kind": "http",
+          "route": "POST /flows",
+          "locator": "packages/node_modules/@node-red/editor-api/lib/admin/index.js:44"
+        },
+        "entity_why": "primary effect row_upsert lands on this table",
+        "ref_code": "apiPromise = runtime.flows.setFlows(flows.flows,flows.credentials,deploymentType,null,null,opts.user);\n// setFlows: config = jsonClone(_config); newFlowConfig = flowUtil.parseConfig(jsonClone(config)); diff = flowUtil.diffConfigs(activeFlowConfig,newFlowConfig); ... credentials.clean(config); credentials.export(); storage.saveFlows(saveConfig,user) ... stop(type,diff).then(() => { start(type,diff) })",
+        "edges": [
+          "needsPermission(\"flows.write\") on admin/index.js:44; permissions.hasPermission(req.authInfo.scope,permission) (auth/index.js:68)"
+        ]
+      },
+      "entity": "Flow",
+      "_binds": {
+        "rev": "Flow.id"
+      },
+      "_output_schema": {
+        "rev": "new flow revision"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "flows"
+        ],
+        "messages": {
+          "auth": "You must sign in and hold flows.write before deploying.",
+          "precondition": "You must sign in and hold flows.write before deploying."
+        }
+      },
+      "description": "Deploy a full flow configuration to the live runtime: replaces the active flow set and restarts the affected flows. This is the signature Node-RED \"deploy\" operation; pass the complete replacement flow array."
+    },
+    {
+      "tool": "flow_reload",
+      "op": "update",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Flow",
+        "search_fields": [
+          "id"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "id"
+          ]
+        }
+      },
+      "input_schema": {
+        "deploymentType": {
+          "type": "text",
+          "required": true,
+          "description": "Must be 'reload' to trigger a reload."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/node_modules/@node-red/runtime/lib/api/flows.js:73",
+        "id_local": "Flow.reload",
+        "entry": {
+          "kind": "http",
+          "route": "POST /flows",
+          "locator": "packages/node_modules/@node-red/editor-api/lib/admin/flows.js:53"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "if (deploymentType === 'reload') { apiPromise = runtime.flows.loadFlows(true); }",
+        "edges": [
+          "needsPermission(\"flows.write\") on admin/index.js:44; permissions.hasPermission(req.authInfo.scope,permission) (auth/index.js:68)"
+        ]
+      },
+      "entity": "Flow",
+      "_output_schema": {
+        "rev": "flow revision"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "deploymentType"
+        ],
+        "messages": {
+          "auth": "You must sign in and hold flows.write to reload the flow configuration."
+        }
+      },
+      "description": "Reload the flow configuration from storage and restart flows. Requires the flows.write permission."
+    },
+    {
+      "tool": "flow_get",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Flow",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the flow tab to read, or the literal 'global' for the whole active config."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/node_modules/@node-red/runtime/lib/flows/index.js:620",
+        "id_local": "Flow.get",
+        "entry": {
+          "kind": "http",
+          "route": "GET /flow/:id",
+          "locator": "packages/node_modules/@node-red/editor-api/lib/admin/index.js:53"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "function getFlow(id) {\n  if (id === 'global') { flow = activeFlowConfig; } else { flow = activeFlowConfig.flows[id]; }\n  if (!flow) { return null; }\n  var result = { id: id };\n  nodeIds.forEach(function(nodeId) { var node = jsonClone(flow.nodes[nodeId]); delete node.credentials; result.nodes.push(node); });",
+        "edges": [
+          "needsPermission(\"flows.read\") on admin/index.js:53; permissions.hasPermission(req.authInfo.scope,permission) (auth/index.js:68)"
+        ]
+      },
+      "entity": "Flow",
+      "_binds": {
+        "id": "Flow.id"
+      },
+      "_output_schema": {
+        "id": "string",
+        "label": "string",
+        "nodes": "list of node configs",
+        "configs": "list of config nodes",
+        "subflows": "list of subflow defs",
+        "disabled": "bool",
+        "info": "text",
+        "env": "json"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "not_found": "No flow tab with that id exists (or 'global' is empty)."
+        }
+      },
+      "description": "Read a single flow tab and all of its nodes by flow id. The id 'global' reads the whole active configuration."
+    },
+    {
+      "tool": "flow_add",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Flow",
+        "fields": [
+          "label",
+          "info",
+          "disabled",
+          "env"
+        ],
+        "set_on_create": {
+          "type": "tab"
+        }
+      },
+      "input_schema": {
+        "label": {
+          "type": "text",
+          "required": false,
+          "description": "Display label for the new flow tab."
+        },
+        "info": {
+          "type": "text",
+          "required": false,
+          "description": "Free-text description shown on the tab."
+        },
+        "disabled": {
+          "type": "bool",
+          "required": false,
+          "description": "Whether the new tab starts disabled."
+        },
+        "env": {
+          "type": "json",
+          "required": false,
+          "description": "Environment variables scoped to the new flow."
+        },
+        "nodes": {
+          "type": "json",
+          "required": true,
+          "description": "Array of node config objects to include in the new flow."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/node_modules/@node-red/runtime/lib/flows/index.js:561",
+        "id_local": "Flow.add",
+        "entry": {
+          "kind": "http",
+          "route": "POST /flow",
+          "locator": "packages/node_modules/@node-red/editor-api/lib/admin/index.js:54"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "flow.id = redUtil.generateId();\nvar tabNode = { type:'tab', label:flow.label, id:flow.id };\nif (flow.hasOwnProperty('info')) { tabNode.info = flow.info; }\nvar nodes = [tabNode];\nfor (i=0;i<flow.nodes.length;i++) {\n  node = flow.nodes[i];\n  if (activeFlowConfig.allNodes[node.id]) { throw new Error('duplicate id'); }\n  node.z = flow.id; nodes.push(node);\n}\nreturn setFlows(newConfig, null, 'flows', true, null, user)...",
+        "edges": [
+          "needsPermission(\"flows.write\") on admin/index.js:54; permissions.hasPermission(req.authInfo.scope,permission) (auth/index.js:68)"
+        ]
+      },
+      "entity": "Flow",
+      "_binds": {
+        "label": "Flow.label",
+        "info": "Flow.info",
+        "disabled": "Flow.disabled",
+        "env": "Flow.env"
+      },
+      "_output_schema": {
+        "id": "new flow id"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "nodes"
+        ],
+        "messages": {
+          "auth": "You must sign in and hold flows.write before adding a flow tab."
+        }
+      },
+      "description": "Create a new flow tab with the given label, metadata and initial set of nodes. The flow id is generated by the runtime; the nodes you pass are attached to the new tab."
+    },
+    {
+      "tool": "flow_update",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Flow",
+        "row_key": {
+          "id": {
+            "$arg": "id"
+          }
+        },
+        "set": {
+          "label": {
+            "$arg": "label"
+          },
+          "info": {
+            "$arg": "info"
+          },
+          "disabled": {
+            "$arg": "disabled"
+          },
+          "env": {
+            "$arg": "env"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the flow tab to replace."
+        },
+        "label": {
+          "type": "text",
+          "required": false,
+          "description": "New label for the tab."
+        },
+        "info": {
+          "type": "text",
+          "required": false,
+          "description": "New free-text description for the tab."
+        },
+        "disabled": {
+          "type": "bool",
+          "required": false,
+          "description": "Whether the tab is disabled."
+        },
+        "env": {
+          "type": "json",
+          "required": false,
+          "description": "Environment variables for the flow."
+        },
+        "nodes": {
+          "type": "json",
+          "required": false,
+          "description": "Replacement array of node config objects."
+        },
+        "configs": {
+          "type": "json",
+          "required": false,
+          "description": "Replacement array of config nodes."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/node_modules/@node-red/runtime/lib/flows/index.js:723",
+        "id_local": "Flow.update",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /flow/:id",
+          "locator": "packages/node_modules/@node-red/editor-api/lib/admin/index.js:56"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "function updateFlow(id,newFlow, user) {\n  if (id !== 'global') { if (!activeFlowConfig.flows[id]) { var e=new Error(); e.code=404; throw e; } }\n  var newConfig = jsonClone(activeConfig.flows);\n  if (id !== 'global') {\n    newConfig = newConfig.filter(function(node) { return node.z !== id && node.id !== id; });\n    var tabNode = { type:'tab', label:newFlow.label, id:id };\n    nodes = [tabNode].concat(newFlow.nodes||[]).concat(newFlow.configs||[]);",
+        "edges": [
+          "needsPermission(\"flows.write\") on admin/index.js:56; permissions.hasPermission(req.authInfo.scope,permission) (auth/index.js:68)"
+        ]
+      },
+      "entity": "Node",
+      "_binds": {
+        "id": "Flow.id",
+        "label": "Flow.label",
+        "info": "Flow.info",
+        "disabled": "Flow.disabled",
+        "env": "Flow.env"
+      },
+      "_output_schema": {
+        "id": "flow id"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "not_found": "No flow tab with that id exists."
+        }
+      },
+      "description": "Update a flow tab's metadata: its label, description, disabled flag and environment. (In the real editor this also replaces the tab's nodes.) Fails if the flow id does not exist."
+    },
+    {
+      "tool": "flow_remove",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "Flow",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the flow tab to delete (not 'global')."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/node_modules/@node-red/runtime/lib/flows/index.js:791",
+        "id_local": "Flow.remove",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /flow/:id",
+          "locator": "packages/node_modules/@node-red/editor-api/lib/admin/index.js:55"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "function removeFlow(id, user) {\n  if (id === 'global') { throw new Error('not allowed to remove global'); }\n  var flow = activeFlowConfig.flows[id]; if (!flow) { var e=new Error(); e.code=404; throw e; }\n  var newConfig = jsonClone(activeConfig.flows);\n  newConfig = newConfig.filter(function(node) { return node.z !== id && node.id !== id; });\n  return setFlows(newConfig, null, 'flows', true, null, user);",
+        "edges": [
+          "needsPermission(\"flows.write\") on admin/index.js:55; permissions.hasPermission(req.authInfo.scope,permission) (auth/index.js:68)"
+        ]
+      },
+      "entity": "Flow",
+      "_binds": {
+        "id": "Flow.id"
+      },
+      "_output_schema": {},
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "not_found": "No flow tab with that id exists."
+        }
+      },
+      "description": "Delete a flow tab and every node attached to it. Refuses to remove the reserved 'global' config."
+    },
+    {
+      "tool": "flow_getstate",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "RuntimeSettings",
+        "lookup_by": {
+          "key": "runtimeFlowState"
+        }
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "packages/node_modules/@node-red/runtime/lib/api/flows.js:267",
+        "id_local": "Flow.getState",
+        "entry": {
+          "kind": "http",
+          "route": "GET /flows/state",
+          "locator": "packages/node_modules/@node-red/editor-api/lib/admin/index.js:47"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "getState: async function(opts) { const result = { state: runtime.flows.state() }; return result; }",
+        "edges": [
+          "needsPermission(\"flows.read\") on admin/index.js:47; permissions.hasPermission(req.authInfo.scope,permission) (auth/index.js:68)"
+        ]
+      },
+      "entity": "RuntimeSettings",
+      "_output_schema": {
+        "state": "start|stop|safe"
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in before reading the runtime flow state.",
+          "not_found": "The runtime flow state has not been set yet."
+        }
+      },
+      "description": "Read the current runtime flow state: 'start', 'stop' or 'safe'."
+    },
+    {
+      "tool": "flow_setstate",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "RuntimeSettings",
+        "row_key": {
+          "key": "runtimeFlowState"
+        },
+        "fields": [
+          "value"
+        ],
+        "set": {
+          "key": "runtimeFlowState",
+          "value": {
+            "$arg": "state"
+          }
+        }
+      },
+      "input_schema": {
+        "state": {
+          "type": "text",
+          "required": true,
+          "description": "New state: 'start' or 'stop'."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/node_modules/@node-red/runtime/lib/api/flows.js:283",
+        "id_local": "Flow.setState",
+        "entry": {
+          "kind": "http",
+          "route": "POST /flows/state",
+          "locator": "packages/node_modules/@node-red/editor-api/lib/admin/index.js:49"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "if(!runtime.settings.runtimeState || runtime.settings.runtimeState.enabled !== true) { throw (makeError(\"Method Not Allowed\", \"not_allowed\", 405)) }\nswitch (opts.state) {\n  case \"start\": runtime.settings.set('runtimeFlowState', opts.state); await runtime.flows.startFlows(\"full\"); return getState()\n  case \"stop\": runtime.settings.set('runtimeFlowState', opts.state); await runtime.flows.stopFlows(\"full\"); return getState()",
+        "edges": [
+          "needsPermission(\"flows.write\") on admin/index.js:49; permissions.hasPermission(req.authInfo.scope,permission) (auth/index.js:68)"
+        ]
+      },
+      "entity": "RuntimeSettings",
+      "_output_schema": {
+        "state": "start|stop"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "state"
+        ],
+        "messages": {
+          "auth": "You must sign in to start or stop the runtime.",
+          "precondition": "The runtime does not allow flow-state changes from the API.",
+          "not_found": "The runtime flow-state setting could not be found."
+        }
+      },
+      "description": "Start or stop the flow runtime. Starting runs all deployed flows; stopping halts them. Refuses if the runtime has flow-state control disabled."
+    },
+    {
+      "tool": "credentials_getnode",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Credentials",
+        "lookup_by": {
+          "node_id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the node whose credentials to read."
+        },
+        "type": {
+          "type": "text",
+          "required": true,
+          "description": "Node type; subflow:*/tab/group return only has_<cred> booleans."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/node_modules/@node-red/runtime/lib/api/flows.js:228",
+        "id_local": "Credentials.getNode",
+        "entry": {
+          "kind": "http",
+          "route": "GET /credentials/:type/:id",
+          "locator": "packages/node_modules/@node-red/editor-api/lib/editor/index.js:107"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "var credentials = runtime.nodes.getCredentials(opts.id);\nif (!credentials) { return {}; }\nif (/^subflow(:|$)/.test(opts.type) || opts.type === \"tab\" || opts.type === \"group\") {\n  for (cred in credentials) { sendCredentials['has_'+cred] = credentials[cred] != null && credentials[cred] !== ''; }\n} else { var definition = ...; for (cred in definition) { if (definition[cred].type == \"password\") { sendCredentials['has_'+cred] = ... } else { sendCredentials[cred] = credentials[cred] || ''; } } }",
+        "edges": [
+          "editor/index.js:107 needsPermission(\"credentials.read\")"
+        ]
+      },
+      "entity": "Credentials",
+      "_binds": {
+        "id": "Credentials.node_id"
+      },
+      "_output_schema": {
+        "has_<cred>": "bool (password fields)",
+        "<cred>": "string (non-password)"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "id",
+          "type"
+        ],
+        "messages": {
+          "not_found": "No credentials are stored for that node."
+        }
+      },
+      "description": "Read the stored credentials for a single node. Password-typed credentials are returned only as has_<name> booleans (never their values); other credential fields return their values."
+    },
+    {
+      "tool": "nodeset_getall",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "NodeSet",
+        "search_fields": [
+          "name"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "name"
+          ]
+        }
+      },
+      "input_schema": {
+        "lang": {
+          "type": "text",
+          "required": false,
+          "description": "Locale used for the HTML config bundle (ignored for JSON responses)."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/node_modules/@node-red/editor-api/lib/admin/nodes.js:25",
+        "id_local": "NodeSet.getAll",
+        "entry": {
+          "kind": "http",
+          "route": "GET /nodes",
+          "locator": "packages/node_modules/@node-red/editor-api/lib/admin/index.js:59"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "getAll: function(req,res) { if (req.get(\"accept\") == \"application/json\") { runtimeAPI.nodes.getNodeList(opts).then(function(list){ res.json(list); }) } else { runtimeAPI.nodes.getNodeConfigs(opts)... } }",
+        "edges": [
+          "needsPermission(\"nodes.read\") on admin/index.js:59; permissions.hasPermission (auth/index.js:68)"
+        ]
+      },
+      "entity": "NodeSet",
+      "_output_schema": {
+        "list": "list of node set info (JSON accept) | HTML config blob (default)"
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in before listing installed node sets."
+        }
+      },
+      "description": "List all installed node sets (modules). With the JSON accept header this returns structured node-set info; otherwise an HTML editor bundle. This is the admin's view of installed nodes."
+    },
+    {
+      "tool": "nodeset_get",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Module",
+        "lookup_by": {
+          "name": {
+            "$arg": "module"
+          }
+        }
+      },
+      "input_schema": {
+        "module": {
+          "type": "text",
+          "required": true,
+          "description": "npm module name to inspect."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/node_modules/@node-red/runtime/lib/api/nodes.js:125",
+        "id_local": "NodeSet.get",
+        "entry": {
+          "kind": "http",
+          "route": "GET /nodes/:module",
+          "locator": "packages/node_modules/@node-red/editor-api/lib/admin/index.js:72"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "getModuleInfo: async function(opts) { var result = runtime.nodes.getModuleInfo(opts.module); if (result) { return result; } else { var err=new Error(); err.code=\"not_found\"; err.status=404; throw err; } }",
+        "edges": [
+          "needsPermission(\"nodes.read\") on admin/index.js:72; permissions.hasPermission (auth/index.js:68)"
+        ]
+      },
+      "entity": "Module",
+      "_binds": {
+        "module": "Module.name"
+      },
+      "_output_schema": {
+        "name": "string",
+        "version": "string",
+        "user": "bool",
+        "nodes": "list of NodeSet info"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "module"
+        ],
+        "messages": {
+          "not_found": "No such module is installed."
+        }
+      },
+      "description": "Read the metadata of a single installed npm module: its version, whether it is user-installed, and its node sets."
+    },
+    {
+      "tool": "nodeset_getinfo",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "NodeSet",
+        "lookup_by": {
+          "name": {
+            "$arg": "id"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "text",
+          "required": true,
+          "description": "Node set name (e.g. 'module/nodeSet') or node type."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/node_modules/@node-red/runtime/lib/api/nodes.js:50",
+        "id_local": "NodeSet.getInfo",
+        "entry": {
+          "kind": "http",
+          "route": "GET /nodes/:module/:node",
+          "locator": "packages/node_modules/@node-red/editor-api/lib/admin/index.js:75"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "getNodeInfo: async function(opts) { var result = runtime.nodes.getNodeInfo(id); if (result) { return result; } else { var err=new Error(); err.code=\"not_found\"; err.status=404; throw err; } }",
+        "edges": [
+          "needsPermission(\"nodes.read\") on admin/index.js:75; permissions.hasPermission (auth/index.js:68)"
+        ]
+      },
+      "entity": "NodeSet",
+      "_binds": {
+        "id": "NodeSet.name"
+      },
+      "_output_schema": {
+        "module": "module name",
+        "nodes": "list of node set info"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "not_found": "No node set with that name exists."
+        }
+      },
+      "description": "Read the info of a single node set within a module: its full node type registry."
+    },
+    {
+      "tool": "nodeset_setenabled",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "NodeSet",
+        "row_key": {
+          "name": {
+            "$arg": "id"
+          }
+        },
+        "fields": [
+          "module",
+          "types",
+          "enabled",
+          "file",
+          "err",
+          "loaded"
+        ],
+        "set": {
+          "enabled": {
+            "$arg": "enabled"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "text",
+          "required": true,
+          "description": "Node set name (e.g. 'module/nodeSet') to toggle."
+        },
+        "enabled": {
+          "type": "bool",
+          "required": true,
+          "description": "true to enable, false to disable the node set."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/node_modules/@node-red/runtime/lib/api/nodes.js:393",
+        "id_local": "NodeSet.setEnabled",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /nodes/:module/:node",
+          "locator": "packages/node_modules/@node-red/editor-api/lib/admin/index.js:76"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "setNodeSetState: async function(opts) { var node = runtime.nodes.getNodeInfo(id); if (!node) { err.code=\"not_found\"; throw err } delete node.loaded; return putNode(node,enabled).then(function(result){ return result; }) }",
+        "edges": [
+          "needsPermission(\"nodes.write\") on admin/index.js:76; permissions.hasPermission (auth/index.js:68)",
+          "flows.checkTypeInUse(id) before disable (runtime/lib/nodes/index.js:143)"
+        ]
+      },
+      "entity": "NodeSet",
+      "_binds": {
+        "id": "NodeSet.name",
+        "enabled": "NodeSet.enabled"
+      },
+      "_output_schema": {
+        "name": "node set name",
+        "types": "node types",
+        "enabled": "bool"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "id",
+          "enabled"
+        ],
+        "messages": {
+          "not_found": "No node set with that name exists."
+        }
+      },
+      "description": "Enable or disable a single node set (the 'module/nodeSet' registry item). Disabling is refused while the node type is in use by a deployed flow."
+    },
+    {
+      "tool": "module_setenabled",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "NodeSet",
+        "row_key": {
+          "module": {
+            "$arg": "module"
+          }
+        },
+        "fields": [
+          "module",
+          "types",
+          "enabled",
+          "file",
+          "err",
+          "loaded"
+        ],
+        "set": {
+          "enabled": {
+            "$arg": "enabled"
+          }
+        }
+      },
+      "input_schema": {
+        "module": {
+          "type": "text",
+          "required": true,
+          "description": "npm module name whose node sets to toggle."
+        },
+        "enabled": {
+          "type": "bool",
+          "required": true,
+          "description": "true to enable, false to disable the module's nodes."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/node_modules/@node-red/runtime/lib/api/nodes.js:352",
+        "id_local": "Module.setEnabled",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /nodes/:module",
+          "locator": "packages/node_modules/@node-red/editor-api/lib/admin/index.js:73"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "setModuleState: async function(opts) { var module = runtime.nodes.getModuleInfo(mod); ... var nodes = module.nodes; for (i...) { promises.push(putNode(nodes[i],opts.enabled)); } return Promise.all(promises).then(function(){ return runtime.nodes.getModuleInfo(mod); }) }",
+        "edges": [
+          "needsPermission(\"nodes.write\") on admin/index.js:73; permissions.hasPermission (auth/index.js:68)"
+        ]
+      },
+      "entity": "NodeSet",
+      "_binds": {
+        "module": "Module.name",
+        "enabled": "NodeSet.enabled"
+      },
+      "_output_schema": {
+        "name": "module name",
+        "version": "string",
+        "nodes": "list of node sets"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "module",
+          "enabled"
+        ],
+        "messages": {
+          "auth": "You must sign in and hold nodes.write before toggling a module.",
+          "not_found": "That npm module is not installed."
+        }
+      },
+      "description": "Enable or disable every node in an installed npm module at once."
+    },
+    {
+      "tool": "module_add",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Module",
+        "fields": [
+          "version",
+          "local",
+          "user",
+          "path",
+          "dependencies",
+          "pending_version",
+          "nodes",
+          "used_by"
+        ],
+        "set_on_create": {
+          "name": {
+            "$arg": "module"
+          },
+          "version": {
+            "$arg": "version"
+          },
+          "user": true
+        }
+      },
+      "input_schema": {
+        "module": {
+          "type": "text",
+          "required": true,
+          "description": "npm module name to install."
+        },
+        "version": {
+          "type": "text",
+          "required": false,
+          "description": "Version to install; defaults to latest."
+        },
+        "url": {
+          "type": "text",
+          "required": false,
+          "description": "Install from this URL instead of the registry."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/node_modules/@node-red/runtime/lib/api/nodes.js:146",
+        "id_local": "Module.add",
+        "entry": {
+          "kind": "http",
+          "route": "POST /nodes",
+          "locator": "packages/node_modules/@node-red/editor-api/lib/admin/index.js:65"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "addModule: async function(opts) { ... installModule(module,version,url)... return runtime.nodes.installModule(opts.module,opts.version,opts.url).then(function(info){ return info; }) }",
+        "edges": [
+          "needsPermission(\"nodes.write\") on admin/index.js:65; permissions.hasPermission (auth/index.js:68)"
+        ]
+      },
+      "entity": "Module",
+      "_output_schema": {
+        "name": "module name",
+        "version": "string",
+        "nodes": "list of node sets"
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "not_found": "Could not install that module."
+        }
+      },
+      "description": "Install a new node module from the npm registry, a URL, or an uploaded tarball. The module then appears in the node registry and all its nodes can be enabled."
+    },
+    {
+      "tool": "module_remove",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "Module",
+        "lookup_by": {
+          "name": {
+            "$arg": "module"
+          }
+        }
+      },
+      "input_schema": {
+        "module": {
+          "type": "text",
+          "required": true,
+          "description": "npm module name to uninstall."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/node_modules/@node-red/runtime/lib/api/nodes.js:235",
+        "id_local": "Module.remove",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /nodes/:module",
+          "locator": "packages/node_modules/@node-red/editor-api/lib/admin/index.js:74"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "removeModule: async function(opts) { var module = runtime.nodes.getModuleInfo(opts.module); if (!module) { err.code=\"not_found\"; throw err } return runtime.nodes.uninstallModule(opts.module) }",
+        "edges": [
+          "needsPermission(\"nodes.write\") on admin/index.js:74; permissions.hasPermission (auth/index.js:68)"
+        ]
+      },
+      "entity": "Module",
+      "_binds": {
+        "module": "Module.name"
+      },
+      "_output_schema": {},
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "module"
+        ],
+        "messages": {
+          "auth": "You must sign in to uninstall a module.",
+          "precondition": "You must sign in to uninstall a module.",
+          "not_found": "No such module is installed."
+        }
+      },
+      "description": "Uninstall an installed node module and all of its node sets."
+    },
+    {
+      "tool": "auth_login",
+      "op": "action",
+      "family": "guard.auth",
+      "exec_spec": {
+        "verify": {
+          "entity": "User"
+        }
+      },
+      "input_schema": {
+        "username": {
+          "type": "text",
+          "required": true,
+          "description": "The account username."
+        },
+        "password": {
+          "type": "text",
+          "required": true,
+          "description": "The account password."
+        },
+        "client_id": {
+          "type": "text",
+          "required": false,
+          "description": "OAuth client id to attribute the token to."
+        },
+        "scope": {
+          "type": "json",
+          "required": false,
+          "description": "Requested permission scope; defaults to the user's own permissions."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/node_modules/@node-red/editor-api/lib/auth/strategies.js:66",
+        "id_local": "Auth.login",
+        "entry": {
+          "kind": "http",
+          "route": "POST /auth/token",
+          "locator": "packages/node_modules/@node-red/editor-api/lib/index.js:68"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "function passwordTokenExchange(client, username, password, scope, done) {\n  ... var attemptCount; if (attemptCount > 5) { done(new Error(\"Too many login attempts...\"),false); return; }\n  Users.authenticate(username,password).then(function(user) {\n    if (user) { if (scope === \"\") { scope = user.permissions; }\n      if (permissions.hasPermission(user.permissions,scope)) {\n        if(user.token){ done(null,user.token,null,null); } else { Tokens.create(username,client.id,scope,false).then(...); }",
+        "edges": [
+          "Users.authenticate(username,password) bcrypt.compare (users.js:25); rate limit >5 attempts in 10min rejects (strategies.js:66)"
+        ]
+      },
+      "entity": "Session",
+      "_binds": {
+        "username": "User.username",
+        "scope": "User.permissions"
+      },
+      "_output_schema": {
+        "accessToken": "string",
+        "expires_in": "int"
+      },
+      "guards": {
+        "required": [
+          "username",
+          "password"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "username",
+                  "op": "eq",
+                  "value": {
+                    "arg": "username"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "precondition": "No such user exists.",
+          "auth": "Sign in before looking up a user."
+        }
+      },
+      "description": "Sign in with a username and password. Returns an access token that identifies the session; every tool that touches flows, projects, nodes or settings requires this first. The signed-in user is what $actor resolves to."
+    },
+    {
+      "tool": "session_revoke",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "Session",
+        "lookup_by": {
+          "token": {
+            "$arg": "token"
+          }
+        }
+      },
+      "input_schema": {
+        "token": {
+          "type": "text",
+          "required": true,
+          "description": "The access token to revoke."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/node_modules/@node-red/editor-api/lib/auth/index.js:141",
+        "id_local": "Session.revoke",
+        "entry": {
+          "kind": "http",
+          "route": "POST /auth/revoke",
+          "locator": "packages/node_modules/@node-red/editor-api/lib/index.js:77"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "function revoke(req,res) { var token = req.body.token; Tokens.revoke(token).then(function(){ log.audit(...); res.status(200).end(); }); }",
+        "edges": [
+          "needsPermission(\"\") on POST /auth/revoke (editor-api/lib/index.js:77) – requires any valid session"
+        ]
+      },
+      "entity": "Session",
+      "_binds": {
+        "token": "Session.token"
+      },
+      "_output_schema": {},
+      "description": "Revoke an access token, invalidating the session it belongs to.",
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in before revoking a token.",
+          "not_found": "That token is not a current session."
+        }
+      }
+    },
+    {
+      "tool": "session_exchangecode",
+      "op": "update",
+      "family": "crud.upsert",
+      "exec_spec": {
+        "entity": "Session",
+        "key": {
+          "exchange_code": {
+            "$arg": "code"
+          }
+        },
+        "insert_fields": {
+          "user": {
+            "$arg": "user"
+          },
+          "client": {
+            "$arg": "client"
+          },
+          "scope": {
+            "$arg": "scope"
+          },
+          "access_token": {
+            "$arg": "access_token"
+          },
+          "expires": {
+            "$arg": "expires"
+          },
+          "exchange_code": {
+            "$arg": "code"
+          },
+          "exchange_code_expires": {
+            "$arg": "exchange_code_expires"
+          }
+        },
+        "set_on_exists": {
+          "expires": "2026-01-01T00:00:00"
+        }
+      },
+      "input_schema": {
+        "code": {
+          "type": "text",
+          "required": true,
+          "description": "The one-time exchange code issued during a login."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/node_modules/@node-red/editor-api/lib/auth/tokens.js:177",
+        "id_local": "Session.exchangeCode",
+        "entry": {
+          "kind": "http",
+          "route": "POST /auth/token",
+          "locator": "packages/node_modules/@node-red/editor-api/lib/index.js:80"
+        },
+        "entity_why": "primary effect row_upsert lands on this table",
+        "ref_code": "exchangeCodeForToken: function(exchangeCode) { const session = pendingSessions[exchangeCode]; if (session && session.exchangeCodeExpires > Date.now()) { delete pendingSessions[exchangeCode]; delete session.exchangeCode; delete session.exchangeCodeExpires; sessions[session.accessToken] = session; return storage.saveSessions(sessions)... } else { reject(Invalid exchange code) } }"
+      },
+      "entity": "Session",
+      "_binds": {
+        "code": "Session.exchange_code"
+      },
+      "_output_schema": {
+        "accessToken": "string",
+        "expires_in": "int"
+      },
+      "guards": {
+        "required": [
+          "code"
+        ],
+        "messages": {
+          "not_found": "That exchange code is invalid or has expired."
+        },
+        "requires_auth": true
+      },
+      "description": "Exchange a one-time session code for the access token it was issued for, completing that login flow."
+    },
+    {
+      "tool": "project_list",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Project",
+        "search_fields": [
+          "name"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "name"
+          ]
+        }
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "packages/node_modules/@node-red/editor-api/lib/editor/projects.js:23",
+        "id_local": "Project.list",
+        "entry": {
+          "kind": "http",
+          "route": "GET /projects",
+          "locator": "packages/node_modules/@node-red/editor-api/lib/editor/projects.js:100"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "listProjects(req,res) { var opts={user,library,req}; runtimeAPI.projects.listProjects(opts).then(function(result){ res.json(result); }) }",
+        "edges": [
+          "needsPermission(\"projects.read\") on editor/projects.js:100; also app.use projects.available() 404 when projects disabled (projects.js:87)"
+        ]
+      },
+      "entity": "Project",
+      "_output_schema": {
+        "projects": "list of project names",
+        "active": "active project name"
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in before listing projects."
+        }
+      },
+      "description": "List the git projects known to this Node-RED instance and which one is currently active."
+    },
+    {
+      "tool": "project_get",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Project",
+        "lookup_by": {
+          "name": {
+            "$arg": "id"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "text",
+          "required": true,
+          "description": "Name of the project."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/node_modules/@node-red/editor-api/lib/editor/projects.js:34",
+        "id_local": "Project.get",
+        "entry": {
+          "kind": "http",
+          "route": "GET /projects/:id",
+          "locator": "packages/node_modules/@node-red/editor-api/lib/editor/projects.js:156"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "getProject(req,res) { var opts={user,id:req.params.id}; runtimeAPI.projects.getProject(opts).then(function(data){ if(data) res.json(data); else res.status(404).end(); }) }",
+        "edges": [
+          "needsPermission(\"projects.read\") on editor/projects.js:156; also app.use projects.available() 404 when projects disabled (projects.js:87)"
+        ]
+      },
+      "entity": "Project",
+      "_binds": {
+        "id": "Project.name"
+      },
+      "_output_schema": {
+        "name": "string",
+        "summary": "string",
+        "version": "string",
+        "files": "json",
+        "git": "json"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "not_found": "No such project exists."
+        }
+      },
+      "description": "Read the metadata of a project: its summary, version, description and git configuration. Refers to the active project."
+    },
+    {
+      "tool": "project_create",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Project",
+        "fields": {
+          "root_path": {
+            "$arg": "root_path"
+          },
+          "summary": {
+            "$arg": "summary"
+          },
+          "version": {
+            "$arg": "version"
+          },
+          "description": {
+            "$arg": "description"
+          },
+          "empty": {
+            "$arg": "empty"
+          },
+          "dependencies": {
+            "$arg": "dependencies"
+          },
+          "credential_secret": {
+            "$arg": "credentialSecret"
+          },
+          "git": {
+            "$arg": "git"
+          },
+          "branch": {
+            "$arg": "branch"
+          },
+          "merging": {
+            "$arg": "merging"
+          }
+        },
+        "set_on_create": {
+          "root_path": "",
+          "empty": true
+        },
+        "unique_on": [
+          "name"
+        ]
+      },
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "Name of the project and of its directory."
+        },
+        "path": {
+          "type": "text",
+          "required": false,
+          "description": "Directory for the project; defaults under the projects root and must not already exist."
+        },
+        "credentialSecret": {
+          "type": "text",
+          "required": false,
+          "description": "Secret used to encrypt the project's stored credentials."
+        },
+        "git": {
+          "type": "json",
+          "required": false,
+          "description": "Git init config, e.g. {remotes:{origin:{url,...}}}."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/node_modules/@node-red/runtime/lib/storage/localfilesystem/projects/Project.js:988",
+        "id_local": "Project.create",
+        "entry": {
+          "kind": "http",
+          "route": "POST /projects",
+          "locator": "packages/node_modules/@node-red/editor-api/lib/editor/projects.js:103"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "createProject(user, metadata) { if (!metadata.path) throw... if (!metadata.name) throw...; fs.stat(projectPath,...){ if exists reject project_exists; fs.ensureDir(projectPath); settings.set('projects',projects); ... gitTools.clone or createDefaultProject(user,metadata) } }",
+        "edges": [
+          "needsPermission(\"projects.write\") on editor/projects.js:103; also app.use projects.available() 404 when projects disabled (projects.js:87)"
+        ]
+      },
+      "entity": "Project",
+      "_binds": {
+        "name": "Project.name",
+        "credentialSecret": "Project.credential_secret",
+        "git": "Project.git"
+      },
+      "_output_schema": {
+        "project": "the Project object"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "name"
+        ],
+        "messages": {
+          "auth": "You must sign in to create a project.",
+          "precondition": "You must sign in to create a project.",
+          "unique": "A project with that name already exists."
+        }
+      },
+      "description": "Create a new (initially empty) project in the projects root and register it with the runtime."
+    },
+    {
+      "tool": "project_update",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Project",
+        "row_key": {
+          "name": {
+            "$arg": "id"
+          }
+        },
+        "set": {
+          "summary": {
+            "$arg": "summary"
+          },
+          "version": {
+            "$arg": "version"
+          },
+          "description": {
+            "$arg": "description"
+          },
+          "dependencies": {
+            "$arg": "dependencies"
+          },
+          "credential_secret": {
+            "$arg": "credentialSecret"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "text",
+          "required": true,
+          "description": "Name of the project to update."
+        },
+        "credentialSecret": {
+          "type": "text",
+          "required": false,
+          "description": "New credential secret; changing it requires the current secret."
+        },
+        "description": {
+          "type": "text",
+          "required": false,
+          "description": "New project description."
+        },
+        "dependencies": {
+          "type": "json",
+          "required": false,
+          "description": "New dependency set."
+        },
+        "summary": {
+          "type": "text",
+          "required": false,
+          "description": "New project summary."
+        },
+        "version": {
+          "type": "text",
+          "required": false,
+          "description": "New project version."
+        },
+        "active": {
+          "type": "bool",
+          "required": false,
+          "description": "Set this as the active project and reload flows."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/node_modules/@node-red/runtime/lib/storage/localfilesystem/projects/Project.js:253",
+        "id_local": "Project.update",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /projects/:id",
+          "locator": "packages/node_modules/@node-red/editor-api/lib/editor/projects.js:117"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "Project.prototype.update = async function (user, data) { ... if (data.credentialSecret && data.credentialSecret !== this.credentialSecret) { ... if (!isReset && this.credentialSecret && !this.credentialSecretInvalid && this.credentialSecret !== existingSecret) { throw missing_current_credential_key } this.credentialSecret = secret; ... } ... if (saveREADME) { util.writeFile(README,description) } if (savePackage) { util.writeFile(package.json,...) } ... if (workflowMode === 'auto') { return project.stageFile(...).then(() => project.commit(...)) } }",
+        "edges": [
+          "needsPermission(\"projects.write\") on editor/projects.js:117; also app.use projects.available() 404 when projects disabled (projects.js:87)"
+        ]
+      },
+      "entity": "GitCommit",
+      "_binds": {
+        "id": "Project.name",
+        "credentialSecret": "Project.credential_secret",
+        "description": "Project.description",
+        "dependencies": "Project.dependencies",
+        "summary": "Project.summary",
+        "version": "Project.version"
+      },
+      "_output_schema": {
+        "project": "the Project object"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must sign in to manage this project.",
+          "precondition": "You must sign in to manage this project.",
+          "not_found": "The project does not exist or is not the active project."
+        }
+      },
+      "description": "Update a project's metadata (summary, description, version, dependencies) and, if requested, make it the active project or set its credential secret."
+    },
+    {
+      "tool": "project_delete",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "Project",
+        "lookup_by": {
+          "name": {
+            "$arg": "id"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "text",
+          "required": true,
+          "description": "Name of the project to delete."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/node_modules/@node-red/runtime/lib/storage/localfilesystem/projects/index.js:253",
+        "id_local": "Project.delete",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /projects/:id",
+          "locator": "packages/node_modules/@node-red/editor-api/lib/editor/projects.js:159"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "function deleteProject(user, name) { if (activeProject && activeProject.name === name) { var e=new Error(); e.code=\"cannot_delete_active_project\"; throw e; } return Projects.delete(user, projectPath); }",
+        "edges": [
+          "needsPermission(\"projects.write\") on editor/projects.js:159; also app.use projects.available() 404 when projects disabled (projects.js:87)"
+        ]
+      },
+      "entity": "Project",
+      "_binds": {
+        "id": "Project.name"
+      },
+      "_output_schema": {},
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must sign in to delete a project.",
+          "precondition": "You must sign in to delete a project.",
+          "not_found": "No such project exists."
+        }
+      },
+      "description": "Delete a project and its directory from disk. Refused while the project is the active project."
+    },
+    {
+      "tool": "project_getstatus",
+      "op": "read",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Project",
+        "search_fields": [
+          "name"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "name"
+          ]
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "text",
+          "required": true,
+          "description": "Name of the project."
+        },
+        "remote": {
+          "type": "bool",
+          "required": false,
+          "description": "Also fetch and include remote status."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/node_modules/@node-red/runtime/lib/storage/localfilesystem/projects/index.js:328",
+        "id_local": "Project.getStatus",
+        "entry": {
+          "kind": "http",
+          "route": "GET /projects/:id/status",
+          "locator": "packages/node_modules/@node-red/editor-api/lib/editor/projects.js:174"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "getStatus(user, project, includeRemote) { checkActiveProject(project); return activeProject.status(user, includeRemote); }",
+        "edges": [
+          "needsPermission(\"projects.read\") on editor/projects.js:174; also app.use projects.available() 404 when projects disabled (projects.js:87)"
+        ]
+      },
+      "entity": "Project",
+      "_binds": {
+        "id": "Project.name"
+      },
+      "_output_schema": {
+        "files": "json",
+        "commits": "json",
+        "branches": "json"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "not_found": "No such project exists."
+        }
+      },
+      "description": "Read the project's full git status: changed files, commit log and branches. Optionally includes remote status."
+    },
+    {
+      "tool": "project_commit",
+      "op": "update",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "GitCommit",
+        "fields": [
+          "message"
+        ],
+        "set_on_create": {
+          "project": {
+            "$arg": "id"
+          },
+          "author": {
+            "$session": "username"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "text",
+          "required": true,
+          "description": "Name of the project to commit."
+        },
+        "message": {
+          "type": "text",
+          "required": true,
+          "description": "Commit message."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/node_modules/@node-red/runtime/lib/storage/localfilesystem/projects/index.js:285",
+        "id_local": "Project.commit",
+        "entry": {
+          "kind": "http",
+          "route": "POST /projects/:id/commit",
+          "locator": "packages/node_modules/@node-red/editor-api/lib/editor/projects.js:256"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "commit(user, project,options) { checkActiveProject(project); return activeProject.commit(user, options).then(...) }",
+        "edges": [
+          "needsPermission(\"projects.write\") on editor/projects.js:256; also app.use projects.available() 404 when projects disabled (projects.js:87)"
+        ]
+      },
+      "entity": "GitCommit",
+      "_binds": {
+        "id": "Project.name",
+        "message": "GitCommit.message"
+      },
+      "_output_schema": {
+        "status": "git status object"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "id",
+          "message"
+        ],
+        "messages": {
+          "auth": "You must sign in to commit.",
+          "precondition": "You must sign in to commit.",
+          "not_found": "The project does not exist or is not the active project."
+        }
+      },
+      "description": "Commit the project's staged changes to git with a message, recording the commit as the current author."
+    },
+    {
+      "tool": "project_stagefile",
+      "op": "update",
+      "family": "action.emit",
+      "exec_spec": {
+        "channel": "git",
+        "record": {
+          "table": "ProjectLog"
+        },
+        "_record_undeclared": true
+      },
+      "input_schema": {
+        "id": {
+          "type": "text",
+          "required": true,
+          "description": "Name of the project."
+        },
+        "path": {
+          "type": "text",
+          "required": true,
+          "description": "File path to stage."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/node_modules/@node-red/runtime/lib/storage/localfilesystem/projects/index.js:277",
+        "id_local": "Project.stageFile",
+        "entry": {
+          "kind": "http",
+          "route": "POST /projects/:id/stage/*",
+          "locator": "packages/node_modules/@node-red/editor-api/lib/editor/projects.js:226"
+        },
+        "entity_why": "fell back to the entity prefix of id_local",
+        "ref_code": "stageFile(user, project,file) { checkActiveProject(project); return activeProject.stageFile(file); }",
+        "edges": [
+          "needsPermission(\"projects.write\") on editor/projects.js:226; also app.use projects.available() 404 when projects disabled (projects.js:87)"
+        ]
+      },
+      "entity": "Project",
+      "_binds": {
+        "id": "Project.name"
+      },
+      "_output_schema": {
+        "status": "git status object"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "id",
+          "path"
+        ],
+        "messages": {
+          "auth": "You must sign in to stage files.",
+          "precondition": "You must sign in to stage files.",
+          "not_found": "The project does not exist or is not active."
+        }
+      },
+      "description": "Stage a file in the project's git index so it is included in the next commit."
+    },
+    {
+      "tool": "project_unstagefile",
+      "op": "update",
+      "family": "action.emit",
+      "exec_spec": {
+        "channel": "git",
+        "record": {
+          "table": "ProjectLog"
+        },
+        "_record_undeclared": true
+      },
+      "input_schema": {
+        "id": {
+          "type": "text",
+          "required": true,
+          "description": "Name of the project."
+        },
+        "path": {
+          "type": "text",
+          "required": false,
+          "description": "File path to unstage; omit to unstage all files."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/node_modules/@node-red/runtime/lib/storage/localfilesystem/projects/index.js:281",
+        "id_local": "Project.unstageFile",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /projects/:id/stage/*",
+          "locator": "packages/node_modules/@node-red/editor-api/lib/editor/projects.js:271"
+        },
+        "entity_why": "fell back to the entity prefix of id_local",
+        "ref_code": "unstageFile(user, project,file) { checkActiveProject(project); return activeProject.unstageFile(file); }",
+        "edges": [
+          "needsPermission(\"projects.write\") on editor/projects.js:271; also app.use projects.available() 404 when projects disabled (projects.js:87)"
+        ]
+      },
+      "entity": "Project",
+      "_binds": {
+        "id": "Project.name"
+      },
+      "_output_schema": {
+        "status": "git status object"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must sign in to unstage files.",
+          "precondition": "You must sign in to unstage files.",
+          "not_found": "The project does not exist or is not active."
+        }
+      },
+      "description": "Unstage a file so it is excluded from the next commit. Omit the path to unstage everything."
+    },
+    {
+      "tool": "project_revertfile",
+      "op": "update",
+      "family": "action.emit",
+      "exec_spec": {
+        "channel": "git",
+        "record": {
+          "table": "ProjectLog"
+        },
+        "_record_undeclared": true
+      },
+      "input_schema": {
+        "id": {
+          "type": "text",
+          "required": true,
+          "description": "Name of the project."
+        },
+        "path": {
+          "type": "text",
+          "required": true,
+          "description": "File path to revert."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/node_modules/@node-red/runtime/lib/storage/localfilesystem/projects/index.js:312",
+        "id_local": "Project.revertFile",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /projects/:id/files/_/*",
+          "locator": "packages/node_modules/@node-red/editor-api/lib/editor/projects.js:210"
+        },
+        "entity_why": "fell back to the entity prefix of id_local",
+        "ref_code": "revertFile(user, project,filePath) { checkActiveProject(project); return activeProject.revertFile(filePath).then(() => reloadActiveProject(\"revert\")) }",
+        "edges": [
+          "needsPermission(\"projects.write\") on editor/projects.js:210; also app.use projects.available() 404 when projects disabled (projects.js:87)"
+        ]
+      },
+      "entity": "Project",
+      "_binds": {
+        "id": "Project.name"
+      },
+      "_output_schema": {},
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "id",
+          "path"
+        ],
+        "messages": {
+          "auth": "You must sign in to revert files.",
+          "precondition": "You must sign in to revert files.",
+          "not_found": "The project does not exist or is not active."
+        }
+      },
+      "description": "Revert an uncommitted change to a file in the working tree, restoring it to the last commit, and reload the project."
+    },
+    {
+      "tool": "project_getfile",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Project",
+        "lookup_by": {
+          "name": {
+            "$arg": "id"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "text",
+          "required": true,
+          "description": "Name of the project."
+        },
+        "treeish": {
+          "type": "text",
+          "required": true,
+          "description": "Git tree ref, or '_' for the working tree."
+        },
+        "path": {
+          "type": "text",
+          "required": true,
+          "description": "File path within the project."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/node_modules/@node-red/runtime/lib/storage/localfilesystem/projects/index.js:308",
+        "id_local": "Project.getFile",
+        "entry": {
+          "kind": "http",
+          "route": "GET /projects/:id/files/:treeish/*",
+          "locator": "packages/node_modules/@node-red/editor-api/lib/editor/projects.js:194"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "getFile(user, project,filePath,sha) { checkActiveProject(project); return activeProject.getFile(filePath,sha); }",
+        "edges": [
+          "needsPermission(\"projects.read\") on editor/projects.js:194; also app.use projects.available() 404 when projects disabled (projects.js:87)"
+        ]
+      },
+      "entity": "Project",
+      "_binds": {
+        "id": "Project.name"
+      },
+      "_output_schema": {
+        "content": "file text"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "id",
+          "treeish",
+          "path"
+        ],
+        "messages": {
+          "not_found": "No such file exists in the project."
+        }
+      },
+      "description": "Read the content of a file at a given git tree reference (or the working tree) in the project."
+    },
+    {
+      "tool": "project_getcommits",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "GitCommit",
+        "search_fields": [
+          "project"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "project"
+          ]
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "text",
+          "required": true,
+          "description": "Name of the project."
+        },
+        "limit": {
+          "type": "int",
+          "required": false,
+          "description": "Maximum number of commits to return (default 20)."
+        },
+        "before": {
+          "type": "text",
+          "required": false,
+          "description": "Commit sha to page back from."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/node_modules/@node-red/runtime/lib/storage/localfilesystem/projects/index.js:299",
+        "id_local": "Project.getCommits",
+        "entry": {
+          "kind": "http",
+          "route": "GET /projects/:id/commits",
+          "locator": "packages/node_modules/@node-red/editor-api/lib/editor/projects.js:318"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "getCommits(user, project,options) { checkActiveProject(project); return activeProject.getCommits(options); }",
+        "edges": [
+          "needsPermission(\"projects.read\") on editor/projects.js:318; also app.use projects.available() 404 when projects disabled (projects.js:87)"
+        ]
+      },
+      "entity": "GitCommit",
+      "_binds": {
+        "id": "Project.name",
+        "before": "GitCommit.sha"
+      },
+      "_output_schema": {
+        "count": "int",
+        "total": "int",
+        "commits": "list of GitCommit"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must sign in before listing a project's commits."
+        }
+      },
+      "description": "List the project's recent commits, newest first, with an optional pagination cursor."
+    },
+    {
+      "tool": "project_getcommit",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "GitCommit",
+        "lookup_by": {
+          "sha": {
+            "$arg": "sha"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "text",
+          "required": true,
+          "description": "Name of the project."
+        },
+        "sha": {
+          "type": "text",
+          "required": true,
+          "description": "Sha of the commit to read."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/node_modules/@node-red/runtime/lib/storage/localfilesystem/projects/index.js:303",
+        "id_local": "Project.getCommit",
+        "entry": {
+          "kind": "http",
+          "route": "GET /projects/:id/commits/:sha",
+          "locator": "packages/node_modules/@node-red/editor-api/lib/editor/projects.js:334"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "getCommit(user, project,sha) { checkActiveProject(project); return activeProject.getCommit(sha); }",
+        "edges": [
+          "needsPermission(\"projects.read\") on editor/projects.js:334; also app.use projects.available() 404 when projects disabled (projects.js:87)"
+        ]
+      },
+      "entity": "GitCommit",
+      "_binds": {
+        "id": "Project.name",
+        "sha": "GitCommit.sha"
+      },
+      "_output_schema": {
+        "commit": "GitCommit details"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "id",
+          "sha"
+        ],
+        "messages": {
+          "auth": "You must sign in to read a commit.",
+          "precondition": "You must sign in to read a commit.",
+          "not_found": "No such commit exists in the project."
+        }
+      },
+      "description": "Read the details of a single commit in the project."
+    },
+    {
+      "tool": "project_push",
+      "op": "action",
+      "family": "action.emit",
+      "exec_spec": {
+        "channel": "git",
+        "record": {
+          "table": "ProjectLog"
+        },
+        "_record_undeclared": true
+      },
+      "input_schema": {
+        "id": {
+          "type": "text",
+          "required": true,
+          "description": "Name of the project."
+        },
+        "remote": {
+          "type": "text",
+          "required": false,
+          "description": "Remote and branch spec to push to (e.g. 'origin/main')."
+        },
+        "track": {
+          "type": "bool",
+          "required": false,
+          "description": "Set the upstream remote branch."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/node_modules/@node-red/runtime/lib/storage/localfilesystem/projects/index.js:318",
+        "id_local": "Project.push",
+        "entry": {
+          "kind": "http",
+          "route": "POST /projects/:id/push/?*",
+          "locator": "packages/node_modules/@node-red/editor-api/lib/editor/projects.js:349"
+        },
+        "entity_why": "fell back to the entity prefix of id_local",
+        "ref_code": "push(user, project,remoteBranchName,setRemote) { checkActiveProject(project); return activeProject.push(user,remoteBranchName,setRemote); }",
+        "edges": [
+          "needsPermission(\"projects.write\") on editor/projects.js:349; also app.use projects.available() 404 when projects disabled (projects.js:87)"
+        ]
+      },
+      "entity": "Project",
+      "_binds": {
+        "id": "Project.name"
+      },
+      "_output_schema": {},
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must sign in to manage this project.",
+          "precondition": "You must sign in to manage this project.",
+          "not_found": "The project does not exist or is not the active project."
+        }
+      },
+      "description": "Push the current branch to a git remote, optionally setting the upstream branch."
+    },
+    {
+      "tool": "project_pull",
+      "op": "action",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Project",
+        "row_key": {
+          "name": {
+            "$arg": "id"
+          }
+        },
+        "fields": [
+          "root_path",
+          "summary",
+          "version",
+          "description",
+          "empty",
+          "dependencies",
+          "credential_secret",
+          "git",
+          "branch",
+          "merging"
+        ],
+        "set": {
+          "merging": false
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "text",
+          "required": true,
+          "description": "Name of the project."
+        },
+        "remote": {
+          "type": "text",
+          "required": false,
+          "description": "Remote and branch spec to pull from."
+        },
+        "track": {
+          "type": "bool",
+          "required": false,
+          "description": "Set the upstream branch."
+        },
+        "allowUnrelatedHistories": {
+          "type": "bool",
+          "required": false,
+          "description": "Allow merging unrelated histories."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/node_modules/@node-red/runtime/lib/storage/localfilesystem/projects/index.js:322",
+        "id_local": "Project.pull",
+        "entry": {
+          "kind": "http",
+          "route": "POST /projects/:id/pull/?*",
+          "locator": "packages/node_modules/@node-red/editor-api/lib/editor/projects.js:365"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "pull(user, project,remoteBranchName,setRemote,allowUnrelatedHistories) { checkActiveProject(project); return activeProject.pull(user,remoteBranchName,setRemote,allowUnrelatedHistories).then(() => reloadActiveProject(\"pull\")) }",
+        "edges": [
+          "needsPermission(\"projects.write\") on editor/projects.js:365; also app.use projects.available() 404 when projects disabled (projects.js:87)"
+        ]
+      },
+      "entity": "Project",
+      "_binds": {
+        "id": "Project.name"
+      },
+      "_output_schema": {},
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must sign in to manage this project.",
+          "precondition": "You must sign in to manage this project.",
+          "not_found": "The project does not exist or is not the active project."
+        }
+      },
+      "description": "Pull changes from a git remote into the project and reload it, optionally allowing unrelated histories."
+    },
+    {
+      "tool": "project_abortmerge",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Project",
+        "row_key": {
+          "name": {
+            "$arg": "id"
+          }
+        },
+        "fields": [
+          "root_path",
+          "summary",
+          "version",
+          "description",
+          "empty",
+          "dependencies",
+          "credential_secret",
+          "git",
+          "branch",
+          "merging"
+        ],
+        "set": {
+          "merging": false
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "text",
+          "required": true,
+          "description": "Name of the project."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/node_modules/@node-red/runtime/lib/storage/localfilesystem/projects/index.js:336",
+        "id_local": "Project.abortMerge",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /projects/:id/merge",
+          "locator": "packages/node_modules/@node-red/editor-api/lib/editor/projects.js:382"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "abortMerge(user, project) { checkActiveProject(project); return activeProject.abortMerge().then(() => reloadActiveProject(\"merge-abort\")) }",
+        "edges": [
+          "needsPermission(\"projects.write\") on editor/projects.js:382; also app.use projects.available() 404 when projects disabled (projects.js:87)"
+        ]
+      },
+      "entity": "Project",
+      "_binds": {
+        "id": "Project.name"
+      },
+      "_output_schema": {},
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must sign in to manage this project.",
+          "precondition": "You must sign in to manage this project.",
+          "not_found": "The project does not exist or is not the active project."
+        }
+      },
+      "description": "Abort an in-progress git merge in the project and reload it, returning to the pre-merge state."
+    },
+    {
+      "tool": "project_resolvemerge",
+      "op": "update",
+      "family": "action.emit",
+      "exec_spec": {
+        "channel": "git",
+        "record": {
+          "table": "ProjectLog"
+        },
+        "_record_undeclared": true
+      },
+      "input_schema": {
+        "id": {
+          "type": "text",
+          "required": true,
+          "description": "Name of the project."
+        },
+        "path": {
+          "type": "text",
+          "required": true,
+          "description": "File whose conflict is being resolved."
+        },
+        "resolution": {
+          "type": "json",
+          "required": true,
+          "description": "Map of conflict block to the chosen content."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/node_modules/@node-red/runtime/lib/storage/localfilesystem/projects/index.js:332",
+        "id_local": "Project.resolveMerge",
+        "entry": {
+          "kind": "http",
+          "route": "POST /projects/:id/resolve/*",
+          "locator": "packages/node_modules/@node-red/editor-api/lib/editor/projects.js:396"
+        },
+        "entity_why": "fell back to the entity prefix of id_local",
+        "ref_code": "resolveMerge(user, project,file,resolution) { checkActiveProject(project); return activeProject.resolveMerge(file,resolution); }",
+        "edges": [
+          "needsPermission(\"projects.write\") on editor/projects.js:396; also app.use projects.available() 404 when projects disabled (projects.js:87)"
+        ]
+      },
+      "entity": "Project",
+      "_binds": {
+        "id": "Project.name"
+      },
+      "_output_schema": {},
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "id",
+          "path",
+          "resolution"
+        ],
+        "messages": {
+          "auth": "You must sign in to manage this project.",
+          "precondition": "You must sign in to manage this project.",
+          "not_found": "The project does not exist or is not the active project."
+        }
+      },
+      "description": "Resolve a merge conflict in one file by choosing which conflicting content blocks to keep."
+    },
+    {
+      "tool": "project_getbranches",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Project",
+        "search_fields": [
+          "branch"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "branch"
+          ]
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "text",
+          "required": true,
+          "description": "Name of the project."
+        },
+        "remote": {
+          "type": "bool",
+          "required": false,
+          "description": "List remote branches instead of local ones."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/node_modules/@node-red/runtime/lib/storage/localfilesystem/projects/index.js:342",
+        "id_local": "Project.getBranches",
+        "entry": {
+          "kind": "http",
+          "route": "GET /projects/:id/branches",
+          "locator": "packages/node_modules/@node-red/editor-api/lib/editor/projects.js:412"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "getBranches(user, project,isRemote) { checkActiveProject(project); return activeProject.getBranches(user, isRemote); }",
+        "edges": [
+          "needsPermission(\"projects.read\") on editor/projects.js:412; also app.use projects.available() 404 when projects disabled (projects.js:87)"
+        ]
+      },
+      "entity": "Project",
+      "_binds": {
+        "id": "Project.name"
+      },
+      "_output_schema": {
+        "branches": "list of branch names"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must sign in before listing a project's branches."
+        }
+      },
+      "description": "List the branches of the project, optionally including remote-tracking branches."
+    },
+    {
+      "tool": "project_setbranch",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Project",
+        "row_key": {
+          "name": {
+            "$arg": "id"
+          }
+        },
+        "fields": [
+          "root_path",
+          "summary",
+          "version",
+          "description",
+          "empty",
+          "dependencies",
+          "credential_secret",
+          "git",
+          "branch",
+          "merging"
+        ],
+        "set": {
+          "branch": {
+            "$arg": "branch"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "text",
+          "required": true,
+          "description": "Name of the project."
+        },
+        "branch": {
+          "type": "text",
+          "required": true,
+          "description": "Branch to switch to."
+        },
+        "create": {
+          "type": "bool",
+          "required": false,
+          "description": "Create the branch if it does not yet exist."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/node_modules/@node-red/runtime/lib/storage/localfilesystem/projects/index.js:352",
+        "id_local": "Project.setBranch",
+        "entry": {
+          "kind": "http",
+          "route": "POST /projects/:id/branches",
+          "locator": "packages/node_modules/@node-red/editor-api/lib/editor/projects.js:473"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "setBranch(user, project,branchName,isCreate) { checkActiveProject(project); return activeProject.setBranch(branchName,isCreate).then(() => reloadActiveProject(\"change-branch\")) }",
+        "edges": [
+          "needsPermission(\"projects.write\") on editor/projects.js:473; also app.use projects.available() 404 when projects disabled (projects.js:87)"
+        ]
+      },
+      "entity": "Project",
+      "_binds": {
+        "id": "Project.name",
+        "branch": "Project.branch"
+      },
+      "_output_schema": {},
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "id",
+          "branch"
+        ],
+        "messages": {
+          "auth": "You must sign in to manage this project.",
+          "precondition": "You must sign in to manage this project.",
+          "not_found": "The project does not exist or is not the active project."
+        }
+      },
+      "description": "Switch the project to another branch, creating it if requested, and reload the project."
+    },
+    {
+      "tool": "project_deletebranch",
+      "op": "delete",
+      "family": "action.emit",
+      "exec_spec": {
+        "channel": "git",
+        "record": {
+          "table": "ProjectLog"
+        },
+        "_record_undeclared": true
+      },
+      "input_schema": {
+        "id": {
+          "type": "text",
+          "required": true,
+          "description": "Name of the project."
+        },
+        "branch": {
+          "type": "text",
+          "required": true,
+          "description": "Branch to delete."
+        },
+        "force": {
+          "type": "bool",
+          "required": false,
+          "description": "Force the delete even if the branch is not merged."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/node_modules/@node-red/runtime/lib/storage/localfilesystem/projects/index.js:347",
+        "id_local": "Project.deleteBranch",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /projects/:id/branches/:branchName",
+          "locator": "packages/node_modules/@node-red/editor-api/lib/editor/projects.js:427"
+        },
+        "entity_why": "fell back to the entity prefix of id_local",
+        "ref_code": "deleteBranch(user, project, branch, isRemote, force) { checkActiveProject(project); return activeProject.deleteBranch(user, branch, isRemote, force); }",
+        "edges": [
+          "needsPermission(\"projects.write\") on editor/projects.js:427; also app.use projects.available() 404 when projects disabled (projects.js:87)"
+        ]
+      },
+      "entity": "Project",
+      "_binds": {
+        "id": "Project.name"
+      },
+      "_output_schema": {},
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "id",
+          "branch"
+        ],
+        "messages": {
+          "auth": "You must sign in to manage this project.",
+          "precondition": "You must sign in to manage this project.",
+          "not_found": "The project does not exist or is not the active project."
+        }
+      },
+      "description": "Delete a branch of the project, optionally forcing the delete."
+    },
+    {
+      "tool": "project_getremotes",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Project",
+        "lookup_by": {
+          "name": {
+            "$arg": "id"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "text",
+          "required": true,
+          "description": "Name of the project."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/node_modules/@node-red/editor-api/lib/editor/projects.js:67",
+        "id_local": "Project.getRemotes",
+        "entry": {
+          "kind": "http",
+          "route": "GET /projects/:id/remotes",
+          "locator": "packages/node_modules/@node-red/editor-api/lib/editor/projects.js:489"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "function getProjectRemotes(req,res) { var opts={user,id:req.params.id}; runtimeAPI.projects.getRemotes(opts).then(function(data){ res.json(data); }) }",
+        "edges": [
+          "needsPermission(\"projects.read\") on editor/projects.js:489; also app.use projects.available() 404 when projects disabled (projects.js:87)"
+        ]
+      },
+      "entity": "Project",
+      "_binds": {
+        "id": "Project.name"
+      },
+      "_output_schema": {
+        "remotes": "list of remote configs"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must sign in before listing a project's remotes.",
+          "not_found": "The project does not exist or is not the active project."
+        }
+      },
+      "description": "List the git remotes configured on the project."
+    },
+    {
+      "tool": "project_addremote",
+      "op": "update",
+      "family": "action.emit",
+      "exec_spec": {
+        "channel": "git",
+        "record": {
+          "table": "ProjectLog"
+        },
+        "_record_undeclared": true
+      },
+      "input_schema": {
+        "id": {
+          "type": "text",
+          "required": true,
+          "description": "Name of the project."
+        },
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "Name of the remote (e.g. 'origin')."
+        },
+        "url": {
+          "type": "text",
+          "required": true,
+          "description": "URL of the remote."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/node_modules/@node-red/runtime/lib/storage/localfilesystem/projects/index.js:368",
+        "id_local": "Project.addRemote",
+        "entry": {
+          "kind": "http",
+          "route": "POST /projects/:id/remotes",
+          "locator": "packages/node_modules/@node-red/editor-api/lib/editor/projects.js:492"
+        },
+        "entity_why": "fell back to the entity prefix of id_local",
+        "ref_code": "addRemote(user, project, options) { checkActiveProject(project); return activeProject.addRemote(user, options.name, options); }",
+        "edges": [
+          "needsPermission(\"projects.write\") on editor/projects.js:492; also app.use projects.available() 404 when projects disabled (projects.js:87)"
+        ]
+      },
+      "entity": "Project",
+      "_binds": {
+        "id": "Project.name"
+      },
+      "_output_schema": {
+        "remotes": "list of remote configs"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "id",
+          "name",
+          "url"
+        ],
+        "messages": {
+          "auth": "You must sign in to manage this project.",
+          "precondition": "You must sign in to manage this project.",
+          "not_found": "The project does not exist or is not the active project."
+        }
+      },
+      "description": "Add a git remote to the project. URLs carrying embedded credentials are rejected."
+    },
+    {
+      "tool": "project_removeremote",
+      "op": "update",
+      "family": "action.emit",
+      "exec_spec": {
+        "channel": "git",
+        "record": {
+          "table": "ProjectLog"
+        },
+        "_record_undeclared": true
+      },
+      "input_schema": {
+        "id": {
+          "type": "text",
+          "required": true,
+          "description": "Name of the project."
+        },
+        "remote": {
+          "type": "text",
+          "required": true,
+          "description": "Name of the remote to remove."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/node_modules/@node-red/runtime/lib/storage/localfilesystem/projects/index.js:372",
+        "id_local": "Project.removeRemote",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /projects/:id/remotes/:remoteName",
+          "locator": "packages/node_modules/@node-red/editor-api/lib/editor/projects.js:511"
+        },
+        "entity_why": "fell back to the entity prefix of id_local",
+        "ref_code": "removeRemote(user, project, remote) { checkActiveProject(project); return activeProject.removeRemote(user, remote); }",
+        "edges": [
+          "needsPermission(\"projects.write\") on editor/projects.js:511; also app.use projects.available() 404 when projects disabled (projects.js:87)"
+        ]
+      },
+      "entity": "Project",
+      "_binds": {
+        "id": "Project.name"
+      },
+      "_output_schema": {
+        "remotes": "list of remote configs"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "id",
+          "remote"
+        ],
+        "messages": {
+          "auth": "You must sign in to manage this project.",
+          "precondition": "You must sign in to manage this project.",
+          "not_found": "The project does not exist or is not the active project."
+        }
+      },
+      "description": "Remove a git remote from the project."
+    },
+    {
+      "tool": "sshkey_list",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "SSHKey",
+        "scope": {
+          "owner_col": "username"
+        },
+        "search_fields": [
+          "name"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "name"
+          ]
+        }
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "packages/node_modules/@node-red/editor-api/lib/editor/sshkeys.js:30",
+        "id_local": "SSHKey.list",
+        "entry": {
+          "kind": "http",
+          "route": "GET /settings/user/keys",
+          "locator": "packages/node_modules/@node-red/editor-api/lib/editor/index.js:116"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "app.get(\"/\", function(req,res) { var opts={user:req.user}; runtimeAPI.settings.getUserKeys(opts).then(function(list){ res.json({keys:list}); }) })",
+        "edges": [
+          "editor/index.js:116 editorApp.use(\"/settings/user/keys\", needsPermission(\"settings.write\"), info.sshkeys())"
+        ]
+      },
+      "entity": "SSHKey",
+      "_output_schema": {
+        "keys": "list of key names"
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in before listing your SSH keys."
+        }
+      },
+      "description": "List the names of your own SSH keys (project deploy keys)."
+    },
+    {
+      "tool": "sshkey_get",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "SSHKey",
+        "lookup_by": {
+          "name": {
+            "$arg": "id"
+          }
+        },
+        "scope": {
+          "owner_col": "username"
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "text",
+          "required": true,
+          "description": "Name of your SSH key to read."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/node_modules/@node-red/editor-api/lib/editor/sshkeys.js:44",
+        "id_local": "SSHKey.get",
+        "entry": {
+          "kind": "http",
+          "route": "GET /settings/user/keys/:id",
+          "locator": "packages/node_modules/@node-red/editor-api/lib/editor/sshkeys.js:44"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "app.get(\"/:id\", function(req,res) { var opts={user:req.user,id:req.params.id}; runtimeAPI.settings.getUserKey(opts).then(function(data){ res.json({publickey:data}); }) })",
+        "edges": [
+          "editor/index.js:116 editorApp.use(\"/settings/user/keys\", needsPermission(\"settings.write\"), info.sshkeys())"
+        ]
+      },
+      "entity": "SSHKey",
+      "_binds": {
+        "id": "SSHKey.name"
+      },
+      "_output_schema": {
+        "publickey": "public key text"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must sign in to read an SSH key.",
+          "precondition": "You must sign in to read an SSH key.",
+          "not_found": "No SSH key with that name exists."
+        }
+      },
+      "description": "Read the public key text of one of your own SSH keys."
+    },
+    {
+      "tool": "sshkey_generate",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "SSHKey",
+        "fields": [
+          "comment",
+          "size",
+          "password"
+        ],
+        "set_on_create": {
+          "username": {
+            "$session": "username"
+          }
+        }
+      },
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "Name of the new key; must be unique for you."
+        },
+        "password": {
+          "type": "text",
+          "required": false,
+          "description": "Optional passphrase that encrypts the stored private key."
+        },
+        "comment": {
+          "type": "text",
+          "required": false,
+          "description": "Optional comment describing the key."
+        },
+        "size": {
+          "type": "int",
+          "required": false,
+          "description": "Key length in bits; defaults to 2048."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/node_modules/@node-red/editor-api/lib/editor/sshkeys.js:59",
+        "id_local": "SSHKey.generate",
+        "entry": {
+          "kind": "http",
+          "route": "POST /settings/user/keys",
+          "locator": "packages/node_modules/@node-red/editor-api/lib/editor/sshkeys.js:59"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "app.post(\"/\", function(req,res) { var opts={user:req.user}; opts.name=req.body.name; opts.password=req.body.password; opts.comment=req.body.comment; opts.size=req.body.size; runtimeAPI.settings.generateUserKey(opts).then(function(name){ res.json({name:name}); }) })",
+        "edges": [
+          "editor/index.js:116 editorApp.use(\"/settings/user/keys\", needsPermission(\"settings.write\"), info.sshkeys())"
+        ]
+      },
+      "entity": "SSHKey",
+      "_binds": {
+        "name": "SSHKey.name",
+        "password": "SSHKey.password",
+        "comment": "SSHKey.comment",
+        "size": "SSHKey.size"
+      },
+      "_output_schema": {
+        "name": "key name"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "name"
+        ],
+        "messages": {
+          "auth": "You must sign in to generate an SSH key.",
+          "precondition": "You must sign in to generate an SSH key.",
+          "unique": "An SSH key with that name already exists."
+        }
+      },
+      "description": "Generate a new SSH key pair for you. The private key is stored server-side (optionally passphrase-protected) and the public key is returned for use as a deploy key."
+    },
+    {
+      "tool": "sshkey_remove",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "SSHKey",
+        "lookup_by": {
+          "name": {
+            "$arg": "id"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "text",
+          "required": true,
+          "description": "Name of your SSH key to delete."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/node_modules/@node-red/editor-api/lib/editor/sshkeys.js:80",
+        "id_local": "SSHKey.remove",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /settings/user/keys/:id",
+          "locator": "packages/node_modules/@node-red/editor-api/lib/editor/sshkeys.js:80"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "app.delete(\"/:id\", function(req,res) { var opts={user:req.user,id:req.params.id}; runtimeAPI.settings.removeUserKey(opts).then(function(name){ res.status(204).end(); }) })",
+        "edges": [
+          "editor/index.js:116 editorApp.use(\"/settings/user/keys\", needsPermission(\"settings.write\"), info.sshkeys())"
+        ]
+      },
+      "entity": "SSHKey",
+      "_binds": {
+        "id": "SSHKey.name"
+      },
+      "_output_schema": {},
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must sign in to delete an SSH key.",
+          "precondition": "You must sign in to delete an SSH key.",
+          "not_found": "No SSH key with that name exists."
+        }
+      },
+      "description": "Delete one of your own SSH keys."
+    },
+    {
+      "tool": "project_getfiles",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Project",
+        "search_fields": [
+          "name"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "name"
+          ]
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "text",
+          "required": true,
+          "description": "Name of the project."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/node_modules/@node-red/runtime/lib/storage/localfilesystem/projects/index.js:273",
+        "id_local": "Project.getFiles",
+        "entry": {
+          "kind": "http",
+          "route": "GET /projects/:id/files",
+          "locator": "packages/node_modules/@node-red/editor-api/lib/editor/projects.js:178"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "getFiles(user, project) { checkActiveProject(project); return activeProject.getFiles(); }",
+        "edges": [
+          "needsPermission(\"projects.read\") on editor/projects.js:178; also app.use projects.available() 404 when projects disabled (projects.js:87)"
+        ]
+      },
+      "entity": "Project",
+      "_binds": {
+        "id": "Project.name"
+      },
+      "_output_schema": {
+        "files": "git status file map"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must sign in before listing a project's files."
+        }
+      },
+      "description": "List the project's tracked files and their git status (staged/unstaged changes)."
+    },
+    {
+      "tool": "settings_getuser",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "UserSettings",
+        "lookup_by": {
+          "username": {
+            "$session": "account_id"
+          }
+        },
+        "scope": {
+          "owner_col": "username"
+        }
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "packages/node_modules/@node-red/editor-api/lib/editor/settings.js:13",
+        "id_local": "Settings.getUser",
+        "entry": {
+          "kind": "http",
+          "route": "GET /settings/user",
+          "locator": "packages/node_modules/@node-red/editor-api/lib/editor/index.js:112"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "userSettings: function(req, res) { var opts={user:req.user}; runtimeAPI.settings.getUserSettings(opts).then(function(result){ res.json(result); }); }",
+        "edges": [
+          "editor/index.js:112 needsPermission(\"settings.read\")"
+        ]
+      },
+      "entity": "UserSettings",
+      "_output_schema": {
+        "settings": "the user's settings object"
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in before reading your settings."
+        }
+      },
+      "description": "Read your own user settings object."
+    },
+    {
+      "tool": "settings_updateuser",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "UserSettings",
+        "row_key": {
+          "username": {
+            "$session": "account_id"
+          }
+        },
+        "fields": [
+          "settings"
+        ]
+      },
+      "input_schema": {
+        "settings": {
+          "type": "json",
+          "required": true,
+          "description": "Partial settings object to merge into your stored settings."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/node_modules/@node-red/runtime/lib/api/settings.js:204",
+        "id_local": "Settings.updateUser",
+        "entry": {
+          "kind": "http",
+          "route": "POST /settings/user",
+          "locator": "packages/node_modules/@node-red/editor-api/lib/editor/index.js:114"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "updateUserSettings: async function(opts) { var username = (opts.user&&!opts.user.anonymous)?opts.user.username:'_'; var currentSettings = runtime.settings.getUserSettings(username)||{}; currentSettings = extend(currentSettings, opts.settings); ... return runtime.settings.setUserSettings(username, currentSettings) }",
+        "edges": [
+          "editor/index.js:114 needsPermission(\"settings.write\")"
+        ]
+      },
+      "entity": "UserSettings",
+      "_binds": {
+        "settings": "UserSettings.settings"
+      },
+      "_output_schema": {},
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "settings"
+        ],
+        "messages": {
+          "auth": "You must sign in to update your settings.",
+          "precondition": "You must sign in to update your settings."
+        }
+      },
+      "description": "Update your own user settings, merging the supplied partial object into what is already stored."
+    },
+    {
+      "tool": "settings_getruntime",
+      "op": "read",
+      "family": "search",
+      "exec_spec": {
+        "entity": "RuntimeSettings",
+        "search_fields": [
+          "key"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "key"
+          ]
+        }
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "packages/node_modules/@node-red/editor-api/lib/admin/settings.js:68",
+        "id_local": "Settings.getRuntime",
+        "entry": {
+          "kind": "http",
+          "route": "GET /settings",
+          "locator": "packages/node_modules/@node-red/editor-api/lib/admin/index.js:89"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "runtimeSettings: function(req,res) { var opts={user:req.user}; runtimeAPI.settings.getRuntimeSettings(opts).then(...) }",
+        "edges": [
+          "admin/index.js:89 needsPermission(\"settings.read\")"
+        ]
+      },
+      "entity": "RuntimeSettings",
+      "_output_schema": {
+        "httpNodeRoot": "string",
+        "version": "string",
+        "flows": {
+          "flowEncryptionType": "string"
+        },
+        "user": "json"
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in before reading runtime settings."
+        }
+      },
+      "description": "Read the runtime's admin settings projection: version, HTTP node root, flow encryption type and the requesting user's info. Admin-level view."
+    },
+    {
+      "tool": "library_getentry",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "LibraryEntry",
+        "lookup_by": {
+          "path": {
+            "$arg": "path"
+          }
+        }
+      },
+      "input_schema": {
+        "library": {
+          "type": "text",
+          "required": true,
+          "description": "Library name (e.g. 'local')."
+        },
+        "type": {
+          "type": "text",
+          "required": true,
+          "description": "Entry type, e.g. 'flows' or 'functions'."
+        },
+        "path": {
+          "type": "text",
+          "required": true,
+          "description": "Path of the entry within the library."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/node_modules/@node-red/editor-api/lib/editor/library.js:24",
+        "id_local": "Library.getEntry",
+        "entry": {
+          "kind": "http",
+          "route": "GET /library/:lib/:type/:path",
+          "locator": "packages/node_modules/@node-red/editor-api/lib/editor/index.js:100"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "getEntry: function(req,res) { var opts={user,library:req.params[0],type:req.params[1],path:req.params[2]||\"\"}; runtimeAPI.library.getEntry(opts).then(function(result){ ... res.write(result); res.end(); }) }",
+        "edges": [
+          "editor/index.js:100 needsPermission(\"library.read\")"
+        ]
+      },
+      "entity": "LibraryEntry",
+      "_binds": {
+        "type": "LibraryEntry.type",
+        "path": "LibraryEntry.path"
+      },
+      "_output_schema": {
+        "body": "file text, or dir listing for a directory"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "library",
+          "type",
+          "path"
+        ],
+        "messages": {
+          "not_found": "No library entry exists at that path."
+        }
+      },
+      "description": "Read a library entry by path. For a directory path this returns a listing of child entries; for a file it returns the stored body."
+    },
+    {
+      "tool": "library_saveentry",
+      "op": "update",
+      "family": "crud.upsert",
+      "exec_spec": {
+        "entity": "LibraryEntry",
+        "key": {
+          "path": {
+            "$arg": "path"
+          }
+        },
+        "insert_fields": [
+          "body",
+          "meta",
+          "type"
+        ],
+        "set_on_exists": {}
+      },
+      "input_schema": {
+        "library": {
+          "type": "text",
+          "required": true,
+          "description": "Library name."
+        },
+        "type": {
+          "type": "text",
+          "required": true,
+          "description": "Entry type, e.g. 'flows' or 'functions'."
+        },
+        "path": {
+          "type": "text",
+          "required": true,
+          "description": "Path of the entry to save."
+        },
+        "body": {
+          "type": "text",
+          "required": true,
+          "description": "Entry body (full request JSON for flows)."
+        },
+        "meta": {
+          "type": "json",
+          "required": false,
+          "description": "Metadata for non-flow entries."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/node_modules/@node-red/editor-api/lib/editor/library.js:56",
+        "id_local": "Library.saveEntry",
+        "entry": {
+          "kind": "http",
+          "route": "POST /library/:lib/:type/:path",
+          "locator": "packages/node_modules/@node-red/editor-api/lib/editor/index.js:101"
+        },
+        "entity_why": "primary effect row_upsert lands on this table",
+        "ref_code": "saveEntry: function(req,res) { var opts={user,library:req.params[0],type:req.params[1],path:req.params[2]||\"\"}; if (opts.type==='flows'){ opts.meta={}; opts.body=JSON.stringify(req.body); } else { opts.meta=req.body; opts.body=opts.meta.text; delete opts.meta.text; } runtimeAPI.library.saveEntry(opts)... }",
+        "edges": [
+          "editor/index.js:101 needsPermission(\"library.write\")"
+        ]
+      },
+      "entity": "LibraryEntry",
+      "_binds": {
+        "type": "LibraryEntry.type",
+        "path": "LibraryEntry.path",
+        "body": "LibraryEntry.body",
+        "meta": "LibraryEntry.meta"
+      },
+      "_output_schema": {},
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "library",
+          "type",
+          "path",
+          "body"
+        ],
+        "messages": {
+          "not_found": "Could not save the library entry at that path."
+        }
+      },
+      "description": "Create or overwrite a library entry at the given path. Saved flows can later be imported into the editor."
+    },
+    {
+      "tool": "context_getvalue",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "ContextValue",
+        "lookup_by": {
+          "key": {
+            "$arg": "key"
+          }
+        }
+      },
+      "input_schema": {
+        "scope": {
+          "type": "text",
+          "required": true,
+          "description": "Context scope: 'global', 'flow' or 'node'."
+        },
+        "id": {
+          "type": "int",
+          "required": false,
+          "description": "Flow or node id for 'flow'/'node' scopes."
+        },
+        "key": {
+          "type": "text",
+          "required": true,
+          "description": "Context key (dot-path) to read."
+        },
+        "store": {
+          "type": "text",
+          "required": false,
+          "description": "Context store to query; defaults to the default store."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/node_modules/@node-red/runtime/lib/api/context.js:54",
+        "id_local": "Context.getValue",
+        "entry": {
+          "kind": "http",
+          "route": "GET /context/:scope(global)/* | /context/:scope(node|flow)/:id/*",
+          "locator": "packages/node_modules/@node-red/editor-api/lib/admin/index.js:79"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "getValue: async function(opts) { ... var ctx; if (scope==='global'){ ctx = runtime.nodes.getContext('global'); } else if (scope==='flow'){ ctx = runtime.nodes.getContext(id); } ... if (key){ store = store||availableStores.default; ctx.get(key,store,function(err,v){ ... resolve(encoded); }); return; } ... }",
+        "edges": [
+          "admin/index.js:79 needsPermission(\"context.read\")"
+        ]
+      },
+      "entity": "ContextValue",
+      "_binds": {
+        "scope": "ContextValue.scope",
+        "id": "ContextValue.scope",
+        "key": "ContextValue.key"
+      },
+      "_output_schema": {
+        "[store]": {
+          "[key]": "encoded value",
+          "format": "string"
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "scope",
+          "key"
+        ],
+        "messages": {
+          "not_found": "No context value exists for that key."
+        }
+      },
+      "description": "Read a value from the node context store, keyed by scope (global/flow/node) and key."
+    },
+    {
+      "tool": "context_delete",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "ContextValue",
+        "lookup_by": {
+          "key": {
+            "$arg": "key"
+          }
+        }
+      },
+      "input_schema": {
+        "scope": {
+          "type": "text",
+          "required": true,
+          "description": "Context scope: 'global', 'flow' or 'node'."
+        },
+        "id": {
+          "type": "int",
+          "required": false,
+          "description": "Flow or node id for 'flow'/'node' scopes."
+        },
+        "key": {
+          "type": "text",
+          "required": true,
+          "description": "Context key (dot-path) to delete."
+        },
+        "store": {
+          "type": "text",
+          "required": false,
+          "description": "Context store to remove from; defaults to the default store."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/node_modules/@node-red/runtime/lib/api/context.js:194",
+        "id_local": "Context.delete",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /context/:scope(global)/* | /context/:scope(node|flow)/:id/*",
+          "locator": "packages/node_modules/@node-red/editor-api/lib/admin/index.js:85"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "delete: async function(opts) { ... var ctx = ...; if (key){ store = store||availableStores.default; ctx.set(key,undefined,store,function(err){ ... resolve(); }); return; } ... }",
+        "edges": [
+          "admin/index.js:85 needsPermission(\"context.write\")"
+        ]
+      },
+      "entity": "ContextValue",
+      "_binds": {
+        "scope": "ContextValue.scope",
+        "id": "ContextValue.scope",
+        "key": "ContextValue.key"
+      },
+      "_output_schema": {},
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "scope",
+          "key"
+        ],
+        "messages": {
+          "auth": "You must sign in to delete a context value.",
+          "precondition": "You must sign in to delete a context value.",
+          "not_found": "No such context value exists."
+        }
+      },
+      "description": "Delete a value from the node context store, keyed by scope and key."
+    },
+    {
+      "tool": "project_getfilediff",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Project",
+        "lookup_by": {
+          "name": {
+            "$arg": "id"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "text",
+          "required": true,
+          "description": "Name of the project."
+        },
+        "path": {
+          "type": "text",
+          "required": true,
+          "description": "File path to diff."
+        },
+        "type": {
+          "type": "text",
+          "required": true,
+          "description": "'tree' for the working tree diff or 'index' for the staged diff."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/node_modules/@node-red/runtime/lib/storage/localfilesystem/projects/index.js:295",
+        "id_local": "Project.getFileDiff",
+        "entry": {
+          "kind": "http",
+          "route": "GET /projects/:id/diff/:type/*",
+          "locator": "packages/node_modules/@node-red/editor-api/lib/editor/projects.js:300"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "getFileDiff(user, project,file,type) { checkActiveProject(project); return activeProject.getFileDiff(file,type); }",
+        "edges": [
+          "needsPermission(\"projects.read\") on editor/projects.js:300; also app.use projects.available() 404 when projects disabled (projects.js:87)"
+        ]
+      },
+      "entity": "Project",
+      "_binds": {
+        "id": "Project.name"
+      },
+      "_output_schema": {
+        "diff": "diff text"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "id",
+          "path",
+          "type"
+        ],
+        "messages": {
+          "not_found": "No such file exists in the project."
+        }
+      },
+      "description": "Read the diff of a single project file between its working/staged state and HEAD."
+    },
+    {
+      "tool": "project_getbranchstatus",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Project",
+        "lookup_by": {
+          "name": {
+            "$arg": "id"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "text",
+          "required": true,
+          "description": "Name of the project."
+        },
+        "branch": {
+          "type": "text",
+          "required": true,
+          "description": "Branch to compare against its remote."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/node_modules/@node-red/runtime/lib/storage/localfilesystem/projects/index.js:358",
+        "id_local": "Project.getBranchStatus",
+        "entry": {
+          "kind": "http",
+          "route": "GET /projects/:id/branches/remote/*/status",
+          "locator": "packages/node_modules/@node-red/editor-api/lib/editor/projects.js:458"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "function getBranchStatus(user, project,branchName) { checkActiveProject(project); return activeProject.getBranchStatus(branchName); }",
+        "edges": [
+          "needsPermission(\"projects.read\") on editor/projects.js:458; also app.use projects.available() 404 when projects disabled (projects.js:87)"
+        ]
+      },
+      "entity": "Project",
+      "_binds": {
+        "id": "Project.name",
+        "branch": "Project.branch"
+      },
+      "_output_schema": {
+        "status": "branch ahead/behind details"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "id",
+          "branch"
+        ],
+        "messages": {
+          "not_found": "No such branch exists in the project."
+        }
+      },
+      "description": "Read how far a project branch is ahead of and behind its remote-tracking branch."
+    },
+    {
+      "tool": "project_updateremote",
+      "op": "action",
+      "family": "action.emit",
+      "exec_spec": {
+        "channel": "event",
+        "record": {
+          "table": "ProjectLog"
+        },
+        "_record_undeclared": true
+      },
+      "input_schema": {
+        "id": {
+          "type": "text",
+          "required": true,
+          "description": "Name of the project."
+        },
+        "remote": {
+          "type": "text",
+          "required": true,
+          "description": "Name of the remote to update."
+        },
+        "auth": {
+          "type": "json",
+          "required": false,
+          "description": "New auth: {keyFile, passphrase} or {username, password}."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/node_modules/@node-red/runtime/lib/storage/localfilesystem/projects/index.js:376",
+        "id_local": "Project.updateRemote",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /projects/:id/remotes/:remoteName",
+          "locator": "packages/node_modules/@node-red/editor-api/lib/editor/projects.js:526"
+        },
+        "entity_why": "fell back to the entity prefix of id_local",
+        "ref_code": "updateRemote(user, project, remote, body) { checkActiveProject(project); return activeProject.updateRemote(user, remote, body); }",
+        "edges": [
+          "needsPermission(\"projects.write\") on editor/projects.js:526; also app.use projects.available() 404 when projects disabled (projects.js:87)"
+        ]
+      },
+      "entity": "Project",
+      "_binds": {
+        "id": "Project.name"
+      },
+      "_output_schema": {},
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "id",
+          "remote"
+        ],
+        "messages": {
+          "auth": "You must sign in to manage this project.",
+          "precondition": "You must sign in to manage this project.",
+          "not_found": "The project does not exist or is not the active project."
+        }
+      },
+      "description": "Update a git remote's configuration, such as its authentication settings."
+    },
+    {
+      "tool": "project_initialise",
+      "op": "update",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "GitCommit",
+        "fields": [
+          "project",
+          "author",
+          "email",
+          "message",
+          "timestamp"
+        ],
+        "set_on_create": {
+          "project": {
+            "$arg": "id"
+          },
+          "message": "Create project"
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "text",
+          "required": true,
+          "description": "Name of the (empty, active) project."
+        },
+        "initialise": {
+          "type": "bool",
+          "required": true,
+          "description": "true to initialise the project files."
+        },
+        "credentialSecret": {
+          "type": "text",
+          "required": false,
+          "description": "Secret for encrypting stored credentials."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/node_modules/@node-red/runtime/lib/storage/localfilesystem/projects/index.js:459",
+        "id_local": "Project.initialise",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /projects/:id",
+          "locator": "packages/node_modules/@node-red/editor-api/lib/editor/projects.js:117"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "initialiseProject(user, project, data) { if (!activeProject || activeProject.name !== project) throw ...; return activeProject.initialise(user,data).then(function(result){ ... runtime.nodes.setCredentialSecret(activeProject.credentialSecret); return reloadActiveProject(\"updated\"); }) }",
+        "edges": [
+          "needsPermission(\"projects.write\") on editor/projects.js:117; also app.use projects.available() 404 when projects disabled (projects.js:87)"
+        ]
+      },
+      "entity": "GitCommit",
+      "_binds": {
+        "id": "Project.name",
+        "credentialSecret": "Project.credential_secret"
+      },
+      "_output_schema": {
+        "project": "the Project object"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "id",
+          "initialise"
+        ],
+        "messages": {
+          "auth": "You must sign in to manage this project.",
+          "precondition": "You must sign in to manage this project.",
+          "not_found": "The project does not exist or is not the active project."
+        }
+      },
+      "description": "Initialise the project files in an empty project (creating the flow and credential files with a given credential secret) and make an initial commit."
+    }
+  ],
+  "seed_state": {
+    "User": [
+      {
+        "username": "ops@node_red.example",
+        "password": "pw-operations",
+        "permissions": [
+          "*"
+        ],
+        "token": "tok-admin",
+        "id": 1
+      },
+      {
+        "username": "member@node_red.example",
+        "password": "pw-member",
+        "permissions": [
+          "flows.read",
+          "flows.write",
+          "nodes.read",
+          "nodes.write",
+          "projects.read",
+          "projects.write",
+          "library.write",
+          "settings.write"
+        ],
+        "token": null,
+        "id": 2
+      }
+    ],
+    "SSHKey": [
+      {
+        "name": "work",
+        "username": "admin",
+        "comment": "primary deploy key",
+        "size": 2048,
+        "password": "kk-pass",
+        "id": 1
+      }
+    ],
+    "Flow": [
+      {
+        "id": "f_welcome",
+        "type": "tab",
+        "label": "Welcome",
+        "info": "",
+        "disabled": false,
+        "env": [],
+        "nodes": [],
+        "configs": [],
+        "groups": [],
+        "subflows": []
+      },
+      {
+        "id": "f_deploy",
+        "type": "tab",
+        "label": "Deploy",
+        "info": "",
+        "disabled": false,
+        "env": [],
+        "nodes": [],
+        "configs": [],
+        "groups": [],
+        "subflows": []
+      }
+    ],
+    "Node": [
+      {
+        "id": "n1",
+        "type": "inject",
+        "z": "f_deploy",
+        "name": "tick",
+        "wires": [
+          [
+            "n2"
+          ]
+        ],
+        "d": false,
+        "x": 100,
+        "y": 100
+      },
+      {
+        "id": "n2",
+        "type": "debug",
+        "z": "f_deploy",
+        "name": "log",
+        "wires": [],
+        "d": false,
+        "x": 220,
+        "y": 100
+      }
+    ],
+    "RuntimeSettings": [
+      {
+        "key": "runtimeFlowState",
+        "value": "start",
+        "id": 1
+      }
+    ],
+    "UserSettings": [
+      {
+        "username": "admin",
+        "settings": {
+          "theme": "dark"
+        },
+        "id": 1
+      }
+    ],
+    "Module": [
+      {
+        "name": "node-red-dashboard",
+        "version": "3.6.5",
+        "local": false,
+        "user": false,
+        "path": "/usr/lib/node_modules/node-red-dashboard",
+        "dependencies": [],
+        "pending_version": null,
+        "nodes": [],
+        "used_by": [],
+        "id": 1
+      }
+    ],
+    "NodeSet": [
+      {
+        "name": "dashboard",
+        "module": "node-red-dashboard",
+        "types": [
+          "ui_base",
+          "ui_button"
+        ],
+        "enabled": true,
+        "file": "dashboard/index.js",
+        "err": null,
+        "loaded": true,
+        "id": 1
+      }
+    ],
+    "Project": [
+      {
+        "name": "sample",
+        "root_path": "/projects/sample",
+        "summary": "demo project",
+        "version": "0.1.0",
+        "description": "sample flow project",
+        "empty": false,
+        "dependencies": {},
+        "credential_secret": "sec-sample",
+        "git": {},
+        "branch": "main",
+        "merging": false,
+        "id": 1
+      }
+    ],
+    "GitCommit": [
+      {
+        "sha": "a1b2c3",
+        "project": "sample",
+        "author": "admin",
+        "email": "admin@example.com",
+        "message": "initial commit",
+        "timestamp": "2026-01-02T10:00:00Z",
+        "id": 1
+      }
+    ],
+    "LibraryEntry": [
+      {
+        "path": "flows/greeting",
+        "type": "flows",
+        "body": "{\"flows\":[]}",
+        "meta": {},
+        "id": 1
+      }
+    ],
+    "ContextValue": [
+      {
+        "scope": "global",
+        "key": "site_name",
+        "value": "Node-RED",
+        "id": 1
+      }
+    ]
+  },
+  "summary": "Node-RED flow-based runtime: Node.js visual flow editor + execution engine where users wire nodes into flows, deploy them to a live runtime, and persist flows/credentials as JSON files (flow_<host>.json, flow_cred.json, .config.*.json, contexts/*, lib/*) plus optional git-backed projects; no SQL store.",
+  "_read_denied": "not_found",
+  "_no_edges": [
+    {
+      "id_local": "Context.set",
+      "why": "internal context-store write reached via deploy/flow logic, no direct route (context/localfilesystem.js:299)"
+    },
+    {
+      "id_local": "Session.exchangeCode",
+      "why": "has no triggered ops - it moves a pending session to persisted storage (tokens.js:177); no permission middleware beyond the exchange code itself being the credential"
+    }
+  ],
+  "auth": {
+    "account_entity": "User",
+    "username_col": "username",
+    "password_col": "password",
+    "session_fields": {
+      "username": "username"
+    }
+  }
+}

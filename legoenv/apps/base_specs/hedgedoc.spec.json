@@ -1,0 +1,3403 @@
+{
+  "env_id": "hedgedoc",
+  "_prep_version": 3,
+  "entities": [
+    {
+      "name": "User",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "username",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "guest_uuid",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "display_name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "photo_url",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "email",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "author_style",
+          "type": "int",
+          "nullable": false
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "username"
+          ]
+        },
+        {
+          "kind": "unique",
+          "cols": [
+            "guest_uuid"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Group",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "display_name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "is_special",
+          "type": "bool",
+          "default": false
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "name"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "GroupUser",
+      "columns": [
+        {
+          "name": "group_id",
+          "type": "id",
+          "pk": true,
+          "nullable": false,
+          "fk_to": "Group.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "user_id",
+          "type": "id",
+          "pk": true,
+          "nullable": false,
+          "fk_to": "User.id",
+          "on_delete": "cascade"
+        }
+      ]
+    },
+    {
+      "name": "Note",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "version",
+          "type": "int",
+          "nullable": false,
+          "default": 2
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "owner_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "User.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "publicly_visible",
+          "type": "bool",
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "name": "Alias",
+      "columns": [
+        {
+          "name": "alias",
+          "type": "text",
+          "pk": true
+        },
+        {
+          "name": "note_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Note.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "is_primary",
+          "type": "bool",
+          "nullable": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "note_id",
+            "is_primary"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ApiToken",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "pk": true
+        },
+        {
+          "name": "user_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "User.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "label",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "secret_hash",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "valid_until",
+          "type": "datetime",
+          "nullable": false
+        },
+        {
+          "name": "last_used_at",
+          "type": "datetime",
+          "nullable": true,
+          "audit": true
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "nullable": false,
+          "audit": true,
+          "immutable": true
+        }
+      ]
+    },
+    {
+      "name": "Identity",
+      "columns": [
+        {
+          "name": "user_id",
+          "type": "id",
+          "pk": true,
+          "nullable": false,
+          "fk_to": "User.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "provider_type",
+          "type": "text",
+          "nullable": true,
+          "enum": [
+            "ldap",
+            "local",
+            "oidc"
+          ]
+        },
+        {
+          "name": "provider_identifier",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "provider_user_id",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "password_hash",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "audit": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "user_id",
+            "provider_type",
+            "provider_identifier"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Revision",
+      "columns": [
+        {
+          "name": "uuid",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "note_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Note.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "patch",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "content",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "yjs_state_vector",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "note_type",
+          "type": "text",
+          "nullable": true,
+          "enum": [
+            "DOCUMENT",
+            "SLIDE"
+          ]
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        }
+      ]
+    },
+    {
+      "name": "RevisionTag",
+      "columns": [
+        {
+          "name": "revision_id",
+          "type": "id",
+          "pk": true,
+          "nullable": false,
+          "fk_to": "Revision.uuid",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "tag",
+          "type": "text",
+          "pk": true,
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "name": "AuthorshipInfo",
+      "columns": [
+        {
+          "name": "revision_id",
+          "type": "id",
+          "pk": true,
+          "nullable": false,
+          "fk_to": "Revision.uuid",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "author_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "User.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "start_position",
+          "type": "int",
+          "nullable": false
+        },
+        {
+          "name": "end_position",
+          "type": "int",
+          "nullable": false
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        }
+      ]
+    },
+    {
+      "name": "NoteUserPermission",
+      "columns": [
+        {
+          "name": "note_id",
+          "type": "id",
+          "pk": true,
+          "nullable": false,
+          "fk_to": "Note.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "user_id",
+          "type": "id",
+          "pk": true,
+          "nullable": false,
+          "fk_to": "User.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "can_edit",
+          "type": "bool",
+          "nullable": false,
+          "default": false
+        }
+      ]
+    },
+    {
+      "name": "NoteGroupPermission",
+      "columns": [
+        {
+          "name": "note_id",
+          "type": "id",
+          "pk": true,
+          "nullable": false,
+          "fk_to": "Note.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "group_id",
+          "type": "id",
+          "pk": true,
+          "nullable": false,
+          "fk_to": "Group.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "can_edit",
+          "type": "bool",
+          "nullable": false,
+          "default": false
+        }
+      ]
+    },
+    {
+      "name": "MediaUpload",
+      "columns": [
+        {
+          "name": "uuid",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "user_id",
+          "type": "id",
+          "fk_to": "User.id",
+          "on_delete": "no_action"
+        },
+        {
+          "name": "file_name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "backend_type",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "azure",
+            "filesystem",
+            "imgur",
+            "s3",
+            "webdav"
+          ]
+        },
+        {
+          "name": "backend_data",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        }
+      ]
+    },
+    {
+      "name": "MediaUploadNote",
+      "columns": [
+        {
+          "name": "media_upload_uuid",
+          "type": "id",
+          "pk": true,
+          "nullable": false,
+          "fk_to": "MediaUpload.uuid",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "note_id",
+          "type": "id",
+          "pk": true,
+          "nullable": false,
+          "fk_to": "Note.id",
+          "on_delete": "cascade"
+        }
+      ]
+    },
+    {
+      "name": "UserPinnedNote",
+      "columns": [
+        {
+          "name": "user_id",
+          "type": "id",
+          "pk": true,
+          "nullable": false,
+          "fk_to": "User.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "note_id",
+          "type": "id",
+          "pk": true,
+          "nullable": false,
+          "fk_to": "Note.id",
+          "on_delete": "cascade"
+        }
+      ]
+    },
+    {
+      "name": "VisitedNote",
+      "columns": [
+        {
+          "name": "user_id",
+          "type": "id",
+          "pk": true,
+          "nullable": false,
+          "fk_to": "User.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "note_id",
+          "type": "id",
+          "pk": true,
+          "nullable": false,
+          "fk_to": "Note.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "visited_at",
+          "type": "datetime"
+        }
+      ]
+    },
+    {
+      "name": "Session",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "pk": true
+        },
+        {
+          "name": "csrf_token",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "user_id",
+          "type": "id",
+          "nullable": true,
+          "fk_to": "User.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "login_auth_provider_type",
+          "type": "text",
+          "nullable": true,
+          "enum": [
+            "ldap",
+            "local",
+            "oidc",
+            "guest"
+          ]
+        },
+        {
+          "name": "login_auth_provider_identifier",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "oidc_id_token",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "oidc_sid",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "oidc_login_state",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "oidc_login_code",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "pending_user_data",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "nullable": false,
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "nullable": false,
+          "audit": true
+        },
+        {
+          "name": "expires_at",
+          "type": "datetime",
+          "nullable": false
+        }
+      ]
+    }
+  ],
+  "summary": "HedgeDoc is a collaborative Markdown note-taking server (NestJS + Knex over PostgreSQL): users create notes addressed by aliases, edit them via revisions (with realtime Yjs persistence), share them via per-user/per-group permissions and public visibility, upload media linked to notes, authenticate via local/LDAP/OIDC/guest, and list/explore notes (own, shared, public, pinned, recently-visited).",
+  "_session_fields": {
+    "email": "email"
+  },
+  "_auth_candidates": [
+    {
+      "entity": "Identity",
+      "username_col": "provider_user_id",
+      "password_col": "password_hash"
+    },
+    {
+      "entity": "User",
+      "username_col": "guest_uuid",
+      "password_col": "guest_uuid"
+    }
+  ],
+  "_no_edges": [
+    {
+      "id_local": "Group.get",
+      "why": "read-only info endpoint (no mutating op); only SessionGuard auth on the controller, calls nothing (groups.controller.ts:27)"
+    },
+    {
+      "id_local": "Revision.getLatest",
+      "why": "internal leaf read helper; calls nothing (revisions.service.ts:250)"
+    },
+    {
+      "id_local": "Note.getVisited",
+      "why": "internal fire-and-forget visit marker (row_upsert); its caller edge is captured on Note.get (note.service.ts:368)"
+    },
+    {
+      "id_local": "MediaUpload.getFileResponse",
+      "why": "internal read of a media row + backend; no guard of its own, access delegated to caller MediaUpload.redirect.getMedia (media.service.ts:169)"
+    },
+    {
+      "id_local": "User.createGuest",
+      "why": "internal helper that inserts a guest User row; no preconditions beyond the GuestsEnabledGuard on its only caller Auth.registerGuest, calls nothing downstream (users.service.ts:101)"
+    },
+    {
+      "id_local": "Auth.loginOidc",
+      "why": "OIDC login initiation that only writes the current Session and redirects to the provider; no DB precondition, calls no other op (oidc.controller.ts:62)"
+    }
+  ],
+  "_unattached_walls": [],
+  "_record_undeclared": [],
+  "_audit_disputed": [],
+  "auth": {
+    "account_entity": "Identity",
+    "username_col": "provider_user_id",
+    "password_col": "password_hash"
+  },
+  "tools": [
+    {
+      "tool": "sign_in",
+      "family": "guard.auth",
+      "entity": "Session",
+      "_evidence": {
+        "locator": "backend/src/auth/local/local.service.ts:106",
+        "id_local": "Auth.loginLocal",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/private/auth/local/login",
+          "locator": "backend/src/api/private/auth/local/local.controller.ts:72"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "async checkLocalPassword(username, password) {\n  const identity = await this.identityService.getIdentityFromUserIdAndProviderType(username, AuthProviderType.LOCAL, null);\n  const passwordValid = await checkPassword(password, identity.password_hash ?? '');\n  if (!passwordValid) throw new InvalidCredentialsError('Username or password is not correct');\n  return identity;\n}",
+        "edges": [
+          "checkLocalPassword (local.service.ts:106)"
+        ]
+      },
+      "description": "Sign in with a local (registered) username and password. Required before anything that touches a note, an API token, your profile, sharing or media; the session it opens is what $actor resolves to. Fails if the username is unknown or the password is wrong.",
+      "input_schema": {
+        "provider_user_id": {
+          "type": "text",
+          "required": true,
+          "description": "The local account's username (matches the identity's provider_user_id)."
+        },
+        "password_hash": {
+          "type": "text",
+          "required": true,
+          "description": "The account's password."
+        }
+      },
+      "exec_spec": {
+        "verify": {
+          "entity": "Identity",
+          "username_col": "provider_user_id",
+          "password_col": "password_hash"
+        }
+      },
+      "guards": {
+        "required": [
+          "provider_user_id",
+          "password_hash"
+        ],
+        "messages": {
+          "auth": "Sign in with your username and password first."
+        }
+      }
+    },
+    {
+      "tool": "sign_in_as_guest",
+      "family": "guard.auth",
+      "entity": "Session",
+      "_evidence": {
+        "locator": "backend/src/users/users.service.ts:258",
+        "id_local": "Auth.loginGuest",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/private/auth/guest/login",
+          "locator": "backend/src/api/private/auth/guest/guest.controller.ts:44"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "@UseGuards(GuestsEnabledGuard)\n@Post('login')\nasync loginGuestUser(@Req() request, @Body() loginDto: GuestLoginDto) {\n  const userId = await this.usersService.getUserIdByGuestUuid(loginDto.uuid);\n  request.session.loginAuthProviderType = AuthProviderType.GUEST;\n  request.session.userId = userId;\n}",
+        "edges": [
+          "getUserIdByGuestUuid (guest.controller.ts:46)"
+        ]
+      },
+      "description": "Resume an existing guest session from its guest uuid. Guests can read and write notes but have no username, cannot be granted note permissions and cannot own API tokens. Fails if no guest has that uuid.",
+      "input_schema": {
+        "guest_uuid": {
+          "type": "text",
+          "required": true,
+          "description": "The guest_uuid of a previously registered guest account."
+        }
+      },
+      "exec_spec": {
+        "verify": {
+          "entity": "User",
+          "username_col": "guest_uuid",
+          "password_col": "guest_uuid"
+        }
+      },
+      "guards": {
+        "required": [
+          "guest_uuid"
+        ],
+        "messages": {
+          "auth": "Sign in with a guest uuid first."
+        }
+      }
+    },
+    {
+      "tool": "register",
+      "family": "auth.register",
+      "entity": "User",
+      "_evidence": {
+        "locator": "backend/src/auth/local/local.service.ts:60",
+        "id_local": "Auth.registerLocal",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/private/auth/local",
+          "locator": "backend/src/api/private/auth/local/local.controller.ts:37"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "@UseGuards(RegistrationEnabledGuard)\n@Post()\nasync registerUser(@Req() request, @Body() registerDto: RegisterDto) {\n  await this.localIdentityService.checkPasswordStrength(registerDto.password);\n  const userId = await this.localIdentityService.createUserWithLocalIdentity(registerDto.username, registerDto.password, registerDto.displayName);\n  request.session.loginAuthProviderType = AuthProviderType.LOCAL;\n  request.session.userId = userId;\n  request.session.pendingUser = null;\n}",
+        "edges": [
+          "createUser/createUserWithLocalIdentity (identity.service.ts:144)"
+        ]
+      },
+      "description": "Register a local account with a username, password and display name; the caller is signed into the new account. Creates the local identity behind it. Fails if the username is already taken.",
+      "input_schema": {
+        "username": {
+          "type": "text",
+          "required": true,
+          "description": "Unique local username to claim."
+        },
+        "password": {
+          "type": "text",
+          "required": true,
+          "description": "Password (strength-checked by the server)."
+        },
+        "displayName": {
+          "type": "text",
+          "required": true,
+          "description": "Human-readable display name."
+        }
+      },
+      "exec_spec": {
+        "entity": "User",
+        "fields": {
+          "username": {
+            "$arg": "username"
+          },
+          "display_name": {
+            "$arg": "displayName"
+          }
+        },
+        "set_on_create": {
+          "guest_uuid": null,
+          "email": null,
+          "photo_url": null,
+          "author_style": 1,
+          "created_at": "2026-01-01T00:00:00"
+        },
+        "prechecks": [
+          {
+            "entity": "User",
+            "where": {
+              "username": {
+                "$arg": "username"
+              }
+            },
+            "negate": true,
+            "message": "That username is already registered. Pick another."
+          }
+        ],
+        "side_inserts": [
+          {
+            "entity": "Identity",
+            "fields": {
+              "provider_type": "local",
+              "provider_identifier": null,
+              "provider_user_id": {
+                "$arg": "username"
+              },
+              "password_hash": {
+                "$arg": "password"
+              },
+              "created_at": "2026-01-01T00:00:00",
+              "updated_at": "2026-01-01T00:00:00"
+            },
+            "link_col": "user_id"
+          }
+        ]
+      },
+      "guards": {
+        "required": [
+          "username",
+          "password",
+          "displayName"
+        ],
+        "messages": {
+          "register": "That username is already taken."
+        }
+      }
+    },
+    {
+      "tool": "sign_out",
+      "family": "guard.logout",
+      "entity": "Session",
+      "_evidence": {
+        "locator": "backend/src/sessions/session.service.ts:93",
+        "id_local": "Auth.logout",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/private/auth/logout",
+          "locator": "backend/src/api/private/auth/auth.controller.ts:43"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "@UseGuards(SessionGuard)\n@Delete('logout')\nasync logout(@Req() request) {\n  if (request.session.loginAuthProviderType === AuthProviderType.OIDC) logoutUrl = this.oidcService.getLogoutUrl(request);\n  const destroy = promisify(request.session.destroy.bind(request.session));\n  await destroy();\n  return LogoutResponseDto.create({ redirect: logoutUrl || '/' });\n}",
+        "edges": [
+          "@UseGuards(SessionGuard) (auth.controller.ts:44)"
+        ]
+      },
+      "description": "End the current session and sign out the caller. Fails if there is no active session.",
+      "input_schema": {},
+      "exec_spec": {
+        "entity": "Session"
+      },
+      "guards": {
+        "messages": {
+          "auth": "You must be signed in to sign out."
+        }
+      }
+    },
+    {
+      "tool": "get_my_profile",
+      "family": "crud.fetch",
+      "entity": "User",
+      "_evidence": {
+        "locator": "backend/src/users/users.service.ts:303",
+        "id_local": "User.getMe",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/private/me",
+          "locator": "backend/src/api/private/me/me.controller.ts:44"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "async getMe(@RequestUserId() userId, @SessionAuthProvider() authProvider) {\n  const user = await this.userService.getUserById(userId);\n  return this.userService.toLoginUserInfoDto(user, authProvider);\n}"
+      },
+      "description": "Return the signed-in user's own profile: username, display name, photo, email and auth provider.",
+      "input_schema": {},
+      "exec_spec": {
+        "entity": "User",
+        "lookup_by": {
+          "id": {
+            "$session": "account_id"
+          }
+        },
+        "scope": {
+          "owner_col": "id"
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "Sign in to view your own profile."
+        }
+      }
+    },
+    {
+      "tool": "update_my_display_name",
+      "family": "update.field_set",
+      "entity": "User",
+      "_evidence": {
+        "locator": "backend/src/users/users.service.ts:165",
+        "id_local": "User.updateProfile",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /api/private/me/profile",
+          "locator": "backend/src/api/private/me/me.controller.ts:81"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "async updateProfile(@RequestUserId({ forbidGuests: true }) userId, @Body('displayName') newDisplayName) {\n  await this.userService.updateUser(userId, newDisplayName, undefined, undefined);\n}",
+        "edges": [
+          "SessionGuard + forbidGuests (me.controller.ts:81)"
+        ]
+      },
+      "description": "Update the signed-in user's display name. Fails if you are not a registered (non-guest) user.",
+      "input_schema": {
+        "displayName": {
+          "type": "text",
+          "required": true,
+          "description": "New display name."
+        }
+      },
+      "exec_spec": {
+        "entity": "User",
+        "row_key": {
+          "id": {
+            "$session": "account_id"
+          }
+        },
+        "set": {
+          "display_name": {
+            "$arg": "displayName"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "Sign in to update your display name.",
+          "not_found": "No such profile.",
+          "precondition": "Only registered (non-guest) users can update their profile."
+        }
+      }
+    },
+    {
+      "tool": "delete_my_account",
+      "family": "crud.delete",
+      "entity": "User",
+      "_evidence": {
+        "locator": "backend/src/users/users.service.ts:138",
+        "id_local": "User.delete",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/private/me",
+          "locator": "backend/src/api/private/me/me.controller.ts:61"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "const mediaUploads = await this.mediaService.getMediaUploadUuidsByUserId(userId);\nfor (const mediaUpload of mediaUploads) { await this.mediaService.deleteFile(mediaUpload); }\nawait this.userService.deleteUser(userId);\nconst destroy = promisify(request.session.destroy.bind(request.session));\ndestroy().catch(() => { throw new InternalServerErrorException(); });",
+        "edges": [
+          "SessionGuard (me.controller.ts:31)"
+        ]
+      },
+      "description": "Permanently delete the signed-in user's account and all of their data (notes, uploads, tokens, permissions, identity), then signs them out. Cannot be undone.",
+      "input_schema": {},
+      "exec_spec": {
+        "entity": "User",
+        "lookup_by": {
+          "id": {
+            "$session": "account_id"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "Sign in to delete your account.",
+          "not_found": "No such account."
+        }
+      }
+    },
+    {
+      "tool": "check_username_available",
+      "family": "search",
+      "entity": "User",
+      "_evidence": {
+        "locator": "backend/src/users/users.service.ts:202",
+        "id_local": "User.checkUsername",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/private/users/check",
+          "locator": "backend/src/api/private/users/users.controller.ts:27"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "async checkUsername(@Body() usernameCheck: UsernameCheckDto) {\n  const userExists = await this.userService.isUsernameTaken(usernameCheck.username);\n  return UsernameCheckResponseDto.create({ usernameAvailable: !userExists });\n}"
+      },
+      "description": "Check whether a username is still available to claim (returns true) or already taken (returns false).",
+      "input_schema": {
+        "username": {
+          "type": "text",
+          "required": true,
+          "description": "Username to check."
+        }
+      },
+      "exec_spec": {
+        "entity": "User",
+        "search_fields": [
+          "username"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "username"
+          ]
+        }
+      },
+      "guards": {
+        "required": [
+          "username"
+        ]
+      }
+    },
+    {
+      "tool": "change_my_password",
+      "family": "update.field_set",
+      "entity": "Identity",
+      "_evidence": {
+        "locator": "backend/src/auth/local/local.service.ts:86",
+        "id_local": "Auth.updateLocalPassword",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /api/private/auth/local",
+          "locator": "backend/src/api/private/auth/local/local.controller.ts:56"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "const user = await this.usersService.getUserById(userId);\nconst username = user.username;\nif (username === null) throw new NoLocalIdentityError('User has no username assigned');\nawait this.localIdentityService.checkLocalPassword(username, changePasswordDto.currentPassword);\nawait this.localIdentityService.updateLocalPassword(userId, changePasswordDto.newPassword);",
+        "edges": [
+          "checkLocalPassword (local.service.ts:86)"
+        ]
+      },
+      "description": "Change the signed-in user's local password after verifying their current password. Fails if the current password is wrong, your account has no local identity, or you are a guest.",
+      "input_schema": {
+        "currentPassword": {
+          "type": "text",
+          "required": true,
+          "description": "Your current local password."
+        },
+        "newPassword": {
+          "type": "text",
+          "required": true,
+          "description": "New password to set."
+        }
+      },
+      "exec_spec": {
+        "entity": "Identity",
+        "row_key": {
+          "user_id": {
+            "$session": "account_id"
+          },
+          "provider_type": "local"
+        },
+        "set": {
+          "password_hash": {
+            "$arg": "newPassword"
+          },
+          "updated_at": "2026-01-01T00:00:00"
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "Sign in to change your password.",
+          "not_found": "Your account has no local password to change.",
+          "precondition": "Only registered (non-guest) users can change their password."
+        }
+      }
+    },
+    {
+      "tool": "finalize_registration",
+      "family": "crud.insert",
+      "entity": "User",
+      "_evidence": {
+        "locator": "backend/src/auth/identity.service.ts:173",
+        "id_local": "Identity.finalizePendingRegistration",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /api/private/auth/pending-user",
+          "locator": "backend/src/api/private/auth/auth.controller.ts:71"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "request.session.userId = await this.identityService.createUserWithIdentityFromPendingUserConfirmation(\n  request.session.pendingUser.confirmationData, pendingUserConfirmationData,\n  request.session.pendingUser.authProviderType, request.session.pendingUser.authProviderIdentifier,\n  request.session.pendingUser.providerUserId);\nrequest.session.loginAuthProviderType = request.session.pendingUser.authProviderType;\nrequest.session.loginAuthProviderIdentifier = request.session.pendingUser.authProviderIdentifier;\nrequest.session.pendingUser = null;\nawait request.session.save();",
+        "edges": [
+          "SessionGuard (auth.controller.ts)"
+        ]
+      },
+      "description": "Complete a pending OIDC/LDAP registration by choosing a username, display name and optional profile picture, and sign into the new account. Fails if the username is taken.",
+      "input_schema": {
+        "username": {
+          "type": "text",
+          "required": true,
+          "description": "Username to claim."
+        },
+        "displayName": {
+          "type": "text",
+          "required": true,
+          "description": "Display name."
+        },
+        "profilePicture": {
+          "type": "text",
+          "required": false,
+          "description": "Optional photo URL."
+        }
+      },
+      "exec_spec": {
+        "entity": "User",
+        "fields": {
+          "username": {
+            "$arg": "username"
+          },
+          "display_name": {
+            "$arg": "displayName"
+          },
+          "photo_url": {
+            "$arg": "profilePicture"
+          }
+        },
+        "set_on_create": {
+          "guest_uuid": null,
+          "email": null,
+          "author_style": 1,
+          "created_at": "2026-01-01T00:00:00"
+        },
+        "unique_on": [
+          "username"
+        ]
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "A pending registration session is required.",
+          "unique": "That username is already taken."
+        }
+      }
+    },
+    {
+      "tool": "create_api_token",
+      "family": "crud.insert",
+      "entity": "ApiToken",
+      "_evidence": {
+        "locator": "backend/src/api-token/api-token.service.ts:103",
+        "id_local": "ApiToken.create",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/private/tokens",
+          "locator": "backend/src/api/private/api-tokens/api-tokens.controller.ts:39"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "const existing = await transaction(TableApiToken).select('id').where('user_id', userId);\nif (existing.length >= 200) throw new TooManyTokensError('There is a maximum of 200 API tokens per user');\nconst secret = bufferToBase64Url(randomBytes(64));\nconst keyId = bufferToBase64Url(randomBytes(8));\nconst secretHash = hashApiToken(secret);\nconst fullToken = `${AUTH_TOKEN_PREFIX}.${keyId}.${secret}`;\nconst maximumTokenValidity = getCurrentDateTime().plus({ year: 2 });\nawait transaction(TableApiToken).insert({ id: keyId, userId, label, secretHash, validUntil, lastUsedAt: null, createdAt: dateTimeToDB",
+        "edges": [
+          "SessionGuard + forbidGuests (api-tokens.controller.ts:43)"
+        ]
+      },
+      "description": "Create an API token for the signed-in user with the given label and validity window. Fails if you are a guest or already hold 200 tokens.",
+      "input_schema": {
+        "label": {
+          "type": "text",
+          "required": true,
+          "description": "Human label for the token."
+        },
+        "validUntil": {
+          "type": "datetime",
+          "required": true,
+          "description": "ISO expiry timestamp of the token."
+        }
+      },
+      "exec_spec": {
+        "entity": "ApiToken",
+        "fields": {
+          "label": {
+            "$arg": "label"
+          },
+          "valid_until": {
+            "$arg": "validUntil"
+          }
+        },
+        "set_on_create": {
+          "id": {
+            "$arg": "id"
+          },
+          "user_id": {
+            "$session": "account_id"
+          },
+          "secret_hash": "hashed-token-secret",
+          "last_used_at": null,
+          "created_at": "2026-01-01T00:00:00"
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "label"
+        ],
+        "messages": {
+          "auth": "Sign in before creating an API token.",
+          "precondition": "Guests cannot own API tokens; your account may hold at most 200."
+        }
+      }
+    },
+    {
+      "tool": "list_api_tokens",
+      "family": "crud.fetch",
+      "entity": "ApiToken",
+      "_evidence": {
+        "locator": "backend/src/api-token/api-token.service.ts:188",
+        "id_local": "ApiToken.list",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/private/tokens",
+          "locator": "backend/src/api/private/api-tokens/api-tokens.controller.ts:33"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "getUserTokens(@RequestUserId({ forbidGuests: true }) userId) {\n  return this.apiTokenService.getTokensOfUserById(userId);\n}"
+      },
+      "description": "List the API tokens belonging to the signed-in user (label, expiry, last use).",
+      "input_schema": {},
+      "exec_spec": {
+        "entity": "ApiToken",
+        "lookup_by": {
+          "user_id": {
+            "$session": "account_id"
+          }
+        },
+        "scope": {
+          "owner_col": "user_id"
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "Sign in to list your API tokens."
+        }
+      }
+    },
+    {
+      "tool": "revoke_api_token",
+      "family": "crud.delete",
+      "entity": "ApiToken",
+      "_evidence": {
+        "locator": "backend/src/api-token/api-token.service.ts:219",
+        "id_local": "ApiToken.delete",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/private/tokens/:keyId",
+          "locator": "backend/src/api/private/api-tokens/api-tokens.controller.ts:52"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "async deleteToken(@RequestUserId({ forbidGuests: true }) userId, @Param('keyId') keyId) {\n  await this.apiTokenService.removeToken(keyId, userId);\n}",
+        "edges": [
+          "removeToken(keyId,userId) (api-token.service.ts:219)"
+        ]
+      },
+      "description": "Delete an API token that belongs to the signed-in user, by its key id. Fails if the token does not exist or is not yours.",
+      "input_schema": {
+        "keyId": {
+          "type": "text",
+          "required": true,
+          "description": "The key id of the token to revoke."
+        }
+      },
+      "exec_spec": {
+        "entity": "ApiToken",
+        "lookup_by": {
+          "id": {
+            "$arg": "keyId"
+          },
+          "user_id": {
+            "$session": "account_id"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "keyId"
+        ],
+        "messages": {
+          "auth": "Sign in to revoke an API token.",
+          "not_found": "That API token does not exist or is not yours."
+        }
+      }
+    },
+    {
+      "tool": "create_note",
+      "family": "crud.insert",
+      "entity": "Note",
+      "_evidence": {
+        "locator": "backend/src/notes/note.service.ts:92",
+        "id_local": "Note.create",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/private/notes",
+          "locator": "backend/src/api/private/notes/notes.controller.ts:97"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "const createdAt = dateTimeToDB(getCurrentDateTime());\nconst createdNotes = await transaction(TableNote).insert({ owner_id: ownerUserId, version: 2, createdAt, publicly_visible: this.noteConfig.permissions.default.publiclyVisible }, ['id']);\nconst noteId = createdNotes[0].id;\nif (givenAlias !== undefined) await this.aliasService.ensureAliasIsAvailable(givenAlias, transaction);\nconst newAlias = givenAlias === undefined ? this.aliasService.generateRandomAlias() : givenAlias;\nawait this.aliasService.addAlias(noteId, newAlias, transaction);\nawait this.revisionsService.createRevision(noteId, noteCon",
+        "edges": [
+          "SessionGuard (backend/src/auth/session.guard.ts:29) + PermissionsGuard checkIfUserMayCreateNote (permissions.guard.ts:61)"
+        ]
+      },
+      "description": "Create a new note with the given markdown content and an optional alias, as the signed-in user. A random alias is generated when none is given; the caller becomes the owner.",
+      "input_schema": {
+        "content": {
+          "type": "text",
+          "required": true,
+          "description": "Raw markdown body of the note."
+        },
+        "alias": {
+          "type": "text",
+          "required": false,
+          "description": "Optional alias to address the note; a random one is generated if omitted."
+        }
+      },
+      "exec_spec": {
+        "entity": "Note",
+        "set_on_create": {
+          "owner_id": {
+            "$session": "account_id"
+          },
+          "version": 2,
+          "publicly_visible": false,
+          "created_at": "2026-01-01T00:00:00"
+        },
+        "side_inserts": [
+          {
+            "entity": "Alias",
+            "fields": {
+              "alias": {
+                "$arg": "alias"
+              },
+              "is_primary": true
+            },
+            "link_col": "note_id"
+          }
+        ],
+        "fields": [
+          "version",
+          "owner_id",
+          "publicly_visible"
+        ]
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "content"
+        ],
+        "messages": {
+          "auth": "Sign in to create a note."
+        }
+      }
+    },
+    {
+      "tool": "create_note_with_alias",
+      "family": "crud.insert",
+      "entity": "Note",
+      "_evidence": {
+        "locator": "backend/src/notes/note.service.ts:92",
+        "id_local": "Note.createNamed",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/private/notes/:newNoteAlias",
+          "locator": "backend/src/api/private/notes/notes.controller.ts:109"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "async createNamedNote(@RequestUserId() userId, @Param('newNoteAlias') noteAlias, @MarkdownBody() text) {\n  const createdNoteId = await this.noteService.createNote(text, userId, noteAlias);\n  return await this.noteService.toNoteDto(createdNoteId);\n}",
+        "edges": [
+          "ensureAliasIsAvailable (alias.service.ts:251)"
+        ]
+      },
+      "description": "Create a new note addressed immediately by the given alias. Fails if the alias is already in use. The caller becomes the owner.",
+      "input_schema": {
+        "alias": {
+          "type": "text",
+          "required": true,
+          "description": "Alias for the new note; must be unused."
+        },
+        "content": {
+          "type": "text",
+          "required": true,
+          "description": "Raw markdown body."
+        }
+      },
+      "exec_spec": {
+        "entity": "Note",
+        "set_on_create": {
+          "owner_id": {
+            "$session": "account_id"
+          },
+          "version": 2,
+          "publicly_visible": false,
+          "created_at": "2026-01-01T00:00:00"
+        },
+        "side_inserts": [
+          {
+            "entity": "Alias",
+            "fields": {
+              "alias": {
+                "$arg": "alias"
+              },
+              "is_primary": true
+            },
+            "link_col": "note_id"
+          }
+        ],
+        "fields": [
+          "version",
+          "owner_id",
+          "publicly_visible"
+        ]
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "alias",
+          "content"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Alias",
+                "where": {
+                  "node": "field",
+                  "col": "alias",
+                  "op": "eq",
+                  "value": {
+                    "arg": "alias"
+                  }
+                }
+              },
+              "op": "eq",
+              "n": 0
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in to create a note.",
+          "precondition": "That alias is already in use. Pick another."
+        }
+      }
+    },
+    {
+      "tool": "update_note_content",
+      "family": "crud.insert",
+      "entity": "Revision",
+      "_evidence": {
+        "locator": "backend/src/notes/note.service.ts:245",
+        "id_local": "Note.update",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /api/v2/notes/:noteAlias",
+          "locator": "backend/src/api/public/notes/notes.controller.ts:145"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "async updateNote(noteId, noteContent) {\n  this.eventEmitter.emit(NoteEvent.CLOSE_REALTIME, noteId);\n  await this.revisionsService.createRevision(noteId, noteContent);\n}",
+        "edges": [
+          "@RequirePermission(WRITE) (public notes controller:144)"
+        ]
+      },
+      "description": "Save new markdown content for a note, recorded as a new revision. Fails if you lack write permission on the note or the note does not exist.",
+      "input_schema": {
+        "noteId": {
+          "type": "int",
+          "required": true,
+          "description": "The note id to update."
+        },
+        "content": {
+          "type": "text",
+          "required": true,
+          "description": "New full markdown content."
+        }
+      },
+      "exec_spec": {
+        "entity": "Revision",
+        "fields": {
+          "content": {
+            "$arg": "content"
+          }
+        },
+        "set_on_create": {
+          "note_id": {
+            "$arg": "noteId"
+          },
+          "uuid": {
+            "$arg": "uuid"
+          },
+          "created_at": "2026-01-01T00:00:00",
+          "patch": {
+            "$arg": "patch"
+          },
+          "title": {
+            "$arg": "title"
+          },
+          "description": {
+            "$arg": "description"
+          },
+          "note_type": {
+            "$arg": "noteType"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "noteId",
+          "content"
+        ],
+        "messages": {
+          "auth": "Sign in to edit a note.",
+          "not_found": "That note does not exist.",
+          "precondition": "You need write permission on that note."
+        }
+      }
+    },
+    {
+      "tool": "delete_note",
+      "family": "crud.delete",
+      "entity": "Note",
+      "_evidence": {
+        "locator": "backend/src/notes/note.service.ts:227",
+        "id_local": "Note.delete",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/private/notes/:noteAlias",
+          "locator": "backend/src/api/private/notes/notes.controller.ts:119"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "this.eventEmitter.emit(NoteEvent.DELETION, noteId);\nconst n = await this.knex(TableNote).where('id', noteId).delete();\nif (n === 0) throw new NotInDBError('Note not found');",
+        "edges": [
+          "@RequirePermission(FULL) + isOwner (notes.controller.ts:124)"
+        ]
+      },
+      "description": "Permanently delete a note you own, together with its aliases, revisions, permissions, media links and pin/visit links. Fails if the note does not exist or you are not its owner.",
+      "input_schema": {
+        "noteId": {
+          "type": "int",
+          "required": true,
+          "description": "The note id to delete."
+        }
+      },
+      "exec_spec": {
+        "entity": "Note",
+        "lookup_by": {
+          "id": {
+            "$arg": "noteId"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "noteId"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Note",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "noteId"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "owner_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in to delete a note.",
+          "precondition": "Only the owner can delete a note.",
+          "not_found": "That note does not exist."
+        }
+      }
+    },
+    {
+      "tool": "get_note",
+      "family": "crud.fetch",
+      "entity": "Note",
+      "_evidence": {
+        "locator": "backend/src/notes/note.service.ts:352",
+        "id_local": "Note.get",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/private/notes/:noteAlias",
+          "locator": "backend/src/api/private/notes/notes.controller.ts:74"
+        },
+        "entity_why": "primary effect row_upsert lands on this table",
+        "ref_code": "@Get(':noteAlias') @RequirePermission(PermissionLevel.READ) @UseInterceptors(GetNoteIdInterceptor)\nasync getNote(@RequestNoteId() noteId, @RequestUserId() userId) {\n  void this.noteService.markNoteAsVisited(noteId, userId);\n  return await this.noteService.toNoteDto(noteId);\n}",
+        "edges": [
+          "@RequirePermission(READ) (notes.controller.ts:74) via PermissionsGuard"
+        ]
+      },
+      "description": "Fetch a note's full content and metadata by its id, marking it as recently visited for you. Fails if the note does not exist or you lack read permission.",
+      "input_schema": {
+        "noteId": {
+          "type": "int",
+          "required": true,
+          "description": "The note id to fetch."
+        }
+      },
+      "exec_spec": {
+        "entity": "Note",
+        "lookup_by": {
+          "id": {
+            "$arg": "noteId"
+          }
+        },
+        "scope": {
+          "owner_col": "owner_id",
+          "visibility_col": "publicly_visible",
+          "public": [
+            "true"
+          ]
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "noteId"
+        ],
+        "messages": {
+          "auth": "Sign in to read a note.",
+          "not_found": "That note does not exist."
+        }
+      }
+    },
+    {
+      "tool": "get_note_metadata",
+      "family": "crud.fetch",
+      "entity": "Alias",
+      "_evidence": {
+        "locator": "backend/src/notes/note.service.ts:259",
+        "id_local": "Note.getMetadata",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/private/notes/:noteAlias/metadata",
+          "locator": "backend/src/api/private/notes/notes.controller.ts:146"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "const aliases = await this.aliasService.getAllAliases(noteId, transaction);\nconst noteAliases = this.aliasService.toNoteAliasesDto(aliases);\nconst note = await transaction(TableNote).select('created_at','version').where('id', noteId).first();\n// + latest revision metadata; returns NoteMetadataDto"
+      },
+      "description": "Return a note's metadata: its aliases and primary alias, title, description, created/updated times and version. Fails if you lack read permission or the note does not exist.",
+      "input_schema": {
+        "noteId": {
+          "type": "int",
+          "required": true,
+          "description": "The note id."
+        }
+      },
+      "exec_spec": {
+        "entity": "Alias",
+        "lookup_by": {
+          "note_id": {
+            "$arg": "noteId"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "noteId"
+        ],
+        "messages": {
+          "auth": "Sign in to view note metadata.",
+          "not_found": "That note does not exist."
+        }
+      }
+    },
+    {
+      "tool": "get_note_content",
+      "family": "crud.fetch",
+      "entity": "Revision",
+      "_evidence": {
+        "locator": "backend/src/notes/note.service.ts:175",
+        "id_local": "Note.getContent",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v2/notes/:noteAlias/content",
+          "locator": "backend/src/api/public/notes/notes.controller.ts:175"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "const realtimeContent = this.realtimeNoteStore.find(noteId)?.getRealtimeDoc().getCurrentContent();\nif (realtimeContent) return realtimeContent;\nconst latestRevision = await this.revisionsService.getLatestRevision(noteId, transaction);\nreturn latestRevision.content;"
+      },
+      "description": "Fetch the current full markdown content of a note. Fails if you lack read permission or the note does not exist.",
+      "input_schema": {
+        "noteId": {
+          "type": "int",
+          "required": true,
+          "description": "The note id."
+        }
+      },
+      "exec_spec": {
+        "entity": "Revision",
+        "lookup_by": {
+          "note_id": {
+            "$arg": "noteId"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "noteId"
+        ],
+        "messages": {
+          "auth": "Sign in to read a note.",
+          "not_found": "That note does not exist."
+        }
+      }
+    },
+    {
+      "tool": "get_note_permissions",
+      "family": "crud.fetch",
+      "entity": "Note",
+      "_evidence": {
+        "locator": "backend/src/permissions/permission.service.ts:427",
+        "id_local": "Note.getPermissions",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/private/notes/:noteAlias/metadata/permissions",
+          "locator": "backend/src/api/private/notes/notes.controller.ts:152"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "const metadata = await transaction(TableNote).join(TableUser,...).select('username','publicly_visible').where('id', noteId).first();\nconst userPermissions = await transaction(TableNoteUserPermission).join(TableUser,...).select('username','can_edit').where('note_id', noteId);\nconst groupPermissions = await transaction(TableNoteGroupPermission).join(TableGroup,...).select('name','can_edit').where('note_id', noteId);\nreturn NotePermissionsDto.create({owner,publiclyVisible,sharedToUsers,sharedToGroups});"
+      },
+      "description": "Read a note's sharing configuration: its owner, public visibility, and the users and groups it is shared with. Fails if you lack read permission.",
+      "input_schema": {
+        "noteId": {
+          "type": "int",
+          "required": true,
+          "description": "The note whose permissions to read."
+        }
+      },
+      "exec_spec": {
+        "entity": "Note",
+        "lookup_by": {
+          "id": {
+            "$arg": "noteId"
+          }
+        },
+        "scope": {
+          "owner_col": "owner_id",
+          "visibility_col": "publicly_visible",
+          "public": [
+            "true"
+          ]
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "noteId"
+        ],
+        "messages": {
+          "auth": "Sign in to view note permissions.",
+          "not_found": "That note does not exist."
+        }
+      }
+    },
+    {
+      "tool": "list_note_aliases",
+      "family": "crud.fetch",
+      "entity": "Alias",
+      "_evidence": {
+        "locator": "backend/src/alias/alias.service.ts:226",
+        "id_local": "Alias.getAll",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/private/alias/:alias",
+          "locator": "backend/src/api/private/alias/alias.controller.ts:68"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "const noteId = await this.noteService.getNoteIdByAlias(alias);\nif ((await this.permissionsService.determinePermission(userId, noteId)) === PermissionLevel.DENY)\n  throw new UnauthorizedException();\nconst allAliases = await this.aliasService.getAllAliases(noteId);\nreturn this.aliasService.toNoteAliasesDto(allAliases);"
+      },
+      "description": "List all aliases (and which is primary) for a note. Fails if you lack read permission on the note.",
+      "input_schema": {
+        "noteId": {
+          "type": "int",
+          "required": true,
+          "description": "The note whose aliases to list."
+        }
+      },
+      "exec_spec": {
+        "entity": "Alias",
+        "lookup_by": {
+          "note_id": {
+            "$arg": "noteId"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "noteId"
+        ],
+        "messages": {
+          "auth": "Sign in to list aliases.",
+          "not_found": "That note does not exist."
+        }
+      }
+    },
+    {
+      "tool": "add_note_alias",
+      "family": "crud.insert",
+      "entity": "Alias",
+      "_evidence": {
+        "locator": "backend/src/alias/alias.service.ts:80",
+        "id_local": "Alias.add",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/private/alias",
+          "locator": "backend/src/api/private/alias/alias.controller.ts:86"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "const noteId = await this.getNoteIdAndCheckIfUserCanEditAliases(userId, newAliasDto.noteAlias);\nawait this.aliasService.ensureAliasIsAvailable(newAliasDto.newAlias);\nawait this.aliasService.addAlias(noteId, newAliasDto.newAlias);",
+        "edges": [
+          "getNoteIdAndCheckIfUserCanEditAliases (alias.controller.ts:90)",
+          "ensureAliasIsAvailable (alias.service.ts:266)"
+        ]
+      },
+      "description": "Attach a new, non-primary alias to a note you own. Fails if the alias is already in use, or you are not the note's owner.",
+      "input_schema": {
+        "noteId": {
+          "type": "int",
+          "required": true,
+          "description": "The note to add an alias to."
+        },
+        "newAlias": {
+          "type": "text",
+          "required": true,
+          "description": "The new alias; must be unused."
+        }
+      },
+      "exec_spec": {
+        "entity": "Alias",
+        "fields": {
+          "alias": {
+            "$arg": "newAlias"
+          },
+          "is_primary": null
+        },
+        "set_on_create": {
+          "note_id": {
+            "$arg": "noteId"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "noteId",
+          "newAlias"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Alias",
+                "where": {
+                  "node": "field",
+                  "col": "alias",
+                  "op": "eq",
+                  "value": {
+                    "arg": "newAlias"
+                  }
+                }
+              },
+              "op": "eq",
+              "n": 0
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in to add an alias.",
+          "precondition": "That alias is already in use, or you do not own the note.",
+          "not_found": "That note does not exist."
+        }
+      }
+    },
+    {
+      "tool": "set_primary_alias",
+      "family": "update.field_set",
+      "entity": "Alias",
+      "_evidence": {
+        "locator": "backend/src/alias/alias.service.ts:111",
+        "id_local": "Alias.setPrimary",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /api/private/alias/:alias",
+          "locator": "backend/src/api/private/alias/alias.controller.ts:97"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "await transaction(TableAlias).where('note_id', noteId).update('is_primary', null);\nconst n = await transaction(TableAlias).update('is_primary', true).whereEqualLowercase('alias', alias).andWhere('note_id', noteId);\nif (n !== 1) throw new NotInDBError('Alias not found');",
+        "edges": [
+          "getNoteIdAndCheckIfUserCanEditAliases (alias.controller.ts:107)"
+        ]
+      },
+      "description": "Make one of a note's aliases the primary alias. Fails if you do not own the note or the alias does not belong to it.",
+      "input_schema": {
+        "noteId": {
+          "type": "int",
+          "required": true,
+          "description": "The note whose alias is promoted."
+        },
+        "alias": {
+          "type": "text",
+          "required": true,
+          "description": "The alias to make primary."
+        }
+      },
+      "exec_spec": {
+        "entity": "Alias",
+        "row_key": {
+          "note_id": {
+            "$arg": "noteId"
+          },
+          "alias": {
+            "$arg": "alias"
+          }
+        },
+        "set": {
+          "is_primary": true
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "noteId",
+          "alias"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Alias",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "note_id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "noteId"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "alias",
+                      "op": "eq",
+                      "value": {
+                        "arg": "alias"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in to set a primary alias.",
+          "precondition": "Only the owner can set the primary alias.",
+          "not_found": "That alias does not belong to that note."
+        }
+      }
+    },
+    {
+      "tool": "remove_note_alias",
+      "family": "crud.delete",
+      "entity": "Alias",
+      "_evidence": {
+        "locator": "backend/src/alias/alias.service.ts:154",
+        "id_local": "Alias.remove",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/private/alias/:alias",
+          "locator": "backend/src/api/private/alias/alias.controller.ts:113"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "const aliases = await transaction(TableAlias).select().whereEqualLowercase('alias', alias);\nif (aliases.length !== 1) throw new NotInDBError('Alias not found');\nconst noteId = aliases[0].note_id;\nconst n = await transaction(TableAlias).where('alias', alias).andWhere('note_id', noteId).andWhere('is_primary', null).delete();\nif (n !== 1) throw new PrimaryAliasDeletionForbiddenError();",
+        "edges": [
+          "deletes only where is_primary=null else PrimaryAliasDeletionForbiddenError (alias.service.ts:171)"
+        ]
+      },
+      "description": "Remove a non-primary alias from a note. Fails if the alias is the note's primary alias (demote it first) or you do not own the note.",
+      "input_schema": {
+        "noteId": {
+          "type": "int",
+          "required": true,
+          "description": "The note to remove the alias from."
+        },
+        "alias": {
+          "type": "text",
+          "required": true,
+          "description": "The alias to remove."
+        }
+      },
+      "exec_spec": {
+        "entity": "Alias",
+        "lookup_by": {
+          "note_id": {
+            "$arg": "noteId"
+          },
+          "alias": {
+            "$arg": "alias"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "noteId",
+          "alias"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Alias",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "note_id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "noteId"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "alias",
+                      "op": "eq",
+                      "value": {
+                        "arg": "alias"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "is_primary",
+                      "op": "is_null"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in to remove an alias.",
+          "precondition": "The primary alias cannot be removed; demote another alias first.",
+          "not_found": "That alias does not exist on that note."
+        }
+      }
+    },
+    {
+      "tool": "list_note_revisions",
+      "family": "search",
+      "entity": "Revision",
+      "_evidence": {
+        "locator": "backend/src/revisions/revisions.service.ts:74",
+        "id_local": "Revision.getNoteRevisions",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/private/notes/:noteAlias/revisions",
+          "locator": "backend/src/api/private/notes/notes.controller.ts:158"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "const noteRevisions = await this.knex(TableRevision)\n  .distinct('revision.uuid','revision.created_at','revision.description','revision.content','revision.title','user.username','user.guest_uuid','revision_tag.tag')\n  .leftJoin(TableRevisionTag, 'revision_tag.revision_uuid','revision.uuid')\n  .leftJoin(TableAuthorshipInfo, 'authorship_info.revision_uuid','revision.uuid')\n  .leftJoin(TableUser, 'user.id','authorship_info.author_id')\n  .where('revision.note_id', noteId).orderBy('revision.created_at','desc');",
+        "edges": [
+          "@RequirePermission(READ) (notes.controller.ts:160)"
+        ]
+      },
+      "description": "List the revision history of a note (uuid, date, title, description, author), most recent first. Fails if you lack read permission or the note does not exist.",
+      "input_schema": {
+        "noteId": {
+          "type": "int",
+          "required": true,
+          "description": "The note whose revisions to list."
+        }
+      },
+      "exec_spec": {
+        "entity": "Revision",
+        "filter": {
+          "col": "note_id",
+          "mode": "eq",
+          "val": {
+            "$arg": "noteId"
+          }
+        },
+        "search_fields": [
+          "uuid",
+          "title",
+          "description"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "uuid",
+            "title",
+            "description"
+          ]
+        },
+        "sort": {
+          "col": "created_at",
+          "dir": "desc"
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "noteId"
+        ],
+        "messages": {
+          "auth": "Sign in to view revision history.",
+          "not_found": "That note does not exist."
+        }
+      }
+    },
+    {
+      "tool": "get_note_revision",
+      "family": "crud.fetch",
+      "entity": "Revision",
+      "_evidence": {
+        "locator": "backend/src/revisions/revisions.service.ts:213",
+        "id_local": "Revision.getNoteRevision",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/private/notes/:noteAlias/revisions/:revisionUuid",
+          "locator": "backend/src/api/private/notes/notes.controller.ts:175"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "const revision = await this.knex(TableRevision).select('uuid','created_at','description','content','title','patch')\n  .where('uuid', revisionUuid).andWhere('note_id', noteId).first();\nif (revision === undefined) throw new NotInDBError('Revision not found');\nreturn RevisionDto.create({...});",
+        "edges": [
+          "@RequirePermission(READ) (notes.controller.ts:177)"
+        ]
+      },
+      "description": "Return a specific revision (full content and patch) of a note. Fails if the revision does not belong to the note or the note is not readable by you.",
+      "input_schema": {
+        "noteId": {
+          "type": "int",
+          "required": true,
+          "description": "The note the revision belongs to."
+        },
+        "revisionUuid": {
+          "type": "int",
+          "required": true,
+          "description": "The revision uuid to fetch."
+        }
+      },
+      "exec_spec": {
+        "entity": "Revision",
+        "lookup_by": {
+          "uuid": {
+            "$arg": "revisionUuid"
+          },
+          "note_id": {
+            "$arg": "noteId"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "noteId",
+          "revisionUuid"
+        ],
+        "messages": {
+          "auth": "Sign in to view a revision.",
+          "not_found": "That revision does not exist or is not in that note."
+        }
+      }
+    },
+    {
+      "tool": "purge_note_revisions",
+      "family": "crud.delete",
+      "entity": "Revision",
+      "_evidence": {
+        "locator": "backend/src/revisions/revisions.service.ts:181",
+        "id_local": "Revision.purgeNoteRevisions",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/private/notes/:noteAlias/revisions",
+          "locator": "backend/src/api/private/notes/notes.controller.ts:166"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "const allRevisions = await tx(TableRevision).select().where('note_id', noteId).orderBy('created_at','desc');\nif (allRevisions.length===0) return;\nconst latest = allRevisions[0];\nconst toDelete = allRevisions.filter(r => r.uuid !== latest.uuid);\nawait tx(TableRevision).whereIn('uuid', toDelete.map(r=>r.uuid)).delete();\nconst primaryAlias = await aliasService.getPrimaryAliasByNoteId(noteId, tx);\nawait tx(TableRevision).update({ patch: createPatch(primaryAlias,'',latest.content) }).where('uuid', latest.uuid);",
+        "edges": [
+          "@RequirePermission(FULL) (notes.controller.ts:168)"
+        ]
+      },
+      "description": "Delete all but the latest revision of a note, collapsing its history down to one. Fails if the note does not exist (or you lack full permission on it).",
+      "input_schema": {
+        "noteId": {
+          "type": "int",
+          "required": true,
+          "description": "The note whose non-latest revisions to purge."
+        }
+      },
+      "exec_spec": {
+        "entity": "Revision",
+        "lookup_by": {
+          "note_id": {
+            "$arg": "noteId"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "noteId"
+        ],
+        "messages": {
+          "auth": "Sign in to purge revisions.",
+          "not_found": "That note does not exist.",
+          "precondition": "You need full permission on that note to purge its revisions."
+        }
+      }
+    },
+    {
+      "tool": "share_note_with_user",
+      "family": "crud.upsert",
+      "entity": "NoteUserPermission",
+      "_evidence": {
+        "locator": "backend/src/permissions/permission.service.ts:267",
+        "id_local": "NoteUserPermission.set",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /api/private/notes/:noteAlias/metadata/permissions/users/:username",
+          "locator": "backend/src/api/private/notes/notes.controller.ts:186"
+        },
+        "entity_why": "primary effect row_upsert lands on this table",
+        "ref_code": "async setUserPermission(noteId, userId, canEdit) {\n  return this.knex.transaction(async t => {\n    if (await this.isOwner(userId, noteId, t)) return;\n    if (!await this.userService.isRegisteredUser(userId, t)) throw new PermissionError('Note permissions can not be granted to guests');\n    await t(TableNoteUserPermission).insert({ userId, noteId, canEdit }).onConflict(['note_id','user_id']).merge();\n    this.notifyOthers(noteId);\n  });\n}",
+        "edges": [
+          "@RequirePermission(FULL) (notes.controller.ts:189)",
+          "setUserPermission (permission.service.ts:269,274)"
+        ]
+      },
+      "description": "Grant or change a registered user's edit permission on a note you own (true = can edit, false = read-only). The owner is exempt. Fails if the target user does not exist, is a guest, or you are not the owner.",
+      "input_schema": {
+        "noteId": {
+          "type": "int",
+          "required": true,
+          "description": "The note to share."
+        },
+        "user_id": {
+          "type": "int",
+          "required": true,
+          "description": "The id of the registered user to share with."
+        },
+        "canEdit": {
+          "type": "bool",
+          "required": true,
+          "description": "true grants edit, false read-only."
+        }
+      },
+      "exec_spec": {
+        "entity": "NoteUserPermission",
+        "key": {
+          "note_id": {
+            "$arg": "noteId"
+          },
+          "user_id": {
+            "$arg": "user_id"
+          }
+        },
+        "insert_fields": {
+          "can_edit": {
+            "$arg": "canEdit"
+          }
+        },
+        "set_on_exists": {
+          "can_edit": {
+            "$arg": "canEdit"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "noteId",
+          "user_id",
+          "canEdit"
+        ],
+        "preconditions": [],
+        "messages": {
+          "auth": "Sign in to share a note.",
+          "precondition": "Only the owner can share a note, and permissions can only be granted to registered users.",
+          "not_found": "That note or user does not exist."
+        }
+      }
+    },
+    {
+      "tool": "revoke_user_access",
+      "family": "crud.delete",
+      "entity": "NoteUserPermission",
+      "_evidence": {
+        "locator": "backend/src/permissions/permission.service.ts:301",
+        "id_local": "NoteUserPermission.remove",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/private/notes/:noteAlias/metadata/permissions/users/:username",
+          "locator": "backend/src/api/private/notes/notes.controller.ts:200"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "async removeUserPermission(noteId, userId) {\n  const result = await this.knex(TableNoteUserPermission).where('note_id', noteId).andWhere('user_id', userId).delete();\n  await this.knex(TableVisitedNote).where('note_id', noteId).andWhere('user_id', userId).delete();\n  if (result !== 1) throw new NotInDBError('The user does not have a permission on this note.');\n  this.notifyOthers(noteId);\n}",
+        "edges": [
+          "@RequirePermission(FULL) (notes.controller.ts:203)"
+        ]
+      },
+      "description": "Remove a user's permission on a note you own, so they can no longer see or edit it. Fails if you are not the owner or the user had no permission.",
+      "input_schema": {
+        "noteId": {
+          "type": "int",
+          "required": true,
+          "description": "The note to revoke access to."
+        },
+        "user_id": {
+          "type": "int",
+          "required": true,
+          "description": "The id of the user to revoke."
+        }
+      },
+      "exec_spec": {
+        "entity": "NoteUserPermission",
+        "lookup_by": {
+          "note_id": {
+            "$arg": "noteId"
+          },
+          "user_id": {
+            "$arg": "user_id"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "noteId",
+          "user_id"
+        ],
+        "messages": {
+          "auth": "Sign in to revoke access.",
+          "precondition": "Only the owner can revoke access.",
+          "not_found": "That user has no permission on that note."
+        }
+      }
+    },
+    {
+      "tool": "share_note_with_group",
+      "family": "crud.upsert",
+      "entity": "NoteGroupPermission",
+      "_evidence": {
+        "locator": "backend/src/permissions/permission.service.ts:330",
+        "id_local": "NoteGroupPermission.set",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /api/private/notes/:noteAlias/metadata/permissions/groups/:groupName",
+          "locator": "backend/src/api/private/notes/notes.controller.ts:220"
+        },
+        "entity_why": "primary effect row_upsert lands on this table",
+        "ref_code": "async setGroupPermission(noteId, groupId, canEdit) {\n  await this.knex(TableNoteGroupPermission).insert({ canEdit, groupId, noteId }).onConflict(['note_id','group_id']).merge();\n  this.notifyOthers(noteId);\n}",
+        "edges": [
+          "@RequirePermission(FULL) (notes.controller.ts:223,229)"
+        ]
+      },
+      "description": "Grant or change a group's edit permission on a note you own (true = can edit, false = read-only). Fails if the group does not exist or you are not the owner.",
+      "input_schema": {
+        "noteId": {
+          "type": "int",
+          "required": true,
+          "description": "The note to share."
+        },
+        "groupId": {
+          "type": "int",
+          "required": true,
+          "description": "The id of the group to share with."
+        },
+        "canEdit": {
+          "type": "bool",
+          "required": true,
+          "description": "true grants edit, false read-only."
+        }
+      },
+      "exec_spec": {
+        "entity": "NoteGroupPermission",
+        "key": {
+          "note_id": {
+            "$arg": "noteId"
+          },
+          "group_id": {
+            "$arg": "groupId"
+          }
+        },
+        "insert_fields": {
+          "can_edit": {
+            "$arg": "canEdit"
+          }
+        },
+        "set_on_exists": {
+          "can_edit": {
+            "$arg": "canEdit"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "noteId",
+          "groupId",
+          "canEdit"
+        ],
+        "messages": {
+          "auth": "Sign in to share a note with a group.",
+          "precondition": "Only the owner can share a note.",
+          "not_found": "That note or group does not exist."
+        }
+      }
+    },
+    {
+      "tool": "revoke_group_access",
+      "family": "crud.delete",
+      "entity": "NoteGroupPermission",
+      "_evidence": {
+        "locator": "backend/src/permissions/permission.service.ts:355",
+        "id_local": "NoteGroupPermission.remove",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/private/notes/:noteAlias/metadata/permissions/groups/:groupName",
+          "locator": "backend/src/api/private/notes/notes.controller.ts:243"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "async removeGroupPermission(noteId, groupId) {\n  const result = await this.knex(TableNoteGroupPermission).where('note_id', noteId).andWhere('group_id', groupId).delete();\n  if (result !== 1) throw new NotInDBError('The group does not have a permission on this note.');\n  this.notifyOthers(noteId);\n}",
+        "edges": [
+          "@RequirePermission(FULL) (notes.controller.ts:253)"
+        ]
+      },
+      "description": "Remove a group's permission on a note you own, so the group can no longer see or edit it. Fails if you are not the owner or the group had no permission.",
+      "input_schema": {
+        "noteId": {
+          "type": "int",
+          "required": true,
+          "description": "The note to revoke access to."
+        },
+        "groupId": {
+          "type": "int",
+          "required": true,
+          "description": "The id of the group to revoke."
+        }
+      },
+      "exec_spec": {
+        "entity": "NoteGroupPermission",
+        "lookup_by": {
+          "note_id": {
+            "$arg": "noteId"
+          },
+          "group_id": {
+            "$arg": "groupId"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "noteId",
+          "groupId"
+        ],
+        "messages": {
+          "auth": "Sign in to revoke group access.",
+          "precondition": "Only the owner can revoke group access.",
+          "not_found": "That group has no permission on that note."
+        }
+      }
+    },
+    {
+      "tool": "change_note_owner",
+      "family": "action.trigger",
+      "entity": "Note",
+      "_evidence": {
+        "locator": "backend/src/permissions/permission.service.ts:377",
+        "id_local": "Note.changeOwner",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /api/private/notes/:noteAlias/metadata/permissions/owner",
+          "locator": "backend/src/api/private/notes/notes.controller.ts:258"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "async changeOwner(noteId, newOwnerId) {\n  const result = await this.knex(TableNote).update({ owner_id: newOwnerId }).where('id', noteId);\n  if (result !== 1) throw new NotInDBError('The user id of the new owner or the note id does not exist');\n  this.notifyOthers(noteId);\n}",
+        "edges": [
+          "@RequirePermission(FULL) (notes.controller.ts:260)"
+        ]
+      },
+      "description": "Transfer ownership of a note to another registered user, so they become the new owner. Fails if the new owner does not exist or the note does not exist.",
+      "input_schema": {
+        "noteId": {
+          "type": "int",
+          "required": true,
+          "description": "The note to transfer."
+        },
+        "ownerId": {
+          "type": "int",
+          "required": true,
+          "description": "The id of the user to become the new owner."
+        }
+      },
+      "exec_spec": {
+        "entity": "Note",
+        "target": {
+          "entity": "Note",
+          "lookup_by": {
+            "id": {
+              "$arg": "noteId"
+            }
+          }
+        },
+        "set": {
+          "owner_id": {
+            "$arg": "ownerId"
+          }
+        },
+        "messages": {
+          "not_found": "That note or new owner does not exist."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "noteId",
+          "ownerId"
+        ],
+        "messages": {
+          "auth": "Sign in to transfer a note.",
+          "precondition": "You need full permission on the note to transfer it."
+        }
+      }
+    },
+    {
+      "tool": "change_note_visibility",
+      "family": "update.field_set",
+      "entity": "Note",
+      "_evidence": {
+        "locator": "backend/src/permissions/permission.service.ts:396",
+        "id_local": "Note.changeVisibility",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /api/private/notes/:noteAlias/metadata/permissions/visibility",
+          "locator": "backend/src/api/private/notes/notes.controller.ts:268"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "async changePubliclyVisible(noteId, newPublicVisible) {\n  const result = await this.knex(TableNote).update({ publicly_visible: newPublicVisible }).where('id', noteId);\n  if (result !== 1) throw new NotInDBError('The note does not exist');\n}",
+        "edges": [
+          "@RequirePermission(FULL) (notes.controller.ts:269)"
+        ]
+      },
+      "description": "Mark a note as publicly visible or private. Fails if the note does not exist or you have no full permission on it.",
+      "input_schema": {
+        "noteId": {
+          "type": "int",
+          "required": true,
+          "description": "The note to change."
+        },
+        "publiclyVisible": {
+          "type": "bool",
+          "required": true,
+          "description": "true makes the note public, false private."
+        }
+      },
+      "exec_spec": {
+        "entity": "Note",
+        "row_key": {
+          "id": {
+            "$arg": "noteId"
+          }
+        },
+        "set": {
+          "publicly_visible": {
+            "$arg": "publiclyVisible"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "noteId",
+          "publiclyVisible"
+        ],
+        "messages": {
+          "auth": "Sign in to change note visibility.",
+          "precondition": "You need full permission on the note to change its visibility.",
+          "not_found": "That note does not exist."
+        }
+      }
+    },
+    {
+      "tool": "get_group",
+      "family": "crud.fetch",
+      "entity": "Group",
+      "_evidence": {
+        "locator": "backend/src/groups/groups.service.ts:64",
+        "id_local": "Group.get",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/private/groups/:groupName",
+          "locator": "backend/src/api/private/groups/groups.controller.ts:27"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "async getGroupInfoDtoByName(name) {\n  const group = await getRawGroupByName(name);\n  if (group === undefined) throw new NotInDBError(`Group with name '${name}' not found`);\n  return GroupInfoDto.create({ name, displayName, isSpecial });\n}"
+      },
+      "description": "Fetch a group's metadata (name, display name, whether it is a special system group).",
+      "input_schema": {
+        "groupName": {
+          "type": "text",
+          "required": true,
+          "description": "The group's name."
+        }
+      },
+      "exec_spec": {
+        "entity": "Group",
+        "lookup_by": {
+          "name": {
+            "$arg": "groupName"
+          }
+        }
+      },
+      "guards": {
+        "required": [
+          "groupName"
+        ],
+        "messages": {
+          "not_found": "That group does not exist."
+        }
+      }
+    },
+    {
+      "tool": "upload_media",
+      "family": "crud.insert",
+      "entity": "MediaUpload",
+      "_evidence": {
+        "locator": "backend/src/media/media.service.ts:104",
+        "id_local": "MediaUpload.upload",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/private/media",
+          "locator": "backend/src/api/private/media/media.controller.ts:82"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "async uploadMedia(@FastifyFile('file') file, @RequestNoteId() noteId, @RequestUserId() userId) {\n  if (file===undefined) throw new BadRequestException('Request does not contain a file');\n  const uploadUuid = await this.mediaService.saveFile(file.originalname, file.buffer, userId, noteId);\n  return await this.mediaService.getMediaUploadDtoByUuid(uploadUuid);\n}",
+        "edges": [
+          "@RequirePermission(WRITE) (media.controller.ts) via PermissionsGuard"
+        ]
+      },
+      "description": "Upload a media file and attach it to a note you can write. Fails if you lack write permission on the note or no file is given.",
+      "input_schema": {
+        "noteId": {
+          "type": "int",
+          "required": true,
+          "description": "The note the upload is attached to."
+        },
+        "fileName": {
+          "type": "text",
+          "required": true,
+          "description": "Original file name of the upload."
+        }
+      },
+      "exec_spec": {
+        "entity": "MediaUpload",
+        "set_on_create": {
+          "user_id": {
+            "$session": "account_id"
+          },
+          "file_name": {
+            "$arg": "fileName"
+          },
+          "backend_type": "filesystem",
+          "backend_data": null,
+          "created_at": "2026-01-01T00:00:00"
+        },
+        "fields": {
+          "file_name": {
+            "$arg": "fileName"
+          },
+          "user_id": {
+            "$session": "account_id"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "noteId",
+          "fileName"
+        ],
+        "messages": {
+          "auth": "Sign in to upload media.",
+          "precondition": "You need write access on the note to upload to it.",
+          "not_found": "That note does not exist."
+        }
+      }
+    },
+    {
+      "tool": "get_media",
+      "family": "crud.fetch",
+      "entity": "MediaUpload",
+      "_evidence": {
+        "locator": "backend/src/media/media.service.ts:302",
+        "id_local": "MediaUpload.getMedia",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/private/media/:uuid",
+          "locator": "backend/src/api/private/media/media.controller.ts:126"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "async getMedia(userId, uuid) {\n  if (!(await this.mediaService.canUserAccessUpload(userId, uuid))) throw new PermissionError('No permission');\n  return await this.mediaService.getMediaUploadDtoByUuid(uuid);\n}",
+        "edges": [
+          "getMedia (media.controller.ts:126)"
+        ]
+      },
+      "description": "Fetch a media upload's metadata (file name, uploader, created date). Fails if you cannot access the upload.",
+      "input_schema": {
+        "uuid": {
+          "type": "int",
+          "required": true,
+          "description": "The upload uuid."
+        }
+      },
+      "exec_spec": {
+        "entity": "MediaUpload",
+        "lookup_by": {
+          "uuid": {
+            "$arg": "uuid"
+          }
+        },
+        "scope": {
+          "owner_col": "user_id"
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "uuid"
+        ],
+        "messages": {
+          "auth": "Sign in to view media.",
+          "not_found": "That upload does not exist."
+        }
+      }
+    },
+    {
+      "tool": "delete_media",
+      "family": "crud.delete",
+      "entity": "MediaUpload",
+      "_evidence": {
+        "locator": "backend/src/media/media.service.ts:144",
+        "id_local": "MediaUpload.deleteMedia",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/private/media/:uuid",
+          "locator": "backend/src/api/private/media/media.controller.ts:138"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "async deleteMedia(userId, uuid) {\n  if (!(await this.permissionsService.checkMediaDeletePermission(userId, uuid))) throw new PermissionError('User does neither own the upload nor a linked note');\n  await this.mediaService.deleteFile(uuid);\n}",
+        "edges": [
+          "checkMediaDeletePermission (media.controller.ts:138)"
+        ]
+      },
+      "description": "Delete a media upload. Fails if you are neither the uploader nor the owner of a note linked to it.",
+      "input_schema": {
+        "uuid": {
+          "type": "int",
+          "required": true,
+          "description": "The upload uuid to delete."
+        }
+      },
+      "exec_spec": {
+        "entity": "MediaUpload",
+        "lookup_by": {
+          "uuid": {
+            "$arg": "uuid"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "uuid"
+        ],
+        "messages": {
+          "auth": "Sign in to delete media.",
+          "precondition": "Only the uploader (or a linked-note owner) can delete this media.",
+          "not_found": "That upload does not exist."
+        }
+      }
+    },
+    {
+      "tool": "link_media_to_note",
+      "family": "crud.insert",
+      "entity": "MediaUploadNote",
+      "_evidence": {
+        "locator": "backend/src/media/media.service.ts:285",
+        "id_local": "MediaUpload.linkMediaToNote",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /api/private/media/:uuid/notes/:noteAlias",
+          "locator": "backend/src/api/private/media/media.controller.ts:105"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "const mediaUpload = await this.mediaService.findUploadByUuid(uuid);\nconst noteId = await this.noteService.getNoteIdByAlias(noteAlias);\nif (mediaUpload.user_id !== userId) throw new PermissionError('Only the uploader may link this media upload to a note');\nif ((await this.permissionsService.determinePermission(userId, noteId)) < PermissionLevel.WRITE) throw new PermissionError('No permission');\nawait this.mediaService.addNoteToMediaUpload(uuid, noteId);",
+        "edges": [
+          "linkMediaToNote (media.controller.ts:105)"
+        ]
+      },
+      "description": "Link a media upload you own to another note you can write. Fails if you do not own the upload or lack write access on the target note.",
+      "input_schema": {
+        "uuid": {
+          "type": "int",
+          "required": true,
+          "description": "The media upload uuid."
+        },
+        "noteId": {
+          "type": "int",
+          "required": true,
+          "description": "The note to link the upload to."
+        }
+      },
+      "exec_spec": {
+        "entity": "MediaUploadNote",
+        "set_on_create": {
+          "media_upload_uuid": {
+            "$arg": "uuid"
+          },
+          "note_id": {
+            "$arg": "noteId"
+          }
+        },
+        "fields": {
+          "media_upload_uuid": {
+            "$arg": "uuid"
+          },
+          "note_id": {
+            "$arg": "noteId"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "uuid",
+          "noteId"
+        ],
+        "messages": {
+          "auth": "Sign in to link media.",
+          "precondition": "Only the uploader may link the media, and only to a note you can write.",
+          "not_found": "That upload or note does not exist."
+        }
+      }
+    },
+    {
+      "tool": "get_my_notes",
+      "family": "search",
+      "entity": "Note",
+      "_evidence": {
+        "id_local": "Explore.getMyNotes",
+        "locator": "backend/src/explore/explore.service.ts:81"
+      },
+      "description": "List the notes owned by the signed-in user (pagination). Use get_note with a returned id to read full content and metadata.",
+      "input_schema": {},
+      "exec_spec": {
+        "entity": "Note",
+        "scope": {
+          "owner_col": "owner_id"
+        },
+        "pagination": {
+          "default_limit": 20
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "Sign in to list your notes."
+        }
+      }
+    },
+    {
+      "tool": "get_public_notes",
+      "family": "search",
+      "entity": "Note",
+      "_evidence": {
+        "id_local": "Explore.getPublicNotes",
+        "locator": "backend/src/explore/explore.service.ts:153"
+      },
+      "description": "Browse notes that are publicly visible, regardless of ownership (pagination). Use get_note with a returned id to read full content.",
+      "input_schema": {},
+      "exec_spec": {
+        "entity": "Note",
+        "filter": {
+          "col": "publicly_visible",
+          "mode": "eq",
+          "val": true
+        },
+        "pagination": {
+          "default_limit": 20
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "Sign in to browse public notes."
+        }
+      }
+    },
+    {
+      "tool": "get_shared_notes",
+      "family": "search",
+      "entity": "NoteUserPermission",
+      "_evidence": {
+        "id_local": "Explore.getSharedWithMe",
+        "locator": "backend/src/explore/explore.service.ts:114"
+      },
+      "description": "List the note-permission rows showing which notes were shared with the signed-in user and whether they can edit each. Use the note_id values with get_note to read the notes.",
+      "input_schema": {},
+      "exec_spec": {
+        "entity": "NoteUserPermission",
+        "scope": {
+          "owner_col": "user_id"
+        },
+        "search_fields": [
+          "note_id"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "note_id"
+          ]
+        },
+        "pagination": {
+          "default_limit": 20
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "Sign in to list notes shared with you."
+        }
+      }
+    },
+    {
+      "tool": "get_pinned_notes",
+      "family": "search",
+      "entity": "UserPinnedNote",
+      "_evidence": {
+        "id_local": "Explore.getMyPinnedNotes",
+        "locator": "backend/src/explore/explore.service.ts:190"
+      },
+      "description": "List the pinned-note rows for the signed-in user (which notes they pinned). Use the note_id values with get_note to read the notes.",
+      "input_schema": {},
+      "exec_spec": {
+        "entity": "UserPinnedNote",
+        "scope": {
+          "owner_col": "user_id"
+        },
+        "search_fields": [
+          "note_id"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "note_id"
+          ]
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "Sign in to list your pinned notes."
+        }
+      }
+    },
+    {
+      "tool": "get_recently_visited_notes",
+      "family": "search",
+      "entity": "VisitedNote",
+      "_evidence": {
+        "id_local": "Explore.getRecentlyVisitedNotes",
+        "locator": "backend/src/explore/explore.service.ts:216"
+      },
+      "description": "List the recently-visited-note rows for the signed-in user, most recently visited first. Use the note_id values with get_note to read the notes.",
+      "input_schema": {},
+      "exec_spec": {
+        "entity": "VisitedNote",
+        "scope": {
+          "owner_col": "user_id"
+        },
+        "search_fields": [
+          "note_id"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "note_id"
+          ]
+        },
+        "sort": {
+          "col": "visited_at",
+          "dir": "desc"
+        },
+        "pagination": {
+          "default_limit": 20
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "Sign in to list recently visited notes."
+        }
+      }
+    },
+    {
+      "tool": "set_note_pin",
+      "family": "crud.upsert",
+      "entity": "UserPinnedNote",
+      "_evidence": {
+        "locator": "backend/src/explore/explore.service.ts:454",
+        "id_local": "Explore.setNotePinStatus",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /api/private/explore/pin/:noteAlias",
+          "locator": "backend/src/api/private/explore/explore.controller.ts:108"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "return this.knex.transaction(async (transaction) => {\n  if (isPinned) {\n    await transaction(TableUserPinnedNote).insert({ userId, noteId }).onConflict(['user_id','note_id']).ignore();\n    return transformQueryResultIntoDtos(await this.applyCommonQuery(transaction(TableNote).where('note.id', noteId), transaction))[0];\n  } else { await transaction(TableUserPinnedNote).where({ userId, noteId }).delete(); return null; }\n});",
+        "edges": [
+          "SessionGuard controller-wide (explore.controller.ts:108); note resolved by alias"
+        ]
+      },
+      "description": "Pin a note for the signed-in user so it appears in their pinned list. Idempotent: pinning an already-pinned note is a no-op. Remove it with unpin_note.",
+      "input_schema": {
+        "noteId": {
+          "type": "int",
+          "required": true,
+          "description": "The note to pin."
+        }
+      },
+      "exec_spec": {
+        "entity": "UserPinnedNote",
+        "key": {
+          "user_id": {
+            "$session": "account_id"
+          },
+          "note_id": {
+            "$arg": "noteId"
+          }
+        },
+        "insert_fields": {
+          "user_id": {
+            "$session": "account_id"
+          },
+          "note_id": {
+            "$arg": "noteId"
+          }
+        },
+        "set_on_exists": {}
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "noteId"
+        ],
+        "messages": {
+          "auth": "Sign in to pin a note.",
+          "not_found": "That note does not exist."
+        }
+      }
+    },
+    {
+      "tool": "unpin_note",
+      "family": "crud.delete",
+      "entity": "UserPinnedNote",
+      "_evidence": {
+        "id_local": "Explore.setNotePinStatus",
+        "locator": "backend/src/explore/explore.service.ts:454",
+        "ref_code": "else { await transaction(TableUserPinnedNote).where({ userId, noteId }).delete(); return null; }",
+        "edges": [
+          "unpin branch of Explore.setNotePinStatus (explore.service.ts:459)"
+        ]
+      },
+      "description": "Remove a note from the signed-in user's pinned list. No-op if the note was not pinned.",
+      "input_schema": {
+        "noteId": {
+          "type": "int",
+          "required": true,
+          "description": "The note to unpin."
+        }
+      },
+      "exec_spec": {
+        "entity": "UserPinnedNote",
+        "lookup_by": {
+          "user_id": {
+            "$session": "account_id"
+          },
+          "note_id": {
+            "$arg": "noteId"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "noteId"
+        ],
+        "messages": {
+          "auth": "Sign in to unpin a note."
+        }
+      }
+    }
+  ],
+  "seed_state": {
+    "User": [
+      {
+        "id": 1,
+        "username": "alice",
+        "guest_uuid": null,
+        "display_name": "Alice",
+        "created_at": "2026-01-01T00:00:00Z",
+        "photo_url": null,
+        "email": "alice@example.com",
+        "author_style": 1
+      },
+      {
+        "id": 2,
+        "username": "bob",
+        "guest_uuid": null,
+        "display_name": "Bob",
+        "created_at": "2026-01-01T00:00:00Z",
+        "photo_url": null,
+        "email": "bob@example.com",
+        "author_style": 1
+      },
+      {
+        "id": 3,
+        "username": null,
+        "guest_uuid": "guest-abc",
+        "display_name": "Guest",
+        "created_at": "2026-01-01T00:00:00Z",
+        "photo_url": null,
+        "email": null,
+        "author_style": 1
+      }
+    ],
+    "Identity": [
+      {
+        "user_id": 1,
+        "provider_type": "local",
+        "provider_identifier": null,
+        "provider_user_id": "ops@hedgedoc.example",
+        "password_hash": "pw-operations",
+        "created_at": "2026-01-01T00:00:00Z",
+        "updated_at": "2026-01-01T00:00:00Z",
+        "id": 1
+      },
+      {
+        "user_id": 2,
+        "provider_type": "local",
+        "provider_identifier": null,
+        "provider_user_id": "member@hedgedoc.example",
+        "password_hash": "pw-member",
+        "created_at": "2026-01-01T00:00:00Z",
+        "updated_at": "2026-01-01T00:00:00Z",
+        "id": 2
+      }
+    ],
+    "Group": [
+      {
+        "id": 1,
+        "name": "everyone",
+        "display_name": "Everyone",
+        "is_special": true
+      },
+      {
+        "id": 2,
+        "name": "staff",
+        "display_name": "Staff",
+        "is_special": false
+      }
+    ],
+    "Note": [
+      {
+        "id": 101,
+        "version": 2,
+        "created_at": "2026-01-01T00:00:00Z",
+        "owner_id": 1,
+        "publicly_visible": true
+      },
+      {
+        "id": 102,
+        "version": 2,
+        "created_at": "2026-01-01T00:00:00Z",
+        "owner_id": 2,
+        "publicly_visible": true
+      }
+    ],
+    "Alias": [
+      {
+        "alias": "roadmap",
+        "note_id": 101,
+        "is_primary": true,
+        "id": 1
+      },
+      {
+        "alias": "drafts",
+        "note_id": 101,
+        "is_primary": false,
+        "id": 2
+      }
+    ],
+    "Revision": [
+      {
+        "uuid": "r-101-1",
+        "note_id": 101,
+        "patch": "patch-1",
+        "content": "# Roadmap\nPlan.",
+        "title": "Roadmap",
+        "description": "Company roadmap",
+        "yjs_state_vector": null,
+        "note_type": "DOCUMENT",
+        "created_at": "2026-01-01T00:00:00Z",
+        "id": 1
+      },
+      {
+        "uuid": "r-102-1",
+        "note_id": 102,
+        "patch": "patch-2",
+        "content": "# Design\nIdeas.",
+        "title": "Design",
+        "description": "Design doc",
+        "yjs_state_vector": null,
+        "note_type": "DOCUMENT",
+        "created_at": "2026-01-01T00:00:00Z",
+        "id": 2
+      }
+    ],
+    "Session": [],
+    "ApiToken": [
+      {
+        "id": "tk-1",
+        "user_id": 1,
+        "label": "ci",
+        "secret_hash": "h",
+        "valid_until": "2027-01-01T00:00:00Z",
+        "last_used_at": null,
+        "created_at": "2026-01-01T00:00:00Z"
+      }
+    ],
+    "MediaUpload": [
+      {
+        "uuid": "m-1",
+        "user_id": 1,
+        "file_name": "pic.png",
+        "backend_type": "filesystem",
+        "backend_data": "/m/pic.png",
+        "created_at": "2026-01-01T00:00:00Z",
+        "id": 1
+      }
+    ],
+    "MediaUploadNote": [
+      {
+        "media_upload_uuid": "m-1",
+        "note_id": 101,
+        "id": 1
+      }
+    ],
+    "NoteUserPermission": [
+      {
+        "note_id": 102,
+        "user_id": 1,
+        "can_edit": false,
+        "id": 1
+      }
+    ],
+    "NoteGroupPermission": [
+      {
+        "note_id": 101,
+        "group_id": 2,
+        "can_edit": true,
+        "id": 1
+      }
+    ],
+    "GroupUser": [
+      {
+        "group_id": 2,
+        "user_id": 1,
+        "id": 1
+      }
+    ],
+    "UserPinnedNote": [
+      {
+        "user_id": 1,
+        "note_id": 101,
+        "id": 1
+      }
+    ],
+    "VisitedNote": [
+      {
+        "user_id": 1,
+        "note_id": 102,
+        "visited_at": "2026-01-02T00:00:00Z",
+        "id": 1
+      }
+    ],
+    "RevisionTag": [],
+    "AuthorshipInfo": []
+  }
+}

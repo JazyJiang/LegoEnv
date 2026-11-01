@@ -1,0 +1,2898 @@
+{
+  "env_id": "chat",
+  "_prep_version": 3,
+  "entities": [
+    {
+      "name": "User",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "createdat",
+          "type": "datetime",
+          "nullable": false,
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "updatedat",
+          "type": "datetime",
+          "nullable": false,
+          "audit": true
+        },
+        {
+          "name": "state",
+          "type": "int",
+          "nullable": false,
+          "enum": [
+            0,
+            10,
+            20,
+            30
+          ],
+          "default": 0
+        },
+        {
+          "name": "stateat",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "access",
+          "type": "json",
+          "nullable": true
+        },
+        {
+          "name": "lastseen",
+          "type": "datetime",
+          "nullable": true,
+          "audit": true
+        },
+        {
+          "name": "useragent",
+          "type": "text",
+          "nullable": false,
+          "default": "",
+          "max": 255
+        },
+        {
+          "name": "public",
+          "type": "json",
+          "nullable": true
+        },
+        {
+          "name": "trusted",
+          "type": "json",
+          "nullable": true
+        },
+        {
+          "name": "tags",
+          "type": "json",
+          "nullable": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "id"
+          ]
+        }
+      ],
+      "_lifecycle": {
+        "col": "state",
+        "initial": 0,
+        "states": [
+          0,
+          10,
+          20,
+          30
+        ],
+        "via": {
+          "User.update-state": {
+            "col": "state",
+            "from": [
+              0,
+              10
+            ],
+            "to": null
+          },
+          "User.delete": {
+            "col": "state",
+            "from": [
+              0
+            ],
+            "to": 20
+          }
+        }
+      }
+    },
+    {
+      "name": "UserTag",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "userid",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "User.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "tag",
+          "type": "text",
+          "nullable": false,
+          "max": 96
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "userid",
+            "tag"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "uname",
+          "type": "text",
+          "nullable": false,
+          "max": 32
+        },
+        {
+          "name": "userid",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "User.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "scheme",
+          "type": "text",
+          "nullable": false,
+          "max": 16
+        },
+        {
+          "name": "authlvl",
+          "type": "int",
+          "nullable": false
+        },
+        {
+          "name": "secret",
+          "type": "text",
+          "nullable": false,
+          "max": 255
+        },
+        {
+          "name": "expires",
+          "type": "datetime",
+          "nullable": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "userid",
+            "scheme"
+          ]
+        },
+        {
+          "kind": "unique",
+          "cols": [
+            "uname"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Device",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "userid",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "User.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "hash",
+          "type": "text",
+          "nullable": false,
+          "max": 16
+        },
+        {
+          "name": "deviceid",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "platform",
+          "type": "text",
+          "nullable": true,
+          "max": 32
+        },
+        {
+          "name": "lastseen",
+          "type": "datetime",
+          "nullable": false,
+          "audit": true
+        },
+        {
+          "name": "lang",
+          "type": "text",
+          "nullable": true,
+          "max": 8
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "hash"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Topic",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false,
+          "max": 25
+        },
+        {
+          "name": "createdat",
+          "type": "datetime",
+          "nullable": false,
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "updatedat",
+          "type": "datetime",
+          "nullable": false,
+          "audit": true
+        },
+        {
+          "name": "touchedat",
+          "type": "datetime",
+          "nullable": true,
+          "audit": true
+        },
+        {
+          "name": "state",
+          "type": "int",
+          "nullable": false,
+          "enum": [
+            0,
+            10,
+            20,
+            30
+          ],
+          "default": 0
+        },
+        {
+          "name": "stateat",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "usebt",
+          "type": "bool",
+          "nullable": false,
+          "default": false
+        },
+        {
+          "name": "owner",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "User.id",
+          "default": 0
+        },
+        {
+          "name": "access",
+          "type": "json",
+          "nullable": true
+        },
+        {
+          "name": "seqid",
+          "type": "int",
+          "nullable": false,
+          "default": 0
+        },
+        {
+          "name": "delid",
+          "type": "int",
+          "nullable": false,
+          "default": 0
+        },
+        {
+          "name": "subcnt",
+          "type": "int",
+          "nullable": false,
+          "default": 0
+        },
+        {
+          "name": "public",
+          "type": "json",
+          "nullable": true
+        },
+        {
+          "name": "trusted",
+          "type": "json",
+          "nullable": true
+        },
+        {
+          "name": "tags",
+          "type": "json",
+          "nullable": true
+        },
+        {
+          "name": "aux",
+          "type": "json",
+          "nullable": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "name"
+          ]
+        }
+      ],
+      "_lifecycle": {
+        "col": "state",
+        "initial": 0,
+        "states": [
+          0,
+          10,
+          20,
+          30
+        ],
+        "via": {
+          "Topic.delete": {
+            "col": "state",
+            "from": [
+              0
+            ],
+            "to": 20
+          }
+        }
+      }
+    },
+    {
+      "name": "TopicTag",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "topic",
+          "type": "text",
+          "nullable": false,
+          "fk_to": "Topic.name",
+          "on_delete": "cascade",
+          "max": 25
+        },
+        {
+          "name": "tag",
+          "type": "text",
+          "nullable": false,
+          "max": 96
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "topic",
+            "tag"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Subscription",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "createdat",
+          "type": "datetime",
+          "nullable": false,
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "updatedat",
+          "type": "datetime",
+          "nullable": false,
+          "audit": true
+        },
+        {
+          "name": "deletedat",
+          "type": "datetime",
+          "nullable": true,
+          "audit": true
+        },
+        {
+          "name": "userid",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "User.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "topic",
+          "type": "text",
+          "nullable": false,
+          "fk_to": "Topic.name",
+          "max": 25
+        },
+        {
+          "name": "delid",
+          "type": "int",
+          "nullable": false,
+          "default": 0
+        },
+        {
+          "name": "recvseqid",
+          "type": "int",
+          "nullable": false,
+          "default": 0
+        },
+        {
+          "name": "readseqid",
+          "type": "int",
+          "nullable": false,
+          "default": 0
+        },
+        {
+          "name": "modewant",
+          "type": "text",
+          "nullable": true,
+          "max": 8
+        },
+        {
+          "name": "modegiven",
+          "type": "text",
+          "nullable": true,
+          "max": 8
+        },
+        {
+          "name": "private",
+          "type": "json",
+          "nullable": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "topic",
+            "userid"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Message",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "createdat",
+          "type": "datetime",
+          "nullable": false,
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "updatedat",
+          "type": "datetime",
+          "nullable": false,
+          "audit": true
+        },
+        {
+          "name": "deletedat",
+          "type": "datetime",
+          "nullable": true,
+          "audit": true
+        },
+        {
+          "name": "delid",
+          "type": "int",
+          "nullable": false,
+          "default": 0
+        },
+        {
+          "name": "seqid",
+          "type": "int",
+          "nullable": false
+        },
+        {
+          "name": "topic",
+          "type": "text",
+          "nullable": false,
+          "fk_to": "Topic.name",
+          "on_delete": "cascade",
+          "max": 25
+        },
+        {
+          "name": "from",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "User.id"
+        },
+        {
+          "name": "head",
+          "type": "json",
+          "nullable": true
+        },
+        {
+          "name": "content",
+          "type": "json",
+          "nullable": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "topic",
+            "seqid"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Dellog",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "topic",
+          "type": "text",
+          "nullable": false,
+          "fk_to": "Topic.name",
+          "on_delete": "cascade",
+          "max": 25
+        },
+        {
+          "name": "deletedfor",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "User.id",
+          "default": 0
+        },
+        {
+          "name": "delid",
+          "type": "int",
+          "nullable": false
+        },
+        {
+          "name": "low",
+          "type": "int",
+          "nullable": false
+        },
+        {
+          "name": "hi",
+          "type": "int",
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "name": "Credential",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "createdat",
+          "type": "datetime",
+          "nullable": false,
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "updatedat",
+          "type": "datetime",
+          "nullable": false,
+          "audit": true
+        },
+        {
+          "name": "deletedat",
+          "type": "datetime",
+          "nullable": true,
+          "audit": true
+        },
+        {
+          "name": "method",
+          "type": "text",
+          "nullable": false,
+          "max": 16
+        },
+        {
+          "name": "value",
+          "type": "text",
+          "nullable": false,
+          "max": 128
+        },
+        {
+          "name": "synthetic",
+          "type": "text",
+          "nullable": false,
+          "max": 192
+        },
+        {
+          "name": "userid",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "User.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "resp",
+          "type": "text",
+          "nullable": true,
+          "max": 255
+        },
+        {
+          "name": "done",
+          "type": "bool",
+          "nullable": false,
+          "default": false
+        },
+        {
+          "name": "retries",
+          "type": "int",
+          "nullable": false,
+          "default": 0
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "synthetic"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Fileupload",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "createdat",
+          "type": "datetime",
+          "nullable": false,
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "updatedat",
+          "type": "datetime",
+          "nullable": false,
+          "audit": true
+        },
+        {
+          "name": "userid",
+          "type": "id",
+          "nullable": true,
+          "fk_to": "User.id",
+          "on_delete": "set_null"
+        },
+        {
+          "name": "status",
+          "type": "int",
+          "nullable": false,
+          "enum": [
+            0,
+            1,
+            2,
+            3
+          ]
+        },
+        {
+          "name": "mimetype",
+          "type": "text",
+          "nullable": false,
+          "max": 255
+        },
+        {
+          "name": "size",
+          "type": "int",
+          "nullable": false
+        },
+        {
+          "name": "etag",
+          "type": "text",
+          "nullable": true,
+          "max": 128
+        },
+        {
+          "name": "location",
+          "type": "text",
+          "nullable": false,
+          "max": 2048
+        }
+      ]
+    },
+    {
+      "name": "FilemsgLink",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "fileid",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Fileupload.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "msgid",
+          "type": "id",
+          "nullable": true,
+          "fk_to": "Message.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "topic",
+          "type": "text",
+          "nullable": true,
+          "fk_to": "Topic.name",
+          "on_delete": "cascade",
+          "max": 25
+        },
+        {
+          "name": "userid",
+          "type": "id",
+          "nullable": true,
+          "fk_to": "User.id",
+          "on_delete": "cascade"
+        }
+      ]
+    },
+    {
+      "name": "Kvmeta",
+      "columns": [
+        {
+          "name": "key",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "max": 64
+        },
+        {
+          "name": "createdat",
+          "type": "datetime",
+          "nullable": true,
+          "audit": true
+        },
+        {
+          "name": "value",
+          "type": "text",
+          "nullable": true
+        }
+      ]
+    }
+  ],
+  "tools": [
+    {
+      "tool": "sign_in",
+      "op": "action",
+      "family": "guard.auth",
+      "entity": "Auth",
+      "exec_spec": {
+        "verify": {
+          "entity": "Auth",
+          "username_col": "uname",
+          "password_col": "secret"
+        }
+      },
+      "input_schema": {
+        "uname": {
+          "type": "text",
+          "required": true,
+          "description": "The account login name / email (Auth.uname)."
+        },
+        "secret": {
+          "type": "text",
+          "required": true,
+          "description": "The account password (Auth.secret)."
+        }
+      },
+      "guards": {
+        "required": [
+          "uname",
+          "secret"
+        ],
+        "preconditions": null
+      },
+      "_evidence": {
+        "locator": "server/session.go:925",
+        "id_local": "Auth.login",
+        "ref_code": "handler.Authenticate(msg.Login.Secret...) ; if rec.State undefined, userGetState(rec.Uid) rejects suspended accounts (session.go:530)",
+        "entry": {
+          "kind": "internal"
+        }
+      },
+      "description": "Sign in with an account login (uname) and password (secret). Opens the session that `$actor` and all per-user scoping resolve to; most other tools require this first. Fails if the credentials are wrong or the account is suspended."
+    },
+    {
+      "tool": "update_profile",
+      "op": "update",
+      "family": "update.field_set",
+      "entity": "User",
+      "exec_spec": {
+        "entity": "User",
+        "row_key": {
+          "id": {
+            "$session": "userid"
+          }
+        },
+        "set": {
+          "public": {
+            "$arg": "public"
+          },
+          "tags": {
+            "$arg": "tags"
+          }
+        }
+      },
+      "input_schema": {
+        "public": {
+          "type": "json",
+          "required": false,
+          "description": "Replace the public profile (User.public)."
+        },
+        "tags": {
+          "type": "json",
+          "required": false,
+          "description": "Replace discovery tags (User.tags)."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in before updating your profile.",
+          "not_found": "Your account record does not exist."
+        },
+        "preconditions": null
+      },
+      "_evidence": {
+        "locator": "server/user.go:556",
+        "id_local": "User.update",
+        "ref_code": "replyUpdateUser writes public/trusted/tags on the current user (user.go:556)",
+        "entry": "$actor"
+      },
+      "description": "Replace the current user's public profile / discovery tags on their own User row."
+    },
+    {
+      "tool": "change_password",
+      "op": "update",
+      "family": "update.field_set",
+      "entity": "Auth",
+      "exec_spec": {
+        "entity": "Auth",
+        "row_key": {
+          "userid": {
+            "$session": "userid"
+          },
+          "scheme": {
+            "$arg": "scheme"
+          }
+        },
+        "set": {
+          "secret": {
+            "$arg": "secret"
+          }
+        }
+      },
+      "input_schema": {
+        "scheme": {
+          "type": "text",
+          "required": true,
+          "description": "The auth scheme to update (e.g. 'basic')."
+        },
+        "secret": {
+          "type": "text",
+          "required": true,
+          "description": "The new password/secret for that scheme."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Auth",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "userid",
+                      "op": "eq",
+                      "value": {
+                        "session": "userid"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "scheme",
+                      "op": "eq",
+                      "value": {
+                        "arg": "scheme"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must sign in before changing your password.",
+          "precondition": "You have no login record for that scheme to change.",
+          "not_found": "That auth record does not exist."
+        }
+      },
+      "_evidence": {
+        "locator": "server/user.go:336",
+        "id_local": "User.update-auth",
+        "ref_code": "authhdl.UpdateRecord(&auth.Rec{Uid:user.Uid()}, msg.Acc.Secret) — user updates own auth record (user.go:336)",
+        "edges": [
+          {
+            "ref": "User",
+            "kind": "entity",
+            "evidence": "user updates own auth record; session-authenticated (user.go:336)"
+          }
+        ]
+      },
+      "description": "Change the password (secret) of one of your own Auth login records, identified by scheme. Fails if you have no login record for that scheme."
+    },
+    {
+      "tool": "register_device",
+      "op": "update",
+      "family": "crud.upsert",
+      "entity": "Device",
+      "exec_spec": {
+        "entity": "Device",
+        "key": {
+          "userid": {
+            "$session": "userid"
+          },
+          "deviceid": {
+            "$arg": "deviceID"
+          }
+        },
+        "insert_fields": {
+          "platform": {
+            "$arg": "platform"
+          },
+          "lang": {
+            "$arg": "lang"
+          }
+        },
+        "set_on_exists": {
+          "platform": {
+            "$arg": "platform"
+          },
+          "lang": {
+            "$arg": "lang"
+          }
+        }
+      },
+      "input_schema": {
+        "deviceID": {
+          "type": "text",
+          "required": true,
+          "description": "The client device id to register/refresh."
+        },
+        "platform": {
+          "type": "text",
+          "required": false,
+          "description": "ios/android/web platform label."
+        },
+        "lang": {
+          "type": "text",
+          "required": false,
+          "description": "Device language code."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "deviceID"
+        ],
+        "messages": {
+          "auth": "You must sign in before registering a device."
+        },
+        "preconditions": null
+      },
+      "_evidence": {
+        "locator": "server/session.go:739",
+        "id_local": "Device.update",
+        "ref_code": "if msg.Hi.DeviceID != \"\" { store.Devices.Update(s.uid, s.deviceID, ...) } (session.go:739)"
+      },
+      "description": "Register or refresh the push notification device for the current user. Passing an already-known device id updates its platform/language."
+    },
+    {
+      "tool": "delete_account",
+      "op": "delete",
+      "family": "crud.soft_delete",
+      "entity": "User",
+      "exec_spec": {
+        "entity": "User",
+        "lookup_by": {
+          "id": {
+            "$session": "userid"
+          }
+        },
+        "set": {
+          "state": 20
+        }
+      },
+      "input_schema": {},
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "session": "userid"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must sign in before deleting an account.",
+          "not_found": "Your account record does not exist.",
+          "precondition": "Your account record does not exist."
+        }
+      },
+      "_evidence": {
+        "locator": "server/user.go:593",
+        "id_local": "User.delete",
+        "ref_code": "permanentAccounts && authLvl != root -> ErrPolicy; else store.Users.Delete(uid) (user.go:593)",
+        "edges": [
+          {
+            "ref": "User",
+            "kind": "entity",
+            "evidence": "permanentAccounts && authLvl != root -> ErrPolicy; else soft-delete own account (user.go:593)"
+          }
+        ]
+      },
+      "description": "Permanently delete your own account (soft-delete: state moves to 20). The matching auth record, devices, credentials and subscriptions are removed."
+    },
+    {
+      "tool": "create_group",
+      "op": "create",
+      "family": "crud.insert",
+      "entity": "Topic",
+      "exec_spec": {
+        "entity": "Topic",
+        "fields": {
+          "name": {
+            "$arg": "topic"
+          },
+          "public": {
+            "$arg": "public"
+          },
+          "tags": {
+            "$arg": "tags"
+          }
+        },
+        "set_on_create": {
+          "subcnt": 1,
+          "owner": {
+            "$session": "userid"
+          }
+        },
+        "side_inserts": [
+          {
+            "entity": "Subscription",
+            "fields": {
+              "userid": {
+                "$session": "userid"
+              },
+              "topic": {
+                "$arg": "topic"
+              },
+              "modewant": "JRWPSADO",
+              "modegiven": "O",
+              "createdat": "2026-01-01T00:00:00Z",
+              "updatedat": "2026-01-01T00:00:00Z"
+            }
+          }
+        ]
+      },
+      "input_schema": {
+        "topic": {
+          "type": "text",
+          "required": true,
+          "description": "New group topic name (grpXXX). Must be unique."
+        },
+        "public": {
+          "type": "json",
+          "required": false,
+          "description": "Topic public description (Topic.public)."
+        },
+        "tags": {
+          "type": "json",
+          "required": false,
+          "description": "Indexable topic tags (Topic.tags)."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "session": "userid"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must sign in before creating a group.",
+          "unique": "A topic with that name already exists.",
+          "precondition": "Your user account could not be found."
+        }
+      },
+      "_evidence": {
+        "locator": "server/init_topic.go:502",
+        "id_local": "Topic.create-grp",
+        "ref_code": "store.Topics.Create(stopic, t.owner, ...); t.subCnt=1 (session.go:548, init_topic.go:502)",
+        "edges": [
+          {
+            "ref": "User",
+            "kind": "entity",
+            "evidence": "cluster.genLocalTopicName + store.Topics.Create with owner from session (session.go:548, init_topic.go:502)"
+          }
+        ]
+      },
+      "description": "Create a new group (or channel) topic owned by you, and subscribe you to it as owner. The topic name must be unique."
+    },
+    {
+      "tool": "create_direct",
+      "op": "create",
+      "family": "crud.insert",
+      "entity": "Topic",
+      "exec_spec": {
+        "entity": "Topic",
+        "fields": {
+          "name": {
+            "$arg": "topic"
+          }
+        },
+        "set_on_create": {
+          "subcnt": 2,
+          "owner": {
+            "$session": "userid"
+          }
+        },
+        "side_inserts": [
+          {
+            "entity": "Subscription",
+            "fields": {
+              "userid": {
+                "$session": "userid"
+              },
+              "topic": {
+                "$arg": "topic"
+              },
+              "modewant": "JRWPA",
+              "modegiven": "JRWPA",
+              "createdat": "2026-01-01T00:00:00Z"
+            }
+          },
+          {
+            "entity": "Subscription",
+            "fields": {
+              "userid": {
+                "$arg": "other"
+              },
+              "topic": {
+                "$arg": "topic"
+              },
+              "modewant": "JRWPA",
+              "modegiven": "JRWPA",
+              "createdat": "2026-01-01T00:00:00Z"
+            }
+          }
+        ]
+      },
+      "input_schema": {
+        "topic": {
+          "type": "text",
+          "required": true,
+          "description": "The p2p topic name (p2p<uid1><uid2>). Must be unique."
+        },
+        "other": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the other user the direct topic is with; must exist."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "other"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must sign in to start a direct conversation.",
+          "precondition": "That other user does not exist.",
+          "fk": "The other user could not be found.",
+          "unique": "A topic with that name already exists.",
+          "fk_missing": "A direct topic needs an owner; ensure you are signed in."
+        }
+      },
+      "_evidence": {
+        "locator": "server/init_topic.go:227",
+        "id_local": "Topic.create-p2p",
+        "ref_code": "if the other user does not exist, returns ErrUserNotFound (init_topic.go:227)",
+        "edges": [
+          {
+            "ref": "User",
+            "kind": "entity",
+            "evidence": "init_topic: if the other user does not exist, returns ErrUserNotFound (init_topic.go:227)"
+          }
+        ]
+      },
+      "description": "Create a direct (p2p) topic between you and another user, subscribing both parties. The other user must exist; the topic name must be unique."
+    },
+    {
+      "tool": "join_topic",
+      "op": "create",
+      "family": "crud.insert",
+      "entity": "Subscription",
+      "exec_spec": {
+        "entity": "Subscription",
+        "fields": {
+          "modewant": {
+            "$arg": "mode"
+          }
+        },
+        "set_on_create": {
+          "userid": {
+            "$session": "userid"
+          },
+          "topic": {
+            "$arg": "topic"
+          },
+          "modewant": {
+            "$arg": "mode"
+          },
+          "modegiven": "R",
+          "createdat": "2026-01-01T00:00:00Z",
+          "updatedat": "2026-01-01T00:00:00Z",
+          "recvseqid": 0,
+          "readseqid": 0,
+          "delid": 0
+        }
+      },
+      "input_schema": {
+        "topic": {
+          "type": "text",
+          "required": true,
+          "description": "The topic name to subscribe to / join."
+        },
+        "mode": {
+          "type": "text",
+          "required": false,
+          "description": "Requested access mode string (default 'R')."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Topic",
+                "where": {
+                  "node": "field",
+                  "col": "name",
+                  "op": "eq",
+                  "value": {
+                    "arg": "topic"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must sign in to join a topic.",
+          "precondition": "That topic does not exist.",
+          "unique": "You are already subscribed to that topic.",
+          "fk": "The topic could not be found."
+        }
+      },
+      "_evidence": {
+        "locator": "server/topic.go:1646",
+        "id_local": "Subscription.create",
+        "ref_code": "join requires the topic to exist or the user already invited (topic.go:1646)",
+        "edges": [
+          {
+            "ref": "Topic",
+            "kind": "entity",
+            "evidence": "join requires the topic to exist or the user already invited (topic.go:1646)"
+          }
+        ]
+      },
+      "description": "Subscribe the current user to an existing topic as a reader (or with a requested mode). Fails if the topic does not exist."
+    },
+    {
+      "tool": "invite_user",
+      "op": "create",
+      "family": "crud.insert",
+      "entity": "Subscription",
+      "exec_spec": {
+        "entity": "Subscription",
+        "fields": {
+          "modegiven": {
+            "$arg": "mode"
+          }
+        },
+        "set_on_create": {
+          "userid": {
+            "$arg": "user"
+          },
+          "topic": {
+            "$arg": "topic"
+          },
+          "modewant": "R",
+          "modegiven": {
+            "$arg": "mode"
+          },
+          "createdat": "2026-01-01T00:00:00Z",
+          "updatedat": "2026-01-01T00:00:00Z"
+        }
+      },
+      "input_schema": {
+        "topic": {
+          "type": "text",
+          "required": true,
+          "description": "The topic to invite into."
+        },
+        "user": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the user to invite."
+        },
+        "mode": {
+          "type": "text",
+          "required": false,
+          "description": "Access mode to grant the invited user (stored in modegiven); default 'R'."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Subscription",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "topic",
+                      "op": "eq",
+                      "value": {
+                        "arg": "topic"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "userid",
+                      "op": "eq",
+                      "value": {
+                        "session": "userid"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "modewant",
+                      "op": "icontains",
+                      "value": "S"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must sign in to invite users.",
+          "precondition": "Only a sharer of the topic can invite users.",
+          "unique": "That user is already subscribed to the topic.",
+          "fk": "The invited user does not exist."
+        }
+      },
+      "_evidence": {
+        "locator": "server/topic.go:1993",
+        "id_local": "Subscription.invite",
+        "ref_code": "anotherUserSub requires the requester to be a sharer (ModeShare/'S') (topic.go:1881)",
+        "edges": [
+          {
+            "ref": "Subscription",
+            "kind": "entity",
+            "evidence": "anotherUserSub requires the requester to be a sharer (ModeShare/'S') (topic.go:1881)"
+          }
+        ]
+      },
+      "description": "Invite another user into a topic by creating their subscription. Requires the inviter to be a sharer ('S') of the topic."
+    },
+    {
+      "tool": "set_subscription_mode",
+      "op": "update",
+      "family": "update.field_set",
+      "entity": "Subscription",
+      "exec_spec": {
+        "entity": "Subscription",
+        "row_key": {
+          "topic": {
+            "$arg": "topic"
+          },
+          "userid": {
+            "$session": "userid"
+          }
+        },
+        "set": {
+          "modegiven": {
+            "$arg": "mode"
+          }
+        }
+      },
+      "input_schema": {
+        "topic": {
+          "type": "text",
+          "required": true,
+          "description": "The topic whose subscription is being changed."
+        },
+        "mode": {
+          "type": "text",
+          "required": true,
+          "description": "New access mode string."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Subscription",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "topic",
+                      "op": "eq",
+                      "value": {
+                        "arg": "topic"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "userid",
+                      "op": "eq",
+                      "value": {
+                        "session": "userid"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "modewant",
+                      "op": "icontains",
+                      "value": "A"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must sign in to change a subscription.",
+          "precondition": "Only an admin of the topic can change access modes.",
+          "not_found": "That subscription does not exist."
+        }
+      },
+      "_evidence": {
+        "locator": "server/topic.go:1765",
+        "id_local": "Subscription.update",
+        "ref_code": "replySetSub requires the requester to have ModeApprove/'A' (topic.go:2718)",
+        "edges": [
+          {
+            "ref": "Subscription",
+            "kind": "entity",
+            "evidence": "replySetSub requires requester to have ModeApprove/'A' (topic.go:2718)"
+          }
+        ]
+      },
+      "description": "Change the access mode granted on a subscription. Requires the caller to be an admin ('A') of the topic."
+    },
+    {
+      "tool": "update_read_receipt",
+      "op": "update",
+      "family": "update.field_set",
+      "entity": "Subscription",
+      "exec_spec": {
+        "entity": "Subscription",
+        "row_key": {
+          "topic": {
+            "$arg": "topic"
+          },
+          "userid": {
+            "$session": "userid"
+          }
+        },
+        "set": {
+          "recvseqid": {
+            "$arg": "recv"
+          },
+          "readseqid": {
+            "$arg": "read"
+          }
+        }
+      },
+      "input_schema": {
+        "topic": {
+          "type": "text",
+          "required": true,
+          "description": "The topic the read receipt is for."
+        },
+        "recv": {
+          "type": "int",
+          "required": false,
+          "description": "Seqid the user has received up to."
+        },
+        "read": {
+          "type": "int",
+          "required": false,
+          "description": "Seqid the user has read up to."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Subscription",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "topic",
+                      "op": "eq",
+                      "value": {
+                        "arg": "topic"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "userid",
+                      "op": "eq",
+                      "value": {
+                        "session": "userid"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must sign in to send a read receipt.",
+          "precondition": "You are not subscribed to that topic.",
+          "not_found": "Your subscription to that topic does not exist."
+        }
+      },
+      "_evidence": {
+        "locator": "server/topic.go:1217",
+        "id_local": "Subscription.recvread",
+        "ref_code": "store.Subs.Update(topicName, asUid, {RecvSeqId, ReadSeqId}) — only for subscribed topics (topic.go:1217)",
+        "edges": [
+          {
+            "ref": "Subscription",
+            "kind": "entity",
+            "evidence": "handleNoteBroadcast -> note only accepted for subscribed topics (topic.go:1217)"
+          }
+        ]
+      },
+      "description": "Advance the receive/read seqid cursors on your own subscription to a topic."
+    },
+    {
+      "tool": "update_topic_desc",
+      "op": "update",
+      "family": "update.field_set",
+      "entity": "Topic",
+      "exec_spec": {
+        "entity": "Topic",
+        "row_key": {
+          "name": {
+            "$arg": "topic"
+          }
+        },
+        "set": {
+          "public": {
+            "$arg": "public"
+          },
+          "trusted": {
+            "$arg": "trusted"
+          },
+          "access": {
+            "$arg": "defacs_auth"
+          }
+        }
+      },
+      "input_schema": {
+        "topic": {
+          "type": "text",
+          "required": true,
+          "description": "Topic name to update ('me' is the current user's own descriptor)."
+        },
+        "public": {
+          "type": "json",
+          "required": false,
+          "description": "Replace the public description (Topic.public)."
+        },
+        "trusted": {
+          "type": "json",
+          "required": false,
+          "description": "Replace trusted/system data (Topic.trusted)."
+        },
+        "defacs_auth": {
+          "type": "text",
+          "required": false,
+          "description": "Default auth access mode."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Subscription",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "topic",
+                      "op": "eq",
+                      "value": {
+                        "arg": "topic"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "userid",
+                      "op": "eq",
+                      "value": {
+                        "session": "userid"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "modewant",
+                      "op": "icontains",
+                      "value": "A"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must sign in to change a topic description.",
+          "precondition": "Only an owner/admin of the topic can change its description.",
+          "not_found": "That topic does not exist."
+        }
+      },
+      "_evidence": {
+        "locator": "server/topic.go:2204",
+        "id_local": "Topic.update-desc",
+        "ref_code": "replySetDesc: only owner/admin may change the group description (topic.go:2204)",
+        "edges": [
+          {
+            "ref": "Subscription",
+            "kind": "entity",
+            "evidence": "replySetDesc: only owner/admin may change the group description (topic.go:2204)"
+          }
+        ]
+      },
+      "description": "Update a group topic's public/trusted description and default access. Requires admin ('A') on the topic; topic 'me' targets the current user's own descriptor."
+    },
+    {
+      "tool": "update_topic_tags",
+      "op": "update",
+      "family": "update.field_set",
+      "entity": "Topic",
+      "exec_spec": {
+        "entity": "Topic",
+        "row_key": {
+          "name": {
+            "$arg": "topic"
+          }
+        },
+        "set": {
+          "tags": {
+            "$arg": "tags"
+          }
+        }
+      },
+      "input_schema": {
+        "topic": {
+          "type": "text",
+          "required": true,
+          "description": "Topic (group) name, or 'me' for the current user."
+        },
+        "tags": {
+          "type": "json",
+          "required": true,
+          "description": "Replace the topic discovery tags."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Subscription",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "topic",
+                      "op": "eq",
+                      "value": {
+                        "arg": "topic"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "userid",
+                      "op": "eq",
+                      "value": {
+                        "session": "userid"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "modewant",
+                      "op": "icontains",
+                      "value": "A"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must sign in to change topic tags.",
+          "precondition": "Only an owner/admin of the topic can change its tags.",
+          "not_found": "That topic does not exist."
+        }
+      },
+      "_evidence": {
+        "locator": "server/topic.go:2903",
+        "id_local": "Topic.update-tags",
+        "ref_code": "replySetTags: group tags only owner/admin; user ('me') tags self (topic.go:2903)",
+        "edges": [
+          {
+            "ref": "Subscription",
+            "kind": "entity",
+            "evidence": "replySetTags: group tags only owner/admin; user ('me') tags self (topic.go:2903)"
+          }
+        ]
+      },
+      "description": "Replace a topic's discovery tags; topic 'me' updates the current user's own tags. Group tags require admin ('A')."
+    },
+    {
+      "tool": "update_topic_aux",
+      "op": "update",
+      "family": "update.field_set",
+      "entity": "Topic",
+      "exec_spec": {
+        "entity": "Topic",
+        "row_key": {
+          "name": {
+            "$arg": "topic"
+          }
+        },
+        "set": {
+          "aux": {
+            "$arg": "aux"
+          }
+        }
+      },
+      "input_schema": {
+        "topic": {
+          "type": "text",
+          "required": true,
+          "description": "Topic name."
+        },
+        "aux": {
+          "type": "json",
+          "required": true,
+          "description": "Aux key-value set to store (real code merges; here it replaces)."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Subscription",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "topic",
+                      "op": "eq",
+                      "value": {
+                        "arg": "topic"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "userid",
+                      "op": "eq",
+                      "value": {
+                        "session": "userid"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "modewant",
+                      "op": "icontains",
+                      "value": "A"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must sign in to update topic aux data.",
+          "precondition": "Only an admin of the topic can change its aux data.",
+          "not_found": "That topic does not exist."
+        }
+      },
+      "_evidence": {
+        "locator": "server/topic.go:3101",
+        "id_local": "Topic.update-aux",
+        "ref_code": "replySetAux requires the user to have admin (ModeAdmin) access (topic.go:3101)",
+        "edges": [
+          {
+            "ref": "Subscription",
+            "kind": "entity",
+            "evidence": "replySetAux requires the user to have admin (ModeAdmin) access (topic.go:3101)"
+          }
+        ]
+      },
+      "description": "Store an aux key-value set on a topic. Requires admin ('A') on the topic."
+    },
+    {
+      "tool": "delete_topic",
+      "op": "delete",
+      "family": "crud.delete",
+      "entity": "Topic",
+      "exec_spec": {
+        "entity": "Topic",
+        "lookup_by": {
+          "name": {
+            "$arg": "topic"
+          }
+        }
+      },
+      "input_schema": {
+        "topic": {
+          "type": "text",
+          "required": true,
+          "description": "The topic to delete."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Subscription",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "topic",
+                      "op": "eq",
+                      "value": {
+                        "arg": "topic"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "userid",
+                      "op": "eq",
+                      "value": {
+                        "session": "userid"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "modewant",
+                      "op": "icontains",
+                      "value": "O"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must sign in to delete a topic.",
+          "precondition": "Only the owner of the topic can delete it.",
+          "not_found": "That topic does not exist.",
+          "on_child": "That topic still has subscriptions or messages; you cannot delete a topic that is still in use."
+        }
+      },
+      "_evidence": {
+        "locator": "server/session.go:1224",
+        "id_local": "Topic.delete",
+        "ref_code": "deleting a group topic requires the owner; handleDelTopic checks ownership (topic.go:3246)",
+        "edges": [
+          {
+            "ref": "Subscription",
+            "kind": "entity",
+            "evidence": "deleting a group topic requires the owner; handleDelTopic checks ownership (topic.go:3246)"
+          }
+        ]
+      },
+      "description": "Permanently delete a group topic, its subscriptions, messages and del-log. The caller must be the topic owner ('O')."
+    },
+    {
+      "tool": "send_message",
+      "op": "create",
+      "family": "crud.insert",
+      "entity": "Message",
+      "exec_spec": {
+        "entity": "Message",
+        "fields": [
+          "topic",
+          "head",
+          "content"
+        ],
+        "set_on_create": {
+          "from": {
+            "$session": "userid"
+          },
+          "seqid": {
+            "$auto": "max(seqid)+1"
+          }
+        }
+      },
+      "input_schema": {
+        "topic": {
+          "type": "text",
+          "required": true,
+          "description": "The topic to publish the message to."
+        },
+        "content": {
+          "type": "json",
+          "required": true,
+          "description": "The message body (content)."
+        },
+        "head": {
+          "type": "json",
+          "required": false,
+          "description": "Message header map (Message.head)."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Subscription",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "topic",
+                      "op": "eq",
+                      "value": {
+                        "arg": "topic"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "userid",
+                      "op": "eq",
+                      "value": {
+                        "session": "userid"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "modewant",
+                      "op": "icontains",
+                      "value": "W"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must sign in before sending a message.",
+          "precondition": "You must be subscribed with write access to post to that topic.",
+          "fk": "That topic does not exist.",
+          "fk_missing": "The destination topic is required and must exist."
+        }
+      },
+      "_evidence": {
+        "locator": "server/topic.go:999",
+        "id_local": "Message.create",
+        "ref_code": "handlePubBroadcast checks userData.modeMode & ModeWrite (topic.go:1100); session checkUser requires auth (session.go:530)",
+        "edges": [
+          {
+            "ref": "Subscription",
+            "kind": "entity",
+            "evidence": "handlePubBroadcast checks userData.modeMode & ModeWrite (topic.go:1100); session checkUser requires auth (session.go:530)"
+          }
+        ]
+      },
+      "description": "Publish a message to a topic, incrementing the topic and message seqids and linking any attachment file ids. Requires the caller to have write ('W') access."
+    },
+    {
+      "tool": "read_messages",
+      "op": "search",
+      "family": "search",
+      "entity": "Message",
+      "exec_spec": {
+        "entity": "Message",
+        "rank": {
+          "method": "exact"
+        },
+        "filter": {
+          "col": "topic",
+          "mode": "exact",
+          "val": {
+            "$arg": "topic"
+          }
+        },
+        "sort": {
+          "col": "seqid",
+          "dir": "desc"
+        }
+      },
+      "input_schema": {
+        "topic": {
+          "type": "text",
+          "required": true,
+          "description": "The topic whose messages to read."
+        },
+        "limit": {
+          "type": "int",
+          "required": false,
+          "description": "Max messages to return (default 20, newest first)."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Subscription",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "topic",
+                      "op": "eq",
+                      "value": {
+                        "arg": "topic"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "userid",
+                      "op": "eq",
+                      "value": {
+                        "session": "userid"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "modewant",
+                      "op": "icontains",
+                      "value": "R"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must sign in before reading messages.",
+          "precondition": "You must be subscribed with read access to that topic."
+        }
+      },
+      "_evidence": {
+        "locator": "server/topic.go:2768",
+        "id_local": "Message.search",
+        "ref_code": "replyGetData checks access: does the user have ModeRead? (topic.go:2781)",
+        "edges": [
+          {
+            "ref": "Subscription",
+            "kind": "entity",
+            "evidence": "replyGetData checks access: does the user have ModeRead? (topic.go:2781)"
+          }
+        ]
+      },
+      "description": "Fetch messages from a topic (newest first) that the caller has read ('R') access to. Optionally filter by seqid range."
+    },
+    {
+      "tool": "delete_message",
+      "op": "delete",
+      "family": "crud.soft_delete",
+      "entity": "Message",
+      "exec_spec": {
+        "entity": "Message",
+        "lookup_by": {
+          "topic": {
+            "$arg": "topic"
+          },
+          "seqid": {
+            "$arg": "seqid"
+          }
+        },
+        "set": {
+          "deletedat": "now()"
+        }
+      },
+      "input_schema": {
+        "topic": {
+          "type": "text",
+          "required": true,
+          "description": "The topic the message lives in."
+        },
+        "seqid": {
+          "type": "int",
+          "required": true,
+          "description": "The message seqid to delete."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Subscription",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "topic",
+                      "op": "eq",
+                      "value": {
+                        "arg": "topic"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "userid",
+                      "op": "eq",
+                      "value": {
+                        "session": "userid"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "modewant",
+                      "op": "icontains",
+                      "value": "D"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must sign in before deleting a message.",
+          "precondition": "You must have delete access to that topic.",
+          "not_found": "That message does not exist in the topic."
+        }
+      },
+      "_evidence": {
+        "locator": "server/topic.go:3173",
+        "id_local": "Message.delete",
+        "ref_code": "hard delete of messages requires ModeDelete/'D'; soft delete self-messages for reader (topic.go:3173)",
+        "edges": [
+          {
+            "ref": "Subscription",
+            "kind": "entity",
+            "evidence": "hard delete of messages requires ModeDelete/'D'; soft delete self-messages for reader (topic.go:3173)"
+          }
+        ]
+      },
+      "description": "Delete messages in a topic by seqid range. Soft-delete for readers; hard-delete requires delete ('D') access."
+    },
+    {
+      "tool": "upload_file",
+      "op": "create",
+      "family": "crud.insert",
+      "entity": "Fileupload",
+      "exec_spec": {
+        "entity": "Fileupload",
+        "fields": [
+          "mimetype"
+        ],
+        "set_on_create": {
+          "status": 1,
+          "size": 0,
+          "etag": "",
+          "location": "",
+          "userid": {
+            "$session": "userid"
+          }
+        }
+      },
+      "input_schema": {
+        "mime": {
+          "type": "text",
+          "required": false,
+          "description": "Client Content-Type (best-effort, server verifies)."
+        },
+        "file": {
+          "type": "json",
+          "required": true,
+          "description": "The file content to upload (multipart)."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "file"
+        ],
+        "messages": {
+          "auth": "You must sign in before uploading a file."
+        },
+        "preconditions": null
+      },
+      "_evidence": {
+        "locator": "server/hdl_files.go:325",
+        "id_local": "Fileupload.upload",
+        "ref_code": "url,size,err := mh.Upload(fdef,file) ; FinishUpload(fdef,true,size)",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/v0/file/u/",
+          "locator": "server/main.go:783"
+        }
+      },
+      "description": "Start an upload and record a Fileupload row for the current user, then ship the file bytes to object storage."
+    },
+    {
+      "tool": "get_file",
+      "op": "read",
+      "family": "crud.fetch",
+      "entity": "Fileupload",
+      "exec_spec": {
+        "entity": "Fileupload",
+        "lookup_by": {
+          "id": {
+            "$arg": "fid"
+          }
+        }
+      },
+      "input_schema": {
+        "fid": {
+          "type": "int",
+          "required": true,
+          "description": "The file id to fetch."
+        }
+      },
+      "guards": {
+        "required": [
+          "fid"
+        ],
+        "messages": {
+          "not_found": "No file with that id exists."
+        },
+        "preconditions": null
+      },
+      "_evidence": {
+        "locator": "server/hdl_files.go:139",
+        "id_local": "Fileupload.serve",
+        "ref_code": "fd, rsc, err := mh.Download(req.URL.String()); http.ServeContent(wrt, req, \"\", fd.UpdatedAt, rsc)",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v0/file/s/",
+          "locator": "server/main.go:785"
+        }
+      },
+      "_binds": {
+        "fid": "Fileupload.id"
+      },
+      "description": "Fetch a file's record and stream its bytes. Works without signing in."
+    },
+    {
+      "tool": "update_credentials",
+      "op": "create",
+      "family": "crud.upsert",
+      "entity": "Credential",
+      "exec_spec": {
+        "entity": "Credential",
+        "key": {
+          "userid": {
+            "$session": "userid"
+          },
+          "method": {
+            "$arg": "method"
+          },
+          "value": {
+            "$arg": "value"
+          }
+        },
+        "insert_fields": {
+          "resp": {
+            "$arg": "response"
+          }
+        },
+        "set_on_exists": {
+          "resp": {
+            "$arg": "response"
+          }
+        }
+      },
+      "input_schema": {
+        "method": {
+          "type": "text",
+          "required": true,
+          "description": "Credential method: email, tel, captcha."
+        },
+        "value": {
+          "type": "text",
+          "required": true,
+          "description": "The credential value."
+        },
+        "response": {
+          "type": "text",
+          "required": false,
+          "description": "Validation response; if given the credential is validated."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "method",
+          "value"
+        ],
+        "messages": {
+          "auth": "You must sign in before adding credentials."
+        },
+        "preconditions": null
+      },
+      "_evidence": {
+        "locator": "server/topic.go:3037",
+        "id_local": "Credential.upsert",
+        "ref_code": "validatedCreds / addCreds on the current user's account (topic.go:3037)"
+      },
+      "description": "Add or update a credential (email/tel/captcha) for the current user; if a validation response is given the credential is marked done."
+    },
+    {
+      "tool": "list_credentials",
+      "op": "search",
+      "family": "search",
+      "entity": "Credential",
+      "exec_spec": {
+        "entity": "Credential",
+        "rank": {
+          "method": "exact"
+        },
+        "scope": {
+          "where": {
+            "userid": "$session.userid"
+          }
+        }
+      },
+      "input_schema": {
+        "method": {
+          "type": "text",
+          "required": false,
+          "description": "Optional filter by credential method."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in to list your credentials."
+        },
+        "preconditions": null
+      },
+      "_evidence": {
+        "locator": "server/topic.go:2999",
+        "id_local": "Credential.search",
+        "ref_code": "store.Users.GetAllCreds(asUid, \"\", false) — reads the current user's credentials (me topic)"
+      },
+      "description": "List the current user's validated credentials, optionally filtered by method."
+    },
+    {
+      "tool": "create_account",
+      "op": "create",
+      "family": "auth.register",
+      "entity": "User",
+      "exec_spec": {
+        "entity": "User",
+        "fields": [
+          "public",
+          "tags"
+        ],
+        "prechecks": [
+          {
+            "entity": "Auth",
+            "where": {
+              "uname": {
+                "$arg": "email"
+              }
+            },
+            "negate": true,
+            "message": "That email/login is already registered."
+          }
+        ],
+        "side_inserts": [
+          {
+            "entity": "Auth",
+            "link_col": "userid",
+            "fields": {
+              "uname": {
+                "$arg": "email"
+              },
+              "scheme": "basic",
+              "secret": {
+                "$arg": "password"
+              },
+              "authlvl": 10
+            }
+          }
+        ]
+      },
+      "input_schema": {
+        "email": {
+          "type": "text",
+          "required": true,
+          "description": "The new account login / email (stored as Auth.uname). Must be unique."
+        },
+        "password": {
+          "type": "text",
+          "required": true,
+          "description": "The new account password (stored as Auth.secret)."
+        },
+        "public": {
+          "type": "json",
+          "required": false,
+          "description": "Public profile object (User.public)."
+        },
+        "tags": {
+          "type": "json",
+          "required": false,
+          "description": "Discovery tags for the account (User.tags)."
+        }
+      },
+      "guards": {
+        "required": [
+          "email",
+          "password"
+        ],
+        "preconditions": null
+      },
+      "_evidence": {
+        "locator": "server/user.go:99",
+        "id_local": "User.create",
+        "ref_code": "replyCreateUser calls authhdl.IsUnique(secret) to ensure the login is not taken (user.go:44); store.Users.Create(&user, private)",
+        "entry": {
+          "kind": "internal"
+        }
+      },
+      "description": "Register a new account: creates a User identity plus an Auth login record (scheme 'basic') linked to it. Fails if the login name is already taken."
+    }
+  ],
+  "seed_state": {
+    "User": [
+      {
+        "id": 1,
+        "state": 0,
+        "useragent": "",
+        "public": {
+          "fn": "Alex Admin"
+        },
+        "tags": [
+          "admin"
+        ]
+      },
+      {
+        "id": 2,
+        "state": 0,
+        "useragent": "",
+        "public": {
+          "fn": "Bob Reader"
+        }
+      },
+      {
+        "id": 3,
+        "state": 0,
+        "useragent": "",
+        "public": {
+          "fn": "Carol Writer"
+        }
+      },
+      {
+        "id": 4,
+        "state": 0,
+        "useragent": "",
+        "public": {
+          "fn": "Dana Plain"
+        }
+      }
+    ],
+    "Auth": [
+      {
+        "id": 1,
+        "uname": "ops@chat.example",
+        "userid": 1,
+        "scheme": "basic",
+        "authlvl": 30,
+        "secret": "pw-operations"
+      },
+      {
+        "id": 2,
+        "uname": "peer1@chat.example",
+        "userid": 2,
+        "scheme": "basic",
+        "authlvl": 10,
+        "secret": "pw-peer"
+      },
+      {
+        "id": 3,
+        "uname": "peer2@chat.example",
+        "userid": 3,
+        "scheme": "basic",
+        "authlvl": 10,
+        "secret": "pw-peer"
+      },
+      {
+        "id": 4,
+        "uname": "peer3@chat.example",
+        "userid": 4,
+        "scheme": "basic",
+        "authlvl": 10,
+        "secret": "pw-peer"
+      }
+    ],
+    "Device": [
+      {
+        "id": 1,
+        "userid": 1,
+        "hash": "h1",
+        "deviceid": "dev-alex-1",
+        "platform": "web",
+        "lang": "en"
+      }
+    ],
+    "Topic": [
+      {
+        "id": 1,
+        "name": "grpDev",
+        "owner": 1,
+        "state": 0,
+        "subcnt": 3,
+        "seqid": 3,
+        "delid": 0,
+        "usebt": false
+      },
+      {
+        "id": 2,
+        "name": "grpSupport",
+        "owner": 2,
+        "state": 0,
+        "subcnt": 1,
+        "seqid": 0,
+        "delid": 0,
+        "usebt": false
+      }
+    ],
+    "Subscription": [
+      {
+        "id": 1,
+        "topic": "grpDev",
+        "userid": 1,
+        "modewant": "JRWPSADO",
+        "modegiven": "O",
+        "recvseqid": 3,
+        "readseqid": 3,
+        "delid": 0
+      },
+      {
+        "id": 2,
+        "topic": "grpDev",
+        "userid": 2,
+        "modewant": "R",
+        "modegiven": "R",
+        "recvseqid": 2,
+        "readseqid": 2,
+        "delid": 0
+      },
+      {
+        "id": 3,
+        "topic": "grpDev",
+        "userid": 3,
+        "modewant": "RW",
+        "modegiven": "RW",
+        "recvseqid": 3,
+        "readseqid": 0,
+        "delid": 0
+      },
+      {
+        "id": 4,
+        "topic": "grpSupport",
+        "userid": 2,
+        "modewant": "O",
+        "modegiven": "O",
+        "recvseqid": 0,
+        "readseqid": 0,
+        "delid": 0
+      }
+    ],
+    "Message": [
+      {
+        "id": 1,
+        "topic": "grpDev",
+        "seqid": 1,
+        "from": 1,
+        "head": {},
+        "content": {
+          "txt": "Welcome to the dev group"
+        }
+      },
+      {
+        "id": 2,
+        "topic": "grpDev",
+        "seqid": 2,
+        "from": 2,
+        "head": {},
+        "content": {
+          "txt": "Thanks, glad to be here"
+        }
+      },
+      {
+        "id": 3,
+        "topic": "grpDev",
+        "seqid": 3,
+        "from": 3,
+        "head": {},
+        "content": {
+          "txt": "The build is green"
+        }
+      }
+    ],
+    "Fileupload": [
+      {
+        "id": 1,
+        "userid": 1,
+        "status": 1,
+        "mimetype": "text/plain",
+        "size": 12,
+        "etag": "",
+        "location": "/f/1"
+      }
+    ]
+  },
+  "summary": "Tinode is a self-hosted instant messaging server (Go): a WebSocket/long-poll/GRPC chat backend whose store persists users, auth credentials, topics, subscriptions, messages, deletion logs, device push tokens, file uploads and a KV metadata table across pluggable SQL (postgres/mysql) or NoSQL (rethinkdb/mongodb) adapters.",
+  "_read_denied": "not_found",
+  "_no_edges": [
+    {
+      "id_local": "Fileupload.gc",
+      "why": "periodic background GC job (registered server/main.go:635); no auth wall, no preconditions, nothing requires it, calls nothing else"
+    },
+    {
+      "id_local": "Device.push-notify",
+      "why": "internal push fanout (server/push.go:188); no auth wall, no preconditions, no triggers or downstream requires"
+    }
+  ],
+  "auth": {
+    "account_entity": "Auth",
+    "username_col": "uname",
+    "password_col": "secret",
+    "session_fields": {
+      "userid": "userid"
+    }
+  }
+}

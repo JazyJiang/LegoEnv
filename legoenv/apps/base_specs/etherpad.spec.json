@@ -1,0 +1,4585 @@
+{
+  "env_id": "etherpad",
+  "_prep_version": 3,
+  "entities": [
+    {
+      "name": "Pad",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "atext",
+          "type": "json",
+          "nullable": false
+        },
+        {
+          "name": "pool",
+          "type": "json",
+          "nullable": false
+        },
+        {
+          "name": "head",
+          "type": "int",
+          "nullable": false,
+          "default": -1
+        },
+        {
+          "name": "chatHead",
+          "type": "int",
+          "nullable": false,
+          "default": -1
+        },
+        {
+          "name": "publicStatus",
+          "type": "bool",
+          "nullable": false,
+          "default": false
+        },
+        {
+          "name": "savedRevisions",
+          "type": "json",
+          "nullable": false
+        },
+        {
+          "name": "padSettings",
+          "type": "json",
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "name": "Revision",
+      "columns": [
+        {
+          "name": "padId",
+          "type": "id",
+          "pk": true,
+          "fk_to": "Pad.id"
+        },
+        {
+          "name": "rev",
+          "type": "int",
+          "pk": true
+        },
+        {
+          "name": "changeset",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "author",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Author.id"
+        },
+        {
+          "name": "timestamp",
+          "type": "datetime",
+          "nullable": false
+        },
+        {
+          "name": "pool",
+          "type": "json",
+          "nullable": true
+        },
+        {
+          "name": "atext",
+          "type": "json",
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "name": "ChatMessage",
+      "columns": [
+        {
+          "name": "padId",
+          "type": "id",
+          "pk": true,
+          "fk_to": "Pad.id"
+        },
+        {
+          "name": "index",
+          "type": "int",
+          "pk": true
+        },
+        {
+          "name": "text",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "authorId",
+          "type": "id",
+          "nullable": true,
+          "fk_to": "Author.id"
+        },
+        {
+          "name": "time",
+          "type": "datetime",
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "name": "Author",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "colorId",
+          "type": "int",
+          "nullable": true
+        },
+        {
+          "name": "timestamp",
+          "type": "datetime",
+          "nullable": false,
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "lastSeen",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "padIDs",
+          "type": "json",
+          "nullable": true
+        },
+        {
+          "name": "erased",
+          "type": "bool",
+          "nullable": false,
+          "default": false
+        },
+        {
+          "name": "erasedAt",
+          "type": "datetime",
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "name": "Group",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "pk": true
+        },
+        {
+          "name": "pads",
+          "type": "json",
+          "nullable": false
+        },
+        {
+          "name": "mappings",
+          "type": "json",
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "name": "GroupIndex",
+      "columns": [
+        {
+          "name": "groupID",
+          "type": "id",
+          "pk": true,
+          "fk_to": "Group.id"
+        }
+      ]
+    },
+    {
+      "name": "Session",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "pk": true
+        },
+        {
+          "name": "groupID",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Group.id"
+        },
+        {
+          "name": "authorID",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Author.id"
+        },
+        {
+          "name": "validUntil",
+          "type": "datetime",
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "name": "GroupSessionIndex",
+      "columns": [
+        {
+          "name": "groupID",
+          "type": "id",
+          "pk": true,
+          "fk_to": "Group.id"
+        },
+        {
+          "name": "sessionId",
+          "type": "id",
+          "pk": true,
+          "fk_to": "Session.id"
+        }
+      ]
+    },
+    {
+      "name": "AuthorSessionIndex",
+      "columns": [
+        {
+          "name": "authorID",
+          "type": "id",
+          "pk": true,
+          "fk_to": "Author.id"
+        },
+        {
+          "name": "sessionId",
+          "type": "id",
+          "pk": true,
+          "fk_to": "Session.id"
+        }
+      ]
+    },
+    {
+      "name": "AuthorToken",
+      "columns": [
+        {
+          "name": "token",
+          "type": "text",
+          "pk": true
+        },
+        {
+          "name": "authorID",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Author.id"
+        }
+      ]
+    },
+    {
+      "name": "AuthorMapper",
+      "columns": [
+        {
+          "name": "mapper",
+          "type": "text",
+          "pk": true
+        },
+        {
+          "name": "authorID",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Author.id"
+        }
+      ]
+    },
+    {
+      "name": "GroupMapper",
+      "columns": [
+        {
+          "name": "mapper",
+          "type": "text",
+          "pk": true
+        },
+        {
+          "name": "groupID",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Group.id"
+        }
+      ]
+    },
+    {
+      "name": "PadReadOnly",
+      "columns": [
+        {
+          "name": "padId",
+          "type": "id",
+          "pk": true,
+          "fk_to": "Pad.id"
+        },
+        {
+          "name": "readOnlyId",
+          "type": "text",
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "name": "ReadOnlyPad",
+      "columns": [
+        {
+          "name": "readOnlyId",
+          "type": "text",
+          "pk": true
+        },
+        {
+          "name": "padId",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Pad.id"
+        }
+      ]
+    },
+    {
+      "name": "DeletionToken",
+      "columns": [
+        {
+          "name": "padId",
+          "type": "id",
+          "pk": true,
+          "fk_to": "Pad.id"
+        },
+        {
+          "name": "createdAt",
+          "type": "datetime",
+          "nullable": false,
+          "immutable": true,
+          "audit": true
+        },
+        {
+          "name": "hash",
+          "type": "text",
+          "nullable": false,
+          "immutable": true
+        }
+      ]
+    },
+    {
+      "name": "SessionStorage",
+      "columns": [
+        {
+          "name": "sid",
+          "type": "text",
+          "pk": true
+        },
+        {
+          "name": "cookie",
+          "type": "json",
+          "nullable": true
+        }
+      ]
+    }
+  ],
+  "tools": [
+    {
+      "tool": "group_create",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Group",
+        "fields": [
+          "pads",
+          "mappings"
+        ],
+        "set_on_create": {
+          "id": "(generated g.xxxx)",
+          "pads": {},
+          "mappings": {}
+        }
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "src/node/db/API.ts:52",
+        "id_local": "Group.create",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/1/createGroup",
+          "locator": "src/node/hooks/express/openapi.ts:800"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "exports.createGroup = async () => {\n  const groupID = `g.${randomString(16)}`;\n  await db.set(`group:${groupID}`, {pads: {}, mappings: {}});\n  await db.setSub('groups', [groupID], 1);\n  return {groupID};\n};",
+        "note": "createGroup() takes no arguments; groupMapper is the argument of createGroupIfNotExistsFor, not this tool. Invented groupMapper arg removed to match ref_code."
+      },
+      "entity": "Group",
+      "_output_schema": {
+        "groupID": "the new group id (g.xxxx)"
+      },
+      "_defaulted": [
+        "fields"
+      ],
+      "description": "Create a new empty group for collecting pads. The group id (g.xxxx) is generated and returned.",
+      "guards": {
+        "messages": {}
+      }
+    },
+    {
+      "tool": "group_createifnotexistsfor",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "GroupMapper",
+        "fields": [
+          "groupID"
+        ],
+        "set_on_create": {
+          "mapper": {
+            "$arg": "groupMapper"
+          },
+          "groupID": "(generated g.xxxx)"
+        }
+      },
+      "input_schema": {
+        "groupMapper": {
+          "type": "text",
+          "required": true,
+          "description": "An arbitrary string that permanently maps to a group id."
+        }
+      },
+      "_evidence": {
+        "locator": "src/node/db/API.ts:53",
+        "id_local": "Group.createIfNotExistsFor",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/1/createGroupIfNotExistsFor",
+          "locator": "src/node/hooks/express/openapi.ts:800"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "exports.createGroupIfNotExistsFor = async (groupMapper) => {\n  if (typeof groupMapper !== 'string') throw new CustomError('groupMapper is not a string', 'apierror');\n  const groupID = await db.get(`mapper2group:${groupMapper}`);\n  if (groupID && await exports.doesGroupExist(groupID)) return {groupID};\n  const result = await exports.createGroup();\n  await Promise.all([\n    db.set(`mapper2group:${groupMapper}`, result.groupID),\n    db.setSub(`group:${result.groupID}`, ['mappings', groupMapper], 1),\n  ]);\n  return result;\n};"
+      },
+      "entity": "GroupMapper",
+      "_output_schema": {
+        "groupID": "the mapped or newly created group id"
+      },
+      "guards": {
+        "required": [
+          "groupMapper"
+        ],
+        "messages": {
+          "required": "A groupMapper string is required to look up or create the group.",
+          "not_found": "The mapped group could not be found."
+        }
+      },
+      "_defaulted": [
+        "fields"
+      ],
+      "description": "Return the group already mapped to this mapper string, or create a new group and map it. The group id is returned either way."
+    },
+    {
+      "tool": "group_delete",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "Group",
+        "lookup_by": {
+          "id": {
+            "$arg": "groupID"
+          }
+        },
+        "on_child": "cascade"
+      },
+      "input_schema": {
+        "groupID": {
+          "type": "id",
+          "required": true,
+          "description": "Id of the group to delete (g.xxxx)."
+        }
+      },
+      "_evidence": {
+        "locator": "src/node/db/API.ts:54",
+        "id_local": "Group.delete",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/1/deleteGroup",
+          "locator": "src/node/hooks/express/openapi.ts:800"
+        },
+        "entity_why": "deleteGroup removes every pad + session + mapping + the group row (groupId is the subject)",
+        "ref_code": "exports.deleteGroup = async (groupID) => {\n  const group = await db.get(`group:${groupID}`);\n  if (group == null) throw new CustomError('groupID does not exist', 'apierror');\n  await Promise.all(Object.keys(group.pads).map(async (padId) => {\n    const pad = await padManager.getPad(padId); await pad.remove();\n  }));\n  const {sessionIDs = {}} = await db.get(`group2sessions:${groupID}`) || {};\n  await Promise.all(Object.keys(sessionIDs).filter((id) => sessionIDs[id]).map(async (sessionId) => {\n    await sessionManager.deleteSession(sessionId);\n  }));\n  await Promise.all([\n    db.remove(`group2ses",
+        "edges": [
+          "doesGroupExist then reads group:<groupID>; throws 'groupID does not exist' (src/node/db/GroupManager.ts:49)"
+        ],
+        "on_child_evidence": [
+          "Group.delete effects: row_delete Pad, Session, GroupSessionIndex, GroupMapper (collect.json)",
+          "deletes every pad via pad.remove() (src/node/db/GroupManager.ts:150)"
+        ]
+      },
+      "entity": "Pad",
+      "_binds": {
+        "groupID": "Group.id"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Group",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "groupID"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "groupID"
+        ],
+        "messages": {
+          "precondition": "The group you tried to delete does not exist.",
+          "not_found": "That group does not exist.",
+          "on_child": "Delete the group's pads and sessions first, or let group_delete cascade and remove them."
+        }
+      },
+      "description": "Delete a group and every pad and session it contains. Fails if the group does not exist."
+    },
+    {
+      "tool": "group_listpads",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Group",
+        "lookup_by": {
+          "id": {
+            "$arg": "groupID"
+          }
+        }
+      },
+      "input_schema": {
+        "groupID": {
+          "type": "id",
+          "required": true,
+          "description": "Id of the group whose pads to list."
+        }
+      },
+      "_evidence": {
+        "locator": "src/node/db/API.ts:55",
+        "id_local": "Group.listPads",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/1/listPads",
+          "locator": "src/node/hooks/express/openapi.ts:800"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "exports.listPads = async (groupID) => {\n  const exists = await exports.doesGroupExist(groupID);\n  if (!exists) throw new CustomError('groupID does not exist', 'apierror');\n  const result = await db.getSub(`group:${groupID}`, ['pads']);\n  const padIDs = Object.keys(result);\n  return {padIDs};\n};"
+      },
+      "entity": "Group",
+      "_binds": {
+        "groupID": "Group.id"
+      },
+      "_output_schema": {
+        "padIDs": "array of pad ids in the group"
+      },
+      "guards": {
+        "required": [
+          "groupID"
+        ],
+        "messages": {
+          "required": "A groupID is required to list its pads.",
+          "not_found": "That group does not exist."
+        }
+      },
+      "description": "List the ids of every pad in a group."
+    },
+    {
+      "tool": "group_creategrouppad",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Pad",
+        "fields": {
+          "atext": {
+            "$arg": "text"
+          }
+        },
+        "set_on_create": {
+          "head": 0,
+          "publicStatus": false,
+          "id": {
+            "$arg": "padName"
+          }
+        }
+      },
+      "input_schema": {
+        "groupID": {
+          "type": "id",
+          "required": true,
+          "description": "Id of the group that will own the pad."
+        },
+        "padName": {
+          "type": "text",
+          "required": true,
+          "description": "The pad name within the group."
+        },
+        "text": {
+          "type": "text",
+          "required": false,
+          "description": "Initial text to place in the new pad."
+        },
+        "authorId": {
+          "type": "id",
+          "required": false,
+          "description": "Author recorded as the first contributor."
+        }
+      },
+      "_evidence": {
+        "locator": "src/node/db/API.ts:56",
+        "id_local": "Group.createGroupPad",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/1/createGroupPad",
+          "locator": "src/node/hooks/express/openapi.ts:800"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "exports.createGroupPad = async (groupID, padName, text, authorId = '') => {\n  const padID = `${groupID}$${padName}`;\n  const groupExists = await exports.doesGroupExist(groupID);\n  if (!groupExists) throw new CustomError('groupID does not exist', 'apierror');\n  const padExists = await padManager.doesPadExists(padID);\n  if (padExists) throw new CustomError('padName does already exist', 'apierror');\n  await padManager.getPad(padID, text, authorId);\n  await db.setSub(`group:${groupID}`, ['pads', padID], 1);\n  return {padID, deletionToken: await padDeletionManager.createDeletionTokenIfAbsent(padID)",
+        "edges": [
+          "doesGroupExist(groupID) else throws 'groupID does not exist' (src/node/db/GroupManager.ts:150)",
+          "doesPadExists(padID) else throws 'padName does already exist' (src/node/db/GroupManager.ts:156)"
+        ],
+        "note": "pad id is the padName within the group; group membership is recorded in Group.pads (the real composite gID$name is not representable as a concat)"
+      },
+      "entity": "Pad",
+      "_binds": {
+        "groupID": "Group.id",
+        "padName": "Pad.id",
+        "text": "Pad.atext",
+        "authorId": "Author.id"
+      },
+      "_output_schema": {
+        "padID": "the new pad id (<groupID>$<padName>)",
+        "deletionToken": "a deletion token string or null"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Group",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "groupID"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Pad",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "padName"
+                  }
+                }
+              },
+              "op": "eq",
+              "n": 0
+            }
+          ]
+        ],
+        "required": [
+          "groupID",
+          "padName"
+        ],
+        "messages": {
+          "precondition": "The group does not exist, or a pad with that name already exists in it.",
+          "required": "A groupID and padName are required to create the group pad.",
+          "not_found": "That group does not exist."
+        }
+      },
+      "_defaulted": [
+        "dropped unwritable columns ['id']",
+        "fields (mapped to the real parameter names via binds)"
+      ],
+      "description": "Create a new pad that belongs to a group (its id is '<groupID>$<padName>'). Fails if the group is missing or the pad name is taken."
+    },
+    {
+      "tool": "group_listallgroups",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "GroupIndex",
+        "search_fields": [
+          "groupID"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "groupID"
+          ]
+        }
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "src/node/db/API.ts:51",
+        "id_local": "Group.listAllGroups",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/1.1/listAllGroups",
+          "locator": "src/node/hooks/express/openapi.ts:800"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "exports.listAllGroups = async () => {\n  let groups = await db.get('groups');\n  groups = groups || {};\n  const groupIDs = Object.keys(groups);\n  return {groupIDs};\n};",
+        "global_why": "Etherpad exposes the pad/author/group namespace globally through the API (API-key or session-gated, no row-level owner column); no owner-scoped retrieval exists"
+      },
+      "entity": "GroupIndex",
+      "_output_schema": {
+        "groupIDs": "array of all group ids"
+      },
+      "description": "List the ids of every group in the system.",
+      "guards": {
+        "messages": {
+          "not_found": "No groups exist yet."
+        }
+      }
+    },
+    {
+      "tool": "pad_listall",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Pad",
+        "search_fields": [
+          "id"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "id"
+          ]
+        }
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "src/node/db/API.ts:62",
+        "id_local": "Pad.listAll",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/1.2.1/listAllPads",
+          "locator": "src/node/hooks/express/openapi.ts:800"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "async getPads() {\n  if (!this._loaded) {\n    this._loaded = (async () => {\n      const dbData = await db.findKeys('pad:*', '*:*:*');\n      if (dbData == null) return;\n      for (const val of dbData) this.addPad(val.replace(/^pad:/, ''));\n    })();\n  }\n  await this._loaded;\n  if (!this._cachedList) this._cachedList = [...this._list].sort();\n  return this._cachedList;\n}"
+      },
+      "entity": "Pad",
+      "_output_schema": {
+        "padIDs": "array of all pad ids (alphabetical)"
+      },
+      "description": "List the ids of every pad in the system, alphabetically.",
+      "guards": {
+        "messages": {
+          "not_found": "No pads exist."
+        }
+      }
+    },
+    {
+      "tool": "author_create",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Author",
+        "fields": [
+          "name"
+        ],
+        "set_on_create": {
+          "id": "(generated a.xxxx)",
+          "colorId": "(palette index)",
+          "timestamp": "2026-01-01T00:00:00",
+          "lastSeen": "2026-01-01T00:00:00",
+          "erased": false
+        }
+      },
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": false,
+          "description": "Display name for the author."
+        }
+      },
+      "_evidence": {
+        "locator": "src/node/db/API.ts:68",
+        "id_local": "Author.create",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/1/createAuthor",
+          "locator": "src/node/hooks/express/openapi.ts:800"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "exports.createAuthor = async (name) => {\n  const author = `a.${randomString(16)}`;\n  const now = Date.now();\n  const authorObj = {\n    colorId: Math.floor(Math.random() * (exports.getColorPalette().length)),\n    name,\n    timestamp: now,\n    lastSeen: now,\n  };\n  await db.set(`globalAuthor:${author}`, authorObj);\n  return {authorID: author};\n};"
+      },
+      "entity": "Author",
+      "_binds": {
+        "name": "Author.name"
+      },
+      "_output_schema": {
+        "authorID": "the new author id (a.xxxx)"
+      },
+      "description": "Create a new author with a display name. The author id (a.xxxx) is generated and returned.",
+      "guards": {
+        "messages": {
+          "required": "An author name is required to create an author."
+        }
+      }
+    },
+    {
+      "tool": "author_createifnotexistsfor",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "AuthorMapper",
+        "fields": [
+          "authorID"
+        ],
+        "set_on_create": {
+          "mapper": {
+            "$arg": "authorMapper"
+          },
+          "authorID": "(generated, when not mapped)"
+        }
+      },
+      "input_schema": {
+        "authorMapper": {
+          "type": "text",
+          "required": true,
+          "description": "An arbitrary string that permanently maps to an author id."
+        },
+        "name": {
+          "type": "text",
+          "required": false,
+          "description": "Display name to set on the author."
+        }
+      },
+      "_evidence": {
+        "locator": "src/node/db/API.ts:69",
+        "id_local": "Author.createIfNotExistsFor",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/1/createAuthorIfNotExistsFor",
+          "locator": "src/node/hooks/express/openapi.ts:800"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "exports.createAuthorIfNotExistsFor = async (authorMapper, name) => {\n  const author = await mapAuthorWithDBKey('mapper2author', authorMapper);\n  if (name) await exports.setAuthorName(author.authorID, name);\n  return author;\n};\n\nconst mapAuthorWithDBKey = async (mapperkey, mapper) => {\n  const author = await db.get(`${mapperkey}:${mapper}`);\n  if (author == null) {\n    const author = await exports.createAuthor(null);\n    await db.set(`${mapperkey}:${mapper}`, author.authorID);\n    return author;\n  }\n  const now = Date.now();\n  await db.setSub(`globalAuthor:${author}`, ['timestamp'], now);\n  awa"
+      },
+      "entity": "AuthorMapper",
+      "_binds": {
+        "name": "Author.name"
+      },
+      "_output_schema": {
+        "authorID": "the mapped or newly created author id"
+      },
+      "guards": {
+        "required": [
+          "authorMapper"
+        ],
+        "messages": {
+          "required": "An authorMapper is required to look up or create the author."
+        }
+      },
+      "_defaulted": [
+        "fields"
+      ],
+      "description": "Return the author already mapped to this mapper string, or create a new author and map it. The author id is returned either way."
+    },
+    {
+      "tool": "author_getauthorname",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Author",
+        "lookup_by": {
+          "id": {
+            "$arg": "authorID"
+          }
+        }
+      },
+      "input_schema": {
+        "authorID": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the author (a.xxxx)."
+        }
+      },
+      "_evidence": {
+        "locator": "src/node/db/API.ts:70",
+        "id_local": "Author.getAuthorName",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/1.1/getAuthorName",
+          "locator": "src/node/hooks/express/openapi.ts:800"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "exports.getAuthorName = async (author) => await db.getSub(`globalAuthor:${author}`, ['name']);"
+      },
+      "entity": "Author",
+      "_binds": {
+        "authorID": "Author.id"
+      },
+      "_output_schema": {
+        "authorName": "the author's display name"
+      },
+      "guards": {
+        "required": [
+          "authorID"
+        ],
+        "messages": {
+          "required": "An authorID is required.",
+          "not_found": "That author does not exist."
+        }
+      },
+      "description": "Return an author's display name."
+    },
+    {
+      "tool": "author_listpadsofauthor",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Author",
+        "lookup_by": {
+          "id": {
+            "$arg": "authorID"
+          }
+        }
+      },
+      "input_schema": {
+        "authorID": {
+          "type": "id",
+          "required": true,
+          "description": "Id of the author (a.xxxx)."
+        }
+      },
+      "_evidence": {
+        "locator": "src/node/db/API.ts:91",
+        "id_local": "Author.listPadsOfAuthor",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/1/listPadsOfAuthor",
+          "locator": "src/node/hooks/express/openapi.ts:800"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "exports.listPadsOfAuthor = async (authorID) => {\n  const author = await db.get(`globalAuthor:${authorID}`);\n  if (author == null) throw new CustomError('authorID does not exist', 'apierror');\n  const padIDs = Object.keys(author.padIDs || {});\n  return {padIDs};\n};"
+      },
+      "entity": "Author",
+      "_binds": {
+        "authorID": "Author.id"
+      },
+      "_output_schema": {
+        "padIDs": "array of pad ids the author contributed to"
+      },
+      "guards": {
+        "required": [
+          "authorID"
+        ],
+        "messages": {
+          "required": "An authorID is required.",
+          "not_found": "That author does not exist."
+        }
+      },
+      "description": "List the ids of every pad this author has contributed to."
+    },
+    {
+      "tool": "author_anonymize",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Author",
+        "row_key": {
+          "id": {
+            "$arg": "authorID"
+          }
+        },
+        "set": {
+          "name": null,
+          "colorId": 0,
+          "erased": true,
+          "erasedAt": "$now"
+        }
+      },
+      "input_schema": {
+        "authorID": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the author to erase (a.xxxx)."
+        }
+      },
+      "_evidence": {
+        "locator": "src/node/db/API.ts:79",
+        "id_local": "Author.anonymize",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/1.3.1/anonymizeAuthor",
+          "locator": "src/node/hooks/express/openapi.ts:800"
+        },
+        "entity_why": "GDPR erasure edits the Author row itself (name/colorId cleared, erased=true); token/mapper removal is a side effect on child rows",
+        "ref_code": "exports.anonymizeAuthor = async (authorID) => {\n  if (!settings.gdprAuthorErasure || !settings.gdprAuthorErasure.enabled) {\n    throw new CustomError('anonymizeAuthor is disabled - set gdprAuthorErasure.enabled = true', 'apierror');\n  }\n  if (!authorID || typeof authorID !== 'string') throw new CustomError('authorID is required', 'apierror');\n  return await authorManager.anonymizeAuthor(authorID);\n};",
+        "edges": [
+          "reads globalAuthor:<authorID>; short-circuits (counters 0) when absent or already erased (src/node/db/AuthorManager.ts:352)"
+        ]
+      },
+      "entity": "AuthorToken",
+      "_output_schema": {
+        "affectedPads": "int",
+        "removedTokenMappings": "int",
+        "removedExternalMappings": "int",
+        "clearedChatMessages": "int"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Author",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "authorID"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "authorID"
+        ],
+        "messages": {
+          "required": "An authorID is required to erase an author.",
+          "precondition": "That author does not exist, or has already been erased.",
+          "not_found": "The author to erase could not be found."
+        }
+      },
+      "description": "Erase a person from the system under GDPR: clear their profile fields, mark them erased, and detach their token/mapper/chat references. Fails if GDPR author erasure is disabled."
+    },
+    {
+      "tool": "author_search",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Author",
+        "search_fields": [
+          "name",
+          "id"
+        ],
+        "rank": {
+          "method": "substring",
+          "fields": [
+            "name",
+            "id"
+          ]
+        },
+        "pagination": {
+          "default_limit": 20
+        }
+      },
+      "input_schema": {
+        "pattern": {
+          "type": "text",
+          "required": false,
+          "description": "Substring to match against author name or id."
+        },
+        "offset": {
+          "type": "int",
+          "required": false,
+          "description": "Row offset for pagination."
+        },
+        "limit": {
+          "type": "int",
+          "required": false,
+          "description": "Max rows to return."
+        },
+        "sortBy": {
+          "type": "text",
+          "required": false,
+          "description": "Column to sort by."
+        },
+        "ascending": {
+          "type": "bool",
+          "required": false,
+          "description": "Sort ascending when true."
+        },
+        "includeErased": {
+          "type": "bool",
+          "required": false,
+          "description": "Include erased authors in results."
+        }
+      },
+      "_evidence": {
+        "locator": "src/node/hooks/express/adminsettings.ts:424",
+        "id_local": "Author.search",
+        "entry": {
+          "kind": "rpc",
+          "route": "socket authorLoad",
+          "locator": "src/node/hooks/express/adminsettings.ts:424"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "exports.searchAuthors = async (query) => { ... const authorKeys = await db.findKeys('globalAuthor:*', null); ... for (const key of authorKeys) { const rec = await db.get(key); ... rows.push({authorID, name: rec.name ?? null, colorId: rec.colorId ?? null, mapper: mappers, lastSeen: ..., erased}); } ... rows.sort(...); ... return {total, results: page, cappedAt}; };"
+      },
+      "entity": "Author",
+      "_output_schema": {
+        "total": "int",
+        "cappedAt": "int (when capped at 1000 rows)",
+        "results": "list of {authorID,name,colorId,mapper,lastSeen,erased}"
+      },
+      "description": "Search authors by name or id, with pagination and sorting. Returns a page of author records.",
+      "guards": {
+        "messages": {}
+      }
+    },
+    {
+      "tool": "session_create",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Session",
+        "fields": [
+          "groupID",
+          "authorID",
+          "validUntil"
+        ],
+        "set_on_create": {
+          "id": "(generated s.xxxx)",
+          "groupID": {
+            "$arg": "groupID"
+          },
+          "authorID": {
+            "$arg": "authorID"
+          },
+          "validUntil": {
+            "$arg": "validUntil"
+          }
+        }
+      },
+      "input_schema": {
+        "groupID": {
+          "type": "id",
+          "required": true,
+          "description": "Id of the group the session grants access to."
+        },
+        "authorID": {
+          "type": "id",
+          "required": true,
+          "description": "Id of the author the session represents."
+        },
+        "validUntil": {
+          "type": "int",
+          "required": true,
+          "description": "Unix timestamp (seconds) after which the session is invalid."
+        }
+      },
+      "_evidence": {
+        "locator": "src/node/db/API.ts:99",
+        "id_local": "Session.create",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/1/createSession",
+          "locator": "src/node/hooks/express/openapi.ts:800"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "exports.createSession = async (groupID, authorID, validUntil) => {\n  const groupExists = await groupManager.doesGroupExist(groupID);\n  if (!groupExists) throw new CustomError('groupID does not exist', 'apierror');\n  const authorExists = await authorManager.doesAuthorExist(authorID);\n  if (!authorExists) throw new CustomError('authorID does not exist', 'apierror');\n  if (validUntil < Math.floor(Date.now() / 1000)) throw new CustomError('validUntil is in the past', 'apierror');\n  const sessionID = `s.${randomString(16)}`;\n  await db.set(`session:${sessionID}`, {groupID, authorID, validUntil});\n ",
+        "edges": [
+          "doesGroupExist(groupID) else throws 'groupID does not exist' (src/node/db/SessionManager.ts:98)",
+          "doesAuthorExist(authorID) else throws 'authorID does not exist' (src/node/db/SessionManager.ts:103)"
+        ]
+      },
+      "entity": "Session",
+      "_binds": {
+        "groupID": "Group.id",
+        "authorID": "Author.id",
+        "validUntil": "Session.validUntil"
+      },
+      "_output_schema": {
+        "sessionID": "the new session id (s.xxxx)"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Group",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "groupID"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Author",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "authorID"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "groupID",
+          "authorID",
+          "validUntil"
+        ],
+        "messages": {
+          "required": "groupID, authorID and a validUntil timestamp are required.",
+          "precondition": "The group or author does not exist, or the expiry time is in the past.",
+          "fk": "That group or author does not exist."
+        }
+      },
+      "_defaulted": [
+        "fields"
+      ],
+      "description": "Create a session that lets an author act inside a group's pads until a unix expiry. Fails if the group or author is missing or the expiry is in the past."
+    },
+    {
+      "tool": "session_delete",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "Session",
+        "lookup_by": {
+          "id": {
+            "$arg": "sessionID"
+          }
+        },
+        "on_child": "cascade"
+      },
+      "input_schema": {
+        "sessionID": {
+          "type": "id",
+          "required": true,
+          "description": "Id of the session to delete (s.xxxx)."
+        }
+      },
+      "_evidence": {
+        "locator": "src/node/db/API.ts:100",
+        "id_local": "Session.delete",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/1/deleteSession",
+          "locator": "src/node/hooks/express/openapi.ts:800"
+        },
+        "entity_why": "deleteSession removes the Session row plus its group2sessions/author2sessions index entries",
+        "ref_code": "exports.deleteSession = async (sessionID) => {\n  const session = await db.get(`session:${sessionID}`);\n  if (session == null) throw new CustomError('sessionID does not exist', 'apierror');\n  const groupID = session.groupID;\n  const authorID = session.authorID;\n  await Promise.all([\n    db.setSub(`group2sessions:${groupID}`, ['sessionIDs', sessionID], undefined),\n    db.setSub(`author2sessions:${authorID}`, ['sessionIDs', sessionID], undefined),\n  ]);\n  await db.remove(`session:${sessionID}`);\n};",
+        "edges": [
+          "reads session:<sessionID>; throws 'sessionID does not exist' (src/node/db/SessionManager.ts:188)"
+        ],
+        "on_child_evidence": [
+          "Session.delete effects: row_delete GroupSessionIndex + AuthorSessionIndex (collect.json)",
+          "removes indexes before the session row (src/node/db/SessionManager.ts:188)"
+        ]
+      },
+      "entity": "GroupSessionIndex",
+      "_binds": {
+        "sessionID": "Session.id"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Session",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "sessionID"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "sessionID"
+        ],
+        "messages": {
+          "required": "A sessionID is required.",
+          "precondition": "That session does not exist.",
+          "not_found": "That session does not exist."
+        }
+      },
+      "description": "Delete a session, revoking that author's access to the group."
+    },
+    {
+      "tool": "session_getsessioninfo",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Session",
+        "lookup_by": {
+          "id": {
+            "$arg": "sessionID"
+          }
+        }
+      },
+      "input_schema": {
+        "sessionID": {
+          "type": "id",
+          "required": true,
+          "description": "Id of the session (s.xxxx)."
+        }
+      },
+      "_evidence": {
+        "locator": "src/node/db/API.ts:101",
+        "id_local": "Session.getSessionInfo",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/1/getSessionInfo",
+          "locator": "src/node/hooks/express/openapi.ts:800"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "exports.getSessionInfo = async (sessionID) => {\n  const session = await getSessionInfoOrNull(sessionID);\n  if (session == null) throw new CustomError('sessionID does not exist', 'apierror');\n  return session;\n};"
+      },
+      "entity": "Session",
+      "_binds": {
+        "sessionID": "Session.id"
+      },
+      "_output_schema": {
+        "groupID": "id",
+        "authorID": "id",
+        "validUntil": "datetime"
+      },
+      "guards": {
+        "required": [
+          "sessionID"
+        ],
+        "messages": {
+          "required": "A sessionID is required.",
+          "not_found": "That session does not exist."
+        }
+      },
+      "description": "Return the group, author and expiry of a session."
+    },
+    {
+      "tool": "session_listsessionsofgroup",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Session",
+        "search_fields": [
+          "id"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "id"
+          ]
+        },
+        "filter": {
+          "col": "groupID",
+          "mode": "exact",
+          "val": {
+            "$arg": "groupID"
+          }
+        }
+      },
+      "input_schema": {
+        "groupID": {
+          "type": "id",
+          "required": true,
+          "description": "Id of the group whose sessions to list."
+        }
+      },
+      "_evidence": {
+        "locator": "src/node/db/API.ts:102",
+        "id_local": "Session.listSessionsOfGroup",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/1/listSessionsOfGroup",
+          "locator": "src/node/hooks/express/openapi.ts:800"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "exports.listSessionsOfGroup = async (groupID) => {\n  const exists = await groupManager.doesGroupExist(groupID);\n  if (!exists) throw new CustomError('groupID does not exist', 'apierror');\n  return await listSessionsWithDBKey(`group2sessions:${groupID}`);\n};"
+      },
+      "entity": "Session",
+      "_binds": {
+        "groupID": "Group.id"
+      },
+      "_output_schema": {
+        "sessions": "map of sessionID -> {groupID,authorID,validUntil}"
+      },
+      "guards": {
+        "required": [
+          "groupID"
+        ],
+        "messages": {
+          "required": "A groupID is required.",
+          "not_found": "That group does not exist."
+        }
+      },
+      "description": "List the sessions that are valid inside a group."
+    },
+    {
+      "tool": "session_listsessionsofauthor",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Session",
+        "search_fields": [
+          "id"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "id"
+          ]
+        },
+        "filter": {
+          "col": "authorID",
+          "mode": "exact",
+          "val": {
+            "$arg": "authorID"
+          }
+        }
+      },
+      "input_schema": {
+        "authorID": {
+          "type": "id",
+          "required": true,
+          "description": "Id of the author whose sessions to list."
+        }
+      },
+      "_evidence": {
+        "locator": "src/node/db/API.ts:103",
+        "id_local": "Session.listSessionsOfAuthor",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/1/listSessionsOfAuthor",
+          "locator": "src/node/hooks/express/openapi.ts:800"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "exports.listSessionsOfAuthor = async (authorID) => {\n  const exists = await authorManager.doesAuthorExist(authorID);\n  if (!exists) throw new CustomError('authorID does not exist', 'apierror');\n  return await listSessionsWithDBKey(`author2sessions:${authorID}`);\n};"
+      },
+      "entity": "Session",
+      "_binds": {
+        "authorID": "Author.id"
+      },
+      "_output_schema": {
+        "sessions": "map of sessionID -> {groupID,authorID,validUntil}"
+      },
+      "guards": {
+        "required": [
+          "authorID"
+        ],
+        "messages": {
+          "required": "An authorID is required.",
+          "not_found": "That author does not exist."
+        }
+      },
+      "description": "List the sessions granted to an author."
+    },
+    {
+      "tool": "pad_create",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Pad",
+        "fields": {
+          "atext": {
+            "$arg": "text"
+          }
+        },
+        "set_on_create": {
+          "head": 0,
+          "publicStatus": false,
+          "chatHead": -1,
+          "id": {
+            "$arg": "padID"
+          }
+        }
+      },
+      "input_schema": {
+        "padID": {
+          "type": "text",
+          "required": true,
+          "description": "A pad id (a bare name for a global pad; group pads cannot be created this way)."
+        },
+        "text": {
+          "type": "text",
+          "required": false,
+          "description": "Initial text of the pad."
+        },
+        "authorId": {
+          "type": "id",
+          "required": false,
+          "description": "Author recorded as the first contributor."
+        }
+      },
+      "_evidence": {
+        "locator": "src/node/db/API.ts:539",
+        "id_local": "Pad.create",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/1/createPad",
+          "locator": "src/node/hooks/express/openapi.ts:800"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "exports.createPad = async (padID, text, authorId = '') => {\n  if (padID) {\n    if (padID.indexOf('$') !== -1) throw new CustomError(\"createPad can't create group pads\", 'apierror');\n    if (padID.match(/(\\/|\\?|&|#)/)) throw new CustomError('malformed padID: Remove special characters', 'apierror');\n  }\n  await getPadSafe(padID, false, text, authorId);\n  const deletionToken = settings.requireAuthentication || settings.allowPadDeletionByAllUsers\n      ? null\n      : await padDeletionManager.createDeletionTokenIfAbsent(padID);\n  return {deletionToken};\n};",
+        "edges": [
+          "getPadSafe(padID,false) throws 'padID does already exist' (src/node/db/API.ts:538)"
+        ],
+        "note": "pad id is supplied by the caller (padID), the key of the pad row"
+      },
+      "entity": "Pad",
+      "_binds": {
+        "padID": "Pad.id",
+        "text": "Pad.atext",
+        "authorId": "Author.id"
+      },
+      "_output_schema": {
+        "deletionToken": "a deletion token string, or null when requireAuthentication/allowPadDeletionByAllUsers is set"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Pad",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "padID"
+                  }
+                }
+              },
+              "op": "eq",
+              "n": 0
+            }
+          ]
+        ],
+        "required": [
+          "padID"
+        ],
+        "messages": {
+          "required": "A padID (and a text body is helpful) is required.",
+          "precondition": "A pad with that id already exists.",
+          "unique": "A pad with that id already exists.",
+          "not_found": "The pad could not be found."
+        }
+      },
+      "_defaulted": [
+        "dropped unwritable columns ['id']",
+        "fields (mapped to the real parameter names via binds)"
+      ],
+      "description": "Create a new global pad containing some text. Fails if a pad with that id already exists, or the id contains reserved characters."
+    },
+    {
+      "tool": "pad_delete",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "Pad",
+        "lookup_by": {
+          "id": {
+            "$arg": "padID"
+          }
+        },
+        "on_child": "cascade"
+      },
+      "input_schema": {
+        "padID": {
+          "type": "id",
+          "required": true,
+          "description": "Id of the pad to delete."
+        },
+        "deletionToken": {
+          "type": "text",
+          "required": false,
+          "description": "Deletion token returned at pad creation, required when deletion protection is on."
+        }
+      },
+      "_evidence": {
+        "locator": "src/node/db/API.ts:575",
+        "id_local": "Pad.delete",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/1/deletePad",
+          "locator": "src/node/hooks/express/openapi.ts:800"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "exports.deletePad = async (padID, deletionToken) => {\n  const pad = await getPadSafe(padID, true);\n  if (deletionToken !== undefined && deletionToken !== '' &&\n      !settings.allowPadDeletionByAllUsers &&\n      !await padDeletionManager.isValidDeletionToken(padID, deletionToken)) {\n    throw new CustomError('invalid deletionToken', 'apierror');\n  }\n  await pad.remove();\n};",
+        "edges": [
+          "getPadSafe(padID,true) throws 'padID does not exist' (src/node/db/API.ts:580)"
+        ],
+        "on_child_evidence": [
+          "pad.remove() removes revisions + chat before the pad row (src/node/db/PadManager.ts:232)",
+          "Pad.delete effects: row_delete Revision + ChatMessage + PadReadOnly + ReadOnlyPad + DeletionToken (collect.json)"
+        ]
+      },
+      "entity": "Pad",
+      "_binds": {
+        "padID": "Pad.id"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Pad",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "padID"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "padID"
+        ],
+        "messages": {
+          "required": "A padID is required.",
+          "precondition": "That pad does not exist, or the deletion token is invalid.",
+          "not_found": "That pad does not exist.",
+          "confirm": "The deletion token did not match."
+        }
+      },
+      "description": "Delete a pad and all of its revisions and chat history. Passing a deletion token is required on a pad created with deletion protection."
+    },
+    {
+      "tool": "pad_copy",
+      "op": "create",
+      "family": "action.trigger",
+      "exec_spec": {
+        "target": {
+          "entity": "Revision",
+          "lookup_by": {
+            "padId": {
+              "$arg": "padId"
+            }
+          }
+        },
+        "spawn": [
+          {
+            "entity": "Pad",
+            "n": 1
+          },
+          {
+            "entity": "ChatMessage",
+            "n": 1,
+            "link_col": "padId"
+          }
+        ]
+      },
+      "input_schema": {
+        "sourceID": {
+          "type": "id",
+          "required": true,
+          "description": "Id of the pad to copy from."
+        },
+        "destinationID": {
+          "type": "id",
+          "required": true,
+          "description": "Id of the new pad."
+        },
+        "force": {
+          "type": "bool",
+          "required": false,
+          "description": "Overwrite the destination if it already exists."
+        }
+      },
+      "_evidence": {
+        "locator": "src/node/db/API.ts:685",
+        "id_local": "Pad.copy",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/1.2.9/copyPad",
+          "locator": "src/node/hooks/express/openapi.ts:800"
+        },
+        "entity_why": "primary effect spawn lands on this table",
+        "ref_code": "exports.copyPad = async (sourceID, destinationID, force) => {\n  const pad = await getPadSafe(sourceID, true);\n  await pad.copy(destinationID, force);\n};",
+        "edges": [
+          "getPadSafe(sourceID,true) throws if missing (src/node/db/API.ts:687)"
+        ]
+      },
+      "entity": "Revision",
+      "_binds": {
+        "sourceID": "Pad.id",
+        "destinationID": "Pad.id"
+      },
+      "_output_schema": {
+        "padID": "the destination pad id"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Pad",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "sourceID"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "sourceID",
+          "destinationID"
+        ],
+        "messages": {
+          "required": "Both a sourceID and a destinationID are required.",
+          "precondition": "The source pad does not exist.",
+          "not_found": "The source pad does not exist."
+        }
+      },
+      "_defaulted": [
+        "row_key",
+        "row_key (no parameter found; the column name is standing in as one)"
+      ],
+      "description": "Copy every revision and chat message of one pad into a new pad (with history). Fails if the source does not exist."
+    },
+    {
+      "tool": "pad_copywithouthistory",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Pad",
+        "fields": [
+          "atext",
+          "pool",
+          "head",
+          "chatHead",
+          "publicStatus",
+          "savedRevisions",
+          "padSettings"
+        ],
+        "set_on_create": {
+          "id": {
+            "$arg": "destinationID"
+          }
+        }
+      },
+      "input_schema": {
+        "sourceID": {
+          "type": "id",
+          "required": true,
+          "description": "Id of the pad to copy from."
+        },
+        "destinationID": {
+          "type": "id",
+          "required": true,
+          "description": "Id of the new pad."
+        },
+        "force": {
+          "type": "bool",
+          "required": false,
+          "description": "Overwrite the destination if it already exists."
+        },
+        "authorId": {
+          "type": "id",
+          "required": false,
+          "description": "Author credited with the initial revision of the new pad."
+        }
+      },
+      "_evidence": {
+        "locator": "src/node/db/API.ts:703",
+        "id_local": "Pad.copyWithoutHistory",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/1.2.15/copyPadWithoutHistory",
+          "locator": "src/node/hooks/express/openapi.ts:800"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "exports.copyPadWithoutHistory = async (sourceID, destinationID, force, authorId = '') => {\n  const pad = await getPadSafe(sourceID, true);\n  await pad.copyPadWithoutHistory(destinationID, force, authorId);\n};",
+        "edges": [
+          "getPadSafe(padID,true) throws 'padID does not exist' if missing (src/node/db/API.ts:705)"
+        ]
+      },
+      "entity": "Pad",
+      "_binds": {
+        "sourceID": "Pad.id",
+        "destinationID": "Pad.id",
+        "authorId": "Author.id"
+      },
+      "_output_schema": {
+        "padID": "the destination pad id"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Pad",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "sourceID"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "sourceID",
+          "destinationID"
+        ],
+        "messages": {
+          "required": "Both a sourceID and a destinationID are required.",
+          "precondition": "The source pad does not exist.",
+          "not_found": "The source pad does not exist."
+        }
+      },
+      "_defaulted": [
+        "argument invented from the write column",
+        "fields"
+      ],
+      "description": "Copy only the current content of a pad into a new pad, without its revision history. Fails if the source does not exist."
+    },
+    {
+      "tool": "pad_move",
+      "op": "update",
+      "family": "crud.upsert",
+      "exec_spec": {
+        "entity": "Pad",
+        "key": {
+          "id": {
+            "$arg": "destinationID"
+          }
+        },
+        "insert_fields": {
+          "id": {
+            "$arg": "destinationID"
+          },
+          "atext": {
+            "lit": ""
+          },
+          "pool": {
+            "lit": {}
+          },
+          "head": {
+            "lit": 0
+          },
+          "chatHead": {
+            "lit": -1
+          },
+          "publicStatus": {
+            "lit": false
+          },
+          "savedRevisions": {
+            "lit": []
+          },
+          "padSettings": {
+            "lit": {}
+          }
+        },
+        "set_on_exists": {}
+      },
+      "input_schema": {
+        "sourceID": {
+          "type": "id",
+          "required": true,
+          "description": "Id of the pad to move."
+        },
+        "destinationID": {
+          "type": "id",
+          "required": true,
+          "description": "Id the pad should be moved to."
+        },
+        "force": {
+          "type": "bool",
+          "required": false,
+          "description": "Overwrite the destination if it already exists."
+        }
+      },
+      "_evidence": {
+        "locator": "src/node/db/API.ts:766",
+        "id_local": "Pad.move",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/1.2.9/movePad",
+          "locator": "src/node/hooks/express/openapi.ts:800"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "exports.movePad = async (sourceID, destinationID, force) => {\n  const pad = await getPadSafe(sourceID, true);\n  await pad.copy(destinationID, force);\n  await padDeletionManager.transferDeletionToken(sourceID, destinationID);\n  await pad.remove();\n};",
+        "edges": [
+          "getPadSafe(sourceID,true) throws if missing (src/node/db/API.ts:768)"
+        ]
+      },
+      "entity": "Pad",
+      "_binds": {
+        "sourceID": "Pad.id",
+        "destinationID": "Pad.id"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Pad",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "sourceID"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "sourceID",
+          "destinationID"
+        ],
+        "messages": {
+          "required": "Both a sourceID and a destinationID are required.",
+          "precondition": "The source pad does not exist.",
+          "not_found": "The source pad does not exist."
+        }
+      },
+      "_defaulted": [
+        "argument invented from the write column",
+        "fields"
+      ],
+      "description": "Move a pad to a new id: copy its content to the destination id, then delete the source."
+    },
+    {
+      "tool": "pad_restorerevision",
+      "op": "update",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Revision",
+        "fields": [
+          "changeset",
+          "author",
+          "timestamp",
+          "pool",
+          "atext"
+        ],
+        "set_on_create": {
+          "rev": {
+            "$auto": "max(rev)+0"
+          },
+          "author": {
+            "$arg": "authorId"
+          },
+          "padId": {
+            "$arg": "padID"
+          }
+        }
+      },
+      "input_schema": {
+        "padID": {
+          "type": "id",
+          "required": true,
+          "description": "Id of the pad to restore."
+        },
+        "rev": {
+          "type": "int",
+          "required": true,
+          "description": "The revision to restore the pad to."
+        },
+        "authorId": {
+          "type": "text",
+          "required": false,
+          "description": "Author credited with the restore revision."
+        }
+      },
+      "_evidence": {
+        "locator": "src/node/db/API.ts:599",
+        "id_local": "Pad.restoreRevision",
+        "entry": {
+          "kind": "http",
+          "route": "PATCH /api/1.3.0/savedRevisions",
+          "locator": "src/node/hooks/express/openapi.ts:800"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "exports.restoreRevision = async (padID, rev, authorId = '') => {\n  if (rev === undefined) throw new CustomError('rev is not defined', 'apierror');\n  rev = checkValidRev(rev);\n  const pad = await getPadSafe(padID, true);\n  if (rev > pad.getHeadRevisionNumber()) throw new CustomError('rev is higher than the head revision of the pad', 'apierror');\n  const atext = await pad.getInternalRevisionAText(rev);\n  ... const changeset = builder.toString();\n  await pad.appendRevision(changeset, authorId);\n  await padMessageHandler.updatePadClients(pad);\n};",
+        "edges": [
+          "restoreRevision needs the target revision; throws if rev is undefined or > head (src/node/db/API.ts:601)"
+        ]
+      },
+      "entity": "Revision",
+      "_binds": {
+        "padID": "Pad.id",
+        "rev": "Revision.rev",
+        "authorId": "Author.id"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Revision",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "padId",
+                      "op": "eq",
+                      "value": {
+                        "arg": "padID"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "rev",
+                      "op": "eq",
+                      "value": {
+                        "arg": "rev"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "padID",
+          "rev"
+        ],
+        "messages": {
+          "required": "A padID and revision number are required.",
+          "precondition": "The pad does not exist, or the requested revision is beyond the head.",
+          "not_found": "The pad or target revision was not found."
+        }
+      },
+      "_defaulted": [
+        "argument invented from the write column",
+        "fields"
+      ],
+      "description": "Restore a pad to the content it had at an earlier revision by appending a new head revision."
+    },
+    {
+      "tool": "pad_compact",
+      "op": "action",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "Revision",
+        "lookup_by": {
+          "padId": {
+            "$arg": "padID"
+          }
+        }
+      },
+      "input_schema": {
+        "padID": {
+          "type": "id",
+          "required": true,
+          "description": "Id of the pad to compact."
+        },
+        "keepRevisions": {
+          "type": "int",
+          "required": false,
+          "description": "How many newest revisions to keep; omit to delete every revision except the head."
+        }
+      },
+      "_evidence": {
+        "locator": "src/node/db/API.ts:735",
+        "id_local": "Pad.compact",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/1.3.1/compactPad",
+          "locator": "src/node/hooks/express/openapi.ts:800"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "exports.compactPad = async (padID, keepRevisions = null) => {\n  if (!settings.cleanup.enabled) throw new CustomError('compactPad requires cleanup.enabled = true in settings.json', 'apierror');\n  const pad = await getPadSafe(padID, true);\n  const cleanup = require('../utils/Cleanup');\n  if (keepRevisions == null) { await cleanup.deleteAllRevisions(pad.id); return {ok: true, mode: 'all'}; }\n  const keep = Number(keepRevisions);\n  if (!Number.isInteger(keep) || keep < 0) throw new CustomError('keepRevisions must be a non-negative integer', 'apierror');\n  const ok = await cleanup.deleteRevisions(p",
+        "edges": [
+          "getPadSafe(padID,true) throws 'padID does not exist' if missing (src/node/db/API.ts:745)"
+        ]
+      },
+      "entity": "Revision",
+      "_binds": {
+        "padID": "Pad.id"
+      },
+      "_output_schema": {
+        "ok": "bool",
+        "mode": "all | keepLast",
+        "keepRevisions": "int (when keepLast)"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Pad",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "padID"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "padID"
+        ],
+        "messages": {
+          "required": "A padID is required.",
+          "precondition": "That pad does not exist.",
+          "not_found": "That pad does not exist."
+        }
+      },
+      "_defaulted": [
+        "row_key (no parameter found; the column name is standing in as one)"
+      ],
+      "description": "Delete old revisions of a pad, keeping only the newest (or all but the rest if keepRevisions is given). Fails if cleanup is disabled."
+    },
+    {
+      "tool": "pad_gettext",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Pad",
+        "lookup_by": {
+          "id": {
+            "$arg": "padID"
+          }
+        }
+      },
+      "input_schema": {
+        "padID": {
+          "type": "id",
+          "required": true,
+          "description": "Id of the pad."
+        },
+        "rev": {
+          "type": "int",
+          "required": false,
+          "description": "Revision number to read; omit for the latest."
+        }
+      },
+      "_evidence": {
+        "locator": "src/node/db/API.ts:187",
+        "id_local": "Pad.getText",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/1/getText",
+          "locator": "src/node/hooks/express/openapi.ts:800"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "exports.getText = async (padID, rev) => {\n  if (rev !== undefined) rev = checkValidRev(rev);\n  const pad = await getPadSafe(padID, true);\n  const head = pad.getHeadRevisionNumber();\n  if (rev !== undefined) {\n    if (rev > head) throw new CustomError('rev is higher than the head revision of the pad', 'apierror');\n    const {text} = await pad.getInternalRevisionAText(rev);\n    return {text};\n  }\n  const text = exportTxt.getTXTFromAtext(pad, pad.atext);\n  return {text};\n};"
+      },
+      "entity": "Pad",
+      "_binds": {
+        "padID": "Pad.id",
+        "rev": "Revision.rev"
+      },
+      "_output_schema": {
+        "text": "the pad's plain text at the requested revision"
+      },
+      "guards": {
+        "required": [
+          "padID"
+        ],
+        "messages": {
+          "required": "A padID is required.",
+          "not_found": "That pad does not exist."
+        }
+      },
+      "description": "Return a pad's plain text, optionally at a specific revision."
+    },
+    {
+      "tool": "pad_gethtml",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Pad",
+        "lookup_by": {
+          "id": {
+            "$arg": "padID"
+          }
+        }
+      },
+      "input_schema": {
+        "padID": {
+          "type": "id",
+          "required": true,
+          "description": "Id of the pad."
+        },
+        "rev": {
+          "type": "int",
+          "required": false,
+          "description": "Revision number to read; omit for the latest."
+        }
+      },
+      "_evidence": {
+        "locator": "src/node/db/API.ts:279",
+        "id_local": "Pad.getHTML",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/1/getHTML",
+          "locator": "src/node/hooks/express/openapi.ts:800"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "exports.getHTML = async (padID, rev) => {\n  if (rev !== undefined) rev = checkValidRev(rev);\n  const pad = await getPadSafe(padID, true);\n  let html = await exportHtml.getPadHTML(pad, rev);\n  html = `<!DOCTYPE HTML><html><body>${html}</body></html>`;\n  return {html};\n};"
+      },
+      "entity": "Pad",
+      "_binds": {
+        "padID": "Pad.id",
+        "rev": "Revision.rev"
+      },
+      "_output_schema": {
+        "html": "the pad's HTML"
+      },
+      "guards": {
+        "required": [
+          "padID"
+        ],
+        "messages": {
+          "required": "A padID is required.",
+          "not_found": "That pad does not exist."
+        }
+      },
+      "description": "Return a pad's content as HTML, optionally at a specific revision."
+    },
+    {
+      "tool": "pad_settext",
+      "op": "update",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Revision",
+        "fields": [
+          "changeset",
+          "author",
+          "timestamp",
+          "pool",
+          "atext"
+        ],
+        "set_on_create": {
+          "rev": {
+            "$auto": "max(rev)+0"
+          },
+          "author": {
+            "$arg": "authorId"
+          },
+          "padId": {
+            "$arg": "padID"
+          }
+        }
+      },
+      "input_schema": {
+        "padID": {
+          "type": "id",
+          "required": true,
+          "description": "Id of the pad."
+        },
+        "text": {
+          "type": "text",
+          "required": true,
+          "description": "The new plain text."
+        },
+        "authorId": {
+          "type": "text",
+          "required": false,
+          "description": "Author credited with the edit."
+        }
+      },
+      "_evidence": {
+        "locator": "src/node/db/API.ts:232",
+        "id_local": "Pad.setText",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/1/setText",
+          "locator": "src/node/hooks/express/openapi.ts:800"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "exports.setText = async (padID, text, authorId = '') => {\n  if (typeof text !== 'string') throw new CustomError('text is not a string', 'apierror');\n  const pad = await getPadSafe(padID, true);\n  await pad.setText(text, authorId);\n  await padMessageHandler.updatePadClients(pad);\n};",
+        "edges": [
+          "getPadSafe(padID,true) throws 'padID does not exist' if missing (src/node/db/API.ts:240)"
+        ]
+      },
+      "entity": "Revision",
+      "_binds": {
+        "padID": "Pad.id",
+        "text": "Pad.atext",
+        "authorId": "Author.id"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Pad",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "padID"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "padID",
+          "text"
+        ],
+        "messages": {
+          "required": "A padID and new text are required.",
+          "precondition": "That pad does not exist.",
+          "not_found": "That pad does not exist."
+        }
+      },
+      "_defaulted": [
+        "argument invented from the write column",
+        "fields"
+      ],
+      "description": "Replace the entire content of a pad with new text, appending a head revision."
+    },
+    {
+      "tool": "pad_appendtext",
+      "op": "update",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Revision",
+        "fields": [
+          "changeset",
+          "author",
+          "timestamp",
+          "pool",
+          "atext"
+        ],
+        "set_on_create": {
+          "rev": {
+            "$auto": "max(rev)+0"
+          },
+          "author": {
+            "$arg": "authorId"
+          },
+          "padId": {
+            "$arg": "padID"
+          }
+        }
+      },
+      "input_schema": {
+        "padID": {
+          "type": "id",
+          "required": true,
+          "description": "Id of the pad."
+        },
+        "text": {
+          "type": "text",
+          "required": true,
+          "description": "The text to append."
+        },
+        "authorId": {
+          "type": "text",
+          "required": false,
+          "description": "Author credited with the edit."
+        }
+      },
+      "_evidence": {
+        "locator": "src/node/db/API.ts:257",
+        "id_local": "Pad.appendText",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/1.2.13/appendText",
+          "locator": "src/node/hooks/express/openapi.ts:800"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "exports.appendText = async (padID, text, authorId = '') => {\n  if (typeof text !== 'string') throw new CustomError('text is not a string', 'apierror');\n  const pad = await getPadSafe(padID, true);\n  await pad.appendText(text, authorId);\n  await padMessageHandler.updatePadClients(pad);\n};",
+        "edges": [
+          "getPadSafe(padID,true) throws 'padID does not exist' if missing (src/node/db/API.ts:265)"
+        ]
+      },
+      "entity": "Revision",
+      "_binds": {
+        "padID": "Pad.id",
+        "text": "Pad.atext",
+        "authorId": "Author.id"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Pad",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "padID"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "padID",
+          "text"
+        ],
+        "messages": {
+          "required": "A padID and text to append are required.",
+          "precondition": "That pad does not exist.",
+          "not_found": "That pad does not exist."
+        }
+      },
+      "_defaulted": [
+        "argument invented from the write column",
+        "fields"
+      ],
+      "description": "Append text to the end of a pad, appending a head revision."
+    },
+    {
+      "tool": "pad_sethtml",
+      "op": "update",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Revision",
+        "fields": [
+          "changeset",
+          "author",
+          "timestamp",
+          "pool",
+          "atext"
+        ],
+        "set_on_create": {
+          "rev": {
+            "$auto": "max(rev)+0"
+          },
+          "author": {
+            "$arg": "authorId"
+          },
+          "padId": {
+            "$arg": "padID"
+          }
+        }
+      },
+      "input_schema": {
+        "padID": {
+          "type": "id",
+          "required": true,
+          "description": "Id of the pad."
+        },
+        "html": {
+          "type": "text",
+          "required": true,
+          "description": "The HTML to import as the pad content."
+        },
+        "authorId": {
+          "type": "text",
+          "required": false,
+          "description": "Author credited with the edit."
+        }
+      },
+      "_evidence": {
+        "locator": "src/node/db/API.ts:315",
+        "id_local": "Pad.setHTML",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/1/setHTML",
+          "locator": "src/node/hooks/express/openapi.ts:800"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "exports.setHTML = async (padID, html, authorId = '') => {\n  if (typeof html !== 'string') throw new CustomError('html is not a string', 'apierror');\n  const pad = await getPadSafe(padID, true);\n  try { await importHtml.setPadHTML(pad, cleanText(html), authorId); }\n  catch (e) { throw new CustomError('HTML is malformed', 'apierror'); }\n  padMessageHandler.updatePadClients(pad);\n};",
+        "edges": [
+          "getPadSafe(padID,true) throws 'padID does not exist' if missing (src/node/db/API.ts:323)"
+        ]
+      },
+      "entity": "Revision",
+      "_binds": {
+        "padID": "Pad.id",
+        "html": "Pad.atext",
+        "authorId": "Author.id"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Pad",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "padID"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "padID",
+          "html"
+        ],
+        "messages": {
+          "required": "A padID and HTML are required.",
+          "precondition": "That pad does not exist.",
+          "not_found": "That pad does not exist."
+        }
+      },
+      "_defaulted": [
+        "argument invented from the write column",
+        "fields"
+      ],
+      "description": "Replace a pad's content from an HTML document, appending a head revision. Fails if the HTML is malformed."
+    },
+    {
+      "tool": "pad_getattributepool",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Pad",
+        "lookup_by": {
+          "id": {
+            "$arg": "padID"
+          }
+        }
+      },
+      "input_schema": {
+        "padID": {
+          "type": "id",
+          "required": true,
+          "description": "Id of the pad."
+        }
+      },
+      "_evidence": {
+        "locator": "src/node/db/API.ts:136",
+        "id_local": "Pad.getAttributePool",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/1.2.8/getAttributePool",
+          "locator": "src/node/hooks/express/openapi.ts:800"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "exports.getAttributePool = async (padID) => {\n  const pad = await getPadSafe(padID, true);\n  return {pool: pad.pool};\n};"
+      },
+      "entity": "Pad",
+      "_binds": {
+        "padID": "Pad.id"
+      },
+      "_output_schema": {
+        "pool": "the pad's attribute pool (numToAttrib/attribToNum/nextNum)"
+      },
+      "guards": {
+        "required": [
+          "padID"
+        ],
+        "messages": {
+          "required": "A padID is required.",
+          "not_found": "That pad does not exist."
+        }
+      },
+      "description": "Return a pad's attribute pool (the mapping between attribute numbers and the formatting attributes used in its revisions)."
+    },
+    {
+      "tool": "pad_getrevisionchangeset",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Revision",
+        "lookup_by": {
+          "padId": {
+            "$arg": "padID"
+          },
+          "rev": "(head when rev omitted, else $arg.rev)"
+        }
+      },
+      "input_schema": {
+        "padID": {
+          "type": "id",
+          "required": true,
+          "description": "Id of the pad."
+        },
+        "rev": {
+          "type": "int",
+          "required": false,
+          "description": "Revision to read; omit for the head."
+        }
+      },
+      "_evidence": {
+        "locator": "src/node/db/API.ts:154",
+        "id_local": "Pad.getRevisionChangeset",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/1.2.8/getRevisionChangeset",
+          "locator": "src/node/hooks/express/openapi.ts:800"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "exports.getRevisionChangeset = async (padID, rev) => {\n  if (rev !== undefined) rev = checkValidRev(rev);\n  const pad = await getPadSafe(padID, true);\n  const head = pad.getHeadRevisionNumber();\n  if (rev !== undefined) {\n    if (rev > head) throw new CustomError('rev is higher than the head revision of the pad', 'apierror');\n    return await pad.getRevisionChangeset(rev);\n  }\n  return await pad.getRevisionChangeset(head);\n};"
+      },
+      "entity": "Revision",
+      "_binds": {
+        "padID": "Pad.id",
+        "rev": "Revision.rev"
+      },
+      "_output_schema": {
+        "changeset": "the changeset string at that revision"
+      },
+      "guards": {
+        "required": [
+          "padID"
+        ],
+        "messages": {
+          "required": "A padID is required.",
+          "not_found": "That pad does not exist."
+        }
+      },
+      "description": "Return the changeset (text diff) at a specific revision of a pad."
+    },
+    {
+      "tool": "pad_getrevisionscount",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Pad",
+        "lookup_by": {
+          "id": {
+            "$arg": "padID"
+          }
+        }
+      },
+      "input_schema": {
+        "padID": {
+          "type": "id",
+          "required": true,
+          "description": "Id of the pad."
+        }
+      },
+      "_evidence": {
+        "locator": "src/node/db/API.ts:442",
+        "id_local": "Pad.getRevisionsCount",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/1/getRevisionsCount",
+          "locator": "src/node/hooks/express/openapi.ts:800"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "exports.getRevisionsCount = async (padID) => {\n  const pad = await getPadSafe(padID, true);\n  return {revisions: pad.getHeadRevisionNumber()};\n};"
+      },
+      "entity": "Pad",
+      "_binds": {
+        "padID": "Pad.id"
+      },
+      "_output_schema": {
+        "revisions": "int - the current head revision number"
+      },
+      "guards": {
+        "required": [
+          "padID"
+        ],
+        "messages": {
+          "required": "A padID is required.",
+          "not_found": "That pad does not exist."
+        }
+      },
+      "description": "Return the head (latest) revision number of a pad."
+    },
+    {
+      "tool": "pad_getlastedited",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Revision",
+        "lookup_by": {
+          "padId": {
+            "$arg": "padID"
+          },
+          "rev": "(head revision)"
+        }
+      },
+      "input_schema": {
+        "padID": {
+          "type": "id",
+          "required": true,
+          "description": "Id of the pad."
+        }
+      },
+      "_evidence": {
+        "locator": "src/node/db/API.ts:521",
+        "id_local": "Pad.getLastEdited",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/1/getLastEdited",
+          "locator": "src/node/hooks/express/openapi.ts:800"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "exports.getLastEdited = async (padID) => {\n  const pad = await getPadSafe(padID, true);\n  const lastEdited = await pad.getLastEdit();\n  return {lastEdited};\n};"
+      },
+      "entity": "Revision",
+      "_binds": {
+        "padID": "Pad.id"
+      },
+      "_output_schema": {
+        "lastEdited": "datetime - timestamp of the latest revision"
+      },
+      "guards": {
+        "required": [
+          "padID"
+        ],
+        "messages": {
+          "required": "A padID is required.",
+          "not_found": "That pad does not exist."
+        }
+      },
+      "description": "Return the timestamp of the most recent revision of a pad."
+    },
+    {
+      "tool": "pad_creatediffhtml",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Revision",
+        "lookup_by": {
+          "padId": {
+            "$arg": "padID"
+          },
+          "rev": "(startRev..endRev range)"
+        }
+      },
+      "input_schema": {
+        "padID": {
+          "type": "id",
+          "required": true,
+          "description": "Id of the pad."
+        },
+        "startRev": {
+          "type": "int",
+          "required": false,
+          "description": "Start of the revision range."
+        },
+        "endRev": {
+          "type": "int",
+          "required": false,
+          "description": "End of the revision range."
+        }
+      },
+      "_evidence": {
+        "locator": "src/node/db/API.ts:956",
+        "id_local": "Pad.createDiffHTML",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/1.2.7/createDiffHTML",
+          "locator": "src/node/hooks/express/openapi.ts:800"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "exports.createDiffHTML = async (padID, startRev, endRev) => {\n  if (startRev !== undefined) startRev = checkValidRev(startRev);\n  if (endRev !== undefined) endRev = checkValidRev(endRev);\n  const pad = await getPadSafe(padID, true);\n  let padDiff;\n  try { padDiff = new PadDiff(pad, startRev, endRev); }\n  catch (e) { throw {stop: e.message}; }\n  const html = await padDiff.getHtml();\n  const authors = await padDiff.getAuthors();\n  return {html, authors};\n};"
+      },
+      "entity": "Revision",
+      "_binds": {
+        "padID": "Pad.id",
+        "startRev": "Revision.rev",
+        "endRev": "Revision.rev"
+      },
+      "_output_schema": {
+        "html": "the diff HTML",
+        "authors": "list of author ids involved"
+      },
+      "guards": {
+        "required": [
+          "padID"
+        ],
+        "messages": {
+          "required": "A padID is required.",
+          "not_found": "That pad does not exist."
+        }
+      },
+      "description": "Return the HTML diff between two revisions of a pad, along with the authors who contributed in that range."
+    },
+    {
+      "tool": "pad_listauthorsofpad",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Pad",
+        "lookup_by": {
+          "id": {
+            "$arg": "padID"
+          }
+        }
+      },
+      "input_schema": {
+        "padID": {
+          "type": "id",
+          "required": true,
+          "description": "Id of the pad."
+        }
+      },
+      "_evidence": {
+        "locator": "src/node/db/API.ts:867",
+        "id_local": "Pad.listAuthorsOfPad",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/1/listAuthorsOfPad",
+          "locator": "src/node/hooks/express/openapi.ts:800"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "exports.listAuthorsOfPad = async (padID) => {\n  const pad = await getPadSafe(padID, true);\n  const authorIDs = pad.getAllAuthors().filter((id) => !isSystemAuthor(id));\n  return {authorIDs};\n};"
+      },
+      "entity": "Pad",
+      "_binds": {
+        "padID": "Pad.id"
+      },
+      "_output_schema": {
+        "authorIDs": "array of author ids who contributed to the pad (excluding the system author)"
+      },
+      "guards": {
+        "required": [
+          "padID"
+        ],
+        "messages": {
+          "required": "A padID is required.",
+          "not_found": "That pad does not exist."
+        }
+      },
+      "description": "List the ids of every author who has contributed to a pad, excluding the system author."
+    },
+    {
+      "tool": "pad_setpublicstatus",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Pad",
+        "row_key": {
+          "id": {
+            "$arg": "padID"
+          }
+        },
+        "fields": [
+          "publicStatus"
+        ]
+      },
+      "input_schema": {
+        "padID": {
+          "type": "id",
+          "required": true,
+          "description": "Id of the group pad."
+        },
+        "publicStatus": {
+          "type": "bool",
+          "required": true,
+          "description": "True to make the pad public."
+        }
+      },
+      "_evidence": {
+        "locator": "src/node/db/API.ts:825",
+        "id_local": "Pad.setPublicStatus",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/1/setPublicStatus",
+          "locator": "src/node/hooks/express/openapi.ts:800"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "exports.setPublicStatus = async (padID, publicStatus) => {\n  checkGroupPad(padID, 'publicStatus');\n  const pad = await getPadSafe(padID, true);\n  if (typeof publicStatus === 'string') publicStatus = (publicStatus.toLowerCase() === 'true');\n  await pad.setPublicStatus(publicStatus);\n};",
+        "edges": [
+          "getPadSafe(padID,true) throws 'padID does not exist' if missing (src/node/db/API.ts:833)"
+        ]
+      },
+      "entity": "Pad",
+      "_binds": {
+        "padID": "Pad.id",
+        "publicStatus": "Pad.publicStatus"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Pad",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "padID"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "padID",
+          "publicStatus"
+        ],
+        "messages": {
+          "required": "A padID and a publicStatus are required.",
+          "precondition": "That pad does not exist.",
+          "not_found": "That pad does not exist."
+        }
+      },
+      "description": "Set whether a group pad is publicly readable. Only valid for group pads."
+    },
+    {
+      "tool": "pad_getpublicstatus",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Pad",
+        "lookup_by": {
+          "id": {
+            "$arg": "padID"
+          }
+        }
+      },
+      "input_schema": {
+        "padID": {
+          "type": "id",
+          "required": true,
+          "description": "Id of the group pad."
+        }
+      },
+      "_evidence": {
+        "locator": "src/node/db/API.ts:849",
+        "id_local": "Pad.getPublicStatus",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/1/getPublicStatus",
+          "locator": "src/node/hooks/express/openapi.ts:800"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "exports.getPublicStatus = async (padID) => {\n  checkGroupPad(padID, 'publicStatus');\n  const pad = await getPadSafe(padID, true);\n  return {publicStatus: pad.getPublicStatus()};\n};"
+      },
+      "entity": "Pad",
+      "_binds": {
+        "padID": "Pad.id"
+      },
+      "_output_schema": {
+        "publicStatus": "bool"
+      },
+      "guards": {
+        "required": [
+          "padID"
+        ],
+        "messages": {
+          "required": "A padID is required.",
+          "not_found": "That pad does not exist."
+        }
+      },
+      "description": "Return whether a group pad is publicly readable."
+    },
+    {
+      "tool": "pad_getreadonlyid",
+      "op": "read",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "PadReadOnly",
+        "fields": [
+          "readOnlyId"
+        ],
+        "set_on_create": {
+          "padId": {
+            "$arg": "padID"
+          },
+          "readOnlyId": "(generated r.xxxx)"
+        }
+      },
+      "input_schema": {
+        "padID": {
+          "type": "id",
+          "required": true,
+          "description": "Id of the pad."
+        }
+      },
+      "_evidence": {
+        "locator": "src/node/db/API.ts:786",
+        "id_local": "Pad.getReadOnlyID",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/1/getReadOnlyID",
+          "locator": "src/node/hooks/express/openapi.ts:800"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "exports.getReadOnlyID = async (padID) => {\n  await getPadSafe(padID, true);\n  const readOnlyID = await readOnlyManager.getReadOnlyId(padID);\n  return {readOnlyID};\n};"
+      },
+      "entity": "PadReadOnly",
+      "_binds": {
+        "padID": "Pad.id"
+      },
+      "_output_schema": {
+        "readOnlyID": "the read-only id (r.xxxx)"
+      },
+      "guards": {
+        "required": [
+          "padID"
+        ],
+        "messages": {
+          "required": "A padID is required.",
+          "not_found": "That pad does not exist."
+        }
+      },
+      "_defaulted": [
+        "fields"
+      ],
+      "description": "Return (creating if needed) the read-only id (r.xxxx) that lets anyone view a pad without a session."
+    },
+    {
+      "tool": "pad_getpadid",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "ReadOnlyPad",
+        "lookup_by": {
+          "readOnlyId": {
+            "$arg": "roID"
+          }
+        }
+      },
+      "input_schema": {
+        "roID": {
+          "type": "text",
+          "required": true,
+          "description": "The read-only id (r.xxxx)."
+        }
+      },
+      "_evidence": {
+        "locator": "src/node/db/API.ts:805",
+        "id_local": "Pad.getPadID",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/1.2.10/getPadID",
+          "locator": "src/node/hooks/express/openapi.ts:800"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "exports.getPadID = async (roID) => {\n  const padID = await readOnlyManager.getPadId(roID);\n  if (padID == null) throw new CustomError('padID does not exist', 'apierror');\n  return {padID};\n};"
+      },
+      "entity": "ReadOnlyPad",
+      "_binds": {
+        "roID": "ReadOnlyPad.readOnlyId"
+      },
+      "_output_schema": {
+        "padID": "the real pad id"
+      },
+      "guards": {
+        "required": [
+          "roID"
+        ],
+        "messages": {
+          "required": "A read-only id is required.",
+          "not_found": "No pad is mapped to that read-only id."
+        }
+      },
+      "description": "Resolve a read-only id back to the real pad id. Fails if the read-only id is unknown."
+    },
+    {
+      "tool": "pad_getchathistory",
+      "op": "read",
+      "family": "search",
+      "exec_spec": {
+        "entity": "ChatMessage",
+        "search_fields": [
+          "index"
+        ],
+        "filter": {
+          "col": "padId",
+          "mode": "exact",
+          "val": {
+            "$arg": "padID"
+          }
+        }
+      },
+      "input_schema": {
+        "padID": {
+          "type": "id",
+          "required": true,
+          "description": "Id of the pad."
+        },
+        "start": {
+          "type": "int",
+          "required": false,
+          "description": "First message index (0-based)."
+        },
+        "end": {
+          "type": "int",
+          "required": false,
+          "description": "Last message index."
+        }
+      },
+      "_evidence": {
+        "locator": "src/node/db/API.ts:356",
+        "id_local": "Pad.getChatHistory",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/1.2.7/getChatHistory",
+          "locator": "src/node/hooks/express/openapi.ts:800"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "exports.getChatHistory = async (padID, start, end) => {\n  if (start && end) { if (start < 0) throw new CustomError('start is below zero','apierror'); ... }\n  const pad = await getPadSafe(padID, true);\n  const chatHead = pad.chatHead;\n  if (!start || !end) { start = 0; end = pad.chatHead; }\n  if (start > chatHead) throw new CustomError('start is higher than the current chatHead', 'apierror');\n  if (end > chatHead) throw new CustomError('end is higher than the current chatHead', 'apierror');\n  const messages = await pad.getChatMessages(start, end);\n  return {messages};\n};"
+      },
+      "entity": "ChatMessage",
+      "_binds": {
+        "padID": "Pad.id",
+        "start": "ChatMessage.index",
+        "end": "ChatMessage.index"
+      },
+      "_output_schema": {
+        "messages": "list of chat messages; each {text, authorID, time}"
+      },
+      "guards": {
+        "required": [
+          "padID"
+        ],
+        "messages": {
+          "required": "A padID is required.",
+          "not_found": "That pad does not exist."
+        }
+      },
+      "description": "Return the chat messages of a pad within an index range."
+    },
+    {
+      "tool": "pad_appendchatmessage",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "ChatMessage",
+        "fields": [
+          "text",
+          "authorId",
+          "time"
+        ],
+        "set_on_create": {
+          "index": {
+            "$auto": "max(index)+0"
+          },
+          "text": {
+            "$arg": "text"
+          },
+          "authorId": {
+            "$arg": "authorID"
+          },
+          "time": {
+            "$arg": "time"
+          },
+          "padId": {
+            "$arg": "padID"
+          }
+        }
+      },
+      "input_schema": {
+        "padID": {
+          "type": "id",
+          "required": true,
+          "description": "Id of the pad."
+        },
+        "text": {
+          "type": "text",
+          "required": false,
+          "description": "The chat message text."
+        },
+        "authorID": {
+          "type": "id",
+          "required": false,
+          "description": "Id of the author sending the message."
+        },
+        "time": {
+          "type": "int",
+          "required": false,
+          "description": "Unix timestamp for the message; defaults to now."
+        }
+      },
+      "_evidence": {
+        "locator": "src/node/db/API.ts:406",
+        "id_local": "Pad.appendChatMessage",
+        "entry": {
+          "kind": "http",
+          "route": "PATCH /api/1.2.12/chats/messages",
+          "locator": "src/node/hooks/express/openapi.ts:800"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "exports.appendChatMessage = async (padID, text, authorID, time) => {\n  if (typeof text !== 'string') throw new CustomError('text is not a string', 'apierror');\n  if (time === undefined || !isInt(time)) time = Date.now();\n  if (!await padManager.doesPadExists(padID)) throw new CustomError('padID does not exist', 'apierror');\n  await padMessageHandler.sendChatMessageToPadClients(new ChatMessage(text, authorID, time), padID);\n};",
+        "edges": [
+          "getPadSafe(padID,true) throws 'padID does not exist' if missing (src/node/db/API.ts:414)"
+        ]
+      },
+      "entity": "ChatMessage",
+      "_binds": {
+        "padID": "Pad.id",
+        "text": "ChatMessage.text",
+        "authorID": "Author.id",
+        "time": "ChatMessage.time"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Pad",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "padID"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "padID",
+          "text"
+        ],
+        "messages": {
+          "required": "A padID and message text are required.",
+          "precondition": "That pad does not exist.",
+          "not_found": "That pad does not exist."
+        }
+      },
+      "_defaulted": [
+        "fields"
+      ],
+      "description": "Append a chat message to a pad."
+    },
+    {
+      "tool": "pad_getchathead",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Pad",
+        "lookup_by": {
+          "id": {
+            "$arg": "padID"
+          }
+        }
+      },
+      "input_schema": {
+        "padID": {
+          "type": "id",
+          "required": true,
+          "description": "Id of the pad."
+        }
+      },
+      "_evidence": {
+        "locator": "src/node/db/API.ts:930",
+        "id_local": "Pad.getChatHead",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/1.2.7/getChatHead",
+          "locator": "src/node/hooks/express/openapi.ts:800"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "exports.getChatHead = async (padID) => {\n  const pad = await getPadSafe(padID, true);\n  return {chatHead: pad.chatHead};\n};"
+      },
+      "entity": "Pad",
+      "_binds": {
+        "padID": "Pad.id"
+      },
+      "_output_schema": {
+        "chatHead": "int - index of the last chat message"
+      },
+      "guards": {
+        "required": [
+          "padID"
+        ],
+        "messages": {
+          "required": "A padID is required.",
+          "not_found": "That pad does not exist."
+        }
+      },
+      "description": "Return the index of the last chat message on a pad."
+    },
+    {
+      "tool": "pad_saverevision",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Pad",
+        "row_key": {
+          "id": {
+            "$arg": "padID"
+          }
+        },
+        "fields": [
+          "atext",
+          "pool",
+          "head",
+          "chatHead",
+          "publicStatus",
+          "savedRevisions",
+          "padSettings"
+        ],
+        "set": {
+          "savedRevisions": "(saved revision appended)"
+        }
+      },
+      "input_schema": {
+        "padID": {
+          "type": "id",
+          "required": true,
+          "description": "Id of the pad."
+        },
+        "rev": {
+          "type": "int",
+          "required": false,
+          "description": "Revision to save; omit for the head."
+        }
+      },
+      "_evidence": {
+        "locator": "src/node/db/API.ts:488",
+        "id_local": "Pad.saveRevision",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/1.2.11/saveRevision",
+          "locator": "src/node/hooks/express/openapi.ts:800"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "exports.saveRevision = async (padID, rev) => {\n  if (rev !== undefined) rev = checkValidRev(rev);\n  const pad = await getPadSafe(padID, true);\n  const head = pad.getHeadRevisionNumber();\n  if (rev !== undefined) {\n    if (rev > head) throw new CustomError('rev is higher than the head revision of the pad', 'apierror');\n  } else rev = pad.getHeadRevisionNumber();\n  const author = await authorManager.createAuthor('API');\n  await pad.addSavedRevision(rev, author.authorID, 'Saved through API call');\n};",
+        "edges": [
+          "getPadSafe(padID,true) throws 'padID does not exist' if missing (src/node/db/API.ts:494)"
+        ]
+      },
+      "entity": "Pad",
+      "_binds": {
+        "padID": "Pad.id",
+        "rev": "Revision.rev"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Pad",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "padID"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "padID"
+        ],
+        "messages": {
+          "required": "A padID is required.",
+          "precondition": "That pad does not exist.",
+          "not_found": "That pad does not exist."
+        }
+      },
+      "_defaulted": [
+        "argument invented from the write column",
+        "fields"
+      ],
+      "description": "Bookmark a pad's current (or given) revision into its saved-revisions list."
+    },
+    {
+      "tool": "pad_listsavedrevisions",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Pad",
+        "lookup_by": {
+          "id": {
+            "$arg": "padID"
+          }
+        }
+      },
+      "input_schema": {
+        "padID": {
+          "type": "id",
+          "required": true,
+          "description": "Id of the pad."
+        }
+      },
+      "_evidence": {
+        "locator": "src/node/db/API.ts:472",
+        "id_local": "Pad.listSavedRevisions",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/1.2.11/listSavedRevisions",
+          "locator": "src/node/hooks/express/openapi.ts:800"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "exports.listSavedRevisions = async (padID) => {\n  const pad = await getPadSafe(padID, true);\n  return {savedRevisions: pad.getSavedRevisionsList()};\n};"
+      },
+      "entity": "Pad",
+      "_binds": {
+        "padID": "Pad.id"
+      },
+      "_output_schema": {
+        "savedRevisions": "array of saved revision objects {id,revNum,savedById,label,timestamp}"
+      },
+      "guards": {
+        "required": [
+          "padID"
+        ],
+        "messages": {
+          "required": "A padID is required.",
+          "not_found": "That pad does not exist."
+        }
+      },
+      "description": "List a pad's saved (bookmarked) revisions."
+    },
+    {
+      "tool": "pad_getsavedrevisionscount",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Pad",
+        "lookup_by": {
+          "id": {
+            "$arg": "padID"
+          }
+        }
+      },
+      "input_schema": {
+        "padID": {
+          "type": "id",
+          "required": true,
+          "description": "Id of the pad."
+        }
+      },
+      "_evidence": {
+        "locator": "src/node/db/API.ts:457",
+        "id_local": "Pad.getSavedRevisionsCount",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/1.2.11/getSavedRevisionsCount",
+          "locator": "src/node/hooks/express/openapi.ts:800"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "exports.getSavedRevisionsCount = async (padID) => {\n  const pad = await getPadSafe(padID, true);\n  return {savedRevisions: pad.getSavedRevisionsNumber()};\n};"
+      },
+      "entity": "Pad",
+      "_binds": {
+        "padID": "Pad.id"
+      },
+      "_output_schema": {
+        "savedRevisions": "int"
+      },
+      "guards": {
+        "required": [
+          "padID"
+        ],
+        "messages": {
+          "required": "A padID is required.",
+          "not_found": "That pad does not exist."
+        }
+      },
+      "description": "Return how many saved (bookmarked) revisions a pad has."
+    },
+    {
+      "tool": "pad_paduserscount",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Pad",
+        "lookup_by": {
+          "id": {
+            "$arg": "padID"
+          }
+        }
+      },
+      "input_schema": {
+        "padID": {
+          "type": "id",
+          "required": true,
+          "description": "Id of the pad."
+        }
+      },
+      "_evidence": {
+        "locator": "src/node/handler/PadMessageHandler.ts:1734",
+        "id_local": "Pad.padUsersCount",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/1/padUsersCount",
+          "locator": "src/node/hooks/express/openapi.ts:800"
+        },
+        "entity_why": "the pad id is the only real reference; connected users are not persisted",
+        "ref_code": "exports.padUsersCount = (padID) => ({ padUsersCount: _getRoomSockets(padID).length });",
+        "global_why": "Etherpad exposes the pad/author namespace globally through the API (API-key or session-gated, no row-level owner column); no owner-scoped retrieval exists"
+      },
+      "entity": "Pad",
+      "_binds": {
+        "padID": "Pad.id"
+      },
+      "_output_schema": {
+        "padUsersCount": "int - number of connected users on the pad"
+      },
+      "guards": {
+        "required": [
+          "padID"
+        ],
+        "messages": {
+          "required": "A padID is required.",
+          "not_found": "That pad does not exist."
+        }
+      },
+      "_defaulted": [
+        "entity (not taken from the primary effect: fell back to the entity prefix of id_local)"
+      ],
+      "description": "Return the number of users currently connected to a pad."
+    },
+    {
+      "tool": "pad_padusers",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Pad",
+        "lookup_by": {
+          "id": {
+            "$arg": "padID"
+          }
+        }
+      },
+      "input_schema": {
+        "padID": {
+          "type": "id",
+          "required": true,
+          "description": "Id of the pad."
+        }
+      },
+      "_evidence": {
+        "locator": "src/node/handler/PadMessageHandler.ts:1741",
+        "id_local": "Pad.padUsers",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/1.1/padUsers",
+          "locator": "src/node/hooks/express/openapi.ts:800"
+        },
+        "entity_why": "the pad id is the only real reference; connected users are not persisted",
+        "ref_code": "exports.padUsers = async (padID) => {\n  const padUsers = [];\n  await Promise.all(_getRoomSockets(padID).map(async (roomSocket) => {\n    const s = sessioninfos[roomSocket.id];\n    if (s) {\n      const author = await authorManager.getAuthor(s.author);\n      if (author) { author.id = s.author; padUsers.push(author); }\n    }\n  }));\n  return {padUsers};\n};",
+        "global_why": "Etherpad exposes the pad/author namespace globally through the API (API-key or session-gated, no row-level owner column); no owner-scoped retrieval exists"
+      },
+      "entity": "Pad",
+      "_binds": {
+        "padID": "Pad.id"
+      },
+      "_output_schema": {
+        "padUsers": "array of author objects currently connected to the pad"
+      },
+      "guards": {
+        "required": [
+          "padID"
+        ],
+        "messages": {
+          "required": "A padID is required.",
+          "not_found": "That pad does not exist."
+        }
+      },
+      "_defaulted": [
+        "entity (not taken from the primary effect: fell back to the entity prefix of id_local)"
+      ],
+      "description": "Return the author objects of users currently connected to a pad."
+    },
+    {
+      "tool": "pad_sendclientsmessage",
+      "op": "action",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Pad",
+        "lookup_by": {
+          "id": {
+            "$arg": "padID"
+          }
+        }
+      },
+      "input_schema": {
+        "padID": {
+          "type": "id",
+          "required": true,
+          "description": "Id of the pad."
+        },
+        "msg": {
+          "type": "text",
+          "required": true,
+          "description": "The custom message payload to broadcast."
+        }
+      },
+      "_evidence": {
+        "locator": "src/node/db/API.ts:904",
+        "id_local": "Pad.sendClientsMessage",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/1.1/sendClientsMessage",
+          "locator": "src/node/hooks/express/openapi.ts:800"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "exports.sendClientsMessage = async (padID, msg) => {\n  await getPadSafe(padID, true);\n  padMessageHandler.handleCustomMessage(padID, msg);\n};",
+        "edges": [
+          "getPadSafe(padID,true) throws 'padID does not exist' if missing (src/node/db/API.ts:906)"
+        ]
+      },
+      "entity": "Pad",
+      "_binds": {
+        "padID": "Pad.id"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Pad",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "padID"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "padID",
+          "msg"
+        ],
+        "messages": {
+          "required": "A padID and message are required.",
+          "precondition": "That pad does not exist.",
+          "not_found": "That pad does not exist."
+        }
+      },
+      "description": "Send a custom message to every client currently connected to a pad."
+    },
+    {
+      "tool": "server_getstats",
+      "op": "search",
+      "family": "search.aggregate",
+      "exec_spec": {
+        "entity": "Pad",
+        "group_by": [],
+        "aggregate": [
+          {
+            "fn": "count",
+            "as": "totalPads"
+          }
+        ],
+        "filter": null
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "src/node/db/API.ts:999",
+        "id_local": "Server.getStats",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/1.2.14/getStats",
+          "locator": "src/node/hooks/express/openapi.ts:800"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "exports.getStats = async () => {\n  const sessionInfos = padMessageHandler.sessioninfos;\n  const sessionKeys = Object.keys(sessionInfos);\n  const activePads = new Set(Object.entries(sessionInfos).map((k) => k[1].padId));\n  const {padIDs} = await padManager.listAllPads();\n  return { totalPads: padIDs.length, totalSessions: sessionKeys.length, totalActivePads: activePads.size };\n};",
+        "global_why": "Etherpad exposes the pad/author namespace globally through the API (API-key or session-gated, no row-level owner column)"
+      },
+      "entity": "Pad",
+      "_output_schema": {
+        "totalPads": "int",
+        "totalSessions": "int",
+        "totalActivePads": "int"
+      },
+      "description": "Return server-wide statistics: total pads, total sessions, and active pads.",
+      "guards": {
+        "messages": {}
+      }
+    },
+    {
+      "tool": "pad_editsocket",
+      "op": "action",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Revision",
+        "fields": [
+          "changeset",
+          "author",
+          "timestamp",
+          "pool",
+          "atext"
+        ],
+        "set_on_create": {
+          "rev": {
+            "$auto": "max(rev)+0"
+          },
+          "author": {
+            "$arg": "author"
+          },
+          "padId": {
+            "$arg": "padId"
+          }
+        }
+      },
+      "input_schema": {
+        "padId": {
+          "type": "id",
+          "required": true,
+          "description": "Id of the pad being edited."
+        },
+        "baseRev": {
+          "type": "int",
+          "required": true,
+          "description": "The revision the client based its changes on."
+        },
+        "changeset": {
+          "type": "text",
+          "required": true,
+          "description": "The changeset to apply to the pad."
+        },
+        "author": {
+          "type": "id",
+          "required": true,
+          "description": "Id of the author making the edit (a.xxxx)."
+        }
+      },
+      "_evidence": {
+        "locator": "src/node/handler/PadMessageHandler.ts:1007",
+        "id_local": "Pad.editSocket",
+        "entry": {
+          "kind": "rpc",
+          "route": "socket.io COLLABROOM/USER_CHANGES",
+          "locator": "src/node/handler/PadMessageHandler.ts:596"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "const newRev = await pad.appendRevision(rebasedChangeset, thisSession.author);\nassert([r, r + 1].includes(newRev));\nconst correctionChangeset = _correctMarkersInPad(pad.atext, pad.pool);\nif (correctionChangeset) await pad.appendRevision(correctionChangeset, thisSession.author);\nassert.equal(thisSession.rev, r);\nsocket.emit('message', {type: 'COLLABROOM', data: {type: 'ACCEPT_COMMIT', newRev}});",
+        "edges": [
+          "securityManager.checkAccess -> sessionManager.findAuthorID requires an unexpired Session bound to the pad's group for group/private pads (src/node/db/SecurityManager.ts:72, SessionManager.ts:39)"
+        ]
+      },
+      "entity": "Revision",
+      "_binds": {
+        "padId": "Pad.id",
+        "baseRev": "Revision.rev"
+      },
+      "_output_schema": {
+        "type": "'ACCEPT_COMMIT'",
+        "newRev": "int",
+        "time": "datetime"
+      },
+      "guards": {
+        "required": [
+          "padId",
+          "baseRev",
+          "changeset",
+          "author"
+        ],
+        "messages": {
+          "required": "A padId, base revision and changeset are required."
+        }
+      },
+      "_defaulted": [
+        "argument invented from the write column",
+        "fields"
+      ],
+      "description": "Apply a collaborative changeset to a pad and grow its revision history, as the socket edit path does. Requires an open, unexpired session."
+    },
+    {
+      "tool": "pad_chatsocket",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "ChatMessage",
+        "fields": [
+          "text",
+          "authorId",
+          "time"
+        ],
+        "set_on_create": {
+          "index": {
+            "$auto": "max(index)+0"
+          },
+          "text": {
+            "$arg": "message"
+          },
+          "authorId": {
+            "$arg": "authorId"
+          },
+          "time": "2026-01-01T00:00:00",
+          "padId": {
+            "$arg": "padId"
+          }
+        }
+      },
+      "input_schema": {
+        "padId": {
+          "type": "id",
+          "required": true,
+          "description": "Id of the pad the chat belongs to."
+        },
+        "message": {
+          "type": "json",
+          "required": true,
+          "description": "The chat message payload to send."
+        },
+        "authorId": {
+          "type": "id",
+          "required": true,
+          "description": "Id of the author sending the message (a.xxxx)."
+        }
+      },
+      "_evidence": {
+        "locator": "src/node/handler/PadMessageHandler.ts:712",
+        "id_local": "Pad.chatSocket",
+        "entry": {
+          "kind": "rpc",
+          "route": "socket.io COLLABROOM/CHAT_MESSAGE",
+          "locator": "src/node/handler/PadMessageHandler.ts:610"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "const handleChatMessage = async (socket, message) => {\n  const chatMessage = ChatMessage.fromObject(message.data.message);\n  const {padId, author: authorId} = sessioninfos[socket.id];\n  chatMessage.time = Date.now();\n  chatMessage.authorId = authorId;\n  await exports.sendChatMessageToPadClients(chatMessage, padId);\n};",
+        "edges": [
+          "securityManager.checkAccess on every socket message (src/node/handler/PadMessageHandler.ts:528)"
+        ]
+      },
+      "entity": "ChatMessage",
+      "_binds": {
+        "padId": "Pad.id"
+      },
+      "_output_schema": {},
+      "guards": {
+        "required": [
+          "padId",
+          "message"
+        ],
+        "messages": {
+          "required": "A padId and message are required."
+        }
+      },
+      "_defaulted": [
+        "fields"
+      ],
+      "description": "Send a chat message over the socket connection. Requires an open session."
+    },
+    {
+      "tool": "pad_deletesocket",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "Pad",
+        "lookup_by": {
+          "id": {
+            "$arg": "padId"
+          }
+        }
+      },
+      "input_schema": {
+        "padId": {
+          "type": "id",
+          "required": true,
+          "description": "Id of the pad to delete."
+        },
+        "deletionToken": {
+          "type": "text",
+          "required": false,
+          "description": "The pad's deletion token, if deletion protection is on."
+        }
+      },
+      "_evidence": {
+        "locator": "src/node/handler/PadMessageHandler.ts:298",
+        "id_local": "Pad.deleteSocket",
+        "entry": {
+          "kind": "rpc",
+          "route": "socket.io COLLABROOM/PAD_DELETE",
+          "locator": "src/node/handler/PadMessageHandler.ts:608"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "const handlePadDelete = async (socket, padDeleteMessage) => {\n  ...\n  const isCreator = session.author === firstContributor;\n  const suppliedToken = padDeleteMessage.data.deletionToken;\n  const tokenOk = tokenSupplied && await padDeletionManager.isValidDeletionToken(padId, suppliedToken);\n  const writable = !session.readonly;\n  const creatorOk = !tokenSupplied && isCreator && writable;\n  const flagOk = !tokenSupplied && !isCreator && settings.allowPadDeletionByAllUsers && writable;\n  if (creatorOk || tokenOk || flagOk) {\n    await retrievedPad.remove();\n    return;\n  }\n  ...socket.emit('shout'",
+        "edges": [
+          "deletion allowed when author is pad creator, or valid deletionToken supplied, or allowPadDeletionByAllUsers (src/node/handler/PadMessageHandler.ts:326)"
+        ]
+      },
+      "entity": "Pad",
+      "_binds": {
+        "padId": "Pad.id"
+      },
+      "_output_schema": {},
+      "guards": {
+        "required": [
+          "padId"
+        ],
+        "messages": {
+          "required": "A padId is required.",
+          "confirm": "The deletion token did not match.",
+          "on_child": "Any revisions still referencing this pad block its deletion."
+        }
+      },
+      "description": "Delete a pad from the socket connection, allowed when the caller is the pad creator, supplies a valid deletion token, or the server allows any user."
+    },
+    {
+      "tool": "pad_setoptions",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Pad",
+        "row_key": {
+          "id": {
+            "$arg": "padId"
+          }
+        },
+        "fields": {
+          "atext": {
+            "$arg": "atext"
+          },
+          "pool": {
+            "$arg": "pool"
+          },
+          "head": {
+            "$arg": "head"
+          },
+          "chatHead": {
+            "$arg": "chatHead"
+          },
+          "publicStatus": {
+            "$arg": "publicStatus"
+          },
+          "savedRevisions": {
+            "$arg": "savedRevisions"
+          },
+          "padSettings": {
+            "$arg": "payload"
+          }
+        },
+        "set": {
+          "padSettings": "(merged with options)"
+        }
+      },
+      "input_schema": {
+        "padId": {
+          "type": "id",
+          "required": true,
+          "description": "Id of the pad."
+        },
+        "payload": {
+          "type": "json",
+          "required": true,
+          "description": "The new pad options (merged with the existing settings)."
+        }
+      },
+      "_evidence": {
+        "locator": "src/node/handler/PadMessageHandler.ts:343",
+        "id_local": "Pad.setOptions",
+        "entry": {
+          "kind": "rpc",
+          "route": "socket.io COLLABROOM/CLIENT_MESSAGE padoptions",
+          "locator": "src/node/handler/PadMessageHandler.ts:618"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "const handlePadOptionsMessage = async (socket, message) => {\n  const session = sessioninfos[socket.id];\n  if (!settings.enablePadWideSettings) return;\n  const pad = await padManager.getPad(session.padId, null, session.author);\n  if (!await isPadCreator(pad, session.author)) { socket.emit('shout', ...'Only the pad creator can change pad settings'...); return; }\n  pad.setPadSettings(message.data.payload.options);\n  await pad.saveToDatabase();\n};",
+        "edges": [
+          "isPadCreator requires session.author === revision-0 author; otherwise 'Only the pad creator can change pad settings' (src/node/handler/PadMessageHandler.ts:352)"
+        ]
+      },
+      "entity": "Pad",
+      "_binds": {
+        "padId": "Pad.id",
+        "payload": "Pad.padSettings"
+      },
+      "_output_schema": {},
+      "guards": {
+        "required": [
+          "padId",
+          "payload"
+        ],
+        "messages": {
+          "required": "A padId and options payload are required."
+        }
+      },
+      "_defaulted": [
+        "fields",
+        "fields (mapped to the real parameter names via binds)"
+      ],
+      "description": "Change a pad's wide settings. Only the pad creator may change them."
+    },
+    {
+      "tool": "pad_opensocket",
+      "op": "create",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Author",
+        "row_key": {
+          "id": {
+            "$arg": "authorId"
+          }
+        },
+        "fields": [
+          "name",
+          "colorId",
+          "lastSeen",
+          "padIDs",
+          "erased",
+          "erasedAt"
+        ],
+        "set": {
+          "name": {
+            "$arg": "name"
+          },
+          "colorId": {
+            "$arg": "colorId"
+          },
+          "lastSeen": "2026-01-01T00:00:00"
+        }
+      },
+      "input_schema": {
+        "padId": {
+          "type": "id",
+          "required": true,
+          "description": "Id of the pad being opened."
+        },
+        "authorId": {
+          "type": "id",
+          "required": true,
+          "description": "Id of the author opening it (a.xxxx)."
+        },
+        "name": {
+          "type": "text",
+          "required": false,
+          "description": "Display name to record for this author on this connection."
+        },
+        "colorId": {
+          "type": "text",
+          "required": false,
+          "description": "Color id to record for this author on this connection."
+        }
+      },
+      "_evidence": {
+        "locator": "src/node/handler/PadMessageHandler.ts:1142",
+        "id_local": "Pad.openSocket",
+        "entry": {
+          "kind": "rpc",
+          "route": "socket.io CLIENT_READY",
+          "locator": "src/node/handler/PadMessageHandler.ts:594"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "const handleClientReady = async (socket, message) => {\n  const sessionInfo = sessioninfos[socket.id];\n  let {colorId: authorColorId, name: authorName} = message.userInfo || {};\n  await Promise.all([\n    authorName && authorManager.setAuthorName(sessionInfo.author, authorName),\n    authorColorId && authorManager.setAuthorColorId(sessionInfo.author, authorColorId),\n  ]);\n  const padExisted = await padManager.doesPadExist(sessionInfo.padId);\n  const pad = await padManager.getPad(sessionInfo.padId, null, sessionInfo.author);\n  if (settings.enablePadWideSettings && !padExisted && message.padSetting",
+        "edges": [
+          "securityManager.checkAccess gates CLIENT_READY (src/node/handler/PadMessageHandler.ts:528)"
+        ]
+      },
+      "entity": "Author",
+      "_binds": {
+        "padId": "Pad.id",
+        "name": "Author.name",
+        "colorId": "Author.colorId"
+      },
+      "_output_schema": {
+        "clientVars": "initial pad state (text, authors, revisions count, settings)"
+      },
+      "guards": {
+        "required": [
+          "padId"
+        ],
+        "messages": {
+          "required": "An authorId (and the pad to open) is required."
+        }
+      },
+      "_defaulted": [
+        "argument invented from the write column",
+        "fields"
+      ],
+      "description": "Record an author's name and color as they open a pad for editing. Set the author's lastSeen and attach their contributed pad."
+    },
+    {
+      "tool": "pad_import",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Pad",
+        "row_key": {
+          "id": {
+            "$arg": "pad"
+          }
+        },
+        "fields": [
+          "atext",
+          "pool",
+          "head",
+          "chatHead",
+          "publicStatus",
+          "savedRevisions",
+          "padSettings"
+        ],
+        "set": {
+          "atext": "(imported content)"
+        }
+      },
+      "input_schema": {
+        "pad": {
+          "type": "id",
+          "required": true,
+          "description": "Id of the pad to import into."
+        },
+        "file": {
+          "type": "json",
+          "required": true,
+          "description": "The uploaded document file to import."
+        }
+      },
+      "_evidence": {
+        "locator": "src/node/hooks/express/importexport.ts:96",
+        "id_local": "Pad.import",
+        "entry": {
+          "kind": "http",
+          "route": "POST /p/{pad}/import",
+          "locator": "src/node/hooks/express/importexport.ts:96"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "args.app.post('/p/:pad/import', (req, res, next) => {\n  (async () => {\n    const {session: {user} = {}} = req;\n    const p = settings.cookie.prefix;\n    const {accessStatus, authorID} = await securityManager.checkAccess(req.params.pad, req.cookies[`${p}sessionID`] || req.cookies.sessionID, req.cookies[`${p}token`] || req.cookies.token, user);\n    if (accessStatus !== 'grant' || !webaccess.userCanModify(req.params.pad, req)) return res.status(403).send('Forbidden');\n    await importHandler.doImport(req, res, req.params.pad, authorID);\n  })().catch((err) => next(err));\n});",
+        "edges": [
+          "checkAccess grant AND webaccess.userCanModify on POST /p/:pad/import; else 403 (src/node/hooks/express/importexport.ts:100)"
+        ]
+      },
+      "entity": "Pad",
+      "_binds": {
+        "pad": "Pad.id"
+      },
+      "_output_schema": {},
+      "guards": {
+        "required": [
+          "pad",
+          "file"
+        ],
+        "messages": {
+          "required": "A target pad and a file are required."
+        }
+      },
+      "_defaulted": [
+        "argument invented from the write column",
+        "fields"
+      ],
+      "description": "Import a document file into an existing pad, replacing its content. Requires write access."
+    },
+    {
+      "tool": "pad_export",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Pad",
+        "lookup_by": {
+          "id": {
+            "$arg": "pad"
+          }
+        }
+      },
+      "input_schema": {
+        "pad": {
+          "type": "id",
+          "required": true,
+          "description": "Id of the pad to export."
+        },
+        "rev": {
+          "type": "int",
+          "required": false,
+          "description": "Revision to export; omit for the head."
+        },
+        "type": {
+          "type": "text",
+          "required": true,
+          "description": "Export format (e.g. txt, html, etherpad)."
+        }
+      },
+      "_evidence": {
+        "locator": "src/node/hooks/express/importexport.ts:31",
+        "id_local": "Pad.export",
+        "entry": {
+          "kind": "http",
+          "route": "GET /p/{pad}/{rev}/export/{type}",
+          "locator": "src/node/hooks/express/importexport.ts:31"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "args.app.get('/p/:pad{/:rev}/export/:type', (req, res, next) => {\n  ... const {session: {user} = {}} = req; ...\n  await exportHandler.doExport(req, res, padId, readOnlyId, req.params.type);\n});",
+        "global_why": "Etherpad exports pads through the global pad namespace (read-only ids are unauthenticated; no row-level owner column)"
+      },
+      "entity": "Pad",
+      "_binds": {
+        "pad": "Pad.id",
+        "rev": "Revision.rev"
+      },
+      "_output_schema": {
+        "file": "the exported document bytes"
+      },
+      "guards": {
+        "required": [
+          "pad",
+          "type"
+        ],
+        "messages": {
+          "required": "A target pad and an export type are required.",
+          "not_found": "That pad could not be exported."
+        }
+      },
+      "description": "Export a pad (optionally at a revision) in the requested format."
+    }
+  ],
+  "seed_state": {
+    "Pad": [
+      {
+        "id": "welcome",
+        "atext": "{\"text\":\"Welcome to Etherpad\",\"attribs\":\"\",\"pool\":\"\"}",
+        "pool": "{}",
+        "head": 0,
+        "chatHead": -1,
+        "publicStatus": true,
+        "savedRevisions": "[]",
+        "padSettings": "{}"
+      },
+      {
+        "id": "meeting",
+        "atext": "{\"text\":\"Meeting notes\",\"attribs\":\"\",\"pool\":\"\"}",
+        "pool": "{}",
+        "head": 1,
+        "chatHead": 3,
+        "publicStatus": false,
+        "savedRevisions": "[]",
+        "padSettings": "{}"
+      }
+    ],
+    "Author": [
+      {
+        "id": 1,
+        "name": "Tester",
+        "colorId": 1,
+        "timestamp": "2026-01-01T00:00:00",
+        "lastSeen": "2026-01-01T00:00:00",
+        "padIDs": "{}",
+        "erased": false,
+        "erasedAt": null
+      },
+      {
+        "id": 2,
+        "name": "Engineer",
+        "colorId": 2,
+        "timestamp": "2026-01-01T00:00:00",
+        "lastSeen": "2026-01-01T00:00:00",
+        "padIDs": "{}",
+        "erased": false,
+        "erasedAt": null
+      }
+    ],
+    "Group": [
+      {
+        "id": "g.demo",
+        "pads": "{}",
+        "mappings": "{}"
+      }
+    ],
+    "GroupIndex": [
+      {
+        "groupID": "g.demo",
+        "id": "g.demo"
+      }
+    ],
+    "Session": [
+      {
+        "id": "s.demo",
+        "groupID": "g.demo",
+        "authorID": 1,
+        "validUntil": "9999-01-01T00:00:00"
+      }
+    ],
+    "GroupSessionIndex": [
+      {
+        "groupID": "g.demo",
+        "sessionId": "s.demo",
+        "id": 1
+      }
+    ],
+    "AuthorSessionIndex": [
+      {
+        "authorID": 1,
+        "sessionId": "s.demo",
+        "id": 1
+      }
+    ],
+    "GroupMapper": [
+      {
+        "mapper": "team-wiki",
+        "groupID": "g.demo",
+        "id": 1
+      }
+    ],
+    "AuthorMapper": [
+      {
+        "mapper": "tester@example.com",
+        "authorID": 1,
+        "id": 1
+      }
+    ],
+    "AuthorToken": [
+      {
+        "token": "tok-a-tester",
+        "authorID": 1,
+        "id": 1
+      }
+    ],
+    "PadReadOnly": [
+      {
+        "padId": "welcome",
+        "readOnlyId": "r-welcome",
+        "id": "welcome"
+      }
+    ],
+    "ReadOnlyPad": [
+      {
+        "readOnlyId": "r-welcome",
+        "padId": "welcome",
+        "id": 1
+      }
+    ],
+    "DeletionToken": [
+      {
+        "padId": "meeting",
+        "createdAt": "2026-01-01T00:00:00",
+        "hash": "tok-meeting",
+        "id": "meeting"
+      }
+    ],
+    "Revision": [
+      {
+        "padId": "welcome",
+        "rev": 0,
+        "changeset": "Z:1>1:0+1$Welcome to Etherpad",
+        "author": 1,
+        "timestamp": "2026-01-01T00:00:00",
+        "pool": "{}",
+        "atext": "{\"text\":\"Welcome to Etherpad\",\"attribs\":\"\",\"pool\":\"\"}",
+        "id": 1
+      },
+      {
+        "padId": "meeting",
+        "rev": 0,
+        "changeset": "Z:1>1:0+1$Meeting",
+        "author": 1,
+        "timestamp": "2026-01-01T00:00:00",
+        "pool": "{}",
+        "atext": "{\"text\":\"Meeting\",\"attribs\":\"\",\"pool\":\"\"}",
+        "id": 2
+      },
+      {
+        "padId": "meeting",
+        "rev": 1,
+        "changeset": "Z:1>1:0+1$Meeting notes",
+        "author": 2,
+        "timestamp": "2026-01-02T00:00:00",
+        "pool": "{}",
+        "atext": "{\"text\":\"Meeting notes\",\"attribs\":\"\",\"pool\":\"\"}",
+        "id": 3
+      }
+    ],
+    "ChatMessage": [
+      {
+        "padId": "meeting",
+        "index": 0,
+        "text": "hello",
+        "authorId": 1,
+        "time": "2026-01-01T00:00:00",
+        "id": 1
+      },
+      {
+        "padId": "meeting",
+        "index": 1,
+        "text": "hi",
+        "authorId": 2,
+        "time": "2026-01-01T00:00:00",
+        "id": 2
+      },
+      {
+        "padId": "meeting",
+        "index": 2,
+        "text": "agenda?",
+        "authorId": 1,
+        "time": "2026-01-01T01:00:00",
+        "id": 3
+      },
+      {
+        "padId": "meeting",
+        "index": 3,
+        "text": "roadmap",
+        "authorId": 2,
+        "time": "2026-01-01T01:30:00",
+        "id": 4
+      }
+    ]
+  },
+  "summary": "Etherpad is a self-hosted collaborative real-time editor: it persists pads (changeset-based docs with revision history and per-line attribute pools), authors, groups, sessions, chat messages and read-only/deletion-token mappings in a ueberdb2 KV store, and exposes a large HTTP API plus a socket.io editing path",
+  "_fk_gravity": {
+    "entity": "Author",
+    "fk_count": 6
+  },
+  "_read_denied": "forbidden",
+  "_no_edges": [
+    {
+      "id_local": "Author.addPad",
+      "why": "internal AuthorManager helper (called from appendRevision/copy); no route, no auth pre-check, calls nothing"
+    },
+    {
+      "id_local": "Author.removePad",
+      "why": "internal AuthorManager helper (called from Pad.remove); no route, no pre-check, calls nothing"
+    },
+    {
+      "id_local": "Author.create",
+      "why": "internal AuthorManager helper; no route, no pre-check, calls nothing"
+    },
+    {
+      "id_local": "Author.createIfNotExistsFor",
+      "why": "HTTP reachable (POST /api/1/createAuthorIfNotExistsFor) but no auth middleware beyond the global API key; does not call another op and has no ownership wall - it creates/maps an author only"
+    },
+    {
+      "id_local": "Author.setAuthorName",
+      "why": "internal AuthorManager helper (socket CLIENT_READY/USERINFO_UPDATE); no route, no pre-check, calls nothing"
+    },
+    {
+      "id_local": "Author.setAuthorColorId",
+      "why": "internal AuthorManager helper (socket CLIENT_READY/USERINFO_UPDATE); no route, no pre-check, calls nothing"
+    },
+    {
+      "id_local": "Group.create",
+      "why": "HTTP reachable (POST /api/1/createGroup) but no auth wall (API key only); calls nothing, no pre-check beyond generating an id"
+    },
+    {
+      "id_local": "Group.createIfNotExistsFor",
+      "why": "HTTP reachable (POST /api/1/createGroupIfNotExistsFor) but no auth wall beyond the global API key; maps or creates a group, no ownership pre-check"
+    },
+    {
+      "id_local": "Pad.padUsersCount",
+      "why": "in-memory-only op: returns the count of socket.io clients in the pad room; reads no persisted entity, calls nothing, and beyond the global API key has no auth wall (src/node/handler/PadMessageHandler.ts:1734)"
+    },
+    {
+      "id_local": "Pad.padUsers",
+      "why": "in-memory-only op: returns the connected authors from in-memory sessioninfos; reads no persisted entity, calls nothing, and beyond the global API key has no auth wall (src/node/handler/PadMessageHandler.ts:1741)"
+    },
+    {
+      "id_local": "Server.checkToken",
+      "why": "no-op that relies entirely on the global API-key check in APIHandler; changes no persisted state, reads nothing, calls nothing (src/node/db/API.ts:917)"
+    }
+  ],
+  "_build_note": "Build-spec agent pass: added auth/sign_in (author-id credential), seed_state, per-tool descriptions/failure messages; dropped server_checktoken (no-op); fixed entity/family on group_delete, session_delete, author_anonymize, pad_move, pad_padusers(count), server_getstats, group_listallgroups; resolved all scope_undecided and record_undeclared markers."
+}

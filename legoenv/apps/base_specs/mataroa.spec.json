@@ -1,0 +1,4542 @@
+{
+  "env_id": "mataroa",
+  "_prep_version": 3,
+  "summary": "mataroa is a Django micro-blogging SaaS where each User gets a subdomain-based blog; they CRUD Posts, Pages and Images (via web forms + a Bearer-token JSON API), publish/schedule by setting published_at, moderate reader Comments, subscribe/unsubscribe Newsletter subscribers, and pay via Stripe (premium upgrades author-approved). Analysts/visits are recorded as AnalyticPage/AnalyticPost rows; scheduled jobs emit newsletter emails (NotificationRecord), monthly markdown exports (ExportRecord), and renewal reminders; superusers moderate all Users. A login creates the account via the Onboard invitation code.",
+  "auth": {
+    "account_entity": "User",
+    "username_col": "username",
+    "password_col": "password",
+    "session_fields": {
+      "username": "username",
+      "api_key": "api_key"
+    }
+  },
+  "entities": [
+    {
+      "name": "User",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "password",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "last_login",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "is_superuser",
+          "type": "bool",
+          "nullable": false,
+          "default": false
+        },
+        {
+          "name": "username",
+          "type": "text",
+          "nullable": false,
+          "max": 150
+        },
+        {
+          "name": "first_name",
+          "type": "text",
+          "nullable": true,
+          "max": 30
+        },
+        {
+          "name": "last_name",
+          "type": "text",
+          "nullable": true,
+          "max": 150
+        },
+        {
+          "name": "email",
+          "type": "text",
+          "nullable": true,
+          "max": 254
+        },
+        {
+          "name": "is_staff",
+          "type": "bool",
+          "nullable": false,
+          "default": false
+        },
+        {
+          "name": "is_active",
+          "type": "bool",
+          "nullable": false,
+          "default": true
+        },
+        {
+          "name": "date_joined",
+          "type": "datetime",
+          "nullable": false,
+          "audit": true,
+          "immutable": true,
+          "default": "$now"
+        },
+        {
+          "name": "api_key",
+          "type": "text",
+          "nullable": false,
+          "max": 32
+        },
+        {
+          "name": "blog_title",
+          "type": "text",
+          "nullable": true,
+          "max": 500
+        },
+        {
+          "name": "blog_byline",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "footer_note",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "theme_zialucia",
+          "type": "bool",
+          "nullable": false,
+          "default": false
+        },
+        {
+          "name": "theme_sansserif",
+          "type": "bool",
+          "nullable": false,
+          "default": false
+        },
+        {
+          "name": "redirect_domain",
+          "type": "text",
+          "nullable": true,
+          "max": 150
+        },
+        {
+          "name": "custom_domain",
+          "type": "text",
+          "nullable": true,
+          "max": 150
+        },
+        {
+          "name": "comments_on",
+          "type": "bool",
+          "nullable": false,
+          "default": false
+        },
+        {
+          "name": "notifications_on",
+          "type": "bool",
+          "nullable": false,
+          "default": true
+        },
+        {
+          "name": "mail_export_on",
+          "type": "bool",
+          "nullable": false,
+          "default": false
+        },
+        {
+          "name": "post_backups_on",
+          "type": "bool",
+          "nullable": false,
+          "default": false
+        },
+        {
+          "name": "post_altpath_on",
+          "type": "bool",
+          "nullable": false,
+          "default": false
+        },
+        {
+          "name": "export_unsubscribe_key",
+          "type": "id",
+          "nullable": false
+        },
+        {
+          "name": "webring_name",
+          "type": "text",
+          "nullable": true,
+          "max": 200
+        },
+        {
+          "name": "webring_url",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "webring_prev_url",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "webring_next_url",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "stripe_customer_id",
+          "type": "text",
+          "nullable": true,
+          "max": 100
+        },
+        {
+          "name": "stripe_subscription_id",
+          "type": "text",
+          "nullable": true,
+          "max": 100
+        },
+        {
+          "name": "monero_address",
+          "type": "text",
+          "nullable": true,
+          "max": 95
+        },
+        {
+          "name": "is_premium",
+          "type": "bool",
+          "nullable": false,
+          "default": false
+        },
+        {
+          "name": "is_grandfathered",
+          "type": "bool",
+          "nullable": false,
+          "default": false
+        },
+        {
+          "name": "is_approved",
+          "type": "bool",
+          "nullable": false,
+          "default": false
+        },
+        {
+          "name": "is_delisted",
+          "type": "bool",
+          "nullable": false,
+          "default": false
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "username"
+          ]
+        },
+        {
+          "kind": "unique",
+          "cols": [
+            "api_key"
+          ]
+        },
+        {
+          "kind": "unique",
+          "cols": [
+            "export_unsubscribe_key"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Post",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "nullable": false,
+          "max": 300
+        },
+        {
+          "name": "slug",
+          "type": "text",
+          "nullable": false,
+          "max": 300
+        },
+        {
+          "name": "body",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "owner",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "User.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "nullable": false,
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "nullable": false,
+          "audit": true
+        },
+        {
+          "name": "published_at",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "broadcasted_at",
+          "type": "datetime",
+          "nullable": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "slug",
+            "owner"
+          ]
+        },
+        {
+          "kind": "conditional",
+          "if": [
+            {
+              "col": "broadcasted_at",
+              "op": "is_not_null"
+            }
+          ],
+          "then": [
+            {
+              "col": "published_at",
+              "op": "is_not_null"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Image",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "owner",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "User.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false,
+          "max": 300
+        },
+        {
+          "name": "slug",
+          "type": "text",
+          "nullable": false,
+          "max": 300
+        },
+        {
+          "name": "data",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "extension",
+          "type": "text",
+          "nullable": false,
+          "max": 10
+        },
+        {
+          "name": "uploaded_at",
+          "type": "datetime",
+          "nullable": false,
+          "audit": true,
+          "immutable": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "slug"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Page",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "nullable": false,
+          "max": 300
+        },
+        {
+          "name": "slug",
+          "type": "text",
+          "nullable": false,
+          "max": 300
+        },
+        {
+          "name": "body",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "owner",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "User.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "nullable": false,
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "nullable": false,
+          "audit": true
+        },
+        {
+          "name": "is_hidden",
+          "type": "bool",
+          "nullable": false,
+          "default": false
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "slug",
+            "owner"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Comment",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "post",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Post.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "nullable": false,
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "body",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": true,
+          "default": "Anonymous",
+          "max": 150
+        },
+        {
+          "name": "email",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "is_approved",
+          "type": "bool",
+          "nullable": false,
+          "default": false
+        },
+        {
+          "name": "is_author",
+          "type": "bool",
+          "nullable": false,
+          "default": false
+        }
+      ]
+    },
+    {
+      "name": "Notification",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "blog_user",
+          "type": "id",
+          "nullable": true,
+          "fk_to": "User.id",
+          "on_delete": "set_null"
+        },
+        {
+          "name": "email",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "unsubscribe_key",
+          "type": "id",
+          "nullable": false
+        },
+        {
+          "name": "is_active",
+          "type": "bool",
+          "nullable": false,
+          "default": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "email",
+            "blog_user"
+          ]
+        },
+        {
+          "kind": "unique",
+          "cols": [
+            "unsubscribe_key"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "NotificationRecord",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "notification",
+          "type": "id",
+          "nullable": true,
+          "fk_to": "Notification.id",
+          "on_delete": "set_null"
+        },
+        {
+          "name": "post",
+          "type": "id",
+          "nullable": true,
+          "fk_to": "Post.id",
+          "on_delete": "set_null"
+        },
+        {
+          "name": "sent_at",
+          "type": "datetime",
+          "nullable": true,
+          "default": "$now"
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "post",
+            "notification"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ExportRecord",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false,
+          "max": 150
+        },
+        {
+          "name": "user",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "User.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "sent_at",
+          "type": "datetime",
+          "nullable": false,
+          "audit": true,
+          "immutable": true
+        }
+      ]
+    },
+    {
+      "name": "Snapshot",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "nullable": false,
+          "max": 300
+        },
+        {
+          "name": "body",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "owner",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "User.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "nullable": false,
+          "audit": true,
+          "immutable": true
+        }
+      ]
+    },
+    {
+      "name": "Onboard",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "user",
+          "type": "id",
+          "nullable": true,
+          "fk_to": "User.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "code",
+          "type": "id",
+          "nullable": false
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "nullable": false,
+          "audit": true,
+          "immutable": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "code"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "AnalyticPost",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "post",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Post.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "nullable": false,
+          "audit": true,
+          "immutable": true
+        }
+      ]
+    },
+    {
+      "name": "AnalyticPage",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "user",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "User.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "path",
+          "type": "text",
+          "nullable": false,
+          "max": 300
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "nullable": false,
+          "audit": true,
+          "immutable": true
+        }
+      ]
+    }
+  ],
+  "tools": [
+    {
+      "tool": "api_approve_comment",
+      "description": "Approve a pending comment on one of your posts via the JSON API.",
+      "family": "update.field_set",
+      "entity": "Comment",
+      "input_schema": {
+        "comment_id": {
+          "type": "int",
+          "required": true,
+          "description": "The comment id to approve."
+        }
+      },
+      "exec_spec": {
+        "entity": "Comment",
+        "row_key": {
+          "id": {
+            "$arg": "comment_id"
+          }
+        },
+        "fields": [
+          "is_approved"
+        ],
+        "set": {
+          "is_approved": true
+        }
+      },
+      "_binds": {
+        "comment_id": "Comment.id"
+      },
+      "_output_schema": {
+        "ok": "bool",
+        "slug": "str",
+        "url": "str"
+      },
+      "_evidence": {
+        "id_local": "API.commentApprove",
+        "locator": "main/views/api.py:149",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/comments/<int:comment_id>/approve/",
+          "locator": "main/urls.py:298"
+        },
+        "ref_code": "def api_comment_approve(request, comment_id):\n  user = _authenticate_token(request)\n  if not user: return 403\n  comment_qs = models.Comment.objects.filter(id=comment_id, post__owner=user)\n  comment = comment_qs.first()\n  if not comment.is_approved:\n    comment.is_approved = True\n    comment.save(update_fields=[\"is_approved\"])",
+        "edges": [
+          "each API view calls _authenticate_token(request) and returns 403 if None; token matched against User.api_key (api.py:39-57,83,121,159,221,296,371)"
+        ],
+        "entity_why": "primary effect row_update lands on this table"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "api_key",
+                  "op": "eq",
+                  "value": {
+                    "session": "api_key"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Your API token is invalid or missing — sign in first.",
+          "precondition": "This endpoint requires a valid API token for your account — pass the api_key you got at sign-up, or reset it if it has been rotated."
+        }
+      }
+    },
+    {
+      "tool": "api_create_page",
+      "description": "Create a page via the JSON API with your API token. Fails if that (slug, owner) already exists.",
+      "family": "crud.insert",
+      "entity": "Page",
+      "input_schema": {
+        "title": {
+          "type": "text",
+          "required": true,
+          "description": "The page title."
+        },
+        "slug": {
+          "type": "text",
+          "required": true,
+          "description": "The page slug."
+        },
+        "body": {
+          "type": "text",
+          "description": "The page body."
+        },
+        "is_hidden": {
+          "type": "bool",
+          "description": "Hide the page."
+        }
+      },
+      "exec_spec": {
+        "entity": "Page",
+        "fields": [
+          "title",
+          "slug",
+          "body",
+          "is_hidden"
+        ],
+        "set_on_create": {
+          "owner": {
+            "$session": "account_id"
+          },
+          "created_at": "2026-01-01T00:00:00",
+          "updated_at": "2026-01-01T00:00:00"
+        },
+        "unique_on": [
+          "slug",
+          "owner"
+        ]
+      },
+      "_binds": {
+        "title": "Page.title",
+        "slug": "Page.slug",
+        "body": "Page.body",
+        "is_hidden": "Page.is_hidden"
+      },
+      "_output_schema": {
+        "ok": "bool",
+        "slug": "str",
+        "url": "str"
+      },
+      "_evidence": {
+        "id_local": "API.pageCreate",
+        "locator": "main/views/api.py:357",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/pages/",
+          "locator": "main/urls.py:305"
+        },
+        "ref_code": "if form.cleaned_data[\"slug\"] in denylist.DISALLOWED_PAGE_SLUGS: 400\nif models.Page.objects.filter(slug=form.cleaned_data[\"slug\"], owner=user).exists(): 400\npage = models.Page.objects.create(owner=user, title=title, slug=slug, body=body, is_hidden=is_hidden)",
+        "edges": [
+          "API.pageCreate rejects slug in denylist and duplicate (owner,slug) (api.py:336-346)",
+          "each API view calls _authenticate_token(request) and returns 403 if None; token matched against User.api_key (api.py:39-57,83,121,159,221,296,371)"
+        ],
+        "entity_why": "primary effect row_insert lands on this table"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "api_key",
+                  "op": "eq",
+                  "value": {
+                    "session": "api_key"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Your API token is invalid or missing — sign in first.",
+          "precondition": "This endpoint requires a valid API token for your account — pass the api_key you got at sign-up, or reset it if it has been rotated."
+        }
+      }
+    },
+    {
+      "tool": "api_create_post",
+      "description": "Create a post via the JSON API with your API token. The slug is derived from the title in the web UI; pass one explicitly to keep the post addressable by slug afterwards.",
+      "family": "crud.insert",
+      "entity": "Post",
+      "input_schema": {
+        "title": {
+          "type": "text",
+          "required": true,
+          "description": "The post title."
+        },
+        "slug": {
+          "type": "text",
+          "description": "The URL slug (normally derived from the title); must be unique among your posts."
+        },
+        "body": {
+          "type": "text",
+          "description": "The post body in markdown."
+        },
+        "published_at": {
+          "type": "datetime",
+          "description": "Publish or schedule the post."
+        }
+      },
+      "exec_spec": {
+        "entity": "Post",
+        "fields": [
+          "title",
+          "slug",
+          "body",
+          "published_at"
+        ],
+        "set_on_create": {
+          "owner": {
+            "$session": "account_id"
+          },
+          "created_at": "2026-01-01T00:00:00",
+          "updated_at": "2026-01-01T00:00:00"
+        },
+        "unique_on": [
+          "slug",
+          "owner"
+        ]
+      },
+      "_binds": {
+        "title": "Post.title",
+        "body": "Post.body",
+        "published_at": "Post.published_at"
+      },
+      "_output_schema": {
+        "ok": "bool",
+        "slug": "str",
+        "url": "str"
+      },
+      "_evidence": {
+        "id_local": "API.postCreate",
+        "locator": "main/views/api.py:205",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/posts/",
+          "locator": "main/urls.py:303"
+        },
+        "ref_code": "if \"title\" not in data: return 400\npost = models.Post.objects.create(owner=user, title=title, slug=slug, body=body, published_at=published_at)",
+        "edges": [
+          "API.postCreate uses text_processing.create_post_slug which suffixes dupes so (owner,slug) stays unique (api.py:198)",
+          "each API view calls _authenticate_token(request) and returns 403 if None; token matched against User.api_key (api.py:39-57,83,121,159,221,296,371)"
+        ],
+        "entity_why": "primary effect row_insert lands on this table"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "api_key",
+                  "op": "eq",
+                  "value": {
+                    "session": "api_key"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Your API token is invalid or missing — sign in first.",
+          "precondition": "This endpoint requires a valid API token for your account — pass the api_key you got at sign-up, or reset it if it has been rotated."
+        }
+      }
+    },
+    {
+      "tool": "api_delete_comment",
+      "description": "Delete a comment on one of your posts via the JSON API.",
+      "family": "crud.delete",
+      "entity": "Comment",
+      "input_schema": {
+        "comment_id": {
+          "type": "int",
+          "required": true,
+          "description": "The comment id to delete."
+        }
+      },
+      "exec_spec": {
+        "entity": "Comment",
+        "lookup_by": {
+          "id": {
+            "$arg": "comment_id"
+          }
+        }
+      },
+      "_binds": {
+        "comment_id": "Comment.id"
+      },
+      "_output_schema": {
+        "ok": "bool"
+      },
+      "_evidence": {
+        "id_local": "API.commentDelete",
+        "locator": "main/views/api.py:133",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/comments/<int:comment_id>/",
+          "locator": "main/urls.py:297"
+        },
+        "ref_code": "def api_comment(request, comment_id):\n  user = _authenticate_token(request)\n  if not user: return 403\n  comment_qs = models.Comment.objects.filter(id=comment_id, post__owner=user)\n  if not comment_qs.exists(): return 404\n  if request.method == \"GET\": return comment\n  comment.delete()",
+        "edges": [
+          "each API view calls _authenticate_token(request) and returns 403 if None; token matched against User.api_key (api.py:39-57,83,121,159,221,296,371)"
+        ],
+        "entity_why": "primary effect row_delete lands on this table"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "api_key",
+                  "op": "eq",
+                  "value": {
+                    "session": "api_key"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Your API token is invalid or missing — sign in first.",
+          "precondition": "This endpoint requires a valid API token for your account — pass the api_key you got at sign-up, or reset it if it has been rotated."
+        }
+      }
+    },
+    {
+      "tool": "api_delete_page",
+      "description": "Delete one of your pages via the JSON API.",
+      "family": "crud.delete",
+      "entity": "Page",
+      "input_schema": {
+        "slug": {
+          "type": "text",
+          "required": true,
+          "description": "The page slug to delete."
+        }
+      },
+      "exec_spec": {
+        "entity": "Page",
+        "lookup_by": {
+          "slug": {
+            "$arg": "slug"
+          },
+          "owner": {
+            "$session": "account_id"
+          }
+        }
+      },
+      "_binds": {
+        "slug": "Page.slug"
+      },
+      "_output_schema": {
+        "ok": "bool"
+      },
+      "_evidence": {
+        "id_local": "API.pageDelete",
+        "locator": "main/views/api.py:400",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/pages/<slug:slug>/",
+          "locator": "main/urls.py:306"
+        },
+        "ref_code": "if request.method == \"DELETE\":\n  page.delete()\n  return JsonResponse({\"ok\": True})",
+        "edges": [
+          "each API view calls _authenticate_token(request) and returns 403 if None; token matched against User.api_key (api.py:39-57,83,121,159,221,296,371)"
+        ],
+        "entity_why": "primary effect row_delete lands on this table"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "api_key",
+                  "op": "eq",
+                  "value": {
+                    "session": "api_key"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Your API token is invalid or missing — sign in first.",
+          "precondition": "This endpoint requires a valid API token for your account — pass the api_key you got at sign-up, or reset it if it has been rotated."
+        }
+      }
+    },
+    {
+      "tool": "api_delete_post",
+      "description": "Delete one of your posts via the JSON API.",
+      "family": "crud.delete",
+      "entity": "Post",
+      "input_schema": {
+        "slug": {
+          "type": "text",
+          "required": true,
+          "description": "The post slug to delete."
+        }
+      },
+      "exec_spec": {
+        "entity": "Post",
+        "lookup_by": {
+          "slug": {
+            "$arg": "slug"
+          },
+          "owner": {
+            "$session": "account_id"
+          }
+        }
+      },
+      "_binds": {
+        "slug": "Post.slug"
+      },
+      "_output_schema": {
+        "ok": "bool"
+      },
+      "_evidence": {
+        "id_local": "API.postDelete",
+        "locator": "main/views/api.py:248",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/posts/<slug:slug>/",
+          "locator": "main/urls.py:304"
+        },
+        "ref_code": "if request.method == \"DELETE\":\n  post.delete()\n  return JsonResponse({\"ok\": True})",
+        "edges": [
+          "each API view calls _authenticate_token(request) and returns 403 if None; token matched against User.api_key (api.py:39-57,83,121,159,221,296,371)"
+        ],
+        "entity_why": "primary effect row_delete lands on this table"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "api_key",
+                  "op": "eq",
+                  "value": {
+                    "session": "api_key"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Your API token is invalid or missing — sign in first.",
+          "precondition": "This endpoint requires a valid API token for your account — pass the api_key you got at sign-up, or reset it if it has been rotated."
+        }
+      }
+    },
+    {
+      "tool": "api_get_page",
+      "description": "Fetch one of your pages by slug via the JSON API.",
+      "family": "crud.fetch",
+      "entity": "Page",
+      "input_schema": {
+        "slug": {
+          "type": "text",
+          "required": true,
+          "description": "The page slug."
+        }
+      },
+      "exec_spec": {
+        "entity": "Page",
+        "lookup_by": {
+          "slug": {
+            "$arg": "slug"
+          },
+          "owner": {
+            "$session": "account_id"
+          }
+        },
+        "scope": {
+          "owner_col": "owner"
+        }
+      },
+      "_binds": {
+        "slug": "Page.slug"
+      },
+      "_output_schema": {
+        "ok": "bool"
+      },
+      "_evidence": {
+        "id_local": "API.pageGet",
+        "locator": "main/views/api.py:392",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/pages/<slug:slug>/",
+          "locator": "main/urls.py:306"
+        },
+        "ref_code": "def api_page(request, slug):\n  user = _authenticate_token(request)\n  if not user: return 403\n  page_list = models.Page.objects.filter(slug=slug, owner=user)\n  if not page_list: return {\"ok\": False, \"error\": \"Not found.\"}, status=404",
+        "edges": [
+          "each API view calls _authenticate_token(request) and returns 403 if None; token matched against User.api_key (api.py:39-57,83,121,159,221,296,371)"
+        ],
+        "entity_why": "primary effect row_read lands on this table"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "api_key",
+                  "op": "eq",
+                  "value": {
+                    "session": "api_key"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Your API token is invalid or missing — sign in first.",
+          "precondition": "This endpoint requires a valid API token for your account — pass the api_key you got at sign-up, or reset it if it has been rotated."
+        }
+      }
+    },
+    {
+      "tool": "api_get_post",
+      "description": "Fetch one of your posts by slug via the JSON API.",
+      "family": "crud.fetch",
+      "entity": "Post",
+      "input_schema": {
+        "slug": {
+          "type": "text",
+          "required": true,
+          "description": "The post slug."
+        }
+      },
+      "exec_spec": {
+        "entity": "Post",
+        "lookup_by": {
+          "slug": {
+            "$arg": "slug"
+          },
+          "owner": {
+            "$session": "account_id"
+          }
+        },
+        "scope": {
+          "owner_col": "owner"
+        }
+      },
+      "_binds": {
+        "slug": "Post.slug"
+      },
+      "_output_schema": {
+        "ok": "bool"
+      },
+      "_evidence": {
+        "id_local": "API.postGet",
+        "locator": "main/views/api.py:240",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/posts/<slug:slug>/",
+          "locator": "main/urls.py:304"
+        },
+        "ref_code": "def api_post(request, slug):\n  user = _authenticate_token(request)\n  if not user: return 403\n  post_list = models.Post.objects.filter(slug=slug, owner=user)\n  if not post_list: return {\"ok\": False, \"error\": \"Not found.\"}, status=404",
+        "edges": [
+          "each API view calls _authenticate_token(request) and returns 403 if None; token matched against User.api_key (api.py:39-57,83,121,159,221,296,371)"
+        ],
+        "entity_why": "primary effect row_read lands on this table"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "api_key",
+                  "op": "eq",
+                  "value": {
+                    "session": "api_key"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Your API token is invalid or missing — sign in first.",
+          "precondition": "This endpoint requires a valid API token for your account — pass the api_key you got at sign-up, or reset it if it has been rotated."
+        }
+      }
+    },
+    {
+      "tool": "api_list_comments",
+      "description": "List comments across your posts via the JSON API.",
+      "family": "search",
+      "entity": "Comment",
+      "input_schema": {},
+      "exec_spec": {
+        "entity": "Comment",
+        "scope": {
+          "owner_col": "post"
+        },
+        "rank": {
+          "method": "exact"
+        }
+      },
+      "_binds": {},
+      "_output_schema": {
+        "ok": "bool",
+        "results": "list"
+      },
+      "_evidence": {
+        "id_local": "API.commentsList",
+        "locator": "main/views/api.py:85",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/comments/",
+          "locator": "main/urls.py:288"
+        },
+        "ref_code": "def api_comments(request):\n  user = _authenticate_token(request)\n  if not user: return 403\n  comment_qs = models.Comment.objects.filter(post__owner=user)",
+        "edges": [
+          "each API view calls _authenticate_token(request) and returns 403 if None; token matched against User.api_key (api.py:39-57,83,121,159,221,296,371)"
+        ],
+        "entity_why": "primary effect row_search lands on this table"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "api_key",
+                  "op": "eq",
+                  "value": {
+                    "session": "api_key"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Your API token is invalid or missing — sign in first.",
+          "precondition": "This endpoint requires a valid API token for your account — pass the api_key you got at sign-up, or reset it if it has been rotated."
+        }
+      }
+    },
+    {
+      "tool": "api_list_pages",
+      "description": "List your pages via the JSON API, authenticated with your API token.",
+      "family": "search",
+      "entity": "Page",
+      "input_schema": {},
+      "exec_spec": {
+        "entity": "Page",
+        "scope": {
+          "owner_col": "owner"
+        },
+        "rank": {
+          "method": "exact"
+        }
+      },
+      "_binds": {},
+      "_output_schema": {
+        "ok": "bool",
+        "results": "list"
+      },
+      "_evidence": {
+        "id_local": "API.pagesList",
+        "locator": "main/views/api.py:300",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/pages/",
+          "locator": "main/urls.py:305"
+        },
+        "ref_code": "def api_pages(request):\n  user = _authenticate_token(request)\n  if not user: return 403\n  if request.method == \"GET\":\n    page_list = models.Page.objects.filter(owner=user)",
+        "edges": [
+          "each API view calls _authenticate_token(request) and returns 403 if None; token matched against User.api_key (api.py:39-57,83,121,159,221,296,371)"
+        ],
+        "entity_why": "primary effect row_search lands on this table"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "api_key",
+                  "op": "eq",
+                  "value": {
+                    "session": "api_key"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Your API token is invalid or missing — sign in first.",
+          "precondition": "This endpoint requires a valid API token for your account — pass the api_key you got at sign-up, or reset it if it has been rotated."
+        }
+      }
+    },
+    {
+      "tool": "api_list_posts",
+      "description": "List your posts via the JSON API, authenticated with your API token.",
+      "family": "search",
+      "entity": "Post",
+      "input_schema": {},
+      "exec_spec": {
+        "entity": "Post",
+        "scope": {
+          "owner_col": "owner"
+        },
+        "rank": {
+          "method": "exact"
+        }
+      },
+      "_binds": {},
+      "_output_schema": {
+        "ok": "bool",
+        "results": "list"
+      },
+      "_evidence": {
+        "id_local": "API.postsList",
+        "locator": "main/views/api.py:164",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/posts/",
+          "locator": "main/urls.py:303"
+        },
+        "ref_code": "def api_posts(request):\n  user = _authenticate_token(request)\n  if not user: return JsonResponse({\"ok\": False, \"error\": \"Not authorized.\"}, status=403)\n  if request.method == \"GET\":\n    post_list = models.Post.objects.filter(owner=user)",
+        "edges": [
+          "each API view calls _authenticate_token(request) and returns 403 if None; token matched against User.api_key (api.py:39-57,83,121,159,221,296,371)"
+        ],
+        "entity_why": "primary effect row_search lands on this table"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "api_key",
+                  "op": "eq",
+                  "value": {
+                    "session": "api_key"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Your API token is invalid or missing — sign in first.",
+          "precondition": "This endpoint requires a valid API token for your account — pass the api_key you got at sign-up, or reset it if it has been rotated."
+        }
+      }
+    },
+    {
+      "tool": "api_pending_comments",
+      "description": "List the comments awaiting your approval via the JSON API.",
+      "family": "search",
+      "entity": "Comment",
+      "input_schema": {},
+      "exec_spec": {
+        "entity": "Comment",
+        "scope": {
+          "owner_col": "post"
+        },
+        "rank": {
+          "method": "exact"
+        }
+      },
+      "_binds": {},
+      "_output_schema": {
+        "ok": "bool",
+        "results": "list"
+      },
+      "_evidence": {
+        "id_local": "API.commentsPending",
+        "locator": "main/views/api.py:113",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/comments/pending/",
+          "locator": "main/urls.py:295"
+        },
+        "ref_code": "def api_comments_pending(request):\n  user = _authenticate_token(request)\n  if not user: return 403\n  comment_qs = models.Comment.objects.filter(post__owner=user, is_approved=False)",
+        "edges": [
+          "each API view calls _authenticate_token(request) and returns 403 if None; token matched against User.api_key (api.py:39-57,83,121,159,221,296,371)"
+        ],
+        "entity_why": "primary effect row_search lands on this table"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "api_key",
+                  "op": "eq",
+                  "value": {
+                    "session": "api_key"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Your API token is invalid or missing — sign in first.",
+          "precondition": "This endpoint requires a valid API token for your account — pass the api_key you got at sign-up, or reset it if it has been rotated."
+        }
+      }
+    },
+    {
+      "tool": "api_post_comments",
+      "description": "List comments on one of your posts via the JSON API.",
+      "family": "search",
+      "entity": "Comment",
+      "input_schema": {
+        "slug": {
+          "type": "text",
+          "required": true,
+          "description": "The post slug."
+        }
+      },
+      "exec_spec": {
+        "entity": "Comment",
+        "scope": {
+          "owner_col": "post"
+        },
+        "rank": {
+          "method": "exact"
+        }
+      },
+      "_binds": {
+        "slug": "Post.slug"
+      },
+      "_output_schema": {
+        "ok": "bool"
+      },
+      "_evidence": {
+        "id_local": "API.postComments",
+        "locator": "main/views/api.py:101",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/posts/<slug:slug>/comments/",
+          "locator": "main/urls.py:289"
+        },
+        "ref_code": "def api_post_comments(request, slug):\n  user = _authenticate_token(request)\n  post = models.Post.objects.filter(owner=user, slug=slug).first()\n  if not post: return 404\n  comment_qs = models.Comment.objects.filter(post=post)",
+        "edges": [
+          "each API view calls _authenticate_token(request) and returns 403 if None; token matched against User.api_key (api.py:39-57,83,121,159,221,296,371)"
+        ],
+        "entity_why": "primary effect row_search lands on this table"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "api_key",
+                  "op": "eq",
+                  "value": {
+                    "session": "api_key"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Your API token is invalid or missing — sign in first.",
+          "precondition": "This endpoint requires a valid API token for your account — pass the api_key you got at sign-up, or reset it if it has been rotated."
+        }
+      }
+    },
+    {
+      "tool": "api_update_page",
+      "description": "Update one of your pages via the JSON API.",
+      "family": "update.field_set",
+      "entity": "Page",
+      "input_schema": {
+        "slug": {
+          "type": "text",
+          "required": true,
+          "description": "The current page slug."
+        },
+        "title": {
+          "type": "text",
+          "description": "New title."
+        },
+        "body": {
+          "type": "text",
+          "description": "New body."
+        },
+        "is_hidden": {
+          "type": "bool",
+          "description": "Hide/show the page."
+        }
+      },
+      "exec_spec": {
+        "entity": "Page",
+        "row_key": {
+          "slug": {
+            "$arg": "slug"
+          },
+          "owner": {
+            "$session": "account_id"
+          }
+        },
+        "fields": [
+          "title",
+          "slug",
+          "body",
+          "is_hidden"
+        ],
+        "set": {
+          "updated_at": "2026-01-01T00:00:00"
+        }
+      },
+      "_binds": {
+        "slug": "Page.slug",
+        "title": "Page.title",
+        "body": "Page.body",
+        "is_hidden": "Page.is_hidden"
+      },
+      "_output_schema": {
+        "ok": "bool"
+      },
+      "_evidence": {
+        "id_local": "API.pageUpdate",
+        "locator": "main/views/api.py:423",
+        "entry": {
+          "kind": "http",
+          "route": "PATCH /api/pages/<slug:slug>/",
+          "locator": "main/urls.py:306"
+        },
+        "ref_code": "if \"slug\" in data:\n  new_slug = form.cleaned_data[\"slug\"]\n  if new_slug in denylist.DISALLOWED_PAGE_SLUGS: 400\n  if new_slug != page.slug and models.Page.objects.filter(slug=new_slug, owner=user).exists(): 400\n  page.slug = new_slug\npage.save()",
+        "edges": [
+          "each API view calls _authenticate_token(request) and returns 403 if None; token matched against User.api_key (api.py:39-57,83,121,159,221,296,371)"
+        ],
+        "entity_why": "primary effect row_update lands on this table"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "api_key",
+                  "op": "eq",
+                  "value": {
+                    "session": "api_key"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Your API token is invalid or missing — sign in first.",
+          "precondition": "This endpoint requires a valid API token for your account — pass the api_key you got at sign-up, or reset it if it has been rotated."
+        }
+      }
+    },
+    {
+      "tool": "api_update_post",
+      "description": "Update one of your posts (title, body, published_at) via the JSON API.",
+      "family": "update.field_set",
+      "entity": "Post",
+      "input_schema": {
+        "slug": {
+          "type": "text",
+          "required": true,
+          "description": "The post slug to update."
+        },
+        "title": {
+          "type": "text",
+          "description": "New title."
+        },
+        "body": {
+          "type": "text",
+          "description": "New body."
+        },
+        "published_at": {
+          "type": "datetime",
+          "description": "New publish/schedule time."
+        }
+      },
+      "exec_spec": {
+        "entity": "Post",
+        "row_key": {
+          "slug": {
+            "$arg": "slug"
+          },
+          "owner": {
+            "$session": "account_id"
+          }
+        },
+        "fields": [
+          "title",
+          "body",
+          "published_at"
+        ],
+        "set": {
+          "updated_at": "2026-01-01T00:00:00"
+        }
+      },
+      "_binds": {
+        "slug": "Post.slug",
+        "title": "Post.title",
+        "body": "Post.body",
+        "published_at": "Post.published_at"
+      },
+      "_output_schema": {
+        "ok": "bool",
+        "slug": "str",
+        "url": "str"
+      },
+      "_evidence": {
+        "id_local": "API.postUpdate",
+        "locator": "main/views/api.py:270",
+        "entry": {
+          "kind": "http",
+          "route": "PATCH /api/posts/<slug:slug>/",
+          "locator": "main/urls.py:304"
+        },
+        "ref_code": "if request.method == \"PATCH\":\n  if \"title\" in data: post.title = ...\n  if \"slug\" in data: post.slug = text_processing.create_post_slug(form.cleaned_data[\"slug\"], user, post=post)\n  if \"body\" in data: post.body = ...\n  if \"published_at\" in data: post.published_at = ...\n  post.save()",
+        "edges": [
+          "each API view calls _authenticate_token(request) and returns 403 if None; token matched against User.api_key (api.py:39-57,83,121,159,221,296,371)"
+        ],
+        "entity_why": "primary effect row_update lands on this table"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "api_key",
+                  "op": "eq",
+                  "value": {
+                    "session": "api_key"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Your API token is invalid or missing — sign in first.",
+          "precondition": "This endpoint requires a valid API token for your account — pass the api_key you got at sign-up, or reset it if it has been rotated."
+        }
+      }
+    },
+    {
+      "tool": "approve_comment",
+      "description": "Approve a pending comment on your own post so it becomes visible. Fails if the comment is already approved.",
+      "family": "update.field_set",
+      "entity": "Comment",
+      "input_schema": {
+        "pk": {
+          "type": "int",
+          "required": true,
+          "description": "The id of the comment to approve."
+        }
+      },
+      "exec_spec": {
+        "entity": "Comment",
+        "row_key": {
+          "id": {
+            "$arg": "pk"
+          }
+        },
+        "fields": [
+          "is_approved"
+        ],
+        "set": {
+          "is_approved": true
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Comment",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "pk"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "is_approved",
+                      "op": "eq",
+                      "value": false
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in first.",
+          "not_found": "No pending comment with that id exists.",
+          "precondition": "That comment is already approved.",
+          "required": "Provide the comment id."
+        }
+      },
+      "_binds": {
+        "slug": "Post.slug",
+        "pk": "Comment.id"
+      },
+      "_output_schema": {
+        "redirect": "browser redirect"
+      },
+      "_evidence": {
+        "id_local": "Comment.approve",
+        "locator": "main/views/general.py:727",
+        "entry": {
+          "kind": "http",
+          "route": "POST /blog/<slug:slug>/comments/<int:pk>/approve/",
+          "locator": "main/urls.py:171"
+        },
+        "ref_code": "class CommentApprove(LoginRequiredMixin, UpdateView):\n  fields = [\"is_approved\"]\n  def dispatch(self,...):\n    self.object = self.get_object()\n    if request.user != self.object.post.owner: raise PermissionDenied()\n    if self.object.is_approved: redirect (already approved)\n  # form_valid sets is_approved=True",
+        "edges": [
+          "dispatch raises PermissionDenied unless request.user == comment.post.owner (general.py:727-734)",
+          "CommentApprove.dispatch redirects if self.object.is_approved already (general.py:731-733)"
+        ],
+        "entity_why": "primary effect row_update lands on this table"
+      }
+    },
+    {
+      "tool": "approve_user",
+      "description": "Moderation: approve a user's account so they can use premium features. Superusers only.",
+      "family": "update.field_set",
+      "entity": "User",
+      "input_schema": {
+        "user_id": {
+          "type": "int",
+          "required": true,
+          "description": "The id of the user to approve."
+        }
+      },
+      "exec_spec": {
+        "entity": "User",
+        "row_key": {
+          "id": {
+            "$arg": "user_id"
+          }
+        },
+        "fields": [
+          "is_approved"
+        ],
+        "set": {
+          "is_approved": true
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "is_superuser",
+                      "op": "eq",
+                      "value": true
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "realm": "Only a superuser may approve users.",
+          "precondition": "Moderation is restricted to superusers — only an account with the admin role can approve users.",
+          "not_found": "No user with that id exists.",
+          "auth": "Sign in first.",
+          "required": "Provide the user id."
+        }
+      },
+      "_binds": {
+        "user_id": "User.id"
+      },
+      "_output_schema": {
+        "redirect": "browser redirect"
+      },
+      "_evidence": {
+        "id_local": "Moderation.userApprove",
+        "locator": "main/views/moderation.py:140",
+        "entry": {
+          "kind": "http",
+          "route": "POST /moderation/users/<int:user_id>/approve/",
+          "locator": "main/urls.py:82"
+        },
+        "ref_code": "def user_approve(request, user_id):\n  if not request.user.is_authenticated or not request.user.is_superuser: raise Http404()\n  user = get_object_or_404(models.User, id=user_id)\n  if request.method == \"POST\":\n    user.is_approved = True\n    user.save()",
+        "edges": [
+          "each moderation view raises Http404 unless request.user.is_authenticated and request.user.is_superuser (moderation.py:23-24,33-34,129-130,141-142)"
+        ],
+        "entity_why": "primary effect row_update lands on this table"
+      }
+    },
+    {
+      "tool": "billing_stripe_webhook",
+      "description": "Stripe webhook: apply subscription events (payment succeeded -> enable premium; subscription deleted -> drop premium) to the user matching a customer id.",
+      "family": "update.field_set",
+      "entity": "User",
+      "exec_spec": {
+        "entity": "User",
+        "row_key": {
+          "stripe_customer_id": {
+            "$arg": "customer_id"
+          }
+        },
+        "fields": [
+          "is_premium",
+          "stripe_subscription_id"
+        ],
+        "set": {
+          "is_premium": true,
+          "is_approved": true
+        }
+      },
+      "input_schema": {
+        "customer_id": {
+          "type": "text",
+          "required": true,
+          "description": "The Stripe customer id identifying the user."
+        }
+      },
+      "guards": {
+        "required": [
+          "customer_id"
+        ],
+        "messages": {
+          "not_found": "No user has that Stripe customer id.",
+          "required": "Provide the customer id."
+        }
+      },
+      "_binds": {},
+      "_output_schema": {
+        "redirect": "browser redirect"
+      },
+      "_evidence": {
+        "id_local": "Billing.stripeWebhook",
+        "locator": "main/views/billing.py:720",
+        "entry": {
+          "kind": "http",
+          "route": "POST /webhook/stripe/",
+          "locator": "main/urls.py:228"
+        },
+        "ref_code": "if event.type == \"invoice.payment_succeeded\":\n  _enable_premium(user, ...)\nelif event.type == \"customer.subscription.deleted\":\n  user.is_premium = False\n  user.stripe_subscription_id = None\n  user.save(update_fields=[\"is_premium\",\"stripe_subscription_id\"])",
+        "edges": [
+          "billing.py webhook: models.User.objects.get(stripe_customer_id=customer_id_str) (billing.py:775,795,806)"
+        ],
+        "entity_why": "primary effect row_update lands on this table"
+      }
+    },
+    {
+      "tool": "comment_as_author",
+      "description": "Reply to a comment on your own post, posted under your author name and approved immediately.",
+      "family": "crud.insert",
+      "entity": "Comment",
+      "input_schema": {
+        "slug": {
+          "type": "text",
+          "required": true,
+          "description": "Slug of the post to reply on."
+        },
+        "body": {
+          "type": "text",
+          "required": true,
+          "description": "The author reply text."
+        }
+      },
+      "exec_spec": {
+        "entity": "Comment",
+        "fields": [
+          "body"
+        ],
+        "set_on_create": {
+          "is_approved": true,
+          "is_author": true,
+          "name": {
+            "$session": "username"
+          },
+          "post": {
+            "$ref": {
+              "entity": "Post",
+              "where": {
+                "slug": {
+                  "$arg": "slug"
+                },
+                "owner": {
+                  "$session": "account_id"
+                }
+              },
+              "col": "id"
+            }
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "Sign in to reply as the author.",
+          "required": "Provide the post slug and reply text.",
+          "fk": "That post does not exist."
+        }
+      },
+      "_binds": {
+        "slug": "Post.slug",
+        "body": "Comment.body"
+      },
+      "_output_schema": {
+        "redirect": "browser redirect"
+      },
+      "_evidence": {
+        "id_local": "Comment.createAuthor",
+        "locator": "main/views/general.py:573",
+        "entry": {
+          "kind": "http",
+          "route": "POST /blog/<slug:slug>/comments/create/author/",
+          "locator": "main/urls.py:156"
+        },
+        "ref_code": "def form_valid(self, form):\n  self.object = form.save(commit=False)\n  self.object.is_approved = True\n  self.object.is_author = True\n  self.object.name = self.request.user.username\n  self.object.post = models.Post.objects.get(owner__username=self.request.subdomain, slug=self.kwargs[\"slug\"])\n  self.object.save()",
+        "edges": [
+          "LoginRequiredMixin on the view"
+        ],
+        "entity_why": "primary effect row_insert lands on this table"
+      }
+    },
+    {
+      "tool": "create_comment",
+      "description": "Post a comment on a post of the blog you are signed in as. The comment starts unapproved and only shows after you approve it. Fails if the blog has comments disabled.",
+      "family": "crud.insert",
+      "entity": "Comment",
+      "input_schema": {
+        "slug": {
+          "type": "text",
+          "required": true,
+          "description": "Slug of the post being commented on."
+        },
+        "body": {
+          "type": "text",
+          "required": true,
+          "description": "The comment text."
+        },
+        "name": {
+          "type": "text",
+          "description": "The commenter's display name."
+        },
+        "email": {
+          "type": "text",
+          "description": "The commenter's email (optional)."
+        }
+      },
+      "exec_spec": {
+        "entity": "Comment",
+        "fields": [
+          "name",
+          "email",
+          "body"
+        ],
+        "set_on_create": {
+          "is_approved": false,
+          "is_author": false,
+          "post": {
+            "$ref": {
+              "entity": "Post",
+              "where": {
+                "slug": {
+                  "$arg": "slug"
+                },
+                "owner": {
+                  "$session": "account_id"
+                }
+              },
+              "col": "id"
+            }
+          }
+        }
+      },
+      "guards": {
+        "required": [
+          "slug",
+          "body"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "comments_on",
+                      "op": "eq",
+                      "value": true
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "precondition": "The blog you are signed in as does not accept comments.",
+          "required": "Provide the post slug and your comment text.",
+          "fk": "That post does not exist."
+        }
+      },
+      "_binds": {
+        "slug": "Post.slug",
+        "name": "Comment.name",
+        "email": "Comment.email",
+        "body": "Comment.body"
+      },
+      "_output_schema": {
+        "redirect": "browser redirect"
+      },
+      "_evidence": {
+        "id_local": "Comment.create",
+        "locator": "main/views/general.py:611",
+        "entry": {
+          "kind": "http",
+          "route": "POST /blog/<slug:slug>/comments/create/",
+          "locator": "main/urls.py:161"
+        },
+        "ref_code": "def form_valid(self, form):\n  if not models.User.objects.get(username=self.request.subdomain).comments_on: error\n  if self._looks_like_spam(): silently drop\n  self.object = form.save(commit=False)\n  self.object.is_approved = False\n  self.object.post = models.Post.objects.get(owner__username=self.request.subdomain, slug=self.kwargs[\"slug\"])\n  self.object.save()\n  mail.send_mail(subject=f\"New comment on {self.object.post.title}\", recipient_list=[self.object.post.owner.email])",
+        "edges": [
+          "CommentCreate.form_valid checks comments_on and _looks_like_spam (general.py:611-673)"
+        ],
+        "entity_why": "primary effect row_insert lands on this table"
+      }
+    },
+    {
+      "tool": "create_page",
+      "description": "Add a page to your blog (an about page, a link list, etc.). Fails if another of your pages uses that slug.",
+      "family": "crud.insert",
+      "entity": "Page",
+      "input_schema": {
+        "title": {
+          "type": "text",
+          "required": true,
+          "description": "The page title."
+        },
+        "slug": {
+          "type": "text",
+          "required": true,
+          "description": "The URL slug for the page; must be unique among your pages."
+        },
+        "body": {
+          "type": "text",
+          "description": "The page body in markdown."
+        },
+        "is_hidden": {
+          "type": "bool",
+          "description": "Hide the page from the blog's navigation."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "Sign in first.",
+          "required": "Give the page a title and a slug.",
+          "unique": "One of your pages already uses that slug."
+        }
+      },
+      "exec_spec": {
+        "entity": "Page",
+        "fields": [
+          "title",
+          "slug",
+          "is_hidden",
+          "body"
+        ],
+        "set_on_create": {
+          "owner": {
+            "$session": "account_id"
+          },
+          "created_at": "2026-01-01T00:00:00",
+          "updated_at": "2026-01-01T00:00:00"
+        },
+        "unique_on": [
+          "slug",
+          "owner"
+        ]
+      },
+      "_binds": {
+        "title": "Page.title",
+        "slug": "Page.slug",
+        "is_hidden": "Page.is_hidden",
+        "body": "Page.body"
+      },
+      "_output_schema": {
+        "redirect": "browser redirect"
+      },
+      "_evidence": {
+        "id_local": "Page.create",
+        "locator": "main/views/general.py:928",
+        "entry": {
+          "kind": "http",
+          "route": "POST /new/page/",
+          "locator": "main/urls.py:312"
+        },
+        "ref_code": "def form_valid(self, form):\n  if form.cleaned_data.get(\"slug\") in denylist.DISALLOWED_PAGE_SLUGS: error\n  if models.Page.objects.filter(owner=self.request.user, slug=...).exists(): error\n  self.object = form.save(commit=False)\n  self.object.owner = self.request.user\n  self.object.save()",
+        "edges": [
+          "PageCreate.form_valid checks slug denylist then Page.objects.filter(owner=self.request.user, slug=...).exists() (general.py:928-937)"
+        ],
+        "entity_why": "primary effect row_insert lands on this table"
+      }
+    },
+    {
+      "tool": "create_post",
+      "description": "Write a new post on your blog. A post without a published_at is a private draft; set published_at to publish it now or schedule it. The slug is derived from the title in the web UI; pass one explicitly to make the post addressable afterwards.",
+      "family": "crud.insert",
+      "entity": "Post",
+      "input_schema": {
+        "title": {
+          "type": "text",
+          "required": true,
+          "description": "The post title."
+        },
+        "slug": {
+          "type": "text",
+          "description": "The URL slug (normally derived from the title); must be unique among your posts."
+        },
+        "body": {
+          "type": "text",
+          "required": true,
+          "description": "The post body in markdown."
+        },
+        "published_at": {
+          "type": "datetime",
+          "description": "When the post becomes public. Omit to keep it a draft."
+        }
+      },
+      "exec_spec": {
+        "entity": "Post",
+        "fields": [
+          "title",
+          "slug",
+          "published_at",
+          "body"
+        ],
+        "set_on_create": {
+          "owner": {
+            "$session": "account_id"
+          },
+          "created_at": "2026-01-01T00:00:00",
+          "updated_at": "2026-01-01T00:00:00"
+        },
+        "unique_on": [
+          "slug",
+          "owner"
+        ]
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "Sign in before writing a post.",
+          "required": "Give the post a title and a body.",
+          "unique": "That (slug, owner) already exists."
+        }
+      },
+      "_binds": {
+        "title": "Post.title",
+        "published_at": "Post.published_at",
+        "body": "Post.body"
+      },
+      "_output_schema": {
+        "redirect": "post detail url"
+      },
+      "_evidence": {
+        "id_local": "Post.create",
+        "locator": "main/views/general.py:399",
+        "entry": {
+          "kind": "http",
+          "route": "POST /new/post/",
+          "locator": "main/urls.py:110"
+        },
+        "ref_code": "def form_valid(self, form):\n  self.object = form.save(commit=False)\n  self.object.slug = text_processing.create_post_slug(self.object.title, self.request.user)\n  self.object.owner = self.request.user\n  self.object.body = text_processing.sanitize_text(self.object.body)\n  self.object.save()",
+        "edges": [
+          "LoginRequiredMixin on the view"
+        ],
+        "entity_why": "primary effect row_insert lands on this table"
+      }
+    },
+    {
+      "tool": "delete_account",
+      "description": "Permanently delete your account and every post, page, image and snapshot you own.",
+      "family": "crud.delete",
+      "entity": "User",
+      "input_schema": {},
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "Sign in before deleting your account.",
+          "not_found": "Your account row was not found.",
+          "on_child": "This user still owns children that reference it."
+        }
+      },
+      "exec_spec": {
+        "entity": "User",
+        "lookup_by": {
+          "id": {
+            "$session": "account_id"
+          }
+        }
+      },
+      "_binds": {},
+      "_output_schema": {
+        "redirect": "browser redirect"
+      },
+      "_evidence": {
+        "id_local": "User.delete",
+        "locator": "main/views/general.py:277",
+        "entry": {
+          "kind": "http",
+          "route": "POST /accounts/delete/",
+          "locator": "main/urls.py:45"
+        },
+        "ref_code": "class UserDelete(LoginRequiredMixin, DeleteView):\n  model = models.User\n  def get_object(self): return self.request.user\n  def form_valid(self, form):\n    if self.request.user.is_premium:\n      subscription = billing._get_stripe_subscription(self.request.user.stripe_subscription_id)\n      try: stripe.Subscription.delete(subscription[\"id\"])\n      except stripe.StripeError as ex: return HttpResponse(status=503)\n    self.object.delete()",
+        "edges": [
+          "LoginRequiredMixin on the view"
+        ],
+        "entity_why": "primary effect row_delete lands on this table"
+      }
+    },
+    {
+      "tool": "delete_comment",
+      "description": "Delete a comment on your own post (the post's author deletes comments).",
+      "family": "crud.delete",
+      "entity": "Comment",
+      "input_schema": {
+        "pk": {
+          "type": "int",
+          "required": true,
+          "description": "The id of the comment to delete."
+        }
+      },
+      "exec_spec": {
+        "entity": "Comment",
+        "lookup_by": {
+          "id": {
+            "$arg": "pk"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "Sign in first.",
+          "not_found": "No comment with that id exists.",
+          "required": "Provide the comment id."
+        }
+      },
+      "_binds": {
+        "slug": "Post.slug",
+        "pk": "Comment.id"
+      },
+      "_output_schema": {
+        "redirect": "browser redirect"
+      },
+      "_evidence": {
+        "id_local": "Comment.delete",
+        "locator": "main/views/general.py:697",
+        "entry": {
+          "kind": "http",
+          "route": "POST /blog/<slug:slug>/comments/<int:pk>/delete/",
+          "locator": "main/urls.py:166"
+        },
+        "ref_code": "class CommentDelete(LoginRequiredMixin, DeleteView):\n  model = models.Comment\n  def dispatch(self,...):\n    self.object = self.get_object()\n    if request.user != self.object.post.owner: raise PermissionDenied()\n  def form_valid(self, form):\n    self.object.delete()",
+        "edges": [
+          "dispatch raises PermissionDenied unless request.user == comment.post.owner (general.py:703-707)"
+        ],
+        "entity_why": "primary effect row_delete lands on this table"
+      }
+    },
+    {
+      "tool": "delete_image",
+      "description": "Permanently delete one of your uploaded images.",
+      "family": "crud.delete",
+      "entity": "Image",
+      "input_schema": {
+        "slug": {
+          "type": "text",
+          "required": true,
+          "description": "The slug of the image to delete."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "Sign in first.",
+          "not_found": "No image with that slug belongs to you.",
+          "required": "Provide the slug of the image to delete."
+        }
+      },
+      "exec_spec": {
+        "entity": "Image",
+        "lookup_by": {
+          "slug": {
+            "$arg": "slug"
+          }
+        }
+      },
+      "_binds": {
+        "slug": "Image.slug"
+      },
+      "_output_schema": {
+        "redirect": "browser redirect"
+      },
+      "_evidence": {
+        "id_local": "Image.delete",
+        "locator": "main/views/general.py:905",
+        "entry": {
+          "kind": "http",
+          "route": "POST /images/<slug:slug>/delete/",
+          "locator": "main/urls.py:264"
+        },
+        "ref_code": "class ImageDelete(LoginRequiredMixin, DeleteView):\n  success_url = reverse_lazy(\"image_list\")\n  def dispatch(self,...):\n    if request.user != image.owner: raise PermissionDenied()",
+        "edges": [
+          "dispatch raises PermissionDenied unless request.user == image.owner (general.py:909-913)"
+        ],
+        "entity_why": "primary effect row_delete lands on this table"
+      }
+    },
+    {
+      "tool": "delete_page",
+      "description": "Permanently delete one of your pages.",
+      "family": "crud.delete",
+      "entity": "Page",
+      "input_schema": {
+        "slug": {
+          "type": "text",
+          "required": true,
+          "description": "The slug of the page to delete."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "Sign in first.",
+          "not_found": "No page with that slug belongs to your blog.",
+          "required": "Provide the slug of the page to delete."
+        }
+      },
+      "exec_spec": {
+        "entity": "Page",
+        "lookup_by": {
+          "slug": {
+            "$arg": "slug"
+          },
+          "owner": {
+            "$session": "account_id"
+          }
+        }
+      },
+      "_binds": {
+        "slug": "Page.slug"
+      },
+      "_output_schema": {
+        "redirect": "browser redirect"
+      },
+      "_evidence": {
+        "id_local": "Page.delete",
+        "locator": "main/views/general.py:1017",
+        "entry": {
+          "kind": "http",
+          "route": "POST /<slug:slug>/delete/",
+          "locator": "main/urls.py:315"
+        },
+        "ref_code": "class PageDelete(LoginRequiredMixin, DeleteView):\n  def get_queryset(self): return models.Page.objects.filter(owner__username=self.request.subdomain)\n  def dispatch(self,...):\n    if request.user != page.owner: raise PermissionDenied()",
+        "edges": [
+          "dispatch raises PermissionDenied unless request.user == page.owner (general.py:1025-1029)"
+        ],
+        "entity_why": "primary effect row_delete lands on this table"
+      }
+    },
+    {
+      "tool": "delete_post",
+      "description": "Permanently delete one of your posts (and its comments). Only your own posts can be deleted.",
+      "family": "crud.delete",
+      "entity": "Post",
+      "input_schema": {
+        "slug": {
+          "type": "text",
+          "required": true,
+          "description": "The slug of the post to delete."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "Sign in first.",
+          "not_found": "No post with that slug belongs to your blog.",
+          "required": "Provide the slug of the post to delete.",
+          "on_child": "This post still has children referencing it."
+        }
+      },
+      "exec_spec": {
+        "entity": "Post",
+        "lookup_by": {
+          "slug": {
+            "$arg": "slug"
+          },
+          "owner": {
+            "$session": "account_id"
+          }
+        }
+      },
+      "_binds": {
+        "slug": "Post.slug"
+      },
+      "_output_schema": {
+        "redirect": "browser redirect"
+      },
+      "_evidence": {
+        "id_local": "Post.delete",
+        "locator": "main/views/general.py:465",
+        "entry": {
+          "kind": "http",
+          "route": "POST /blog/<slug:slug>/delete/",
+          "locator": "main/urls.py:118"
+        },
+        "ref_code": "class PostDelete(LoginRequiredMixin, DeleteView):\n  def get_queryset(self):\n    return models.Post.objects.filter(owner__username=self.request.user.username)\n  def dispatch(self,...):\n    if request.user.username != request.subdomain: raise PermissionDenied()",
+        "edges": [
+          "dispatch requires request.user.username == request.subdomain and get_queryset filters owner=current user (general.py:482-495,470-474)"
+        ],
+        "entity_why": "primary effect row_delete lands on this table"
+      }
+    },
+    {
+      "tool": "delete_user",
+      "description": "Moderation: permanently delete a user's account and everything they own. Superusers only.",
+      "family": "crud.delete",
+      "entity": "User",
+      "input_schema": {
+        "user_id": {
+          "type": "int",
+          "required": true,
+          "description": "The id of the user to delete."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "is_superuser",
+                      "op": "eq",
+                      "value": true
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "realm": "Only a superuser may delete users.",
+          "precondition": "Moderation is restricted to superusers — only an account with the admin role can delete a user's account.",
+          "not_found": "No user with that id exists.",
+          "auth": "Sign in first.",
+          "required": "Provide the user id.",
+          "on_child": "This user still owns children that reference it."
+        }
+      },
+      "exec_spec": {
+        "entity": "User",
+        "lookup_by": {
+          "id": {
+            "$arg": "user_id"
+          }
+        }
+      },
+      "_binds": {
+        "user_id": "User.id"
+      },
+      "_output_schema": {
+        "redirect": "browser redirect"
+      },
+      "_evidence": {
+        "id_local": "Moderation.userDelete",
+        "locator": "main/views/moderation.py:128",
+        "entry": {
+          "kind": "http",
+          "route": "POST /moderation/users/<int:user_id>/delete/",
+          "locator": "main/urls.py:92"
+        },
+        "ref_code": "def user_delete(request, user_id):\n  if not request.user.is_authenticated or not request.user.is_superuser: raise Http404()\n  user = get_object_or_404(models.User, id=user_id)\n  if request.method == \"POST\":\n    user.delete()\n    return JsonResponse({\"ok\": True})\n# Django cascades: Post/Page/Image/Snapshot/Analytic* owner=CASCADE; Comment post=CASCADE; Notification blog_user=SET_NULL; ExportRecord user=CASCADE; Onboard user=SET_NULL (blank)",
+        "edges": [
+          "each moderation view raises Http404 unless request.user.is_authenticated and request.user.is_superuser (moderation.py:23-24,33-34,129-130,141-142)"
+        ],
+        "entity_why": "primary effect row_delete lands on this table"
+      }
+    },
+    {
+      "tool": "disable_mail_export",
+      "description": "Public one-click unsubscribe: disable your monthly markdown email export and rotate your unsubscribe key. No login required.",
+      "family": "update.field_set",
+      "entity": "User",
+      "input_schema": {
+        "unsubscribe_key": {
+          "type": "int",
+          "required": true,
+          "description": "The unsubscribe key from your export email."
+        }
+      },
+      "exec_spec": {
+        "entity": "User",
+        "row_key": {
+          "export_unsubscribe_key": {
+            "$arg": "unsubscribe_key"
+          }
+        },
+        "fields": [
+          "mail_export_on"
+        ],
+        "set": {
+          "mail_export_on": false,
+          "export_unsubscribe_key": "rotated-by-disable_mail_export"
+        }
+      },
+      "guards": {
+        "required": [
+          "unsubscribe_key"
+        ],
+        "messages": {
+          "not_found": "No account matches that unsubscribe key.",
+          "required": "Provide the unsubscribe key from your export email."
+        }
+      },
+      "_binds": {
+        "unsubscribe_key": "User.export_unsubscribe_key"
+      },
+      "_output_schema": {
+        "http_response": "HTML page"
+      },
+      "_evidence": {
+        "id_local": "User.exportUnsubscribe",
+        "locator": "main/views/export.py:197",
+        "entry": {
+          "kind": "http",
+          "route": "GET /export/unsubscribe/<uuid:unsubscribe_key>/",
+          "locator": "main/urls.py:243"
+        },
+        "ref_code": "def export_unsubscribe_key(request, unsubscribe_key):\n  if models.User.objects.filter(export_unsubscribe_key=unsubscribe_key).exists():\n    user = models.User.objects.get(export_unsubscribe_key=unsubscribe_key)\n    user.mail_export_on = False\n    user.export_unsubscribe_key = uuid.uuid4()\n    user.save()",
+        "entity_why": "primary effect row_update lands on this table"
+      }
+    },
+    {
+      "tool": "get_image",
+      "description": "Retrieve one of your uploaded images by its slug.",
+      "family": "crud.fetch",
+      "entity": "Image",
+      "input_schema": {
+        "slug": {
+          "type": "text",
+          "required": true,
+          "description": "The slug of the image to fetch."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "Sign in first.",
+          "not_found": "No image with that slug belongs to you.",
+          "required": "Provide the slug of the image."
+        }
+      },
+      "exec_spec": {
+        "entity": "Image",
+        "lookup_by": {
+          "slug": {
+            "$arg": "slug"
+          }
+        },
+        "scope": {
+          "owner_col": "owner"
+        }
+      },
+      "_binds": {
+        "slug": "Image.slug"
+      },
+      "_output_schema": {
+        "http_response": "HTML page"
+      },
+      "_evidence": {
+        "id_local": "Image.detail",
+        "locator": "main/views/general.py:872",
+        "entry": {
+          "kind": "http",
+          "route": "GET /images/<slug:slug>/",
+          "locator": "main/urls.py:258"
+        },
+        "ref_code": "class ImageDetail(LoginRequiredMixin, DetailView):\n  model = models.Image\n  def dispatch(self, request, *args, **kwargs):\n    image = self.get_object()\n    if request.user != image.owner: raise PermissionDenied()",
+        "edges": [
+          "dispatch raises PermissionDenied unless request.user == image.owner (general.py:886-890)"
+        ],
+        "entity_why": "primary effect row_read lands on this table"
+      }
+    },
+    {
+      "tool": "import_posts",
+      "description": "Import markdown files into your blog as draft posts (each file becomes one post). The slug is derived from the file name in the web UI; pass one to fix it.",
+      "family": "crud.insert",
+      "entity": "Post",
+      "input_schema": {
+        "title": {
+          "type": "text",
+          "required": true,
+          "description": "The file name; becomes the imported post's title."
+        },
+        "slug": {
+          "type": "text",
+          "description": "The URL slug (derived from the file name); must be unique among your posts."
+        },
+        "body": {
+          "type": "text",
+          "description": "The markdown content of the file."
+        }
+      },
+      "exec_spec": {
+        "entity": "Post",
+        "fields": [
+          "title",
+          "slug",
+          "body"
+        ],
+        "set_on_create": {
+          "owner": {
+            "$session": "account_id"
+          },
+          "published_at": null
+        },
+        "unique_on": [
+          "slug",
+          "owner"
+        ]
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "Sign in first.",
+          "required": "Provide the file name to import.",
+          "unique": "That (slug, owner) already exists."
+        }
+      },
+      "_binds": {
+        "title": "Post.title",
+        "body": "Post.body"
+      },
+      "_output_schema": {
+        "redirect": "browser redirect"
+      },
+      "_evidence": {
+        "id_local": "Post.import",
+        "locator": "main/views/general.py:754",
+        "entry": {
+          "kind": "http",
+          "route": "POST /import/",
+          "locator": "main/urls.py:232"
+        },
+        "ref_code": "def form_valid(self, form):\n  files = form.cleaned_data[\"file\"]\n  for f in files:\n    content = f.read().decode(\"utf-8\")\n    models.Post.objects.create(title=f.name, slug=text_processing.create_post_slug(f.name, self.request.user), body=content, owner=self.request.user, published_at=None)",
+        "edges": [
+          "LoginRequiredMixin on the view"
+        ],
+        "entity_why": "primary effect row_insert lands on this table"
+      }
+    },
+    {
+      "tool": "list_images",
+      "description": "List the images in your blog's image library.",
+      "family": "search",
+      "entity": "Image",
+      "exec_spec": {
+        "entity": "Image",
+        "scope": {
+          "owner_col": "owner"
+        },
+        "rank": {
+          "method": "exact"
+        }
+      },
+      "input_schema": {},
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "Sign in to see your images."
+        }
+      },
+      "_binds": {},
+      "_output_schema": {
+        "http_response": "HTML page"
+      },
+      "_evidence": {
+        "id_local": "User.listImages",
+        "locator": "main/views/general.py:786",
+        "entry": {
+          "kind": "http",
+          "route": "GET /images/",
+          "locator": "main/urls.py:253"
+        },
+        "ref_code": "class ImageList(LoginRequiredMixin, FormView):\n  def get_context_data(self, **kwargs):\n    context[\"images\"] = models.Image.objects.filter(owner=self.request.user)",
+        "entity_why": "primary effect row_search lands on this table"
+      }
+    },
+    {
+      "tool": "list_pending_comments",
+      "description": "List the comments on your posts awaiting your approval, oldest first.",
+      "family": "search",
+      "entity": "Comment",
+      "exec_spec": {
+        "entity": "Comment",
+        "scope": {
+          "owner_col": "post"
+        },
+        "rank": {
+          "method": "exact"
+        },
+        "filter": {
+          "col": "is_approved",
+          "mode": "eq",
+          "val": false
+        }
+      },
+      "input_schema": {},
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "Sign in to see pending comments."
+        }
+      },
+      "_binds": {},
+      "_output_schema": {
+        "http_response": "HTML page"
+      },
+      "_evidence": {
+        "id_local": "Comment.pendingList",
+        "locator": "main/views/general.py:544",
+        "entry": {
+          "kind": "http",
+          "route": "GET /comments/pending/",
+          "locator": "main/urls.py:155"
+        },
+        "ref_code": "class CommentPending(LoginRequiredMixin, ListView):\n  def get_queryset(self):\n    return models.Comment.objects.filter(is_approved=False, post__owner=self.request.user).order_by(\"id\")",
+        "entity_why": "primary effect row_search lands on this table"
+      }
+    },
+    {
+      "tool": "list_subscribers",
+      "description": "List the active subscribers to the newsletter of the user you are signed in as.",
+      "family": "search",
+      "entity": "Notification",
+      "exec_spec": {
+        "entity": "Notification",
+        "scope": {
+          "owner_col": "blog_user"
+        },
+        "rank": {
+          "method": "exact"
+        },
+        "filter": {
+          "col": "is_active",
+          "mode": "eq",
+          "val": true
+        }
+      },
+      "input_schema": {},
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "Sign in to see your subscribers."
+        }
+      },
+      "_binds": {},
+      "_output_schema": {
+        "http_response": "HTML page"
+      },
+      "_evidence": {
+        "id_local": "Notification.list",
+        "locator": "main/views/general.py:1283",
+        "entry": {
+          "kind": "http",
+          "route": "GET /notifications/subscribers",
+          "locator": "main/urls.py:146"
+        },
+        "ref_code": "class NotificationList(LoginRequiredMixin, ListView):\n  def get_queryset(self): return models.Notification.objects.filter(blog_user=self.request.user, is_active=True).order_by(\"id\")",
+        "entity_why": "primary effect row_search lands on this table"
+      }
+    },
+    {
+      "tool": "list_users",
+      "description": "Moderation: list users (optionally filtered to unapproved, non-empty, or premium). Superusers only.",
+      "family": "search",
+      "entity": "User",
+      "input_schema": {
+        "mode": {
+          "type": "text",
+          "description": "Comma flags: noapprove, noempty, premium."
+        }
+      },
+      "exec_spec": {
+        "entity": "User",
+        "rank": {
+          "method": "exact"
+        },
+        "pagination": {
+          "default_limit": 20
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "is_superuser",
+                      "op": "eq",
+                      "value": true
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "realm": "Only a superuser can list users.",
+          "precondition": "Moderation is restricted to superusers — only an account with the admin role can browse the user list.",
+          "auth": "Sign in first."
+        }
+      },
+      "_binds": {},
+      "_output_schema": {
+        "http_response": "HTML page"
+      },
+      "_evidence": {
+        "id_local": "Moderation.userList",
+        "locator": "main/views/moderation.py:40",
+        "entry": {
+          "kind": "http",
+          "route": "GET /moderation/users/",
+          "locator": "main/urls.py:52"
+        },
+        "ref_code": "def user_list(request):\n  if not request.user.is_authenticated or not request.user.is_superuser: raise Http404()\n  user_qs = models.User.objects.all()\n  if \"noapprove\" in mode: user_qs = user_qs.filter(is_approved=False)\n  if \"noempty\" in mode: user_qs = user_qs.annotate(count=Count(\"post\")).filter(count__gt=0)\n  if \"premium\" in mode: user_qs = user_qs.filter(is_premium=True)",
+        "edges": [
+          "each moderation view raises Http404 unless request.user.is_authenticated and request.user.is_superuser (moderation.py:23-24,33-34,129-130,141-142)"
+        ],
+        "entity_why": "primary effect row_search lands on this table"
+      }
+    },
+    {
+      "tool": "register",
+      "description": "Create your account and claim a blog from an emailed onboarding link. Fails if the invite was already used or the username is taken.",
+      "family": "auth.register",
+      "entity": "User",
+      "input_schema": {
+        "invite_code": {
+          "type": "int",
+          "required": true,
+          "description": "The one-time onboarding code emailed to you; it is consumed by registering."
+        },
+        "username": {
+          "type": "text",
+          "required": true,
+          "description": "Desired blog username: lowercase letters and digits only."
+        },
+        "email": {
+          "type": "text",
+          "required": true,
+          "description": "Your email address, used for recovery and notifications."
+        },
+        "password": {
+          "type": "text",
+          "required": true,
+          "description": "Choose a password for your account."
+        }
+      },
+      "exec_spec": {
+        "entity": "User",
+        "fields": [
+          "username",
+          "email"
+        ],
+        "set_on_create": {
+          "blog_title": {
+            "$arg": "username"
+          },
+          "is_active": true,
+          "is_approved": false,
+          "is_premium": false,
+          "api_key": "gen-api-key-<user_id>",
+          "export_unsubscribe_key": 999999
+        },
+        "prechecks": [
+          {
+            "entity": "User",
+            "where": {
+              "username": {
+                "$arg": "username"
+              }
+            },
+            "negate": true,
+            "message": "That username is already taken — pick another."
+          }
+        ]
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Onboard",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "code",
+                      "op": "eq",
+                      "value": {
+                        "arg": "invite_code"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user",
+                      "op": "eq",
+                      "value": null
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "precondition": "That invite is invalid or already used — each onboarding link can only create one account.",
+          "required": "Provide the invite code, a username, an email, and a password to register.",
+          "register": "That username or email is already taken."
+        }
+      },
+      "_evidence": {
+        "id_local": "User.createStepOne+User.createStepTwo",
+        "locator": "main/views/general.py:170,190",
+        "entry": {
+          "kind": "http",
+          "route": "POST /accounts/create/ + /accounts/humanity-diagnostics/<uuid>",
+          "locator": "main/urls.py:34,39"
+        },
+        "ref_code": "UserCreateStepTwo.form_valid: denylist + filter(username) then Onboard code -> save user + set onboard.user",
+        "edges": [
+          "UserCreateStepTwo.form_valid checks models.User.objects.filter(username=...) (general.py:196)"
+        ]
+      }
+    },
+    {
+      "tool": "rename_image",
+      "description": "Rename one of your uploaded images (only its display name changes).",
+      "family": "update.field_set",
+      "entity": "Image",
+      "input_schema": {
+        "slug": {
+          "type": "text",
+          "required": true,
+          "description": "The slug of the image to rename."
+        },
+        "name": {
+          "type": "text",
+          "description": "The new display name."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "Sign in first.",
+          "not_found": "No image with that slug belongs to you.",
+          "required": "Provide the slug of the image to rename."
+        }
+      },
+      "exec_spec": {
+        "entity": "Image",
+        "row_key": {
+          "slug": {
+            "$arg": "slug"
+          }
+        },
+        "fields": [
+          "name"
+        ]
+      },
+      "_binds": {
+        "slug": "Image.slug",
+        "name": "Image.name"
+      },
+      "_output_schema": {
+        "redirect": "browser redirect"
+      },
+      "_evidence": {
+        "id_local": "Image.update",
+        "locator": "main/views/general.py:893",
+        "entry": {
+          "kind": "http",
+          "route": "POST /images/<slug:slug>/edit/",
+          "locator": "main/urls.py:261"
+        },
+        "ref_code": "class ImageUpdate(LoginRequiredMixin, UpdateView):\n  model = models.Image\n  fields = [\"name\"]\n  def dispatch(self,...):\n    if request.user != image.owner: raise PermissionDenied()",
+        "edges": [
+          "dispatch raises PermissionDenied unless request.user == image.owner (general.py:898-902)"
+        ],
+        "entity_why": "primary effect row_update lands on this table"
+      }
+    },
+    {
+      "tool": "reset_api_key",
+      "description": "Rotate your API key to a new random value. The old key stops working immediately.",
+      "family": "action.trigger",
+      "entity": "User",
+      "input_schema": {},
+      "exec_spec": {
+        "target": {
+          "entity": "User",
+          "lookup_by": {
+            "id": {
+              "$session": "account_id"
+            }
+          }
+        },
+        "set": {
+          "api_key": "regenerated-by-reset_api_key"
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "Sign in first.",
+          "not_found": "Your account row was not found."
+        }
+      },
+      "_binds": {},
+      "_output_schema": {
+        "ok": "bool",
+        "slug": "str",
+        "url": "str"
+      },
+      "_evidence": {
+        "id_local": "APIKey.reset",
+        "locator": "main/views/api.py:27",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/reset/",
+          "locator": "main/urls.py:287"
+        },
+        "ref_code": "class APIKeyReset(LoginRequiredMixin, FormView):\n  def form_valid(self, form):\n    self.request.user.reset_api_key()\n    return HttpResponseRedirect(self.get_success_url())\n# reset_api_key: self.api_key = _generate_key(); self.save()",
+        "edges": [
+          "LoginRequiredMixin on the view"
+        ],
+        "entity_why": "cannot determine the entity"
+      }
+    },
+    {
+      "tool": "sign_in",
+      "description": "Sign in with your blog username and password so you can manage your blog. Opens the session that every web tool requires; $actor resolves to you.",
+      "family": "guard.auth",
+      "entity": "User",
+      "input_schema": {
+        "username": {
+          "type": "text",
+          "required": true,
+          "description": "Your blog username."
+        },
+        "password": {
+          "type": "text",
+          "required": true,
+          "description": "Your password."
+        }
+      },
+      "exec_spec": {
+        "verify": {
+          "entity": "User"
+        }
+      },
+      "guards": {
+        "messages": {
+          "auth": "Incorrect username or password — re-check your credentials and try again.",
+          "required": "Provide your username and password to sign in."
+        }
+      },
+      "_evidence": {
+        "id_local": "User.signIn",
+        "locator": "main/views/general.py (django.contrib.auth login)",
+        "entry": {
+          "kind": "http",
+          "route": "SESSION (Django auth)",
+          "locator": "main/urls.py"
+        },
+        "ref_code": "django.contrib.auth: login(request, user); every management view carries LoginRequiredMixin.",
+        "edges": [
+          "every mutating web tool carries LoginRequiredMixin; guard.auth is the only login path"
+        ]
+      }
+    },
+    {
+      "tool": "sign_out",
+      "description": "End your current session.",
+      "family": "guard.logout",
+      "entity": "User",
+      "input_schema": {},
+      "exec_spec": {},
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You are not signed in, so there is nothing to sign out of."
+        }
+      },
+      "_evidence": {
+        "id_local": "User.signOut",
+        "locator": "main/views/general.py (django.contrib.auth logout)",
+        "entry": {
+          "kind": "http",
+          "route": "SESSION (Django auth)",
+          "locator": "main/urls.py"
+        },
+        "ref_code": "django.contrib.auth: logout(request)."
+      }
+    },
+    {
+      "tool": "snapshot_create",
+      "description": "Take a snapshot (backup) of your blog's current content; snapshots beyond the newest 250 are pruned.",
+      "family": "crud.insert",
+      "entity": "Snapshot",
+      "input_schema": {
+        "title": {
+          "type": "text",
+          "required": true,
+          "description": "A label for the snapshot."
+        },
+        "body": {
+          "type": "text",
+          "required": true,
+          "description": "The snapshot content."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "Sign in first.",
+          "required": "Provide a snapshot title and body."
+        }
+      },
+      "exec_spec": {
+        "entity": "Snapshot",
+        "fields": [
+          "title",
+          "body"
+        ],
+        "set_on_create": {
+          "owner": {
+            "$session": "account_id"
+          },
+          "created_at": "2026-01-01T00:00:00"
+        }
+      },
+      "_binds": {
+        "title": "Snapshot.title",
+        "body": "Snapshot.body"
+      },
+      "_output_schema": {
+        "redirect": "browser redirect"
+      },
+      "_evidence": {
+        "id_local": "Snapshot.create",
+        "locator": "main/views/general.py:507",
+        "entry": {
+          "kind": "http",
+          "route": "POST /post-backups/create/",
+          "locator": "main/urls.py:102"
+        },
+        "ref_code": "def form_valid(self, form):\n  self.object = form.save(commit=False)\n  self.object.owner = self.request.user\n  self.object.save()\n  most_recent = models.Snapshot.objects.filter(owner=self.request.user).order_by(\"-id\")[:250].values_list(\"id\", flat=True)\n  models.Snapshot.objects.filter(owner=self.request.user).exclude(id__in=most_recent).delete()",
+        "edges": [
+          "SnapshotCreate(LoginRequiredMixin) (general.py:498)"
+        ],
+        "entity_why": "primary effect row_insert lands on this table"
+      }
+    },
+    {
+      "tool": "snapshot_list",
+      "description": "List the backups you've taken of your blog.",
+      "family": "search",
+      "entity": "Snapshot",
+      "exec_spec": {
+        "entity": "Snapshot",
+        "scope": {
+          "owner_col": "owner"
+        },
+        "rank": {
+          "method": "exact"
+        }
+      },
+      "input_schema": {},
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "Sign in to see your snapshots."
+        }
+      },
+      "_binds": {},
+      "_output_schema": {
+        "http_response": "HTML page"
+      },
+      "_evidence": {
+        "id_local": "Snapshot.list",
+        "locator": "main/views/general.py:525",
+        "entry": {
+          "kind": "http",
+          "route": "GET /post-backups/",
+          "locator": "main/urls.py:104"
+        },
+        "ref_code": "class SnapshotList(LoginRequiredMixin, ListView):\n  model = models.Snapshot\n  def get_queryset(self): return models.Snapshot.objects.filter(owner=self.request.user)",
+        "entity_why": "primary effect row_search lands on this table"
+      }
+    },
+    {
+      "tool": "subscribe_newsletter",
+      "description": "Subscribe an email to the newsletter of the user you are signed in as, or reactivate an existing subscription. Fails if the blog has notifications disabled or this email is already active.",
+      "family": "crud.upsert",
+      "entity": "Notification",
+      "input_schema": {
+        "email": {
+          "type": "text",
+          "required": true,
+          "description": "The reader's email address to subscribe."
+        }
+      },
+      "exec_spec": {
+        "entity": "Notification",
+        "key": {
+          "email": {
+            "$arg": "email"
+          },
+          "blog_user": {
+            "$session": "account_id"
+          }
+        },
+        "insert_fields": [
+          "email"
+        ],
+        "set_on_exists": {
+          "is_active": true
+        },
+        "set_on_create": {
+          "blog_user": {
+            "$session": "account_id"
+          },
+          "is_active": true,
+          "unsubscribe_key": 1
+        }
+      },
+      "guards": {
+        "required": [
+          "email"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "notifications_on",
+                      "op": "eq",
+                      "value": true
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "precondition": "The blog you are signed in as does not have newsletter subscriptions enabled.",
+          "unique": "That email is already an active subscriber.",
+          "required": "Provide the email to subscribe.",
+          "not_found": "Your account row was not found."
+        }
+      },
+      "_binds": {
+        "email": "Notification.email"
+      },
+      "_output_schema": {
+        "redirect": "browser redirect"
+      },
+      "_evidence": {
+        "id_local": "Notification.subscribe",
+        "locator": "main/views/general.py:1173",
+        "entry": {
+          "kind": "http",
+          "route": "POST /newsletter/",
+          "locator": "main/urls.py:130"
+        },
+        "ref_code": "def form_valid(self, form):\n  # already active -> error\n  if models.Notification.objects.filter(blog_user=self.request.blog_user, email=..., is_active=True).exists(): error\n  # active was False -> reactivate\n  if models.Notification.objects.filter(blog_user=..., email=..., is_active=False).exists():\n    notification.is_active = True\n    notification.save()\n  self.object = form.save(commit=False)\n  self.object.blog_user = self.request.blog_user\n  self.object.save()",
+        "edges": [
+          "Notification.dispatch redirects index unless notifications_on (general.py:1205-1210)"
+        ],
+        "entity_why": "primary effect row_upsert lands on this table"
+      }
+    },
+    {
+      "tool": "subscribe_premium",
+      "description": "Subscribe to premium: create/renew your Stripe subscription and, once payment succeeds, flags you as premium and approved. Fails if you are already premium or grandfathered.",
+      "family": "update.field_set",
+      "entity": "User",
+      "input_schema": {},
+      "exec_spec": {
+        "entity": "User",
+        "row_key": {
+          "id": {
+            "$session": "account_id"
+          }
+        },
+        "fields": [
+          "stripe_subscription_id"
+        ],
+        "set": {
+          "is_premium": true,
+          "is_approved": true,
+          "stripe_subscription_id": "sub-new"
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "is_premium",
+                      "op": "eq",
+                      "value": false
+                    },
+                    {
+                      "node": "field",
+                      "col": "is_grandfathered",
+                      "op": "eq",
+                      "value": false
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in first.",
+          "precondition": "You can only subscribe to premium if you are not already premium or grandfathered.",
+          "not_found": "Your account row was not found."
+        }
+      },
+      "_binds": {},
+      "_output_schema": {
+        "redirect": "browser redirect"
+      },
+      "_evidence": {
+        "id_local": "Billing.resubscribe",
+        "locator": "main/views/billing.py:595",
+        "entry": {
+          "kind": "http",
+          "route": "POST /billing/resubscribe/",
+          "locator": "main/urls.py:192"
+        },
+        "ref_code": "def post(self, request):\n  stripe_subscription = stripe.Subscription.create(customer=..., items=[{price: STRIPE_PRICE_ID}], payment_behavior=\"error_if_incomplete\", ...)\n  request.user.stripe_subscription_id = stripe_subscription.get(\"id\")\n  request.user.save()\n  if payment_intent and payment_intent.get(\"status\") == \"succeeded\":\n    _enable_premium(request.user, ...)",
+        "edges": [
+          "BillingResubscribe.dispatch redirects if grandfathered or already premium (billing.py:639-660)"
+        ],
+        "entity_why": "primary effect row_update lands on this table"
+      }
+    },
+    {
+      "tool": "unapprove_user",
+      "description": "Moderation: revoke a user's approval. Superusers only.",
+      "family": "update.field_set",
+      "entity": "User",
+      "input_schema": {
+        "user_id": {
+          "type": "int",
+          "required": true,
+          "description": "The id of the user to unapprove."
+        }
+      },
+      "exec_spec": {
+        "entity": "User",
+        "row_key": {
+          "id": {
+            "$arg": "user_id"
+          }
+        },
+        "fields": [
+          "is_approved"
+        ],
+        "set": {
+          "is_approved": false
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "is_superuser",
+                      "op": "eq",
+                      "value": true
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "realm": "Only a superuser may unapprove users.",
+          "precondition": "Moderation is restricted to superusers — only an account with the admin role can revoke a user's approval.",
+          "not_found": "No user with that id exists.",
+          "auth": "Sign in first.",
+          "required": "Provide the user id."
+        }
+      },
+      "_binds": {
+        "user_id": "User.id"
+      },
+      "_output_schema": {
+        "redirect": "browser redirect"
+      },
+      "_evidence": {
+        "id_local": "Moderation.userUnapprove",
+        "locator": "main/views/moderation.py:153",
+        "entry": {
+          "kind": "http",
+          "route": "POST /moderation/users/<int:user_id>/unapprove/",
+          "locator": "main/urls.py:87"
+        },
+        "ref_code": "def user_unapprove(request, user_id):\n  if not request.user.is_authenticated or not request.user.is_superuser: raise Http404()\n  user = get_object_or_404(models.User, id=user_id)\n  user.is_approved = False\n  user.save()",
+        "edges": [
+          "each moderation view raises Http404 unless request.user.is_authenticated and request.user.is_superuser (moderation.py:23-24,33-34,129-130,141-142)"
+        ],
+        "entity_why": "primary effect row_update lands on this table"
+      }
+    },
+    {
+      "tool": "unsubscribe_newsletter",
+      "description": "Unsubscribe an email from the newsletter of the user you are signed in as (a public form; the blog owner disables a subscriber).",
+      "family": "update.field_set",
+      "entity": "Notification",
+      "input_schema": {
+        "email": {
+          "type": "text",
+          "required": true,
+          "description": "The email to unsubscribe."
+        }
+      },
+      "exec_spec": {
+        "entity": "Notification",
+        "row_key": {
+          "email": {
+            "$arg": "email"
+          },
+          "blog_user": {
+            "$session": "account_id"
+          }
+        },
+        "fields": [
+          "is_active"
+        ],
+        "set": {
+          "is_active": false
+        }
+      },
+      "guards": {
+        "required": [
+          "email"
+        ],
+        "messages": {
+          "required": "Provide the email to unsubscribe.",
+          "not_found": "No subscription matches that email on this blog."
+        }
+      },
+      "_binds": {
+        "email": "Notification.email"
+      },
+      "_output_schema": {
+        "redirect": "browser redirect"
+      },
+      "_evidence": {
+        "id_local": "Notification.unsubscribe",
+        "locator": "main/views/general.py:1226",
+        "entry": {
+          "kind": "http",
+          "route": "POST /newsletter/unsubscribe/",
+          "locator": "main/urls.py:131"
+        },
+        "ref_code": "def form_valid(self, form):\n  notification = get_object_or_404(models.Notification, blog_user=self.request.blog_user, email=form.cleaned_data.get(\"email\"))\n  notification.is_active = False\n  notification.save()",
+        "entity_why": "primary effect row_update lands on this table"
+      }
+    },
+    {
+      "tool": "unsubscribe_newsletter_by_key",
+      "description": "Public one-click unsubscribe via the key in the newsletter email: permanently remove that subscription.",
+      "family": "crud.delete",
+      "entity": "Notification",
+      "input_schema": {
+        "unsubscribe_key": {
+          "type": "int",
+          "required": true,
+          "description": "The unsubscribe key from the newsletter email."
+        }
+      },
+      "exec_spec": {
+        "entity": "Notification",
+        "lookup_by": {
+          "unsubscribe_key": {
+            "$arg": "unsubscribe_key"
+          }
+        }
+      },
+      "guards": {
+        "required": [
+          "unsubscribe_key"
+        ],
+        "messages": {
+          "required": "Provide the unsubscribe key.",
+          "not_found": "No subscription matches that unsubscribe key."
+        }
+      },
+      "_binds": {
+        "unsubscribe_key": "Notification.unsubscribe_key"
+      },
+      "_output_schema": {
+        "http_response": "HTML page"
+      },
+      "_evidence": {
+        "id_local": "Notification.unsubscribeKey",
+        "locator": "main/views/general.py:1251",
+        "entry": {
+          "kind": "http",
+          "route": "GET /newsletter/unsubscribe/<uuid:unsubscribe_key>/",
+          "locator": "main/urls.py:136"
+        },
+        "ref_code": "def notification_unsubscribe_key(request, unsubscribe_key):\n  if models.Notification.objects.filter(unsubscribe_key=unsubscribe_key).exists():\n    notification = models.Notification.objects.get(unsubscribe_key=unsubscribe_key)\n    email = notification.email\n    notification.delete()",
+        "entity_why": "primary effect row_delete lands on this table"
+      }
+    },
+    {
+      "tool": "update_page",
+      "description": "Edit one of your pages: title, slug, body, or visibility. Fails if renaming to a slug one of your other pages already uses.",
+      "family": "update.field_set",
+      "entity": "Page",
+      "input_schema": {
+        "slug": {
+          "type": "text",
+          "required": true,
+          "description": "The current slug of the page to edit."
+        },
+        "title": {
+          "type": "text",
+          "description": "New title."
+        },
+        "body": {
+          "type": "text",
+          "description": "New body."
+        },
+        "is_hidden": {
+          "type": "bool",
+          "description": "Hide or show the page."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "Sign in first.",
+          "not_found": "No page with that slug belongs to your blog.",
+          "unique": "One of your other pages already uses that slug.",
+          "required": "Provide the slug of the page to edit."
+        }
+      },
+      "exec_spec": {
+        "entity": "Page",
+        "row_key": {
+          "slug": {
+            "$arg": "slug"
+          },
+          "owner": {
+            "$session": "account_id"
+          }
+        },
+        "fields": [
+          "title",
+          "slug",
+          "is_hidden",
+          "body"
+        ],
+        "set": {
+          "updated_at": "2026-01-01T00:00:00"
+        }
+      },
+      "_binds": {
+        "slug": "Page.slug",
+        "title": "Page.title",
+        "is_hidden": "Page.is_hidden",
+        "body": "Page.body"
+      },
+      "_output_schema": {
+        "redirect": "browser redirect"
+      },
+      "_evidence": {
+        "id_local": "Page.update",
+        "locator": "main/views/general.py:994",
+        "entry": {
+          "kind": "http",
+          "route": "POST /<slug:slug>/edit/",
+          "locator": "main/urls.py:314"
+        },
+        "ref_code": "class PageUpdate(LoginRequiredMixin, UpdateView):\n  def get_queryset(self): return models.Page.objects.filter(owner__username=self.request.subdomain)\n  def form_valid(self, form):\n    if models.Page.objects.filter(owner=self.request.user, slug=...).exclude(id=self.object.id).exists(): error\n  def dispatch(self,...):\n    if request.user != page.owner: raise PermissionDenied()",
+        "edges": [
+          "dispatch raises PermissionDenied unless request.user == page.owner (general.py:1010-1014)",
+          "PageUpdate.form_valid slug uniqueness excluding self (general.py:994-1008)"
+        ],
+        "entity_why": "primary effect row_update lands on this table"
+      }
+    },
+    {
+      "tool": "update_post",
+      "description": "Edit one of your posts: its title, body, or published_at (publish a draft / unpublish / reschedule). Only your own posts can be edited.",
+      "family": "update.field_set",
+      "entity": "Post",
+      "input_schema": {
+        "slug": {
+          "type": "text",
+          "required": true,
+          "description": "The slug of the post to edit."
+        },
+        "title": {
+          "type": "text",
+          "description": "New title."
+        },
+        "body": {
+          "type": "text",
+          "description": "New body, in markdown."
+        },
+        "published_at": {
+          "type": "datetime",
+          "description": "Publish/unpublish or schedule the post."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "Sign in first.",
+          "not_found": "No post with that slug belongs to your blog.",
+          "required": "Provide the slug of the post to edit."
+        }
+      },
+      "exec_spec": {
+        "entity": "Post",
+        "row_key": {
+          "slug": {
+            "$arg": "slug"
+          },
+          "owner": {
+            "$session": "account_id"
+          }
+        },
+        "fields": [
+          "title",
+          "published_at",
+          "body"
+        ],
+        "set": {
+          "updated_at": "2026-01-01T00:00:00"
+        }
+      },
+      "_binds": {
+        "slug": "Post.slug",
+        "title": "Post.title",
+        "published_at": "Post.published_at",
+        "body": "Post.body"
+      },
+      "_output_schema": {
+        "redirect": "post detail url"
+      },
+      "_evidence": {
+        "id_local": "Post.update",
+        "locator": "main/views/general.py:427",
+        "entry": {
+          "kind": "http",
+          "route": "POST /blog/<slug:slug>/edit/",
+          "locator": "main/urls.py:117"
+        },
+        "ref_code": "class PostUpdate(LoginRequiredMixin, UpdateView):\n  def get_queryset(self):\n    return models.Post.objects.filter(owner__username=self.request.user.username)\n  def form_valid(self, form):\n    self.object = form.save(commit=False)\n    updated_slug = form.cleaned_data.get(\"slug\")\n    self.object.slug = text_processing.create_post_slug(updated_slug, self.request.user, post=self.object)\n    self.object.body = text_processing.sanitize_text(self.object.body)\n    self.object.save()\n  def dispatch(self,...):\n    if request.user.username != request.subdomain: raise PermissionDenied()",
+        "edges": [
+          "dispatch requires request.user.username == request.subdomain and get_queryset filters owner=current user (general.py:449-462,421-425)"
+        ],
+        "entity_why": "primary effect row_update lands on this table"
+      }
+    },
+    {
+      "tool": "update_profile",
+      "description": "Update your blog settings: title, byline, footer note, theme toggles, notification and comment prefs, custom or redirect domain. Fails if the custom domain is already taken by another blog.",
+      "family": "update.field_set",
+      "entity": "User",
+      "input_schema": {
+        "username": {
+          "type": "text",
+          "description": "Your blog username."
+        },
+        "email": {
+          "type": "text",
+          "description": "Your email address."
+        },
+        "blog_title": {
+          "type": "text",
+          "description": "Your blog's title."
+        },
+        "blog_byline": {
+          "type": "text",
+          "description": "A one-line byline shown under the title."
+        },
+        "footer_note": {
+          "type": "text",
+          "description": "A note rendered in the blog footer."
+        },
+        "theme_zialucia": {
+          "type": "bool",
+          "description": "Use the Zialucia theme."
+        },
+        "theme_sansserif": {
+          "type": "bool",
+          "description": "Use the sans-serif theme."
+        },
+        "post_altpath_on": {
+          "type": "bool",
+          "description": "Enable alternative post URL paths."
+        },
+        "custom_domain": {
+          "type": "text",
+          "description": "A custom domain connected to this blog; must be unique across the site."
+        },
+        "comments_on": {
+          "type": "bool",
+          "description": "Allow readers to comment on posts."
+        },
+        "notifications_on": {
+          "type": "bool",
+          "description": "Allow readers to subscribe to your newsletter."
+        },
+        "mail_export_on": {
+          "type": "bool",
+          "description": "Receive a monthly markdown export by email."
+        },
+        "redirect_domain": {
+          "type": "text",
+          "description": "Domain that redirects to your blog."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "custom_domain",
+                      "op": "eq",
+                      "value": {
+                        "arg": "custom_domain"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "ne",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "eq",
+              "n": 0
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in before editing your blog settings.",
+          "precondition": "That custom domain is already connected to another blog — pick a different one.",
+          "not_found": "Your account row was not found."
+        }
+      },
+      "exec_spec": {
+        "entity": "User",
+        "row_key": {
+          "id": {
+            "$session": "account_id"
+          }
+        },
+        "fields": [
+          "username",
+          "email",
+          "blog_title",
+          "blog_byline",
+          "footer_note",
+          "theme_zialucia",
+          "theme_sansserif",
+          "post_altpath_on",
+          "custom_domain",
+          "comments_on",
+          "notifications_on",
+          "mail_export_on",
+          "redirect_domain"
+        ]
+      },
+      "_binds": {
+        "username": "User.username",
+        "email": "User.email",
+        "blog_title": "User.blog_title",
+        "blog_byline": "User.blog_byline",
+        "footer_note": "User.footer_note",
+        "theme_zialucia": "User.theme_zialucia",
+        "theme_sansserif": "User.theme_sansserif",
+        "post_altpath_on": "User.post_altpath_on",
+        "custom_domain": "User.custom_domain",
+        "comments_on": "User.comments_on",
+        "notifications_on": "User.notifications_on",
+        "mail_export_on": "User.mail_export_on",
+        "redirect_domain": "User.redirect_domain"
+      },
+      "_output_schema": {
+        "redirect": "browser redirect"
+      },
+      "_evidence": {
+        "id_local": "User.update",
+        "locator": "main/views/general.py:222",
+        "entry": {
+          "kind": "http",
+          "route": "POST /accounts/edit/",
+          "locator": "main/urls.py:44"
+        },
+        "ref_code": "class UserUpdate(LoginRequiredMixin, UpdateView):\n  model = models.User\n  def get_object(self): return self.request.user\n  def form_valid(self, form):\n    # uniqueness check on custom_domain excluding self\n    if (models.User.objects.filter(custom_domain=form.cleaned_data.get(\"custom_domain\"))\n        .exclude(id=self.request.user.id).exists()):\n      form.add_error(\"custom_domain\", \"This domain name is already connected to a mataroa blog.\")",
+        "edges": [
+          "UserUpdate.form_valid custom_domain uniqueness excluding current user (general.py:257-272)"
+        ],
+        "entity_why": "primary effect row_update lands on this table"
+      }
+    },
+    {
+      "tool": "update_webring",
+      "description": "Set the webring you belong to: its name, URL, and the previous and next blogs in the ring.",
+      "family": "update.field_set",
+      "entity": "User",
+      "input_schema": {
+        "webring_name": {
+          "type": "text",
+          "description": "Name of the webring."
+        },
+        "webring_url": {
+          "type": "text",
+          "description": "URL of the webring index."
+        },
+        "webring_prev_url": {
+          "type": "text",
+          "description": "URL of the previous blog in the ring."
+        },
+        "webring_next_url": {
+          "type": "text",
+          "description": "URL of the next blog in the ring."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "Sign in before editing your webring settings.",
+          "not_found": "Your account row was not found."
+        }
+      },
+      "exec_spec": {
+        "entity": "User",
+        "row_key": {
+          "id": {
+            "$session": "account_id"
+          }
+        },
+        "fields": [
+          "webring_name",
+          "webring_url",
+          "webring_prev_url",
+          "webring_next_url"
+        ]
+      },
+      "_binds": {
+        "webring_name": "User.webring_name",
+        "webring_url": "User.webring_url",
+        "webring_prev_url": "User.webring_prev_url",
+        "webring_next_url": "User.webring_next_url"
+      },
+      "_output_schema": {
+        "redirect": "browser redirect"
+      },
+      "_evidence": {
+        "id_local": "Webring.update",
+        "locator": "main/views/general.py:1032",
+        "entry": {
+          "kind": "http",
+          "route": "POST /webring/",
+          "locator": "main/urls.py:231"
+        },
+        "ref_code": "class WebringUpdate(UpdateView):\n  model = models.User\n  fields = [\"webring_name\",\"webring_url\",\"webring_prev_url\",\"webring_next_url\"]\n  def get_object(self):\n    if self.request.user.is_authenticated:\n      return models.User.objects.get(pk=self.request.user.id)",
+        "edges": [
+          "get_object returns only if authenticated on the view"
+        ],
+        "entity_why": "primary effect row_update lands on this table"
+      }
+    },
+    {
+      "tool": "upload_image",
+      "description": "Upload an image (base64 data) to your blog's image library. Images over ~1MB are rejected.",
+      "family": "crud.insert",
+      "entity": "Image",
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "The image file name."
+        },
+        "slug": {
+          "type": "text",
+          "description": "The URL slug (normally generated); must be unique among your images."
+        },
+        "data": {
+          "type": "text",
+          "required": true,
+          "description": "The image bytes (base64)."
+        },
+        "extension": {
+          "type": "text",
+          "required": true,
+          "description": "The image extension, e.g. png/jpeg."
+        }
+      },
+      "exec_spec": {
+        "entity": "Image",
+        "fields": [
+          "name",
+          "slug",
+          "data",
+          "extension"
+        ],
+        "set_on_create": {
+          "owner": {
+            "$session": "account_id"
+          },
+          "uploaded_at": "2026-01-01T00:00:00"
+        },
+        "unique_on": [
+          "slug"
+        ]
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "Sign in first.",
+          "required": "Uploading needs a name, data and extension.",
+          "unique": "That image slug already exists."
+        }
+      },
+      "_binds": {
+        "name": "Image.name",
+        "data": "Image.data",
+        "extension": "Image.extension"
+      },
+      "_output_schema": {
+        "redirect": "browser redirect"
+      },
+      "_evidence": {
+        "id_local": "Image.upload",
+        "locator": "main/views/general.py:815",
+        "entry": {
+          "kind": "http",
+          "route": "POST /images/",
+          "locator": "main/urls.py:253"
+        },
+        "ref_code": "for f in files:\n  name = name_ext_parts[0].replace(\".\", \"-\")\n  self.extension = name_ext_parts[1].casefold()\n  if self.extension == \"jpg\": self.extension = \"jpeg\"\n  data = f.read()\n  if len(data) > 1.1 * 1000 * 1000: error (1MB limit)\n  if user_total_bytes + len(data) > 1_000_000_000: error (1GB quota)\n  self.slug = str(uuid.uuid4())[:8]\n  models.Image.objects.create(name=name, data=data, extension=self.extension, owner=request.user, slug=self.slug)",
+        "edges": [
+          "LoginRequiredMixin on the view"
+        ],
+        "entity_why": "primary effect row_insert lands on this table"
+      }
+    }
+  ],
+  "seed_state": {
+    "User": [
+      {
+        "id": 1,
+        "username": "ops@mataroa.example",
+        "email": "ada@example.com",
+        "password": "pw-operations",
+        "api_key": "key-ada",
+        "export_unsubscribe_key": 9001,
+        "blog_title": "Ada's blog",
+        "blog_byline": "Notes on systems",
+        "is_active": true,
+        "is_approved": true,
+        "is_premium": false,
+        "is_grandfathered": false,
+        "comments_on": true,
+        "notifications_on": true,
+        "mail_export_on": true,
+        "is_superuser": false,
+        "is_staff": false
+      },
+      {
+        "id": 2,
+        "username": "member@mataroa.example",
+        "email": "grace@example.com",
+        "password": "pw-member",
+        "api_key": "key-grace",
+        "export_unsubscribe_key": 9002,
+        "blog_title": "Grace's trail",
+        "is_active": true,
+        "is_approved": true,
+        "is_premium": false,
+        "is_grandfathered": false,
+        "comments_on": true,
+        "notifications_on": true,
+        "mail_export_on": false,
+        "is_superuser": true,
+        "is_staff": true
+      },
+      {
+        "id": 3,
+        "username": "third@mataroa.example",
+        "email": "lin@example.com",
+        "password": "pw-third",
+        "api_key": "key-lin",
+        "export_unsubscribe_key": 9003,
+        "blog_title": "Linus notes",
+        "is_active": true,
+        "is_approved": true,
+        "is_premium": true,
+        "is_grandfathered": false,
+        "stripe_customer_id": "cus_lin",
+        "stripe_subscription_id": "sub_lin",
+        "comments_on": true,
+        "notifications_on": true,
+        "mail_export_on": false,
+        "is_superuser": false,
+        "is_staff": false
+      }
+    ],
+    "Onboard": [
+      {
+        "id": 1,
+        "code": "onb-ada",
+        "user": null
+      },
+      {
+        "id": 2,
+        "code": "onb-used",
+        "user": 1
+      },
+      {
+        "id": 3,
+        "code": "onb-free",
+        "user": null
+      }
+    ],
+    "Post": [
+      {
+        "id": 1,
+        "title": "Hello world",
+        "slug": "hello",
+        "body": "My first post.",
+        "owner": 1,
+        "published_at": "2026-01-05T09:00:00Z",
+        "broadcasted_at": null
+      },
+      {
+        "id": 2,
+        "title": "Draft note",
+        "slug": "draft-note",
+        "body": "Unpublished.",
+        "owner": 1,
+        "published_at": null,
+        "broadcasted_at": null
+      },
+      {
+        "id": 3,
+        "title": "Grace's intro",
+        "slug": "intro",
+        "body": "Welcome.",
+        "owner": 2,
+        "published_at": "2026-02-01T09:00:00Z",
+        "broadcasted_at": null
+      }
+    ],
+    "Page": [
+      {
+        "id": 1,
+        "title": "About",
+        "slug": "about",
+        "body": "About me.",
+        "owner": 1,
+        "is_hidden": false
+      }
+    ],
+    "Comment": [
+      {
+        "id": 1,
+        "post": 1,
+        "body": "Nice post!",
+        "name": "ReaderY",
+        "email": null,
+        "is_approved": false,
+        "is_author": false
+      },
+      {
+        "id": 2,
+        "post": 1,
+        "body": "Thanks all!",
+        "name": "ada",
+        "email": null,
+        "is_approved": true,
+        "is_author": true
+      }
+    ],
+    "Notification": [
+      {
+        "id": 1,
+        "blog_user": 1,
+        "email": "fan@example.com",
+        "unsubscribe_key": 7001,
+        "is_active": true
+      },
+      {
+        "id": 2,
+        "blog_user": 1,
+        "email": "inactive@example.com",
+        "unsubscribe_key": 7002,
+        "is_active": false
+      },
+      {
+        "id": 3,
+        "blog_user": null,
+        "email": "anon@example.com",
+        "unsubscribe_key": 7003,
+        "is_active": true
+      }
+    ],
+    "Snapshot": [
+      {
+        "id": 1,
+        "title": "Jan backup",
+        "body": "snapshot",
+        "owner": 1
+      }
+    ]
+  }
+}

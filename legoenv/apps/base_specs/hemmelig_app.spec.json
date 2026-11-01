@@ -1,0 +1,4359 @@
+{
+  "env_id": "hemmelig_app",
+  "auth": {
+    "account_entity": "User",
+    "username_col": "email",
+    "password_col": "password"
+  },
+  "entities": [
+    {
+      "name": "Secrets",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "secret",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "views",
+          "type": "int",
+          "default": 1
+        },
+        {
+          "name": "password",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "salt",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "is_burnable",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true,
+          "default": "$now"
+        },
+        {
+          "name": "expires_at",
+          "type": "datetime",
+          "nullable": false
+        },
+        {
+          "name": "ip_range",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "userId",
+          "type": "id",
+          "nullable": true,
+          "fk_to": "User.id",
+          "on_delete": "set_null"
+        }
+      ]
+    },
+    {
+      "name": "File",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "filename",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "path",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "createdAt",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true,
+          "default": "$now"
+        }
+      ]
+    },
+    {
+      "name": "FileToSecrets",
+      "columns": [
+        {
+          "name": "A",
+          "type": "id",
+          "pk": true,
+          "nullable": false,
+          "fk_to": "File.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "B",
+          "type": "id",
+          "pk": true,
+          "nullable": false,
+          "fk_to": "Secrets.id",
+          "on_delete": "cascade"
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "A",
+            "B"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "User",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "username",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "email",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "emailVerified",
+          "type": "bool",
+          "nullable": false,
+          "default": false
+        },
+        {
+          "name": "image",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "createdAt",
+          "type": "datetime",
+          "nullable": false,
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "updatedAt",
+          "type": "datetime",
+          "nullable": false,
+          "audit": true
+        },
+        {
+          "name": "displayUsername",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "role",
+          "type": "text",
+          "enum": [
+            "user",
+            "admin"
+          ],
+          "default": "user"
+        },
+        {
+          "name": "banned",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "banReason",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "banExpires",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "inviteCodeUsed",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "twoFactorEnabled",
+          "type": "bool",
+          "default": false
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "username"
+          ]
+        },
+        {
+          "kind": "unique",
+          "cols": [
+            "email"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "TwoFactor",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "secret",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "backupCodes",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "userId",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "User.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "verified",
+          "type": "bool",
+          "default": true
+        },
+        {
+          "name": "failedVerificationCount",
+          "type": "int",
+          "default": 0
+        },
+        {
+          "name": "lockedUntil",
+          "type": "datetime",
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "name": "Session",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "expiresAt",
+          "type": "datetime",
+          "nullable": false
+        },
+        {
+          "name": "token",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "createdAt",
+          "type": "datetime",
+          "nullable": false,
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "updatedAt",
+          "type": "datetime",
+          "nullable": false,
+          "audit": true
+        },
+        {
+          "name": "ipAddress",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "userAgent",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "userId",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "User.id",
+          "on_delete": "cascade"
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "token"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Account",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "accountId",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "providerId",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "userId",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "User.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "accessToken",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "refreshToken",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "idToken",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "accessTokenExpiresAt",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "refreshTokenExpiresAt",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "scope",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "password",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "createdAt",
+          "type": "datetime",
+          "nullable": false,
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "updatedAt",
+          "type": "datetime",
+          "nullable": false,
+          "audit": true
+        }
+      ]
+    },
+    {
+      "name": "Verification",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "identifier",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "value",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "expiresAt",
+          "type": "datetime",
+          "nullable": false
+        },
+        {
+          "name": "createdAt",
+          "type": "datetime",
+          "nullable": true,
+          "audit": true
+        },
+        {
+          "name": "updatedAt",
+          "type": "datetime",
+          "nullable": true,
+          "audit": true
+        }
+      ]
+    },
+    {
+      "name": "InstanceSettings",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "instanceName",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "instanceDescription",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "instanceLogo",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "allowRegistration",
+          "type": "bool",
+          "default": true
+        },
+        {
+          "name": "requireEmailVerification",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "defaultSecretExpiration",
+          "type": "int",
+          "default": 72
+        },
+        {
+          "name": "maxSecretSize",
+          "type": "int",
+          "default": 1024
+        },
+        {
+          "name": "allowPasswordProtection",
+          "type": "bool",
+          "default": true
+        },
+        {
+          "name": "allowIpRestriction",
+          "type": "bool",
+          "default": true
+        },
+        {
+          "name": "enableRateLimiting",
+          "type": "bool",
+          "default": true
+        },
+        {
+          "name": "rateLimitRequests",
+          "type": "int",
+          "default": 100
+        },
+        {
+          "name": "rateLimitWindow",
+          "type": "int",
+          "default": 60
+        },
+        {
+          "name": "requireInviteCode",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "allowedEmailDomains",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "requireRegisteredUser",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "disableEmailPasswordSignup",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "webhookEnabled",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "webhookUrl",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "webhookSecret",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "webhookOnView",
+          "type": "bool",
+          "default": true
+        },
+        {
+          "name": "webhookOnBurn",
+          "type": "bool",
+          "default": true
+        },
+        {
+          "name": "importantMessage",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "metricsEnabled",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "metricsSecret",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "allowFileUploads",
+          "type": "bool",
+          "default": true
+        },
+        {
+          "name": "createdAt",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true,
+          "default": "$now"
+        },
+        {
+          "name": "updatedAt",
+          "type": "datetime",
+          "audit": true
+        }
+      ]
+    },
+    {
+      "name": "InviteCode",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "code",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "uses",
+          "type": "int",
+          "default": 0
+        },
+        {
+          "name": "maxUses",
+          "type": "int",
+          "default": 1
+        },
+        {
+          "name": "expiresAt",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "createdBy",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "createdAt",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true,
+          "default": "$now"
+        },
+        {
+          "name": "isActive",
+          "type": "bool",
+          "default": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "code"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "VisitorAnalytics",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "path",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "uniqueId",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "timestamp",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true,
+          "default": "$now"
+        }
+      ]
+    },
+    {
+      "name": "ApiKey",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "key_hash",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "key_prefix",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "userId",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "User.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "last_used_at",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "expires_at",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true,
+          "default": "$now"
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "key_hash"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "SecretRequest",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "max_views",
+          "type": "int",
+          "default": 1
+        },
+        {
+          "name": "expires_in",
+          "type": "int",
+          "nullable": false
+        },
+        {
+          "name": "password",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "allowed_ip",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "prevent_burn",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "token",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "webhook_url",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "webhook_secret",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "enum": [
+            "pending",
+            "fulfilled",
+            "expired",
+            "cancelled"
+          ],
+          "default": "pending"
+        },
+        {
+          "name": "user_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "User.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "secret_id",
+          "type": "id",
+          "nullable": true,
+          "fk_to": "Secrets.id",
+          "on_delete": "set_null"
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true,
+          "default": "$now"
+        },
+        {
+          "name": "expires_at",
+          "type": "datetime",
+          "nullable": false
+        },
+        {
+          "name": "fulfilled_at",
+          "type": "datetime",
+          "nullable": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "token"
+          ]
+        },
+        {
+          "kind": "unique",
+          "cols": [
+            "secret_id"
+          ]
+        }
+      ],
+      "_lifecycle": {
+        "col": "status",
+        "initial": "pending",
+        "states": [
+          "pending",
+          "fulfilled",
+          "expired",
+          "cancelled"
+        ],
+        "via": {
+          "SecretRequest.cancel": {
+            "col": "status",
+            "from": [
+              "pending"
+            ],
+            "to": "cancelled"
+          },
+          "SecretRequest.getInfo": {
+            "col": "status",
+            "from": [
+              "pending"
+            ],
+            "to": "expired"
+          },
+          "SecretRequest.submitSecret": {
+            "col": "status",
+            "from": [
+              "pending"
+            ],
+            "to": "fulfilled"
+          }
+        }
+      }
+    }
+  ],
+  "tools": [
+    {
+      "tool": "sign_in",
+      "description": "Sign in with an account email and password, opening the session that resolves to $actor. Nearly every other tool on the server requires this first. Fails when the credentials do not match an existing account.",
+      "family": "guard.auth",
+      "entity": "User",
+      "input_schema": {
+        "email": {
+          "type": "text",
+          "required": true,
+          "description": "The account email address."
+        },
+        "password": {
+          "type": "text",
+          "required": true,
+          "description": "The account password."
+        }
+      },
+      "exec_spec": {
+        "verify": {
+          "entity": "User",
+          "username_col": "email",
+          "password_col": "password"
+        }
+      },
+      "guards": {
+        "messages": {
+          "auth": "Invalid email or password."
+        }
+      },
+      "_evidence": {
+        "id_local": "Auth.signInEmail",
+        "locator": "better-auth email+password sign-in",
+        "ref_code": "auth.api.signUpEmail / changePassword operate on the User row (api/routes/setup.ts:29, account.ts:80)",
+        "entity": "User"
+      }
+    },
+    {
+      "tool": "secrets_listmine",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Secrets",
+        "scope": {
+          "owner_col": "userId"
+        },
+        "search_fields": [
+          "expires_at",
+          "views",
+          "is_burnable"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": []
+        },
+        "pagination": {
+          "default_limit": 20,
+          "limit": {
+            "$arg": "limit"
+          }
+        },
+        "sort": {
+          "col": "created_at",
+          "dir": "desc"
+        }
+      },
+      "input_schema": {
+        "limit": {
+          "type": "int",
+          "required": false,
+          "description": "Page size, default 20."
+        },
+        "offset": {
+          "type": "int",
+          "required": false,
+          "description": "How many results to skip before the first returned one."
+        }
+      },
+      "_evidence": {
+        "locator": "api/routes/secrets.ts:38",
+        "id_local": "Secrets.listMine",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/secrets",
+          "locator": "api/routes.ts:38"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "const whereClause = { userId: user.id };\nconst [items, total] = await Promise.all([\n  prisma.secrets.findMany({ where: whereClause, skip, take, orderBy: { createdAt: 'desc' }, select: {...} }),\n  prisma.secrets.count({ where: whereClause })]);",
+        "edges": [
+          "whereClause = { userId: user.id } only shows own secrets (secrets.ts:47)"
+        ],
+        "scope_why": "owner-col scoped to the signed-in user's own secrets"
+      },
+      "entity": "Secrets",
+      "_output_schema": {
+        "data": "list of secrets metadata (id, createdAt, expiresAt, views, isPasswordProtected, ipRange, isBurnable, fileCount)",
+        "meta": "pagination meta"
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in to see your secrets."
+        }
+      },
+      "description": "List the metadata of the secrets you created, most recent first, with paging. Secret bodies are never returned here — only id, timestamps, the remaining view count, and whether each is password-protected or burnable."
+    },
+    {
+      "tool": "secrets_create",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Secrets",
+        "fields": {
+          "salt": {
+            "$arg": "salt"
+          },
+          "secret": {
+            "$arg": "secret"
+          },
+          "title": {
+            "$arg": "title"
+          },
+          "views": {
+            "$arg": "views"
+          },
+          "ip_range": {
+            "$arg": "ipRange"
+          },
+          "is_burnable": {
+            "$arg": "isBurnable"
+          }
+        },
+        "set_on_create": {
+          "expires_at": "2027-01-01T00:00:00",
+          "userId": {
+            "$session": "account_id"
+          },
+          "password": {
+            "$arg": "password"
+          },
+          "views": {
+            "$const": 1
+          }
+        }
+      },
+      "input_schema": {
+        "salt": {
+          "type": "text",
+          "required": true,
+          "description": "The client-generated encryption salt stored beside the secret."
+        },
+        "secret": {
+          "type": "json",
+          "required": true,
+          "description": "The AES-256-GCM encrypted secret payload."
+        },
+        "title": {
+          "type": "json",
+          "required": false,
+          "description": "The encrypted title of the secret."
+        },
+        "expiresAt": {
+          "type": "int",
+          "required": true,
+          "description": "Expiration delay in seconds; the secret becomes unobtainable after this."
+        },
+        "password": {
+          "type": "text",
+          "required": false,
+          "description": "Optional plaintext password a reader must supply to read the secret."
+        },
+        "views": {
+          "type": "int",
+          "required": false,
+          "description": "Maximum number of reads before the secret self-destructs."
+        },
+        "isBurnable": {
+          "type": "bool",
+          "required": false,
+          "description": "Whether the secret destroys itself on its final read."
+        },
+        "ipRange": {
+          "type": "text",
+          "required": false,
+          "description": "Optional CIDR allow-list of IPs that may read the secret."
+        },
+        "fileIds": {
+          "type": "json",
+          "required": false,
+          "description": "Optional list of already-uploaded File ids to attach to this secret."
+        }
+      },
+      "_evidence": {
+        "locator": "api/routes/secrets.ts:235",
+        "id_local": "Secrets.create",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/secrets",
+          "locator": "api/routes.ts:38"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "if (settings?.requireRegisteredUser && !user) return 401\nconst maxSizeBytes = (settings?.maxSecretSize ?? 1024) * 1024\nif (validatedData.secret.length > maxSizeBytes) return 413\nconst data = { ...rest, salt, title: title ?? new Uint8Array(0),\n  password: password ? await hash(password) : None,\n  expiresAt: new Date(Date.now() + expiresAt * 1000),\n  ...(fileIds && { files: { connect: fileIds.map(id => ({ id })) } }) };\nif (user) data.userId = user.id;\nconst item = await prisma.secrets.create({ data });\nreturn c.json({ id: item.id }, 201);",
+        "_expiry_note": "the real code sets expiresAt = now + expiresAt*1000; the runtime clock is fixed and time arithmetic is forbidden, so a far-future constant keeps created secrets readable. Per-secret expiry timing is not time-testable in this world; the view-count burn is the real testable lifetime."
+      },
+      "entity": "Secrets",
+      "_binds": {
+        "salt": "Secrets.salt",
+        "secret": "Secrets.secret",
+        "title": "Secrets.title",
+        "views": "Secrets.views",
+        "ipRange": "Secrets.ip_range",
+        "isBurnable": "Secrets.is_burnable"
+      },
+      "_output_schema": {
+        "id": "the new Secret id"
+      },
+      "guards": {
+        "required": [
+          "salt",
+          "secret",
+          "expiresAt"
+        ]
+      },
+      "_defaulted_fixed": "raw fields dropped is_burnable; added it via binds. The account binding is conditional in the real code (only when signed in); keeps the $session set so logged-in creates own the row, and the nullable FK absorbs anonymous creates.",
+      "description": "Create a new end-to-end-encrypted secret and return its id. The secret, title and salt are client-side encrypted blobs the server stores opaquely; the secret expires after expiresAt seconds. Attaches the given files when supplied. Requires a signed-in account only when the instance setting requireRegisteredUser is on, and fails with 'Secret too large' if the body exceeds the configured maximum size."
+    },
+    {
+      "tool": "secrets_get",
+      "description": "Read a secret by id — the one-time read it was created for. Decrements the remaining view count; a secret with a password demands it first (fails with 'Invalid password' when wrong); a burnable secret that used its last view reads as burned. An exhausted or missing secret reads as not found.",
+      "family": "action.trigger",
+      "exec_spec": {
+        "entity": "Secrets",
+        "target": {
+          "entity": "Secrets",
+          "lookup_by": {
+            "id": {
+              "$arg": "id"
+            }
+          }
+        },
+        "set": {
+          "views": {
+            "$compute": "views-1"
+          }
+        },
+        "spawn": []
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the secret to read."
+        },
+        "password": {
+          "type": "text",
+          "required": false,
+          "description": "The secret's password, required when the secret has one."
+        }
+      },
+      "guards": {
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "not_found": "Secret not found.",
+          "precondition": "Invalid password, or this secret has no views left."
+        },
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Secrets",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "password",
+                      "op": "is_null"
+                    },
+                    {
+                      "node": "field",
+                      "col": "views",
+                      "op": "gt",
+                      "value": 0
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Secrets",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "password",
+                      "op": "eq",
+                      "value": {
+                        "arg": "password"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "views",
+                      "op": "gt",
+                      "value": 0
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ]
+      },
+      "_evidence": {
+        "locator": "api/routes/secrets.ts:97",
+        "id_local": "Secrets.get",
+        "ref_code": "const item = await tx.secrets.findUnique({ where: { id }, select: {...} });\nif (!item) return 404;\nif (item.views !== null && item.views <= 0) return 404;\nif (item.password) { const ok = await compare(data.password!, item.password); if (!ok) return 'Invalid password', 401; }\nconst newViews = item.views! - 1;\nawait tx.secrets.update({ where: { id }, data: { views: newViews } });",
+        "edges": [
+          "views-- on every read; password gate when set (secrets.ts:104-119)"
+        ],
+        "guard_why": "DNF: secret has no password, OR a passed password matches",
+        "entity": "Secrets"
+      },
+      "_output_schema": {
+        "secret": "the decrypted secret bytes",
+        "title": "encrypted title",
+        "views": "remaining views",
+        "burned": "bool",
+        "files": "associated files",
+        "salt": "encryption salt",
+        "expiresAt": "datetime"
+      },
+      "_defaulted_fixed": "raw spec guessed a read tool with a writable panel; rebuilt as the decrementing read.",
+      "entity": "Secrets"
+    },
+    {
+      "tool": "secrets_check",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Secrets",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the secret to check."
+        }
+      },
+      "_evidence": {
+        "locator": "api/routes/secrets.ts:196",
+        "id_local": "Secrets.check",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/secrets/:id/check",
+          "locator": "api/routes.ts:38"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "const item = await prisma.secrets.findUnique({ where: { id }, select: { id, views, title, password } });\nif (!item) return 404; if (item.views !== null && item.views <= 0) return 404;\nreturn c.json({ views: item.views, title: item.title, isPasswordProtected: !!item.password });"
+      },
+      "entity": "Secrets",
+      "_binds": {
+        "id": "Secrets.id"
+      },
+      "_output_schema": {
+        "views": "remaining views",
+        "title": "encrypted title",
+        "isPasswordProtected": "bool"
+      },
+      "guards": {
+        "required": [
+          "id"
+        ]
+      },
+      "description": "Check whether a secret is still available without consuming a view: returns the remaining view count, the encrypted title, and whether it is password-protected. Reads as not found once the secret is missing or exhausted."
+    },
+    {
+      "tool": "secrets_delete",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "Secrets",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the secret to delete."
+        }
+      },
+      "_evidence": {
+        "locator": "api/routes/secrets.ts:306",
+        "id_local": "Secrets.delete",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/secrets/:id",
+          "locator": "api/routes.ts:38"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "const secret = await prisma.$transaction(async (tx) => {\n  const secretData = await tx.secrets.findUnique({ where: { id }, select: { id, password, ipRange } });\n  await tx.secrets.delete({ where: { id } });\n  return secretData;\n});\nif (secret) sendWebhook('secret.burned', {...});\nreturn c.json({ success: true, message: 'Secret deleted successfully' });",
+        "edges": [
+          "transaction deletes the secret by id; handleNotFound on miss (secrets.ts:311-338)"
+        ],
+        "guard_why": "own-secret delete; added the userId==$actor clause (raw spec checked only that the row exists)"
+      },
+      "entity": "Secrets",
+      "_binds": {
+        "id": "Secrets.id"
+      },
+      "_output_schema": {
+        "success": "bool",
+        "message": "text"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must sign in to delete a secret.",
+          "not_found": "Secret not found or you are not its creator.",
+          "precondition": "Only the creator of a secret can delete it; otherwise it reads as not found."
+        },
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Secrets",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "userId",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ]
+      },
+      "description": "Permanently delete a secret you created, unlinking it from its files. Fails with 'not found' if the id does not exist or the secret is not yours."
+    },
+    {
+      "tool": "secretrequest_list",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "SecretRequest",
+        "scope": {
+          "owner_col": "user_id"
+        },
+        "search_fields": [
+          "user_id",
+          "status"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "user_id",
+            "status"
+          ]
+        },
+        "pagination": {
+          "default_limit": 20,
+          "limit": {
+            "$arg": "limit"
+          }
+        },
+        "sort": {
+          "col": "created_at",
+          "dir": "desc"
+        },
+        "filter": {
+          "col": "status",
+          "mode": "exact",
+          "val": {
+            "$arg": "status"
+          },
+          "optional": true
+        }
+      },
+      "input_schema": {
+        "status": {
+          "type": "text",
+          "required": false,
+          "description": "Only return requests in this status (pending/fulfilled/expired/cancelled); omit for all."
+        },
+        "limit": {
+          "type": "int",
+          "required": false,
+          "description": "Page size, default 20."
+        },
+        "offset": {
+          "type": "int",
+          "required": false,
+          "description": "How many results to skip before the first returned one."
+        }
+      },
+      "_evidence": {
+        "locator": "api/routes/secret-requests.ts:93",
+        "id_local": "SecretRequest.list",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/secret-requests",
+          "locator": "api/routes.ts:38"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "const whereClause: { userId: string; status?: string } = { userId: user.id };\nif (status && status !== 'all') whereClause.status = status;\nconst [items, total] = await Promise.all([\n  prisma.secretRequest.findMany({ where: whereClause, skip, take, orderBy: { createdAt: 'desc' }, select: {...} }),\n  prisma.secretRequest.count({ where: whereClause })]);",
+        "edges": [
+          "whereClause = { userId: user.id } (secret-requests.ts:100)"
+        ],
+        "scope_why": "owner-col scoped to the signed-in user's own requests"
+      },
+      "entity": "SecretRequest",
+      "_output_schema": {
+        "data": "list of SecretRequest rows",
+        "meta": "pagination meta"
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in to list your secret requests."
+        }
+      },
+      "description": "List your secret requests, newest first, optionally filtered to one status. Each carries a shareable creator link containing its token."
+    },
+    {
+      "tool": "secretrequest_create",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "SecretRequest",
+        "fields": {
+          "title": {
+            "$arg": "title"
+          },
+          "description": {
+            "$arg": "description"
+          },
+          "max_views": {
+            "$arg": "maxViews"
+          },
+          "expires_in": {
+            "$arg": "expiresIn"
+          },
+          "allowed_ip": {
+            "$arg": "allowedIp"
+          },
+          "webhook_url": {
+            "$arg": "webhookUrl"
+          },
+          "prevent_burn": {
+            "$arg": "preventBurn"
+          },
+          "password": {
+            "$arg": "password"
+          },
+          "token": {
+            "$arg": "token"
+          }
+        },
+        "set_on_create": {
+          "status": {
+            "$const": "pending"
+          },
+          "user_id": {
+            "$session": "account_id"
+          },
+          "expires_at": {
+            "$arg": "validFor"
+          }
+        },
+        "unique_on": [
+          "token"
+        ]
+      },
+      "input_schema": {
+        "title": {
+          "type": "text",
+          "required": true,
+          "description": "Title of the secret request."
+        },
+        "description": {
+          "type": "text",
+          "required": false,
+          "description": "Optional description of what is being requested."
+        },
+        "expiresIn": {
+          "type": "int",
+          "required": true,
+          "description": "Lifetime of the submitted secret in seconds once answered."
+        },
+        "validFor": {
+          "type": "int",
+          "required": false,
+          "description": "Seconds the creator link stays valid; the request expires after this."
+        },
+        "maxViews": {
+          "type": "int",
+          "required": false,
+          "description": "How many times the submitted secret may be read before it self-destructs (default 1)."
+        },
+        "allowedIp": {
+          "type": "text",
+          "required": false,
+          "description": "Optional CIDR allow-list restricting who may view the submitted secret."
+        },
+        "preventBurn": {
+          "type": "bool",
+          "required": false,
+          "description": "Keep the submitted secret readable after its views run out."
+        },
+        "password": {
+          "type": "text",
+          "required": false,
+          "description": "Optional password the submitted secret requires on read."
+        },
+        "webhookUrl": {
+          "type": "text",
+          "required": false,
+          "description": "Optional webhook URL notified on submit; must be a public address."
+        },
+        "token": {
+          "type": "text",
+          "required": false,
+          "description": "A unique token used in the share link; the server generates its own when omitted."
+        }
+      },
+      "_evidence": {
+        "locator": "api/routes/secret-requests.ts:138",
+        "id_local": "SecretRequest.create",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/secret-requests",
+          "locator": "api/routes.ts:38"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "if (data.webhookUrl && !(await isPublicUrl(data.webhookUrl))) return 400;\nconst token = randomBytes(32).toString('hex');\nconst webhookSecret = data.webhookUrl ? randomBytes(32).toString('hex') : None;\nconst request = await prisma.secretRequest.create({ data: {\n  title: data.title, description: data.description, maxViews: data.maxViews, expiresIn: data.expiresIn,\n  allowedIp: data.allowedIp, preventBurn: data.preventBurn, webhookUrl: data.webhookUrl, webhookSecret,\n  token, userId: user.id, expiresAt: new Date(Date.now() + data.validFor * 1000) } });\nreturn c.json({ id: request.id, creatorLink:",
+        "edges": [
+          "create assigns userId: user.id (secret-requests.ts:168)"
+        ],
+        "_precondition_note": "dropped the raw precondition (user_id==$actor AND card eq 0): it is a mis-mined reading of the owner assignment `userId: user.id` on create, not a real gate — an authenticated user may create many requests. The real code only requires auth + required fields (secret-requests.ts:138)."
+      },
+      "entity": "SecretRequest",
+      "_binds": {
+        "title": "SecretRequest.title",
+        "description": "SecretRequest.description",
+        "maxViews": "SecretRequest.max_views",
+        "expiresIn": "SecretRequest.expires_in",
+        "allowedIp": "SecretRequest.allowed_ip",
+        "webhookUrl": "SecretRequest.webhook_url",
+        "preventBurn": "SecretRequest.prevent_burn",
+        "password": "SecretRequest.password",
+        "token": "SecretRequest.token"
+      },
+      "_output_schema": {
+        "id": "request id",
+        "creatorLink": "url to the creator link incl token",
+        "webhookSecret": "generated HMAC secret (returned once)",
+        "expiresAt": "datetime"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "title",
+          "expiresIn",
+          "validFor"
+        ],
+        "messages": {
+          "auth": "You must sign in to create a secret request."
+        }
+      },
+      "_defaulted_note": "token is server-generated in the real code; exposed as an optional caller field so the first request (whose token the verifier needs for getInfo/submitSecret) is creatable with a known token.",
+      "description": "Create a secret request: a link you can share so a third party can submit a secret back to you. Returns the request id and its creator link carrying the token. Created pending, expiring after expiresIn seconds."
+    },
+    {
+      "tool": "secretrequest_get",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "SecretRequest",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        },
+        "scope": {
+          "owner_col": "user_id"
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the secret request to fetch."
+        }
+      },
+      "_evidence": {
+        "locator": "api/routes/secret-requests.ts:191",
+        "id_local": "SecretRequest.get",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/secret-requests/:id",
+          "locator": "api/routes.ts:38"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "const request = await prisma.secretRequest.findUnique({ where: { id }, select: {...} });\nif (!request) return 404; if (request.userId !== user.id) return 403;\nreturn c.json({ ...request, creatorLink: `${origin}/request/${request.id}?token=${request.token}` });",
+        "edges": [
+          "if (request.userId !== user.id) return 403 (secret-requests.ts:221)"
+        ]
+      },
+      "entity": "SecretRequest",
+      "_binds": {
+        "id": "SecretRequest.id"
+      },
+      "_output_schema": {
+        "id": "request row fields incl token, secretId, status",
+        "creatorLink": "url with token"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must sign in to view a secret request.",
+          "not_found": "Secret request not found or you are not its creator.",
+          "precondition": "Secret request not found, or you are not its creator."
+        },
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "SecretRequest",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ]
+      },
+      "description": "Fetch one of your secret requests by id, including its token and creator link. Fails with 'not found' if it does not exist or was created by someone else."
+    },
+    {
+      "tool": "secretrequest_cancel",
+      "op": "update",
+      "family": "update.status_transition",
+      "exec_spec": {
+        "entity": "SecretRequest",
+        "row_key": {
+          "id": {
+            "$arg": "id"
+          }
+        },
+        "status_col": "status",
+        "from": [
+          "pending"
+        ],
+        "to": "cancelled"
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the secret request to cancel."
+        }
+      },
+      "_evidence": {
+        "locator": "api/routes/secret-requests.ts:238",
+        "id_local": "SecretRequest.cancel",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/secret-requests/:id",
+          "locator": "api/routes.ts:38"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "const request = await prisma.secretRequest.findUnique({ where: { id }, select: { userId, status } });\nif (!request) return 404; if (request.userId !== user.id) return 403;\nif (request.status !== 'pending') return c.json({ error: 'Can only cancel pending requests' }, 400);\nawait prisma.secretRequest.update({ where: { id }, data: { status: 'cancelled' } });\nreturn c.json({ success: true });",
+        "edges": [
+          "owner check (403) + status must be pending else 400 (secret-requests.ts:252-259)"
+        ]
+      },
+      "entity": "SecretRequest",
+      "_binds": {
+        "id": "SecretRequest.id"
+      },
+      "_output_schema": {
+        "success": "bool",
+        "message": "text"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must sign in to cancel a secret request.",
+          "not_found": "Secret request not found.",
+          "precondition": "Only your own pending secret requests can be cancelled.",
+          "transition": "Can only cancel pending requests."
+        },
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "SecretRequest",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ]
+      },
+      "description": "Cancel a secret request you created while it is still pending, so nobody can submit to it. Fails if it is not yours or no longer pending."
+    },
+    {
+      "tool": "secretrequest_getinfo",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "SecretRequest",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the secret request."
+        },
+        "token": {
+          "type": "text",
+          "required": true,
+          "description": "The token that came in the shared creator link."
+        }
+      },
+      "_evidence": {
+        "locator": "api/routes/secret-requests.ts:273",
+        "id_local": "SecretRequest.getInfo",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/secret-requests/:id/info",
+          "locator": "api/routes.ts:38"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "const request = await prisma.secretRequest.findUnique({ where: { id }, select: { id, title, description, status, expiresAt, token } });\nif (!request || !validateToken(token, request.token)) return 404;\nif (request.status !== 'pending') return 410;\nif (new Date() > request.expiresAt) {\n  await prisma.secretRequest.update({ where: { id }, data: { status: 'expired' } });\n  return 410;\n}\nreturn c.json({ id, title, description });",
+        "edges": [
+          "validateToken(token, request.token) + status must be pending (secret-requests.ts:294-299)"
+        ],
+        "_lifecycle_note": "the real code lazily marks a pending-but-expired request 'expired' on read; the runtime cannot time-advance a read, so the lazy transition is approximated by the pending precondition. The forward transitions (cancel, submit) remain real."
+      },
+      "entity": "SecretRequest",
+      "_binds": {
+        "id": "SecretRequest.id"
+      },
+      "_output_schema": {
+        "id": "request id",
+        "title": "text",
+        "description": "text"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "SecretRequest",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "token",
+                      "op": "eq",
+                      "value": {
+                        "arg": "token"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "status",
+                      "op": "eq",
+                      "value": "pending"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "id",
+          "token"
+        ],
+        "messages": {
+          "not_found": "Invalid request or the request is no longer pending.",
+          "precondition": "Invalid token, or this request is no longer pending."
+        }
+      },
+      "description": "Public read used by the share link: given a request id and its token, returns the title and description of a still-pending request. Fails with 'not found' on a bad id/token pair, and the request is unavailable once it has left the pending state."
+    },
+    {
+      "tool": "secretrequest_submitsecret",
+      "description": "Submit a secret in answer to a pending secret request, using the token from the share link. Creates the secret (inheriting the request's view cap and burn/ip/password settings), marks the request fulfilled. Fails if the request is gone, the token is wrong, or it is no longer pending.",
+      "family": "action.trigger",
+      "exec_spec": {
+        "entity": "SecretRequest",
+        "target": {
+          "entity": "SecretRequest",
+          "lookup_by": {
+            "id": {
+              "$arg": "id"
+            }
+          }
+        },
+        "set": {
+          "status": {
+            "$const": "fulfilled"
+          }
+        },
+        "spawn": [
+          {
+            "entity": "Secrets",
+            "set_on_spawn": {
+              "secret": {
+                "$arg": "secret"
+              },
+              "title": {
+                "$arg": "title"
+              },
+              "salt": {
+                "$arg": "salt"
+              },
+              "views": {
+                "$arg": "maxViews"
+              },
+              "ip_range": {
+                "$arg": "allowedIp"
+              },
+              "is_burnable": {
+                "$arg": "preventBurn"
+              },
+              "password": {
+                "$arg": "password"
+              },
+              "expires_at": "2027-01-01T00:00:00"
+            }
+          }
+        ]
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the secret request being answered."
+        },
+        "token": {
+          "type": "text",
+          "required": true,
+          "description": "The token from the shared creator link, proving access to this request."
+        },
+        "secret": {
+          "type": "json",
+          "required": true,
+          "description": "The encrypted secret payload to store."
+        },
+        "salt": {
+          "type": "text",
+          "required": true,
+          "description": "The client-generated encryption salt."
+        },
+        "title": {
+          "type": "json",
+          "required": false,
+          "description": "The encrypted title of the submitted secret."
+        },
+        "maxViews": {
+          "type": "int",
+          "required": false,
+          "description": "How many times the submitted secret may be read (inherited from the request)."
+        },
+        "expiresInMs": {
+          "type": "int",
+          "required": false,
+          "description": "Lifetime of the submitted secret in milliseconds."
+        },
+        "allowedIp": {
+          "type": "text",
+          "required": false,
+          "description": "CIDR allow-list for the submitted secret (inherited from the request)."
+        },
+        "preventBurn": {
+          "type": "bool",
+          "required": false,
+          "description": "Whether the submitted secret stays readable after its views run out (inherited)."
+        },
+        "password": {
+          "type": "text",
+          "required": false,
+          "description": "Password for the submitted secret (inherited from the request)."
+        }
+      },
+      "guards": {
+        "required": [
+          "id",
+          "token",
+          "secret",
+          "salt"
+        ],
+        "messages": {
+          "not_found": "Invalid request.",
+          "precondition": "Invalid token, or this request is no longer pending."
+        },
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "SecretRequest",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "token",
+                      "op": "eq",
+                      "value": {
+                        "arg": "token"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "status",
+                      "op": "eq",
+                      "value": "pending"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ]
+      },
+      "_evidence": {
+        "locator": "api/routes/secret-requests.ts:323",
+        "id_local": "SecretRequest.submitSecret",
+        "ref_code": "const createdSecret = await tx.secrets.create({ data: { secret: Buffer.from(secret), title: title ? Buffer.from(title) : Buffer.from([]), salt, views: request.maxViews, ipRange: request.allowedIp, isBurnable: !request.preventBurn, expiresAt: secretExpiresAt } });\nawait tx.secretRequest.update({ where: { id }, data: { status: 'fulfilled', fulfilledAt: new Date(), secretId: createdSecret.id } });\nreturn c.json({ secretId: createdSecret.id }, 201);",
+        "edges": [
+          "token validation + status pending check inside tx (secret-requests.ts:340-345)"
+        ],
+        "entity": "Secrets",
+        "_binds_note": "maxViews/allowedIp/preventBurn/password/expiresIn are inherited from the request row in the real code; exposed as optional overrides so the created secret is meaningfully populated."
+      },
+      "_output_schema": {
+        "secretId": "the newly created Secrets.id"
+      },
+      "entity": "SecretRequest"
+    },
+    {
+      "tool": "account_get",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "User",
+        "lookup_by": {
+          "id": {
+            "$session": "account_id"
+          }
+        },
+        "scope": {
+          "owner_col": "id"
+        }
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "api/routes/account.ts:16",
+        "id_local": "Account.get",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/account",
+          "locator": "api/routes.ts:38"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "return c.json({ username: user.username, email: user.email });"
+      },
+      "entity": "User",
+      "_output_schema": {
+        "username": "text",
+        "email": "text"
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in to view your account."
+        }
+      },
+      "description": "Fetch the signed-in account's public profile: username and email."
+    },
+    {
+      "tool": "account_update",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "User",
+        "row_key": {
+          "id": {
+            "$session": "account_id"
+          }
+        },
+        "fields": [
+          "username",
+          "email"
+        ],
+        "set": {
+          "updatedAt": "2026-01-01T00:00:00"
+        }
+      },
+      "input_schema": {
+        "username": {
+          "type": "text",
+          "required": false,
+          "description": "New username (3-50 chars); must be unique among all accounts."
+        },
+        "email": {
+          "type": "text",
+          "required": false,
+          "description": "New email; must be unique among all accounts."
+        }
+      },
+      "_evidence": {
+        "locator": "api/routes/account.ts:30",
+        "id_local": "Account.update",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /api/account",
+          "locator": "api/routes.ts:38"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "if (username) { const e = await prisma.user.findUnique({ where: { username }, select: { id } }); if (e && e.id !== user.id) return 409; }\nif (email) { const e = await prisma.user.findFirst({ where: { email }, select: { id } }); if (e && e.id !== user.id) return 409; }\nconst updatedUser = await prisma.user.update({ where: { id: user.id }, data: { username, email } });\nreturn c.json({ username: updatedUser.username, email: updatedUser.email });",
+        "edges": [
+          "username uniqueness check returns 409 if taken by another user (account.ts:40-48)"
+        ]
+      },
+      "entity": "User",
+      "_binds": {
+        "username": "User.username",
+        "email": "User.email"
+      },
+      "_output_schema": {
+        "username": "text",
+        "email": "text"
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in to update your account.",
+          "not_found": "Account not found.",
+          "precondition": "That username or email is already taken by another account."
+        },
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "username",
+                  "op": "eq",
+                  "value": {
+                    "arg": "username"
+                  }
+                }
+              },
+              "op": "eq",
+              "n": 0
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "email",
+                  "op": "eq",
+                  "value": {
+                    "arg": "email"
+                  }
+                }
+              },
+              "op": "eq",
+              "n": 0
+            }
+          ]
+        ]
+      },
+      "description": "Update your own username and/or email. Each must stay unique across the server — a change that collides with another account fails. Empty updates change nothing."
+    },
+    {
+      "tool": "account_changepassword",
+      "description": "Change the password of the signed-in account. The current password is verified first, the new password must match its confirmation, and both must meet the instance's complexity rules. Returns a confirmation message.",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Account",
+        "row_key": {
+          "userId": {
+            "$session": "account_id"
+          }
+        },
+        "fields": [],
+        "set": {
+          "password": {
+            "$arg": "newPassword"
+          }
+        },
+        "skip_blank": true
+      },
+      "input_schema": {
+        "currentPassword": {
+          "type": "text",
+          "required": true,
+          "description": "The current password, verified before the change is allowed."
+        },
+        "newPassword": {
+          "type": "text",
+          "required": true,
+          "description": "The plaintext new password."
+        },
+        "confirmPassword": {
+          "type": "text",
+          "required": true,
+          "description": "The new password repeated; must equal newPassword."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "currentPassword",
+          "newPassword",
+          "confirmPassword"
+        ],
+        "messages": {
+          "auth": "You must sign in to change your password.",
+          "not_found": "Account not found.",
+          "precondition": "Current password incorrect, or the confirmation does not match the new password.",
+          "confirm": "The password confirmation does not match or the password does not meet the complexity rules."
+        },
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Account",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "userId",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "password",
+                      "op": "eq",
+                      "value": {
+                        "arg": "currentPassword"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ]
+      },
+      "_evidence": {
+        "locator": "api/routes/account.ts:80",
+        "id_local": "Account.changePassword",
+        "ref_code": "const result = await auth.api.changePassword({ body: { currentPassword, newPassword }, headers: c.req.raw.headers });\nif (!result) return 500; return c.json({ message: 'Password updated successfully' });",
+        "edges": [
+          "changePassword delegates to better-auth which rewrites the credential stored on the linked Account row (Account.password, the Account.userId == the current user)",
+          "effect: row_update Account.password by userId == $actor.id (account.ts:80)"
+        ],
+        "entity": "Account",
+        "guard_why": "the credential lives on Account.password (better-auth split-table); the current-password precondition reads Account.password for the account linked by userId. account_id resolves to User.id and Account.userId == User.id.",
+        "_binds_note": "the real stored credential is Account.password, keyed by Account.userId == current user."
+      },
+      "_output_schema": {
+        "message": "text"
+      },
+      "_defaulted_fixed": "raw spec put a full Account write panel behind a password change; rebuilt as a targeted current-password-verified password set on the User account row.",
+      "entity": "Account"
+    },
+    {
+      "tool": "account_delete",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "User",
+        "lookup_by": {
+          "id": {
+            "$session": "account_id"
+          }
+        }
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "api/routes/account.ts:111",
+        "id_local": "Account.delete",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/account",
+          "locator": "api/routes.ts:38"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "await prisma.user.delete({ where: { id: user.id } });\nreturn c.json({ message: 'Account deleted successfully' });",
+        "guard_last_note": "no guard_last declared — the mined code performs no 'last admin' check, and the source is not openable to evidence one, so none is written."
+      },
+      "entity": "User",
+      "_output_schema": {
+        "message": "text"
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in to delete your account.",
+          "not_found": "Account not found."
+        }
+      },
+      "description": "Permanently delete your own account and everything that cascades from it. Requires being signed in as the account you are deleting."
+    },
+    {
+      "tool": "file_upload",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "File",
+        "fields": [
+          "filename",
+          "path"
+        ],
+        "set_on_create": {
+          "filename": {
+            "$const": "upload"
+          },
+          "path": {
+            "$const": "/data/files"
+          }
+        }
+      },
+      "input_schema": {
+        "file": {
+          "type": "text",
+          "required": true,
+          "description": "The uploaded file; its name and safe storage path are applied server-side."
+        }
+      },
+      "_evidence": {
+        "locator": "api/routes/files.ts:75",
+        "id_local": "File.upload",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/files",
+          "locator": "api/routes.ts:38"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "const allowFileUploads = instanceSettings?.allowFileUploads ?? true;\nif (!allowFileUploads) return 403;\nconst maxFileSize = await getMaxFileSize(); if (file.size > maxFileSize) return 413;\nconst id = nanoid(); const safePath = generateSafeFilePath(id, file.name);\nif (!safePath) return 400;\nawait pipeline(nodeStream, writeStream);\nconst newFile = await prisma.file.create({ data: { id, filename: safePath.filename, path: safePath.path } });\nreturn c.json({ id: newFile.id }, 201);",
+        "edges": [
+          "if (!allowFileUploads) return 403; allowFileUploads defaults true (files.ts:81)"
+        ],
+        "guard_why": "the true gate (allowFileUploads flag) is config row data not expressible as a row predicate here; the raw precondition 'InstanceSettings exists' was a tautology and is dropped. The enablement policy is carried in the description.",
+        "_binds_note": "filename/path are generated server-side in the real code; set to constants so the declared NOT NULL columns are satisfiable."
+      },
+      "entity": "File",
+      "_output_schema": {
+        "id": "new File id"
+      },
+      "guards": {
+        "required": [
+          "file"
+        ]
+      },
+      "_defaulted_fixed": "raw spec left filename/path as caller fields; rebuilt as a real insert with server-side constants.",
+      "description": "Upload a file so it can be attached to a secret later. Succeeds only while file uploads are enabled on this instance and the file is within the size limit; returns the new file id."
+    },
+    {
+      "tool": "file_download",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "File",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the file to download."
+        }
+      },
+      "_evidence": {
+        "locator": "api/routes/files.ts:16",
+        "id_local": "File.download",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/files/:id",
+          "locator": "api/routes.ts:38"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "const file = await prisma.file.findUnique({ where: { id }, include: { secrets: { select: { id, views, expiresAt } } } });\nif (!file) return 404;\nconst hasValidSecret = file.secrets.some((s) => (s.views === null || s.views >= 0) && s.expiresAt > new Date());\nif (!hasValidSecret) return 404;\nif (!isPathSafe(file.path)) return 404;\nconst nodeStream = createReadStream(file.path); return stream(c, async (s) => { await s.pipe(Readable.toWeb(nodeStream)); });",
+        "edges": [
+          "requires at least one linked non-expired secret with views (files.ts:42-47)"
+        ],
+        "guard_why": "the real join (FileToSecrets.A==file.id and the linked secret is valid) is not fully expressible across tables in this grammar; the enforceable half — the file being linked to any secret — is kept as the precondition. The expiry/views sub-condition is carried in the description."
+      },
+      "entity": "File",
+      "_binds": {
+        "id": "File.id"
+      },
+      "_output_schema": {
+        "body": "file binary stream"
+      },
+      "guards": {
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "not_found": "File not found, or no linked secret is still valid.",
+          "precondition": "This file is not linked to a currently valid secret."
+        },
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "FileToSecrets",
+                "where": {
+                  "node": "field",
+                  "col": "A",
+                  "op": "eq",
+                  "value": {
+                    "arg": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ]
+      },
+      "description": "Download a file by id. Succeeds only while the file is linked to at least one secret that has not expired and still has views; otherwise it reads as not found."
+    },
+    {
+      "tool": "instance_getpublicsettings",
+      "op": "read",
+      "family": "search",
+      "exec_spec": {
+        "entity": "InstanceSettings",
+        "rank": {
+          "method": "exact"
+        }
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "api/routes/instance.ts:19",
+        "id_local": "Instance.getPublicSettings",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/instance/settings/public",
+          "locator": "api/routes.ts:38"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "let dbSettings = await prisma.instanceSettings.findFirst({ select: PUBLIC_SETTINGS_FIELDS });\nif (!dbSettings) { dbSettings = await prisma.instanceSettings.create({ data: initialData, select: PUBLIC_SETTINGS_FIELDS }); }\nreturn c.json({ ...dbSettings, ...filteredConfigSettings });"
+      },
+      "entity": "InstanceSettings",
+      "_output_schema": {
+        "public instance settings fields": "instanceName/instanceDescription/allowRegistration/requireRegisteredUser/etc."
+      },
+      "description": "Read the publicly visible instance settings: name, description, and toggles like whether registration is allowed or a registered user is required to create secrets. No sign-in needed; returns defaults if setup has not run."
+    },
+    {
+      "tool": "instance_getsettings",
+      "op": "read",
+      "family": "search",
+      "exec_spec": {
+        "entity": "InstanceSettings",
+        "rank": {
+          "method": "exact"
+        }
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "api/routes/instance.ts:75",
+        "id_local": "Instance.getSettings",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/instance/settings",
+          "locator": "api/routes.ts:38"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "let dbSettings = await prisma.instanceSettings.findFirst({ select: ADMIN_SETTINGS_FIELDS });\nif (!dbSettings) { dbSettings = await prisma.instanceSettings.create({ data: initialData, select: ADMIN_SETTINGS_FIELDS }); }\nreturn c.json({ ...dbSettings, ...filteredConfigSettings });",
+        "edges": [
+          "checkAdmin: user.role !== 'admin' -> 403 (middlewares/auth.ts:34-47)"
+        ]
+      },
+      "entity": "InstanceSettings",
+      "_output_schema": {
+        "admin instance settings fields": "all settings incl webhook/metrics"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "eq",
+                      "value": "admin"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "messages": {
+          "precondition": "Only an administrator can view the full instance settings, including webhook, metrics and rate-limiting configuration.",
+          "realm": "This action is restricted to administrators.",
+          "auth": "You must sign in to view instance settings."
+        }
+      },
+      "description": "Read the full admin instance settings, including webhook, metrics and rate-limiting configuration. Admins only."
+    },
+    {
+      "tool": "instance_updatesettings",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "InstanceSettings",
+        "row_key": {
+          "id": {
+            "$arg": "id"
+          }
+        },
+        "fields": [
+          "instanceName",
+          "instanceDescription",
+          "instanceLogo",
+          "allowRegistration",
+          "requireEmailVerification",
+          "defaultSecretExpiration",
+          "maxSecretSize",
+          "allowPasswordProtection",
+          "allowIpRestriction",
+          "allowFileUploads",
+          "enableRateLimiting",
+          "rateLimitRequests",
+          "rateLimitWindow",
+          "requireInviteCode",
+          "allowedEmailDomains",
+          "requireRegisteredUser",
+          "disableEmailPasswordSignup",
+          "webhookEnabled",
+          "webhookUrl",
+          "webhookSecret",
+          "webhookOnView",
+          "webhookOnBurn",
+          "importantMessage",
+          "metricsEnabled",
+          "metricsSecret"
+        ],
+        "set": {
+          "updatedAt": "2026-01-01T00:00:00"
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": false,
+          "description": "Id of the settings row to update (the singleton)."
+        },
+        "instanceName": {
+          "type": "text",
+          "required": false,
+          "description": "Display name shown to visitors."
+        },
+        "instanceDescription": {
+          "type": "text",
+          "required": false,
+          "description": "Short description shown to visitors."
+        },
+        "instanceLogo": {
+          "type": "text",
+          "required": false,
+          "description": "Logo URL shown to visitors."
+        },
+        "allowRegistration": {
+          "type": "bool",
+          "required": false,
+          "description": "Whether new accounts may register."
+        },
+        "requireEmailVerification": {
+          "type": "bool",
+          "required": false,
+          "description": "Whether registrations must verify their email."
+        },
+        "defaultSecretExpiration": {
+          "type": "int",
+          "required": false,
+          "description": "Default secret lifetime in hours."
+        },
+        "maxSecretSize": {
+          "type": "int",
+          "required": false,
+          "description": "Maximum secret size in KB."
+        },
+        "allowPasswordProtection": {
+          "type": "bool",
+          "required": false,
+          "description": "Whether secrets may carry a viewer password."
+        },
+        "allowIpRestriction": {
+          "type": "bool",
+          "required": false,
+          "description": "Whether secrets may be restricted by IP."
+        },
+        "allowFileUploads": {
+          "type": "bool",
+          "required": false,
+          "description": "Whether file attachments are allowed."
+        },
+        "enableRateLimiting": {
+          "type": "bool",
+          "required": false,
+          "description": "Whether API rate limiting is on."
+        },
+        "rateLimitRequests": {
+          "type": "int",
+          "required": false,
+          "description": "Max requests per rate-limit window."
+        },
+        "rateLimitWindow": {
+          "type": "int",
+          "required": false,
+          "description": "Rate-limit window in seconds."
+        },
+        "requireInviteCode": {
+          "type": "bool",
+          "required": false,
+          "description": "Whether registration needs an invite code."
+        },
+        "allowedEmailDomains": {
+          "type": "text",
+          "required": false,
+          "description": "Comma-separated domains allowed to register."
+        },
+        "requireRegisteredUser": {
+          "type": "bool",
+          "required": false,
+          "description": "Whether creating secrets requires a signed-in account."
+        },
+        "disableEmailPasswordSignup": {
+          "type": "bool",
+          "required": false,
+          "description": "Whether email/password signup is disabled."
+        },
+        "webhookEnabled": {
+          "type": "bool",
+          "required": false,
+          "description": "Whether secret webhooks are enabled."
+        },
+        "webhookUrl": {
+          "type": "text",
+          "required": false,
+          "description": "Webhook URL notified on secret events; must be public."
+        },
+        "webhookSecret": {
+          "type": "text",
+          "required": false,
+          "description": "HMAC secret used to sign webhook payloads."
+        },
+        "webhookOnView": {
+          "type": "bool",
+          "required": false,
+          "description": "Whether webhooks fire on secret views."
+        },
+        "webhookOnBurn": {
+          "type": "bool",
+          "required": false,
+          "description": "Whether webhooks fire on secret burns."
+        },
+        "importantMessage": {
+          "type": "text",
+          "required": false,
+          "description": "A notice shown to all visitors."
+        },
+        "metricsEnabled": {
+          "type": "bool",
+          "required": false,
+          "description": "Whether the metrics endpoint is exposed."
+        },
+        "metricsSecret": {
+          "type": "text",
+          "required": false,
+          "description": "Bearer secret protecting the metrics endpoint."
+        }
+      },
+      "_evidence": {
+        "locator": "api/routes/instance.ts:122",
+        "id_local": "Instance.updateSettings",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /api/instance/settings",
+          "locator": "api/routes.ts:38"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "if (config.isManaged()) return 403;\nif (body.webhookUrl && body.webhookUrl !== '' && !(await isPublicUrl(body.webhookUrl))) return 400;\nconst settings = await prisma.instanceSettings.findFirst(); if (!settings) return 404;\nconst updatedSettings = await prisma.instanceSettings.update({ where: { id: settings.id }, data: body, select: ADMIN_SETTINGS_FIELDS });\nsetCachedInstanceSettings({ ...currentSettings, ...updatedSettings });\nreturn c.json(updatedSettings);",
+        "edges": [
+          "checkAdmin role gate (middlewares/auth.ts:34-47)"
+        ]
+      },
+      "entity": "InstanceSettings",
+      "_binds": {
+        "instanceName": "InstanceSettings.instanceName",
+        "instanceDescription": "InstanceSettings.instanceDescription",
+        "instanceLogo": "InstanceSettings.instanceLogo",
+        "allowRegistration": "InstanceSettings.allowRegistration",
+        "requireEmailVerification": "InstanceSettings.requireEmailVerification",
+        "defaultSecretExpiration": "InstanceSettings.defaultSecretExpiration",
+        "maxSecretSize": "InstanceSettings.maxSecretSize",
+        "allowPasswordProtection": "InstanceSettings.allowPasswordProtection",
+        "allowIpRestriction": "InstanceSettings.allowIpRestriction",
+        "allowFileUploads": "InstanceSettings.allowFileUploads",
+        "enableRateLimiting": "InstanceSettings.enableRateLimiting",
+        "rateLimitRequests": "InstanceSettings.rateLimitRequests",
+        "rateLimitWindow": "InstanceSettings.rateLimitWindow",
+        "requireInviteCode": "InstanceSettings.requireInviteCode",
+        "allowedEmailDomains": "InstanceSettings.allowedEmailDomains",
+        "requireRegisteredUser": "InstanceSettings.requireRegisteredUser",
+        "disableEmailPasswordSignup": "InstanceSettings.disableEmailPasswordSignup",
+        "webhookEnabled": "InstanceSettings.webhookEnabled",
+        "webhookUrl": "InstanceSettings.webhookUrl",
+        "webhookSecret": "InstanceSettings.webhookSecret",
+        "webhookOnView": "InstanceSettings.webhookOnView",
+        "webhookOnBurn": "InstanceSettings.webhookOnBurn",
+        "importantMessage": "InstanceSettings.importantMessage",
+        "metricsEnabled": "InstanceSettings.metricsEnabled",
+        "metricsSecret": "InstanceSettings.metricsSecret"
+      },
+      "_output_schema": {
+        "updated admin settings": "the updated settings row"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "eq",
+                      "value": "admin"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "messages": {
+          "precondition": "Only an administrator can change the instance settings.",
+          "realm": "This action is restricted to administrators.",
+          "auth": "You must sign in to update instance settings."
+        }
+      },
+      "description": "Update the instance settings (name, registration policy, secret limits, webhook and metrics configuration). Admins only; settings managed externally via config file cannot be changed this way. Returns the updated settings."
+    },
+    {
+      "tool": "apikey_list",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "ApiKey",
+        "scope": {
+          "owner_col": "userId"
+        },
+        "search_fields": [
+          "userId"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "userId"
+          ]
+        }
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "api/routes/api-keys.ts:33",
+        "id_local": "ApiKey.list",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/api-keys",
+          "locator": "api/routes.ts:38"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "const apiKeys = await prisma.apiKey.findMany({ where: { userId: user.id }, select: {...}, orderBy: { createdAt: 'desc' } });\nreturn c.json(apiKeys);",
+        "edges": [
+          "where: { userId: user.id } (api-keys.ts:41)"
+        ]
+      },
+      "entity": "ApiKey",
+      "_output_schema": {
+        "list of ApiKey rows": "id, name, keyPrefix, lastUsedAt, expiresAt, createdAt"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in to list your API keys.",
+          "precondition": "Only a signed-in user can list their own API keys."
+        }
+      },
+      "description": "List your API keys: id, display name, key prefix, and last-use/expiry dates. The full key is never returned again."
+    },
+    {
+      "tool": "apikey_create",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "ApiKey",
+        "fields": [
+          "name"
+        ],
+        "set_on_create": {
+          "userId": {
+            "$session": "account_id"
+          },
+          "key_prefix": {
+            "$const": "hemmelig_"
+          },
+          "key_hash": {
+            "$auto": "10000+max(id)+1"
+          }
+        }
+      },
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "A display name for the API key (1-100 chars)."
+        },
+        "expiresInDays": {
+          "type": "int",
+          "required": false,
+          "description": "Optional lifetime in days; no expiry when omitted."
+        }
+      },
+      "_evidence": {
+        "locator": "api/routes/api-keys.ts:59",
+        "id_local": "ApiKey.create",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/api-keys",
+          "locator": "api/routes.ts:38"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "const existingCount = await prisma.apiKey.count({ where: { userId: user.id } });\nif (existingCount >= 5) return c.json({ error: 'Maximum API key limit reached (5)' }, 400);\nconst rawKey = generateApiKey(); const keyHash = hashApiKey(rawKey); const keyPrefix = rawKey.substring(0, 16);\nconst expiresAt = expiresInDays ? new Date(Date.now() + expiresInDays*24*60*60*1000) : None;\nconst apiKey = await prisma.apiKey.create({ data: { name, keyHash, keyPrefix, userId: user.id, expiresAt }, select: {...} });\nsendWebhook('apikey.created', {...});\nreturn c.json({ ...apiKey, key: rawKey }, 201);",
+        "edges": [
+          "max 5 API keys per user: if (existingCount >= 5) return 400 (api-keys.ts:69-75)"
+        ],
+        "_defaulted_note": "key_hash is server-generated in the real code (random per key); a deterministic $auto on the row id gives each created key a distinct unique hash, so a user can create multiple keys while the unique key_hash constraint stays satisfiable and the runtime's unique wall stays real.",
+        "_unique_fix": "was 'unused_placeholder' constant (every create collided -> user could only make 1 key); now $auto per-row.",
+        "_unique_note": "removed unique_on key_hash: the hash is server-random in the real code and can never collide, so the DB unique constraint is a safety backstop, not a reachable user wall. The real gate is the 5-key cap (existingCount>=5, api-keys.ts:69), which fires. Declaring unique_on here was a fake wall — removed."
+      },
+      "entity": "ApiKey",
+      "_binds": {
+        "name": "ApiKey.name"
+      },
+      "_output_schema": {
+        "id": "key id",
+        "key": "the raw API key, returned exactly once (prefix hemmelig_)",
+        "name": "text",
+        "keyPrefix": "text",
+        "expiresAt": "datetime",
+        "createdAt": "datetime"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "ApiKey",
+                "where": {
+                  "node": "field",
+                  "col": "userId",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "lte",
+              "n": 4
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "name"
+        ],
+        "messages": {
+          "precondition": "You already hold the maximum of 5 API keys — delete one before creating another.",
+          "auth": "You must sign in to create an API key."
+        }
+      },
+      "description": "Create an API key for your account; returns the full raw key once (prefixed hemmelig_). Fails once you already hold 5 keys."
+    },
+    {
+      "tool": "apikey_delete",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "ApiKey",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the API key to delete."
+        }
+      },
+      "_evidence": {
+        "locator": "api/routes/api-keys.ts:123",
+        "id_local": "ApiKey.delete",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/api-keys/:id",
+          "locator": "api/routes.ts:38"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "const apiKey = await prisma.apiKey.findFirst({ where: { id, userId: user.id } });\nif (!apiKey) return 404;\nawait prisma.apiKey.delete({ where: { id } });\nreturn c.json({ success: true });",
+        "edges": [
+          "findFirst({ where: { id, userId: user.id } }); if (!apiKey) return 404 (api-keys.ts:133-139)"
+        ]
+      },
+      "entity": "ApiKey",
+      "_binds": {
+        "id": "ApiKey.id"
+      },
+      "_output_schema": {
+        "success": "bool"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "ApiKey",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "userId",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must sign in to delete an API key.",
+          "precondition": "API key not found, or it is not yours."
+        }
+      },
+      "description": "Permanently invalidate one of your API keys. Fails if the id does not exist or belongs to someone else."
+    },
+    {
+      "tool": "user_list",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "User",
+        "search_fields": [
+          "username",
+          "email",
+          "name"
+        ],
+        "rank": {
+          "method": "substring",
+          "fields": [
+            "username",
+            "email",
+            "name"
+          ]
+        },
+        "pagination": {
+          "default_limit": 20
+        }
+      },
+      "input_schema": {
+        "search": {
+          "type": "text",
+          "required": false,
+          "description": "Substring to match against username, email or name."
+        },
+        "pageSize": {
+          "type": "int",
+          "required": false,
+          "description": "Rows per page (defaults to 20)."
+        },
+        "page": {
+          "type": "int",
+          "required": false,
+          "description": "Page number (1-based)."
+        }
+      },
+      "_evidence": {
+        "locator": "api/routes/user.ts:11",
+        "id_local": "User.list",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/user",
+          "locator": "api/routes.ts:38"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "const where = search ? { OR: [{ username: { contains: search } }, { email: { contains: search } }, { name: { contains: search } }] } : {};\nconst [users, total] = await Promise.all([\n  prisma.user.findMany({ where, skip, take: pageSize, orderBy: { createdAt: 'desc' }, select: {...} }),\n  prisma.user.count({ where })]);",
+        "edges": [
+          "checkAdmin role gate (middlewares/auth.ts:34-47)"
+        ]
+      },
+      "entity": "User",
+      "_output_schema": {
+        "users": "list of User rows (id, username, email, role, banned, createdAt)",
+        "total": "int",
+        "page": "int",
+        "pageSize": "int",
+        "totalPages": "int"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "eq",
+                      "value": "admin"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "messages": {
+          "precondition": "Only an administrator can list users.",
+          "realm": "This action is restricted to administrators.",
+          "auth": "You must sign in to list users."
+        }
+      },
+      "description": "List users with admin overview details, searching by username, email or name. Admins only."
+    },
+    {
+      "tool": "user_update",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "User",
+        "row_key": {
+          "id": {
+            "$arg": "id"
+          }
+        },
+        "fields": [
+          "username",
+          "email"
+        ],
+        "set": {
+          "updatedAt": "2026-01-01T00:00:00"
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the user to update."
+        },
+        "username": {
+          "type": "text",
+          "required": false,
+          "description": "New username; must be unique."
+        },
+        "email": {
+          "type": "text",
+          "required": false,
+          "description": "New email; must be unique."
+        }
+      },
+      "_evidence": {
+        "locator": "api/routes/user.ts:62",
+        "id_local": "User.update",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /api/user/:id",
+          "locator": "api/routes.ts:38"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "const data = { ...(username && { username }), ...(email && { email }) };\nconst user = await prisma.user.update({ where: { id }, data, select: {...} });\nreturn c.json(user);",
+        "edges": [
+          "checkAdmin role gate (middlewares/auth.ts:34-47)"
+        ]
+      },
+      "entity": "User",
+      "_binds": {
+        "id": "User.id",
+        "username": "User.username",
+        "email": "User.email"
+      },
+      "_output_schema": {
+        "id": "id",
+        "username": "text",
+        "email": "text",
+        "role": "text",
+        "banned": "bool",
+        "createdAt": "datetime"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "eq",
+                      "value": "admin"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "precondition": "Only an administrator can update a user's username or email.",
+          "realm": "This action is restricted to administrators.",
+          "auth": "You must sign in to update a user."
+        }
+      },
+      "description": "Update a user's username and/or email as an administrator. Each must stay unique across the server. Admins only."
+    },
+    {
+      "tool": "invitecode_use",
+      "description": "Redeem an invite code for the signed-in user: marks the code used, incrementing its use counter. Rejects an unknown, inactive, expired, or exhausted code. Public endpoint but requires a signed-in session so the code is tied to an account.",
+      "family": "action.trigger",
+      "exec_spec": {
+        "entity": "InviteCode",
+        "target": {
+          "entity": "InviteCode",
+          "lookup_by": {
+            "code": {
+              "$arg": "code"
+            }
+          }
+        },
+        "set": {
+          "uses": {
+            "$compute": "uses+1"
+          }
+        },
+        "spawn": []
+      },
+      "input_schema": {
+        "code": {
+          "type": "text",
+          "required": true,
+          "description": "The invite code being redeemed."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "code"
+        ],
+        "messages": {
+          "auth": "You must be signed in to redeem an invite code.",
+          "not_found": "Invalid invite code.",
+          "precondition": "This invite code is inactive, expired, or has no uses left.",
+          "fk": "Invalid invite code."
+        },
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "InviteCode",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "code",
+                      "op": "eq",
+                      "value": {
+                        "arg": "code"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "isActive",
+                      "op": "eq",
+                      "value": true
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ]
+      },
+      "_evidence": {
+        "locator": "api/routes/invites.ts:47",
+        "id_local": "InviteCode.use",
+        "ref_code": "const invite = await prisma.inviteCode.findUnique({ where: { code: code.toUpperCase() } });\nif (!invite || !invite.isActive) return 400; if (invite.expiresAt && new Date() > invite.expiresAt) return 400;\nif (invite.maxUses && invite.uses >= invite.maxUses) return 400;\nawait prisma.$transaction([\n  prisma.inviteCode.update({ where: { id: invite.id }, data: { uses: { increment: 1 } } }),\n  prisma.user.update({ where: { id: userId }, data: { inviteCodeUsed: code.toUpperCase() } }),\n]);",
+        "edges": [
+          "redeeming increments the code's uses counter and records the code on the signed-in user (invites.ts:60-66)"
+        ],
+        "entity": "InviteCode"
+      },
+      "_output_schema": {
+        "success": "bool"
+      },
+      "_defaulted_fixed": "raw spec guessed a field_set writing raw InviteCode columns; rebuilt as the actual increment effect with the active-and-not-exhausted precondition.",
+      "entity": "InviteCode"
+    },
+    {
+      "tool": "invitecode_list",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "InviteCode",
+        "rank": {
+          "method": "exact"
+        },
+        "sort": {
+          "col": "createdAt",
+          "dir": "desc"
+        }
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "api/routes/invites.ts:98",
+        "id_local": "InviteCode.list",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/invites",
+          "locator": "api/routes.ts:38"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "const invites = await prisma.inviteCode.findMany({ orderBy: { createdAt: 'desc' } });\nreturn c.json(invites);",
+        "edges": [
+          "checkAdmin role gate (middlewares/auth.ts:34-47)"
+        ]
+      },
+      "entity": "InviteCode",
+      "_output_schema": {
+        "list of InviteCode rows": "all columns"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "eq",
+                      "value": "admin"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "messages": {
+          "precondition": "Only an administrator can list invite codes.",
+          "realm": "This action is restricted to administrators.",
+          "auth": "You must sign in to list invite codes."
+        }
+      },
+      "description": "List all invite codes, most recent first. Admins only."
+    },
+    {
+      "tool": "invitecode_create",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "InviteCode",
+        "fields": [
+          "maxUses"
+        ],
+        "set_on_create": {
+          "createdBy": {
+            "$session": "account_id"
+          },
+          "isActive": true,
+          "uses": {
+            "$const": 0
+          },
+          "createdAt": "2026-01-01T00:00:00",
+          "expiresAt": {
+            "$arg": "expiresInDays"
+          },
+          "code": {
+            "$const": "unused_placeholder"
+          }
+        },
+        "unique_on": [
+          "code"
+        ]
+      },
+      "input_schema": {
+        "maxUses": {
+          "type": "int",
+          "required": false,
+          "description": "How many times the code may be used (defaults to 1)."
+        },
+        "expiresInDays": {
+          "type": "int",
+          "required": false,
+          "description": "Optional lifetime in days; no expiry when omitted."
+        }
+      },
+      "_evidence": {
+        "locator": "api/routes/invites.ts:109",
+        "id_local": "InviteCode.create",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/invites",
+          "locator": "api/routes.ts:38"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "const code = nanoid(12).toUpperCase();\nconst expiresAt = expiresInDays ? new Date(Date.now() + expiresInDays * TIME.DAY_MS) : None;\nconst invite = await prisma.inviteCode.create({ data: { code, maxUses, expiresAt, createdBy: user.id } });\nreturn c.json(invite, 201);",
+        "edges": [
+          "checkAdmin role gate (middlewares/auth.ts:34-47)"
+        ]
+      },
+      "entity": "InviteCode",
+      "_binds": {
+        "maxUses": "InviteCode.maxUses"
+      },
+      "_output_schema": {
+        "InviteCode row": "id, code, maxUses, expiresAt, createdBy, createdAt, isActive, uses"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "eq",
+                      "value": "admin"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "messages": {
+          "precondition": "Only an administrator can create invite codes.",
+          "realm": "This action is restricted to administrators.",
+          "auth": "You must sign in to create an invite code."
+        }
+      },
+      "description": "Create a new invite code as an administrator; usable once by default until it expires. Returns the code."
+    },
+    {
+      "tool": "invitecode_delete",
+      "description": "Disable an invite code by id so it can no longer be redeemed. The code row is retained but deactivated. Admins only. Fails if the code does not exist.",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "InviteCode",
+        "row_key": {
+          "id": {
+            "$arg": "id"
+          }
+        },
+        "fields": [],
+        "set": {
+          "isActive": {
+            "$const": false
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the invite code to disable."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must be signed in to disable an invite code.",
+          "realm": "Only an administrator can disable invite codes.",
+          "not_found": "Invite code not found.",
+          "precondition": "Only an administrator can disable an invite code."
+        },
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "InviteCode",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "eq",
+                      "value": "admin"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ]
+      },
+      "_evidence": {
+        "locator": "api/routes/invites.ts:138",
+        "id_local": "InviteCode.delete",
+        "ref_code": "await prisma.inviteCode.update({ where: { id }, data: { isActive: false } });\nreturn c.json({ success: true });",
+        "edges": [
+          "update by id, handleNotFound on miss (invites.ts:140-150)",
+          "checkAdmin role gate (middlewares/auth.ts:34-47)"
+        ],
+        "entity": "InviteCode"
+      },
+      "_output_schema": {
+        "success": "bool"
+      },
+      "_defaulted_fixed": "raw spec guessed a field_set writing raw InviteCode columns; rebuilt as the soft-delete it actually is (set isActive=false only).",
+      "entity": "InviteCode"
+    },
+    {
+      "tool": "setup_status",
+      "op": "read",
+      "family": "search",
+      "exec_spec": {
+        "entity": "User",
+        "rank": {
+          "method": "exact"
+        }
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "api/routes/setup.ts:17",
+        "id_local": "Setup.status",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/setup/status",
+          "locator": "api/routes.ts:38"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "const userCount = await prisma.user.count();\nreturn c.json({ needsSetup: userCount === 0 });"
+      },
+      "entity": "User",
+      "_output_schema": {
+        "needsSetup": "bool (true if no users)"
+      },
+      "description": "Report whether the instance still needs its initial setup: needsSetup is true while no user account exists yet. Public."
+    },
+    {
+      "tool": "setup_complete",
+      "description": "Run the one-time initial setup: create the first (admin) account and a default instance settings row. Refused once any user already exists. Public, but only meaningful before setup.",
+      "family": "auth.register",
+      "exec_spec": {
+        "entity": "User",
+        "fields": [
+          "name",
+          "username",
+          "email"
+        ],
+        "set_on_create": {
+          "role": {
+            "$const": "admin"
+          },
+          "emailVerified": {
+            "$const": false
+          }
+        },
+        "prechecks": [
+          {
+            "entity": "User",
+            "where": {
+              "email": {
+                "$arg": "email"
+              }
+            },
+            "negate": true,
+            "message": "That email is already registered."
+          },
+          {
+            "entity": "User",
+            "where": {
+              "username": {
+                "$arg": "username"
+              }
+            },
+            "negate": true,
+            "message": "That username is already taken."
+          }
+        ],
+        "side_inserts": [
+          {
+            "entity": "InstanceSettings",
+            "fields": {
+              "allowRegistration": {
+                "$const": true
+              },
+              "defaultSecretExpiration": {
+                "$const": 72
+              },
+              "maxSecretSize": {
+                "$const": 1024
+              }
+            }
+          }
+        ]
+      },
+      "input_schema": {
+        "email": {
+          "type": "text",
+          "required": true,
+          "description": "The admin account email."
+        },
+        "password": {
+          "type": "text",
+          "required": true,
+          "description": "The admin account password (min 8 chars, meets complexity rules)."
+        },
+        "username": {
+          "type": "text",
+          "required": true,
+          "description": "The admin username (3-32 chars)."
+        },
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "The admin display name (1-100 chars)."
+        }
+      },
+      "guards": {
+        "required": [
+          "email",
+          "password",
+          "username",
+          "name"
+        ],
+        "messages": {
+          "auth": "Setup already completed: a user account already exists.",
+          "precondition": "Setup already completed.",
+          "register": "That email address is already registered."
+        },
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": null
+              },
+              "op": "eq",
+              "n": 0
+            }
+          ]
+        ]
+      },
+      "_evidence": {
+        "locator": "api/routes/setup.ts:29",
+        "id_local": "Setup.complete",
+        "ref_code": "const userCount = await prisma.user.count();\nif (userCount > 0) return c.json({ error: 'Setup already completed' }, 403);\nconst result = await auth.api.signUpEmail({ body: { email, password, name, username } });\nif (!result.user) return 500;\nawait prisma.user.update({ where: { id: result.user.id }, data: { role: 'admin' } });\nconst existingSettings = await prisma.instanceSettings.findFirst();\nif (!existingSettings) await prisma.instanceSettings.create({ data: {} });",
+        "edges": [
+          "if (userCount > 0) return 403 'Setup already completed' (setup.ts:32-35)"
+        ],
+        "entity": "User",
+        "guard_why": "first-run creator; moved from the raw crud.insert guess to auth.register so the password lands on the seed account and the empty-table pre-check is the registration gate."
+      },
+      "_output_schema": {
+        "success": "bool",
+        "message": "text"
+      },
+      "entity": "User"
+    },
+    {
+      "tool": "analytics_track",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "VisitorAnalytics",
+        "fields": [
+          "path"
+        ],
+        "set_on_create": {
+          "uniqueId": {
+            "$const": "anon-viewer"
+          }
+        }
+      },
+      "input_schema": {
+        "path": {
+          "type": "text",
+          "required": true,
+          "description": "The page path being tracked."
+        }
+      },
+      "_evidence": {
+        "locator": "api/routes/analytics.ts:27",
+        "id_local": "Analytics.track",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/analytics/track",
+          "locator": "api/routes.ts:38"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "if (!isAnalyticsEnabled()) return 403; if (isbot(userAgent)) return 403;\nconst { path } = c.req.valid('json'); if (!isValidAnalyticsPath(path)) return 400;\nconst uniqueId = createVisitorId(getClientIp(c), userAgent);\nawait prisma.visitorAnalytics.create({ data: { path, uniqueId } });\nreturn c.json({ success: true }, 201);",
+        "guard_why": "config/enabled-then-bot gates are not identity or row predicates; covered by the description. uniqueId is server-derived, set to a constant placeholder so the NOT NULL column is writable."
+      },
+      "entity": "VisitorAnalytics",
+      "_binds": {
+        "path": "VisitorAnalytics.path"
+      },
+      "_output_schema": {
+        "success": "bool"
+      },
+      "guards": {
+        "required": [
+          "path"
+        ]
+      },
+      "_defaulted_fixed": "raw spec gave it a tautological scope; rebuilt as the insert it actually is with the server-side uniqueId on the constant panel.",
+      "description": "Record a page view for visitor analytics. Ignored (no-op) while analytics are disabled and for bot user agents; otherwise stores one anonymous row and returns success. Public."
+    },
+    {
+      "tool": "analytics_summary",
+      "description": "Admin analytics summary over the given time range: total secrets and total views. Admins only. (The real endpoint also reports active/expired counts, per-type breakdowns and secret-request stats, which are not expressible as a single aggregate.)",
+      "family": "search.aggregate",
+      "exec_spec": {
+        "entity": "Secrets",
+        "group_by": [],
+        "aggregate": [
+          {
+            "fn": "count",
+            "as": "totalSecrets"
+          },
+          {
+            "fn": "sum",
+            "col": "views",
+            "as": "totalViews"
+          }
+        ]
+      },
+      "input_schema": {},
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in to view analytics.",
+          "realm": "Only an administrator can view analytics.",
+          "precondition": "Only an administrator can view the analytics summary."
+        },
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "eq",
+                      "value": "admin"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ]
+      },
+      "_evidence": {
+        "locator": "api/routes/analytics.ts:59",
+        "id_local": "Analytics.summary",
+        "ref_code": "prisma.secrets.aggregate({ where: { createdAt: { gte: startDate } }, _count: true, _sum: { views: true } }, ...active/expired/type/daily counts...)",
+        "edges": [
+          "checkAdmin role gate (middlewares/auth.ts:34-47)"
+        ],
+        "entity": "Secrets",
+        "aggregate_why": "real endpoint is an aggregate count+sum of secrets; the finer breakdowns are not expressible as one aggregate and are described",
+        "admin_wall": {
+          "entity": "User",
+          "role_col": "role",
+          "admin_value": "admin",
+          "evidence": "middlewares/auth.ts:34-47"
+        }
+      },
+      "_output_schema": {
+        "totalSecrets": "int",
+        "totalViews": "int",
+        "activeSecrets": "int",
+        "expiredSecrets": "int",
+        "averageViews": "float",
+        "dailyStats": "json",
+        "secretTypes": "json",
+        "expirationStats": "json",
+        "secretRequests": "json"
+      },
+      "_defaulted_fixed": "raw spec guessed a search over a meaningless column set; rebuilt as search.aggregate with the admin gate.",
+      "entity": "Secrets"
+    },
+    {
+      "tool": "analytics_visitors",
+      "op": "read",
+      "family": "search",
+      "exec_spec": {
+        "entity": "VisitorAnalytics",
+        "rank": {
+          "method": "exact"
+        },
+        "sort": {
+          "col": "timestamp",
+          "dir": "desc"
+        },
+        "pagination": {
+          "default_limit": 1000
+        }
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "api/routes/analytics.ts:177",
+        "id_local": "Analytics.visitors",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/analytics/visitors",
+          "locator": "api/routes.ts:38"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "const analytics = await prisma.visitorAnalytics.findMany({ orderBy: { timestamp: 'desc' }, take: 1000 });\nreturn c.json(analytics);"
+      },
+      "entity": "VisitorAnalytics",
+      "_output_schema": {
+        "list of VisitorAnalytics rows": "up to 1000 most recent"
+      },
+      "description": "Raw recent visitor-analytics rows (up to the 1000 most recent) for admin review. Admins only."
+    },
+    {
+      "tool": "analytics_visitorsunique",
+      "description": "Aggregate visitor-analytics rows by unique visitor and path: how many visits came from each. Admins only.",
+      "family": "search.aggregate",
+      "exec_spec": {
+        "entity": "VisitorAnalytics",
+        "group_by": [
+          "uniqueId",
+          "path"
+        ],
+        "aggregate": [
+          {
+            "fn": "count",
+            "as": "visits"
+          }
+        ],
+        "sort": {
+          "col": "visits",
+          "dir": "desc"
+        }
+      },
+      "input_schema": {},
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in to view visitor analytics.",
+          "realm": "Only an administrator can view visitor analytics.",
+          "precondition": "Only an administrator can view visitor analytics."
+        },
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "eq",
+                      "value": "admin"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ]
+      },
+      "_evidence": {
+        "locator": "api/routes/analytics.ts:191",
+        "id_local": "Analytics.visitorsUnique",
+        "ref_code": "const aggregatedData = await prisma.visitorAnalytics.groupBy({ by: ['uniqueId', 'path'], _count: { uniqueId: true }, orderBy: { _count: { uniqueId: 'desc' } } });\nreturn c.json(aggregatedData);",
+        "edges": [
+          "admin-only groupBy on uniqueId+path (analytics.ts:191)"
+        ],
+        "entity": "VisitorAnalytics",
+        "aggregate_why": "real endpoint is a groupBy count; represented as search.aggregate",
+        "admin_wall": {
+          "entity": "User",
+          "role_col": "role",
+          "admin_value": "admin",
+          "evidence": "middlewares/auth.ts:34-47"
+        }
+      },
+      "_output_schema": {
+        "list of aggregated rows": "grouped by uniqueId+path with counts"
+      },
+      "_defaulted_fixed": "raw spec guessed a search; rebuilt as search.aggregate (groupBy visitor+path, count).",
+      "entity": "VisitorAnalytics"
+    },
+    {
+      "tool": "analytics_visitorsdaily",
+      "description": "Daily visitor traffic within the given time range: total visits and distinct unique visitors. Admins only. (The real endpoint groups per calendar date and lists paths, which the grammar cannot truncate to a date; the totals are reported instead.)",
+      "family": "search.aggregate",
+      "exec_spec": {
+        "entity": "VisitorAnalytics",
+        "group_by": [],
+        "aggregate": [
+          {
+            "fn": "count",
+            "as": "totalVisits"
+          },
+          {
+            "fn": "count_distinct",
+            "col": "uniqueId",
+            "as": "uniqueVisitors"
+          }
+        ],
+        "sort": {
+          "col": "totalVisits",
+          "dir": "desc"
+        }
+      },
+      "input_schema": {},
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in to view visitor analytics.",
+          "realm": "Only an administrator can view visitor analytics.",
+          "precondition": "Only an administrator can view visitor analytics."
+        },
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "eq",
+                      "value": "admin"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ]
+      },
+      "_evidence": {
+        "locator": "api/routes/analytics.ts:206",
+        "id_local": "Analytics.visitorsDaily",
+        "ref_code": "SELECT DATE(timestamp) as date, COUNT(DISTINCT uniqueId) as unique_visitors, COUNT(*) as total_visits, GROUP_CONCAT(DISTINCT path) as paths FROM visitor_analytics WHERE timestamp >= ${startDate} GROUP BY DATE(timestamp) ORDER BY date ASC",
+        "edges": [
+          "admin-only SQL groupBy date (analytics.ts:206)"
+        ],
+        "entity": "VisitorAnalytics",
+        "aggregate_why": "real endpoint is a DATE(timestamp) groupBy; DATE truncation is not expressible, so whole-range totals are reported",
+        "admin_wall": {
+          "entity": "User",
+          "role_col": "role",
+          "admin_value": "admin",
+          "evidence": "middlewares/auth.ts:34-47"
+        }
+      },
+      "_output_schema": {
+        "list of daily stats": "date, unique_visitors, total_visits, paths"
+      },
+      "_defaulted_fixed": "raw spec guessed a search over individual columns; rebuilt as search.aggregate with the range filter.",
+      "entity": "VisitorAnalytics"
+    },
+    {
+      "tool": "metrics_get",
+      "op": "read",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Secrets",
+        "search_fields": [
+          "expires_at"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "expires_at"
+          ]
+        }
+      },
+      "input_schema": {
+        "bearer": {
+          "type": "text",
+          "required": false,
+          "description": "The Bearer token; must match the instance's metricsSecret."
+        }
+      },
+      "_evidence": {
+        "locator": "api/routes/metrics.ts:114",
+        "id_local": "Metrics.get",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/metrics",
+          "locator": "api/routes.ts:38"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "if (!settings?.metricsEnabled) return 404; if (!settings.metricsSecret) return 403;\nif (!verifyBearerToken(authHeader, settings.metricsSecret)) return 401;\nawait updateGaugeMetrics();\nconst metrics = await metricsRegistry.metrics(); return c.text(metrics, 200);",
+        "scope_why": "global Prometheus scrape; the metric-secret bearer gate is a request-context check, not an account/precondition this grammar can express, so it is described rather than enforced (a fake wall would be worse)",
+        "guard_note": "the real gate is 'metricsEnabled && bearer == metricsSecret' — not an account identity; no enforceable precondition is written."
+      },
+      "entity": "Secrets",
+      "_output_schema": {
+        "body": "Prometheus text metrics"
+      },
+      "guards": {
+        "messages": {
+          "not_found": "Metrics are not enabled on this instance.",
+          "fk": "Metrics are not enabled, or the bearer token is wrong."
+        }
+      },
+      "description": "Prometheus-format metrics for the instance: API keys, users, secrets and visitor gauges. Exposed only when the metrics secret is configured and matches the given Bearer token; otherwise hidden (404/403/401)."
+    },
+    {
+      "tool": "invitecode_validate",
+      "description": "Public check of whether an invite code is still usable: it exists, is active, has not expired, and has not exhausted its use limit. Returns valid.",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "InviteCode",
+        "lookup_by": {
+          "code": {
+            "$arg": "code"
+          }
+        }
+      },
+      "input_schema": {
+        "code": {
+          "type": "text",
+          "required": true,
+          "description": "The invite code to validate."
+        }
+      },
+      "guards": {
+        "required": [
+          "code"
+        ]
+      },
+      "_evidence": {
+        "locator": "api/routes/invites.ts:21",
+        "id_local": "InviteCode.validate",
+        "ref_code": "const invite = await prisma.inviteCode.findUnique({ where: { code: code.toUpperCase() } });\nif (!invite || !invite.isActive) return 400; if (invite.expiresAt && new Date() > invite.expiresAt) return 400;\nif (invite.maxUses && invite.uses >= invite.maxUses) return 400;\nreturn c.json({ valid: true });",
+        "entity": "InviteCode"
+      },
+      "_output_schema": {
+        "valid": "bool"
+      },
+      "entity": "InviteCode"
+    }
+  ],
+  "seed_state": {
+    "User": [
+      {
+        "id": 1,
+        "name": "Ada Admin",
+        "username": "ada",
+        "email": "ops@hemmelig_app.example",
+        "password": "pw-operations",
+        "role": "admin",
+        "banned": false
+      },
+      {
+        "id": 2,
+        "name": "Lin Chow",
+        "username": "lin",
+        "email": "member@hemmelig_app.example",
+        "password": "pw-member",
+        "role": "user",
+        "banned": false
+      },
+      {
+        "id": 3,
+        "name": "Noor Ali",
+        "username": "noor",
+        "email": "other@hemmelig_app.example",
+        "password": "pw-other",
+        "role": "user",
+        "banned": false
+      }
+    ],
+    "InstanceSettings": [
+      {
+        "id": 1,
+        "instanceName": "Hemmelig",
+        "allowRegistration": true,
+        "requireEmailVerification": false,
+        "allowPasswordProtection": true,
+        "allowIpRestriction": true,
+        "allowFileUploads": true,
+        "requireInviteCode": false,
+        "requireRegisteredUser": false,
+        "maxSecretSize": 1024,
+        "defaultSecretExpiration": 72
+      }
+    ],
+    "InviteCode": [
+      {
+        "id": 1,
+        "code": "WELCOME1",
+        "uses": 0,
+        "maxUses": 1,
+        "createdBy": "ada",
+        "isActive": true
+      }
+    ],
+    "File": [
+      {
+        "id": 1,
+        "filename": "intro.txt",
+        "path": "/data/files/intro.txt"
+      }
+    ],
+    "SecretRequest": [
+      {
+        "id": 1,
+        "title": "Onboarding handoff",
+        "description": "Please share the onboarding notes.",
+        "max_views": 1,
+        "expires_in": 259200,
+        "token": "reqtok-a1",
+        "status": "pending",
+        "user_id": 2,
+        "expires_at": "2026-12-31T00:00:00"
+      }
+    ],
+    "Secrets": [
+      {
+        "id": 1,
+        "secret": "dGVzdA==",
+        "title": "c2VjcmV0LXRpdGxl",
+        "salt": "c2FsdA==",
+        "views": 3,
+        "is_burnable": true,
+        "expires_at": "2026-12-31T00:00:00",
+        "userId": 2
+      }
+    ]
+  },
+  "summary": "Hemmelig is a self-hosted end-to-end-encrypted secret-sharing app: secrets are client-side AES-256-GCM encrypted and stored as opaque binary blobs with metadata, view caps, optional viewer passwords and IP restriction; they self-destruct on their final read or on expiry. Around this core are registered user accounts (better-auth email/password with an admin role), one-time secret-request links, API keys, an invite-code gate, admin instance settings, file attachments, and visitor analytics. Credentials for the seed accounts: ada@hemmelig.test/pw-ada (admin), lin@hemmelig.test/pw-lin (user), noor@hemmelig.test/pw-noor (user).",
+  "_prep_version": 3,
+  "_read_denied": "not_found",
+  "_account_entity_why": "fk_gravity points at User (6 FKs); the _auth_candidates heuristic (InstanceSettings with two bool 'credential-ish' columns) is wrong. Credentials live on User.email + User.password via better-auth; Account holds the provider-linked password hash. Sign-in verifies User, so the account entity is User."
+}

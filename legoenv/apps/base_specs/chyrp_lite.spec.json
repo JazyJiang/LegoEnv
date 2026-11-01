@@ -1,0 +1,5380 @@
+{
+  "env_id": "chyrp_lite",
+  "_prep_version": 3,
+  "entities": [
+    {
+      "name": "Post",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "feather",
+          "type": "text",
+          "nullable": false,
+          "default": "undefined"
+        },
+        {
+          "name": "clean",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        },
+        {
+          "name": "url",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        },
+        {
+          "name": "pinned",
+          "type": "bool",
+          "nullable": false,
+          "default": false
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "public",
+            "draft",
+            "registered_only",
+            "private",
+            "scheduled"
+          ],
+          "default": "public"
+        },
+        {
+          "name": "user_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "User.id",
+          "default": 0
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "nullable": true,
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "nullable": true,
+          "audit": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "url"
+          ]
+        }
+      ],
+      "_lifecycle": {
+        "col": "status",
+        "initial": "draft",
+        "states": [
+          "public",
+          "draft",
+          "registered_only",
+          "private",
+          "scheduled"
+        ],
+        "via": {
+          "Post.publish_scheduled": {
+            "col": "status",
+            "from": [
+              "scheduled"
+            ],
+            "to": "public"
+          },
+          "Post.update": {
+            "col": "status",
+            "from": [
+              "draft"
+            ],
+            "to": "public"
+          }
+        }
+      }
+    },
+    {
+      "name": "PostAttribute",
+      "columns": [
+        {
+          "name": "post_id",
+          "type": "id",
+          "pk": true,
+          "nullable": false,
+          "fk_to": "Post.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "default": ""
+        },
+        {
+          "name": "value",
+          "type": "json",
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "name": "Page",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        },
+        {
+          "name": "body",
+          "type": "json",
+          "nullable": true
+        },
+        {
+          "name": "public",
+          "type": "bool",
+          "nullable": false,
+          "default": true
+        },
+        {
+          "name": "show_in_list",
+          "type": "bool",
+          "nullable": false,
+          "default": true
+        },
+        {
+          "name": "list_order",
+          "type": "int",
+          "nullable": false,
+          "default": 0
+        },
+        {
+          "name": "clean",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        },
+        {
+          "name": "url",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        },
+        {
+          "name": "user_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "User.id",
+          "default": 0
+        },
+        {
+          "name": "parent_id",
+          "type": "id",
+          "nullable": true,
+          "fk_to": "Page.id",
+          "default": 0
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "nullable": true,
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "nullable": true,
+          "audit": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "url"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "User",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "login",
+          "type": "text",
+          "nullable": false,
+          "default": "",
+          "max": 64
+        },
+        {
+          "name": "password",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        },
+        {
+          "name": "full_name",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        },
+        {
+          "name": "email",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        },
+        {
+          "name": "website",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        },
+        {
+          "name": "group_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Group.id",
+          "default": 0
+        },
+        {
+          "name": "approved",
+          "type": "bool",
+          "nullable": false,
+          "default": true
+        },
+        {
+          "name": "joined_at",
+          "type": "datetime",
+          "nullable": true,
+          "audit": true,
+          "immutable": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "login"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Group",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "name"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Permission",
+      "columns": [
+        {
+          "name": "code",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "default": ""
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        },
+        {
+          "name": "group_id",
+          "type": "id",
+          "pk": true,
+          "nullable": false,
+          "fk_to": "Group.id",
+          "default": 0,
+          "on_delete": "cascade"
+        },
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true,
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "name": "Category",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "clean",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "show_on_home",
+          "type": "bool",
+          "nullable": false,
+          "default": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "clean"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Comment",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "body",
+          "type": "json",
+          "nullable": true
+        },
+        {
+          "name": "author",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        },
+        {
+          "name": "author_url",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        },
+        {
+          "name": "author_email",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        },
+        {
+          "name": "author_ip",
+          "type": "int",
+          "nullable": false,
+          "default": 0
+        },
+        {
+          "name": "author_agent",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "approved",
+            "denied",
+            "spam",
+            "pingback"
+          ],
+          "default": "denied"
+        },
+        {
+          "name": "post_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Post.id",
+          "default": 0,
+          "on_delete": "cascade"
+        },
+        {
+          "name": "user_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "User.id",
+          "default": 0
+        },
+        {
+          "name": "parent_id",
+          "type": "id",
+          "nullable": true,
+          "fk_to": "Comment.id",
+          "default": 0
+        },
+        {
+          "name": "notify",
+          "type": "bool",
+          "nullable": false,
+          "default": false
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "nullable": true,
+          "audit": false,
+          "immutable": true
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "nullable": true,
+          "audit": true
+        }
+      ],
+      "_lifecycle": {
+        "col": "status",
+        "initial": "denied",
+        "states": [
+          "approved",
+          "denied",
+          "spam",
+          "pingback"
+        ],
+        "via": {
+          "Comment.update": {
+            "col": "status",
+            "from": [
+              "denied",
+              "approved"
+            ],
+            "to": null
+          }
+        }
+      }
+    },
+    {
+      "name": "Like",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "post_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Post.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "user_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "User.id"
+        },
+        {
+          "name": "timestamp",
+          "type": "datetime",
+          "nullable": true,
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "session_hash",
+          "type": "text",
+          "nullable": false,
+          "max": 32
+        }
+      ]
+    },
+    {
+      "name": "View",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "post_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Post.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "user_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "User.id",
+          "default": 0
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "nullable": true,
+          "audit": true,
+          "immutable": true
+        }
+      ]
+    },
+    {
+      "name": "Pingback",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "post_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Post.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "source",
+          "type": "text",
+          "nullable": false,
+          "default": "",
+          "max": 2048
+        },
+        {
+          "name": "title",
+          "type": "json",
+          "nullable": true
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "nullable": true,
+          "audit": true,
+          "immutable": true
+        }
+      ]
+    },
+    {
+      "name": "Config",
+      "columns": [
+        {
+          "name": "key",
+          "type": "text",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "value",
+          "type": "json",
+          "nullable": true
+        }
+      ]
+    }
+  ],
+  "tools": [
+    {
+      "tool": "category_add",
+      "description": "Create a new category (an admin-only operation). The slug is auto-generated from the name when no clean slug is given, and must be unique.",
+      "family": "crud.insert",
+      "op": "create",
+      "entity": "Category",
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "Category name."
+        },
+        "clean": {
+          "type": "text",
+          "description": "URL slug; generated from the name if omitted."
+        },
+        "show_on_home": {
+          "type": "bool",
+          "description": "Whether the category is shown on the home page."
+        }
+      },
+      "exec_spec": {
+        "entity": "Category",
+        "fields": [
+          "name",
+          "clean"
+        ],
+        "set_on_create": {
+          "show_on_home": {
+            "$arg": "show_on_home"
+          }
+        },
+        "unique_on": [
+          "clean"
+        ],
+        "messages": {
+          "unique": "A category with that slug already exists."
+        }
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Permission",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "code",
+                      "op": "eq",
+                      "value": "manage_categorize"
+                    },
+                    {
+                      "node": "field",
+                      "col": "group_id",
+                      "op": "eq",
+                      "value": {
+                        "session": "group_id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "name"
+        ],
+        "messages": {
+          "auth": "You must be signed in as an admin to add a category.",
+          "precondition": "Your group does not have the 'manage_categorize' permission.",
+          "required": "A category name is required.",
+          "unique": "A category with that slug already exists.",
+          "constraint": "A category with that slug already exists."
+        }
+      },
+      "_evidence": {
+        "locator": "modules/categorize/categorize.php:357",
+        "id_local": "Category.add",
+        "entry": {
+          "kind": "http",
+          "route": "POST /admin/?action=add_category",
+          "locator": "modules/categorize/categorize.php:333"
+        },
+        "ref_code": "$clean = Category::check_clean(oneof(sanitize($_POST['clean'],true,SLUG_STRICT,128), md5($_POST['name'])));\nCategory::add(name:$_POST['name'], clean:$clean, show_on_home:!empty($_POST['show_on_home']));",
+        "edges": [
+          "admin_add_category checks can('manage_categorize') (categorize.php:336)"
+        ]
+      }
+    },
+    {
+      "tool": "category_delete",
+      "description": "Delete a category (an admin-only operation), removing the category reference from every post that used it.",
+      "family": "crud.delete",
+      "op": "delete",
+      "entity": "Category",
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the category to delete."
+        },
+        "destroy": {
+          "type": "text",
+          "required": true,
+          "description": "Confirmation text; must be 'confirm'."
+        }
+      },
+      "exec_spec": {
+        "entity": "Category",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Permission",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "code",
+                      "op": "eq",
+                      "value": "manage_categorize"
+                    },
+                    {
+                      "node": "field",
+                      "col": "group_id",
+                      "op": "eq",
+                      "value": {
+                        "session": "group_id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "id",
+          "destroy"
+        ],
+        "messages": {
+          "auth": "You must be signed in as an admin to delete a category.",
+          "precondition": "Your group does not have the 'manage_categorize' permission.",
+          "not_found": "That category does not exist."
+        }
+      },
+      "_evidence": {
+        "locator": "modules/categorize/categorize.php:532",
+        "id_local": "Category.delete",
+        "entry": {
+          "kind": "http",
+          "route": "POST /admin/?action=destroy_category",
+          "locator": "modules/categorize/categorize.php:498"
+        },
+        "ref_code": "if (!$category->deletable()) show_403(...);\nCategory::delete($category->id);\n# Category::delete\n$sql->delete(table:\"categorize\", conds:array(\"id\"=>$category_id)); $sql->delete(table:\"post_attributes\", conds:array(\"name\"=>\"category_id\", \"value\"=>$category_id));",
+        "edges": [
+          "admin_destroy_category calls $category->deletable() = can('manage_categorize') (categorize.php:526; Category.php:deletable)"
+        ]
+      }
+    },
+    {
+      "tool": "category_update",
+      "description": "Edit an existing category (an admin-only operation): name, slug, and home-page visibility.",
+      "family": "update.field_set",
+      "op": "update",
+      "entity": "Category",
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the category to edit."
+        },
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "New category name."
+        },
+        "clean": {
+          "type": "text",
+          "description": "New URL slug."
+        },
+        "show_on_home": {
+          "type": "bool",
+          "description": "Whether the category is shown on the home page."
+        }
+      },
+      "exec_spec": {
+        "entity": "Category",
+        "row_key": {
+          "id": {
+            "$arg": "id"
+          }
+        },
+        "fields": [
+          "name",
+          "clean"
+        ],
+        "set": {
+          "show_on_home": {
+            "$arg": "show_on_home"
+          }
+        }
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Permission",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "code",
+                      "op": "eq",
+                      "value": "manage_categorize"
+                    },
+                    {
+                      "node": "field",
+                      "col": "group_id",
+                      "op": "eq",
+                      "value": {
+                        "session": "group_id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "id",
+          "name"
+        ],
+        "messages": {
+          "auth": "You must be signed in as an admin to edit a category.",
+          "precondition": "Your group does not have the 'manage_categorize' permission.",
+          "not_found": "That category does not exist."
+        }
+      },
+      "_evidence": {
+        "locator": "modules/categorize/categorize.php:429",
+        "id_local": "Category.update",
+        "entry": {
+          "kind": "http",
+          "route": "POST /admin/?action=update_category",
+          "locator": "modules/categorize/categorize.php:406"
+        },
+        "ref_code": "$category = new Category($_POST['id']); if ($category->no_results) show_404(...); if (!$category->editable()) show_403(...);\n$category = $category->update(name:$_POST['name'], clean:$clean, show_on_home:!empty($_POST['show_on_home']));",
+        "edges": [
+          "admin_update_category calls $category->editable() = can('manage_categorize') (categorize.php:437; Category.php:editable)"
+        ]
+      }
+    },
+    {
+      "tool": "comment_add",
+      "description": "Add a comment to a post. The comment's initial moderation status follows the site's comment policy: approved when the post author writes it, otherwise the configured default (often 'denied' pending approval).",
+      "family": "crud.insert",
+      "op": "create",
+      "entity": "Comment",
+      "input_schema": {
+        "post_id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the post to comment on."
+        },
+        "body": {
+          "type": "text",
+          "required": true,
+          "description": "Comment body."
+        },
+        "author": {
+          "type": "text",
+          "required": true,
+          "description": "Commenter display name."
+        },
+        "author_email": {
+          "type": "text",
+          "required": true,
+          "description": "Commenter email."
+        },
+        "author_url": {
+          "type": "text",
+          "description": "Commenter website URL."
+        },
+        "parent_id": {
+          "type": "int",
+          "description": "Id of a comment this one replies to."
+        },
+        "notify": {
+          "type": "bool",
+          "description": "Whether to notify the commenter of new replies."
+        }
+      },
+      "exec_spec": {
+        "entity": "Comment",
+        "fields": [
+          "body",
+          "author",
+          "author_url",
+          "author_email",
+          "parent_id",
+          "notify"
+        ],
+        "set_on_create": {
+          "post_id": {
+            "$arg": "post_id"
+          },
+          "user_id": {
+            "$session": "account_id"
+          },
+          "created_at": "2026-01-01T00:00:00",
+          "status": "denied"
+        }
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Permission",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "code",
+                      "op": "eq",
+                      "value": "add_comment"
+                    },
+                    {
+                      "node": "field",
+                      "col": "group_id",
+                      "op": "eq",
+                      "value": {
+                        "session": "group_id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "post_id",
+          "body",
+          "author",
+          "author_email"
+        ],
+        "messages": {
+          "auth": "You must be signed in to comment.",
+          "precondition": "Your group does not have the 'add_comment' permission, or comments are closed on this post.",
+          "required": "A post id, comment body and author details are required.",
+          "fk": "That post (or parent comment) does not exist."
+        }
+      },
+      "_evidence": {
+        "locator": "modules/comments/comments.php:218",
+        "id_local": "Comment.add",
+        "entry": {
+          "kind": "http",
+          "route": "POST /?action=add_comment",
+          "locator": "modules/comments/comments.php:147"
+        },
+        "ref_code": "# add_comment (comments.php:147)\n$post = new Post($_POST['post_id'], array('drafts'=>true)); if ($post->no_results) show_404(...); if (!Comment::creatable($post)) show_403(...); if (!logged_in() and !check_captcha()) return ...;\n$comment = Comment::create(body:$_POST['body'], author:$_POST['author'], author_url:$_POST['author_url'], author_email:$_POST['author_email'], post:$post, parent:(int)fallback($_POST['parent_id'],0), notify:$notify);\n# Comment::create sets status to approved if the poster is the post author, else config default",
+        "edges": [
+          "Comment::creatable checks can('add_comment') (Comment.php:520); plus per-post options CLOSED/REG_ONLY/PRIVATE gating (Comment.php:524-537)"
+        ]
+      }
+    },
+    {
+      "tool": "comment_delete",
+      "description": "Delete a comment. You need the 'delete_comment' permission, or be the comment's author (delete_own_comment) signed into the same account.",
+      "family": "crud.delete",
+      "op": "delete",
+      "entity": "Comment",
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the comment to delete."
+        },
+        "destroy": {
+          "type": "text",
+          "required": true,
+          "description": "Confirmation text; must be 'confirm'."
+        }
+      },
+      "exec_spec": {
+        "entity": "Comment",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Permission",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "code",
+                      "op": "eq",
+                      "value": "delete_comment"
+                    },
+                    {
+                      "node": "field",
+                      "col": "group_id",
+                      "op": "eq",
+                      "value": {
+                        "session": "group_id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Permission",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "code",
+                      "op": "eq",
+                      "value": "delete_own_comment"
+                    },
+                    {
+                      "node": "field",
+                      "col": "group_id",
+                      "op": "eq",
+                      "value": {
+                        "session": "group_id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            },
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Comment",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "id",
+          "destroy"
+        ],
+        "messages": {
+          "auth": "You must be signed in to delete a comment.",
+          "precondition": "You do not have permission to delete this comment (delete_comment, or delete_own_comment as its author).",
+          "not_found": "That comment does not exist."
+        }
+      },
+      "_evidence": {
+        "locator": "modules/comments/comments.php:455",
+        "id_local": "Comment.delete",
+        "entry": {
+          "kind": "http",
+          "route": "POST /admin/?action=destroy_comment",
+          "locator": "modules/comments/comments.php:435"
+        },
+        "ref_code": "$comment = new Comment($_POST['id']); if ($comment->no_results) show_404(...); if (!$comment->deletable()) show_403(...);\nComment::delete($comment->id);",
+        "edges": [
+          "admin_destroy_comment calls $comment->deletable() (Comment.php:444); comments.php:463"
+        ]
+      }
+    },
+    {
+      "tool": "comment_unsubscribe",
+      "description": "Turn off email notifications on a comment thread, verified by the token emailed to the address. Publicly callable.",
+      "family": "update.field_set",
+      "op": "update",
+      "entity": "Comment",
+      "input_schema": {
+        "post_id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the post whose thread to unsubscribe from."
+        },
+        "email": {
+          "type": "text",
+          "required": true,
+          "description": "The email address that was subscribed."
+        },
+        "token": {
+          "type": "text",
+          "required": true,
+          "description": "The unsubscribe token emailed to that address."
+        }
+      },
+      "exec_spec": {
+        "entity": "Comment",
+        "row_key": {
+          "post_id": {
+            "$arg": "post_id"
+          },
+          "author_email": {
+            "$arg": "email"
+          }
+        },
+        "set": {
+          "notify": false
+        },
+        "fields": []
+      },
+      "guards": {
+        "required": [
+          "post_id",
+          "email",
+          "token"
+        ],
+        "messages": {
+          "not_found": "No matching subscription was found for that post and email.",
+          "required": "Post id, email and token are required."
+        }
+      }
+    },
+    {
+      "tool": "comment_update",
+      "description": "Edit a comment: its body, author fields, notification flag and moderation status. You need the 'edit_comment' permission, or be the comment's author (edit_own_comment) signed into the same account.",
+      "family": "update.field_set",
+      "op": "update",
+      "entity": "Comment",
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the comment to edit."
+        },
+        "body": {
+          "type": "text",
+          "required": true,
+          "description": "New comment body."
+        },
+        "author": {
+          "type": "text",
+          "required": true,
+          "description": "Author display name."
+        },
+        "author_email": {
+          "type": "text",
+          "description": "Author email."
+        },
+        "author_url": {
+          "type": "text",
+          "description": "Author website URL."
+        },
+        "status": {
+          "type": "text",
+          "description": "New moderation status: approved, denied, spam, pingback."
+        },
+        "created_at": {
+          "type": "datetime",
+          "description": "Publication timestamp."
+        },
+        "notify": {
+          "type": "bool",
+          "description": "Notification flag."
+        }
+      },
+      "exec_spec": {
+        "entity": "Comment",
+        "row_key": {
+          "id": {
+            "$arg": "id"
+          }
+        },
+        "fields": [
+          "body",
+          "author",
+          "author_url",
+          "author_email",
+          "status",
+          "created_at",
+          "notify"
+        ],
+        "set": {
+          "user_id": {
+            "$session": "account_id"
+          }
+        }
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Permission",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "code",
+                      "op": "eq",
+                      "value": "edit_comment"
+                    },
+                    {
+                      "node": "field",
+                      "col": "group_id",
+                      "op": "eq",
+                      "value": {
+                        "session": "group_id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Permission",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "code",
+                      "op": "eq",
+                      "value": "edit_own_comment"
+                    },
+                    {
+                      "node": "field",
+                      "col": "group_id",
+                      "op": "eq",
+                      "value": {
+                        "session": "group_id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            },
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Comment",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "id",
+          "body",
+          "author"
+        ],
+        "messages": {
+          "auth": "You must be signed in to edit a comment.",
+          "precondition": "You do not have permission to edit this comment (edit_comment, or edit_own_comment as its author).",
+          "not_found": "That comment does not exist."
+        }
+      },
+      "_evidence": {
+        "locator": "modules/comments/comments.php:263",
+        "id_local": "Comment.update",
+        "entry": {
+          "kind": "http",
+          "route": "POST /?action=update_comment",
+          "locator": "modules/comments/comments.php:248"
+        },
+        "ref_code": "$comment = new Comment($_POST['id']); if ($comment->no_results) show_404(...); if (!$comment->editable()) show_403(...);\n$status = ($can_edit_comment) ? $_POST['status'] : $comment->status;\n$comment = $comment->update(body:$_POST['body'], author:$_POST['author'], author_url:$_POST['author_url'], author_email:$_POST['author_email'], status:$status, notify:$notify, created_at:$created_at);",
+        "edges": [
+          "admin_update_comment calls $comment->editable() (Comment.php:423): edit_comment or (logged_in && edit_own_comment && user_id); comments.php:271"
+        ]
+      }
+    },
+    {
+      "tool": "config_content",
+      "description": "Update the blog's content settings: pagination, feed, uploads, markup and webmention behaviour. Requires the 'change_settings' permission.",
+      "family": "crud.upsert",
+      "op": "update",
+      "entity": "Config",
+      "input_schema": {
+        "posts_per_page": {
+          "type": "int",
+          "description": "Posts per page."
+        },
+        "admin_per_page": {
+          "type": "int",
+          "description": "Items per admin page."
+        },
+        "default_post_status": {
+          "type": "text",
+          "description": "Default status for new posts."
+        },
+        "default_page_status": {
+          "type": "text",
+          "description": "Default status for new pages."
+        },
+        "feed_items": {
+          "type": "int",
+          "description": "Number of feed items."
+        },
+        "feed_format": {
+          "type": "text",
+          "description": "Feed format."
+        },
+        "uploads_path": {
+          "type": "text",
+          "description": "Path for uploads."
+        },
+        "uploads_limit": {
+          "type": "int",
+          "description": "Upload size limit."
+        },
+        "search_pages": {
+          "type": "bool",
+          "description": "Include pages in search."
+        },
+        "send_pingbacks": {
+          "type": "bool",
+          "description": "Send/receive pingbacks."
+        },
+        "enable_emoji": {
+          "type": "bool",
+          "description": "Enable emoji."
+        },
+        "enable_markdown": {
+          "type": "bool",
+          "description": "Enable markdown."
+        },
+        "key": {
+          "type": "text",
+          "required": true,
+          "description": "The exact config key being written, e.g. posts_per_page. (Chyrp stores each setting as one row of the key/value Config table.)"
+        },
+        "value": {
+          "type": "json",
+          "required": true,
+          "description": "The new value for that config key (a scalar or boolean."
+        }
+      },
+      "exec_spec": {
+        "entity": "Config",
+        "key": {
+          "key": {
+            "$arg": "key"
+          }
+        },
+        "insert_fields": [
+          "value"
+        ],
+        "set_on_exists": {
+          "value": {
+            "$arg": "value"
+          }
+        }
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Permission",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "code",
+                      "op": "eq",
+                      "value": "change_settings"
+                    },
+                    {
+                      "node": "field",
+                      "col": "group_id",
+                      "op": "eq",
+                      "value": {
+                        "session": "group_id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "key",
+          "value"
+        ],
+        "messages": {
+          "auth": "You must be signed in as an admin to change settings.",
+          "precondition": "Your group does not have the 'change_settings' permission.",
+          "not_found": "That config key does not exist to be updated; pass the exact key you are writing.",
+          "fk": "The referenced group does not exist.",
+          "required": "Supply the exact config key and its new value."
+        }
+      },
+      "_evidence": {
+        "locator": "includes/controller/Admin.php",
+        "id_local": "Config.config_content",
+        "entry": {
+          "kind": "http",
+          "route": "POST /admin/?action=config_content",
+          "locator": "includes/controller/Admin.php"
+        },
+        "ref_code": "$config->set(\"posts_per_page\", $_POST['posts_per_page']); ... each setting is a $config->set(key, value) call over the key/value Config table.",
+        "edges": [
+          "admin_config_content checks can('change_settings')"
+        ]
+      }
+    },
+    {
+      "tool": "config_general",
+      "description": "Update the blog's general identity settings: site name, tagline, URL, contact email, locale, timezone and update-checking. Requires the 'change_settings' permission.",
+      "family": "crud.upsert",
+      "op": "update",
+      "entity": "Config",
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "description": "Site name."
+        },
+        "description": {
+          "type": "text",
+          "description": "Site tagline."
+        },
+        "url": {
+          "type": "text",
+          "description": "Site URL."
+        },
+        "email": {
+          "type": "text",
+          "description": "Contact email."
+        },
+        "email_public": {
+          "type": "bool",
+          "description": "Whether the email is shown publicly."
+        },
+        "timezone": {
+          "type": "text",
+          "description": "Site timezone."
+        },
+        "locale": {
+          "type": "text",
+          "description": "Site locale."
+        },
+        "monospace_font": {
+          "type": "bool",
+          "description": "Use a monospace font."
+        },
+        "check_updates": {
+          "type": "bool",
+          "description": "Check for updates."
+        },
+        "key": {
+          "type": "text",
+          "required": true,
+          "description": "The exact config key being written, e.g. name. (Chyrp stores each setting as one row of the key/value Config table.)"
+        },
+        "value": {
+          "type": "json",
+          "required": true,
+          "description": "The new value for that config key (a scalar or boolean."
+        }
+      },
+      "exec_spec": {
+        "entity": "Config",
+        "key": {
+          "key": {
+            "$arg": "key"
+          }
+        },
+        "insert_fields": [
+          "value"
+        ],
+        "set_on_exists": {
+          "value": {
+            "$arg": "value"
+          }
+        }
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Permission",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "code",
+                      "op": "eq",
+                      "value": "change_settings"
+                    },
+                    {
+                      "node": "field",
+                      "col": "group_id",
+                      "op": "eq",
+                      "value": {
+                        "session": "group_id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "key",
+          "value"
+        ],
+        "messages": {
+          "auth": "You must be signed in as an admin to change settings.",
+          "precondition": "Your group does not have the 'change_settings' permission.",
+          "not_found": "That config key does not exist to be updated; pass the exact key you are writing.",
+          "fk": "The referenced group does not exist.",
+          "required": "Supply the exact config key and its new value."
+        }
+      },
+      "_evidence": {
+        "locator": "includes/controller/Admin.php",
+        "id_local": "Config.config_general",
+        "entry": {
+          "kind": "http",
+          "route": "POST /admin/?action=config_general",
+          "locator": "includes/controller/Admin.php"
+        },
+        "ref_code": "$config->set(\"name\", $_POST['name']); ... each setting is a $config->set(key, value) call over the key/value Config table.",
+        "edges": [
+          "admin_config_general checks can('change_settings')"
+        ]
+      }
+    },
+    {
+      "tool": "config_route",
+      "description": "Update the blog's routing settings: clean URLs, the post URL pattern, and the optional static homepage. Requires the 'change_settings' permission.",
+      "family": "crud.upsert",
+      "op": "update",
+      "entity": "Config",
+      "input_schema": {
+        "clean_urls": {
+          "type": "bool",
+          "description": "Use clean URLs."
+        },
+        "post_url": {
+          "type": "text",
+          "description": "URL pattern for posts."
+        },
+        "enable_homepage": {
+          "type": "bool",
+          "description": "Show a static homepage."
+        },
+        "page_title": {
+          "type": "text",
+          "description": "Homepage title."
+        },
+        "page_body": {
+          "type": "text",
+          "description": "Homepage body."
+        },
+        "key": {
+          "type": "text",
+          "required": true,
+          "description": "The exact config key being written, e.g. clean_urls. (Chyrp stores each setting as one row of the key/value Config table.)"
+        },
+        "value": {
+          "type": "json",
+          "required": true,
+          "description": "The new value for that config key (a scalar or boolean."
+        }
+      },
+      "exec_spec": {
+        "entity": "Config",
+        "key": {
+          "key": {
+            "$arg": "key"
+          }
+        },
+        "insert_fields": [
+          "value"
+        ],
+        "set_on_exists": {
+          "value": {
+            "$arg": "value"
+          }
+        }
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Permission",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "code",
+                      "op": "eq",
+                      "value": "change_settings"
+                    },
+                    {
+                      "node": "field",
+                      "col": "group_id",
+                      "op": "eq",
+                      "value": {
+                        "session": "group_id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "key",
+          "value"
+        ],
+        "messages": {
+          "auth": "You must be signed in as an admin to change settings.",
+          "precondition": "Your group does not have the 'change_settings' permission.",
+          "not_found": "That config key does not exist to be updated; pass the exact key you are writing.",
+          "fk": "The referenced group does not exist.",
+          "required": "Supply the exact config key and its new value."
+        }
+      },
+      "_evidence": {
+        "locator": "includes/controller/Admin.php",
+        "id_local": "Config.config_route",
+        "entry": {
+          "kind": "http",
+          "route": "POST /admin/?action=config_route",
+          "locator": "includes/controller/Admin.php"
+        },
+        "ref_code": "$config->set(\"clean_urls\", $_POST['clean_urls']); ... each setting is a $config->set(key, value) call over the key/value Config table.",
+        "edges": [
+          "admin_config_route checks can('change_settings')"
+        ]
+      }
+    },
+    {
+      "tool": "config_user",
+      "description": "Update the blog's user and registration settings: whether registration is open, the default and guest groups, and activation mode. Requires the 'change_settings' permission.",
+      "family": "crud.upsert",
+      "op": "update",
+      "entity": "Config",
+      "input_schema": {
+        "can_register": {
+          "type": "bool",
+          "description": "Whether new registrations are allowed."
+        },
+        "email_correspondence": {
+          "type": "bool",
+          "description": "Whether to email users."
+        },
+        "default_group": {
+          "type": "int",
+          "description": "Group new registrants are placed in."
+        },
+        "guest_group": {
+          "type": "int",
+          "description": "Group anonymous visitors use."
+        },
+        "user_activation": {
+          "type": "text",
+          "description": "Activation mode (none, user, admin)."
+        },
+        "key": {
+          "type": "text",
+          "required": true,
+          "description": "The exact config key being written, e.g. can_register. (Chyrp stores each setting as one row of the key/value Config table.)"
+        },
+        "value": {
+          "type": "json",
+          "required": true,
+          "description": "The new value for that config key (a scalar or boolean."
+        }
+      },
+      "exec_spec": {
+        "entity": "Config",
+        "key": {
+          "key": {
+            "$arg": "key"
+          }
+        },
+        "insert_fields": [
+          "value"
+        ],
+        "set_on_exists": {
+          "value": {
+            "$arg": "value"
+          }
+        }
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Permission",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "code",
+                      "op": "eq",
+                      "value": "change_settings"
+                    },
+                    {
+                      "node": "field",
+                      "col": "group_id",
+                      "op": "eq",
+                      "value": {
+                        "session": "group_id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "key",
+          "value"
+        ],
+        "messages": {
+          "auth": "You must be signed in as an admin to change settings.",
+          "precondition": "Your group does not have the 'change_settings' permission.",
+          "not_found": "That config key does not exist to be updated; pass the exact key you are writing.",
+          "fk": "The referenced group does not exist.",
+          "required": "Supply the exact config key and its new value."
+        }
+      },
+      "_evidence": {
+        "locator": "includes/controller/Admin.php",
+        "id_local": "Config.config_user",
+        "entry": {
+          "kind": "http",
+          "route": "POST /admin/?action=config_user",
+          "locator": "includes/controller/Admin.php"
+        },
+        "ref_code": "$config->set(\"can_register\", $_POST['can_register']); ... each setting is a $config->set(key, value) call over the key/value Config table.",
+        "edges": [
+          "admin_config_user checks can('change_settings')"
+        ]
+      }
+    },
+    {
+      "tool": "extension_disable",
+      "description": "Disable a module or feather (an admin-only operation): its name is removed from the enabled list and its uninstaller runs.",
+      "family": "crud.upsert",
+      "op": "update",
+      "entity": "Config",
+      "input_schema": {
+        "extension": {
+          "type": "text",
+          "required": true,
+          "description": "Name of the extension to disable."
+        },
+        "type": {
+          "type": "text",
+          "required": true,
+          "description": "Whether it is a 'module' or a 'feather'."
+        },
+        "confirm": {
+          "type": "bool",
+          "description": "Confirmation that destructive uninstall steps may run."
+        },
+        "key": {
+          "type": "text",
+          "description": "The enabled list key to remove from (enabled_modules or enabled_feathers)."
+        }
+      },
+      "exec_spec": {
+        "entity": "Config",
+        "key": {
+          "key": {
+            "$arg": "key"
+          }
+        },
+        "insert_fields": [
+          "value"
+        ],
+        "set_on_exists": {
+          "value": {
+            "$arg": "settings"
+          }
+        }
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Permission",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "code",
+                      "op": "eq",
+                      "value": "toggle_extensions"
+                    },
+                    {
+                      "node": "field",
+                      "col": "group_id",
+                      "op": "eq",
+                      "value": {
+                        "session": "group_id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "extension",
+          "type"
+        ],
+        "messages": {
+          "auth": "You must be signed in as an admin to disable an extension.",
+          "precondition": "Your group does not have the 'toggle_extensions' permission.",
+          "required": "An extension name and type (module/feather) are required."
+        }
+      },
+      "_evidence": {
+        "locator": "includes/controller/Admin.php:3280",
+        "id_local": "Extension.disable",
+        "entry": {
+          "kind": "http",
+          "route": "POST /admin/?action=disable",
+          "locator": "includes/controller/Admin.php:3225"
+        },
+        "ref_code": "if (!in_array($name, $config->$array)) error(...409);\nif (method_exists($class_name, \"__uninstall\")) call_user_func(array($class_name, \"__uninstall\"), $confirm);\n$config->set($array, array_diff($config->$array, array($name)));",
+        "edges": [
+          "admin_disable checks can('toggle_extensions') (Admin.php:3230)"
+        ]
+      }
+    },
+    {
+      "tool": "extension_enable",
+      "description": "Enable a module or feather (an admin-only operation): its installer runs and its name is added to the enabled list.",
+      "family": "crud.upsert",
+      "op": "update",
+      "entity": "Config",
+      "input_schema": {
+        "extension": {
+          "type": "text",
+          "required": true,
+          "description": "Name of the extension to enable."
+        },
+        "type": {
+          "type": "text",
+          "required": true,
+          "description": "Whether it is a 'module' or a 'feather'."
+        },
+        "key": {
+          "type": "text",
+          "description": "The enabled list key to append to (enabled_modules or enabled_feathers)."
+        }
+      },
+      "exec_spec": {
+        "entity": "Config",
+        "key": {
+          "key": {
+            "$arg": "key"
+          }
+        },
+        "insert_fields": [
+          "value"
+        ],
+        "set_on_exists": {
+          "value": {
+            "$arg": "settings"
+          }
+        }
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Permission",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "code",
+                      "op": "eq",
+                      "value": "toggle_extensions"
+                    },
+                    {
+                      "node": "field",
+                      "col": "group_id",
+                      "op": "eq",
+                      "value": {
+                        "session": "group_id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "extension",
+          "type"
+        ],
+        "messages": {
+          "auth": "You must be signed in as an admin to enable an extension.",
+          "precondition": "Your group does not have the 'toggle_extensions' permission.",
+          "required": "An extension name and type (module/feather) are required."
+        }
+      },
+      "_evidence": {
+        "locator": "includes/controller/Admin.php:3186",
+        "id_local": "Extension.enable",
+        "entry": {
+          "kind": "http",
+          "route": "POST /admin/?action=enable",
+          "locator": "includes/controller/Admin.php:3134"
+        },
+        "ref_code": "if (in_array($name, $config->$array)) error(...409);\nrequire $folder.DIR.$name.DIR.$name.\".php\";\nif (method_exists($class_name, \"__install\")) call_user_func(array($class_name, \"__install\"));\n$config->set($array, array_merge($config->$array, array($name)));",
+        "edges": [
+          "admin_enable checks can('toggle_extensions') (Admin.php:3139)"
+        ]
+      }
+    },
+    {
+      "tool": "group_add_admin",
+      "description": "Create a new user group and grant it a set of permissions (an admin-only operation). The group name must be unique.",
+      "family": "crud.insert",
+      "op": "create",
+      "entity": "Group",
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "Unique name for the new group."
+        },
+        "permissions": {
+          "type": "json",
+          "description": "List of permission ids (e.g. add_post, edit_page) to grant this group."
+        }
+      },
+      "exec_spec": {
+        "entity": "Group",
+        "fields": {
+          "name": {
+            "$arg": "name"
+          }
+        },
+        "unique_on": [
+          "name"
+        ],
+        "messages": {
+          "unique": "A group with that name already exists."
+        }
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Permission",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "code",
+                      "op": "eq",
+                      "value": "add_group"
+                    },
+                    {
+                      "node": "field",
+                      "col": "group_id",
+                      "op": "eq",
+                      "value": {
+                        "session": "group_id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "name"
+        ],
+        "messages": {
+          "auth": "You must be signed in as an admin to add a group.",
+          "precondition": "Your group does not have the 'add_group' permission.",
+          "unique": "A group with that name already exists.",
+          "required": "A group name is required.",
+          "constraint": "A group with that name already exists."
+        }
+      },
+      "_evidence": {
+        "locator": "includes/controller/Admin.php:1614",
+        "id_local": "Group.add_admin",
+        "entry": {
+          "kind": "http",
+          "route": "POST /admin/?action=add_group",
+          "locator": "includes/controller/Admin.php:1582"
+        },
+        "ref_code": "$check = new Group(array(\"name\" => $name)); if (!$check->no_results) error(...409);\nGroup::add($name, array_keys($_POST['permissions']));",
+        "edges": [
+          "admin_add_group checks can('add_group') (Admin.php:1584)"
+        ]
+      }
+    },
+    {
+      "tool": "group_destroy_admin",
+      "description": "Delete a user group (an admin-only operation), reassigning its members to another group. Posts already restricted to the deleted group are made private.",
+      "family": "crud.delete",
+      "op": "delete",
+      "entity": "Group",
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the group to delete."
+        },
+        "destroy": {
+          "type": "text",
+          "required": true,
+          "description": "Confirmation text; must be 'confirm'."
+        },
+        "move_group": {
+          "type": "int",
+          "required": true,
+          "description": "Id of a group to move the deleted group's members to."
+        },
+        "default_group": {
+          "type": "int",
+          "description": "Group to use as the new default_group config."
+        },
+        "guest_group": {
+          "type": "int",
+          "description": "Group to use as the new guest_group config."
+        }
+      },
+      "exec_spec": {
+        "entity": "Group",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Permission",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "code",
+                      "op": "eq",
+                      "value": "delete_group"
+                    },
+                    {
+                      "node": "field",
+                      "col": "group_id",
+                      "op": "eq",
+                      "value": {
+                        "session": "group_id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "id",
+          "destroy",
+          "move_group"
+        ],
+        "messages": {
+          "auth": "You must be signed in as an admin to delete a group.",
+          "precondition": "Your group does not have the 'delete_group' permission.",
+          "not_found": "That group does not exist."
+        }
+      },
+      "_evidence": {
+        "locator": "includes/controller/Admin.php:1834",
+        "id_local": "Group.destroy_admin",
+        "entry": {
+          "kind": "http",
+          "route": "POST /admin/?action=destroy_group",
+          "locator": "includes/controller/Admin.php:1799"
+        },
+        "ref_code": "if (!empty($group->users)) { if (!empty($_POST['move_group'])) { $member_group = new Group($_POST['move_group']); foreach ($group->users as $user) $user->update(group_id:$member_group->id); } else { error(...); } }\n... config default_group/guest_group reassignment ...\nforeach ($sql->select(tables:\"posts\", ...) as $post) $sql->update(... status=>POST STATUS_PRIVATE);\nGroup::delete($group->id);",
+        "edges": [
+          "admin_destroy_group checks can('delete_group') (Admin.php:1803)"
+        ]
+      }
+    },
+    {
+      "tool": "group_list_permissions",
+      "description": "List the canonical set of permission names that can be granted to a group, for building the group editor.",
+      "family": "search",
+      "op": "read",
+      "entity": "Permission",
+      "input_schema": {
+        "group_id": {
+          "type": "int",
+          "description": "Optional group id; the canonical permission list (group_id 0) is filtered by default."
+        }
+      },
+      "exec_spec": {
+        "entity": "Permission",
+        "filter": {
+          "col": "group_id",
+          "mode": "range",
+          "val": {
+            "$arg": "group_id"
+          }
+        }
+      },
+      "guards": {
+        "messages": {
+          "auth": "You must be signed in to list permissions."
+        }
+      },
+      "_evidence": {
+        "locator": "includes/model/Group.php:331",
+        "id_local": "Group.list_permissions",
+        "entry": {
+          "kind": "internal"
+        },
+        "ref_code": "$permissions = SQL::current()->select(tables:\"permissions\", conds:array(\"group_id\" => $group_id))->fetchAll(); ... $permission[\"name\"] = $names[$id];",
+        "scope_why": "Permission rows are a global catalogue; the list is keyed by group_id, a fixed boundary."
+      }
+    },
+    {
+      "tool": "group_manage",
+      "description": "List user groups for the admin console; pass a user login to look up that single user's group.",
+      "family": "search",
+      "op": "search",
+      "entity": "Group",
+      "input_schema": {
+        "search": {
+          "type": "text",
+          "description": "A user login; the group that user belongs to is returned."
+        }
+      },
+      "exec_spec": {
+        "entity": "Group",
+        "pagination": {
+          "default_limit": 20
+        }
+      },
+      "guards": {
+        "messages": {
+          "auth": "You must be signed in to browse groups."
+        }
+      },
+      "_evidence": {
+        "locator": "includes/controller/Admin.php:1953",
+        "id_local": "Group.manage",
+        "entry": {
+          "kind": "http",
+          "route": "GET /admin/manage_groups",
+          "locator": "includes/controller/Admin.php:1931"
+        },
+        "ref_code": "if (isset($_POST['search'])) redirect(...);\nif (isset($_GET['search']) and $_GET['search'] != \"\") { $user = new User(array(\"login\" => $_GET['search'])); $groups = ($user->no_results) ? new Paginator(array()) : new Paginator(array($user->group)); } else { $groups = new Paginator(Group::find(array('placeholders'=>true,'order'=>'id ASC')), $this->post_limit); }",
+        "scope_why": "Admin group directory: global by design inside the admin console."
+      }
+    },
+    {
+      "tool": "group_update_admin",
+      "description": "Rename a user group and replace its permission set (an admin-only operation).",
+      "family": "update.field_set",
+      "op": "update",
+      "entity": "Group",
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the group to edit."
+        },
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "New name for the group."
+        },
+        "permissions": {
+          "type": "json",
+          "description": "Full replacement list of permission ids for this group."
+        }
+      },
+      "exec_spec": {
+        "entity": "Group",
+        "row_key": {
+          "id": {
+            "$arg": "id"
+          }
+        },
+        "fields": [
+          "name"
+        ]
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Permission",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "code",
+                      "op": "eq",
+                      "value": "edit_group"
+                    },
+                    {
+                      "node": "field",
+                      "col": "group_id",
+                      "op": "eq",
+                      "value": {
+                        "session": "group_id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "id",
+          "name"
+        ],
+        "messages": {
+          "auth": "You must be signed in as an admin to edit a group.",
+          "precondition": "Your group does not have the 'edit_group' permission.",
+          "not_found": "That group does not exist."
+        }
+      },
+      "_evidence": {
+        "locator": "includes/controller/Admin.php:1729",
+        "id_local": "Group.update_admin",
+        "entry": {
+          "kind": "http",
+          "route": "POST /admin/?action=update_group",
+          "locator": "includes/controller/Admin.php:1676"
+        },
+        "ref_code": "$group = new Group($_POST['id']); if ($group->no_results) show_404(...);\n$group = $group->update($name, array_keys($_POST['permissions']));",
+        "edges": [
+          "admin_update_group checks can('edit_group') (Admin.php:1678)"
+        ]
+      }
+    },
+    {
+      "tool": "like_create",
+      "description": "Like a post for the signed-in user. A user can like a given post only once; liking again fails as a duplicate.",
+      "family": "crud.insert",
+      "op": "create",
+      "entity": "Like",
+      "input_schema": {
+        "post_id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the post to like."
+        }
+      },
+      "exec_spec": {
+        "entity": "Like",
+        "fields": [
+          "post_id"
+        ],
+        "set_on_create": {
+          "user_id": {
+            "$session": "account_id"
+          },
+          "timestamp": "2026-01-01T00:00:00",
+          "session_hash": "seed"
+        }
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Permission",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "code",
+                      "op": "eq",
+                      "value": "like_post"
+                    },
+                    {
+                      "node": "field",
+                      "col": "group_id",
+                      "op": "eq",
+                      "value": {
+                        "session": "group_id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Like",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "post_id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "post_id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "eq",
+              "n": 0
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "post_id"
+        ],
+        "messages": {
+          "auth": "You must be signed in to like a post.",
+          "precondition": "Your group does not have the 'like_post' permission, or you have already liked this post."
+        }
+      },
+      "_evidence": {
+        "locator": "modules/likes/likes.php:164",
+        "id_local": "Like.create",
+        "entry": {
+          "kind": "http",
+          "route": "GET /?action=like",
+          "locator": "modules/likes/likes.php:141"
+        },
+        "ref_code": "$post = new Post($_GET['post_id']); if ($post->no_results) show_404(...);\nLike::create($post->id);\n# Like::create returns early (no insert) if Like::exists($post_id) - i.e. already liked (modules/likes/model/Like.php:129)",
+        "edges": [
+          "main_like: BOT_UA or !can('like_post') -> 403 (likes.php:150)",
+          "Like::create returns early if Like::exists($post_id) (Like.php:129-131)  ->  promoted to a 'not already liked' precondition"
+        ]
+      }
+    },
+    {
+      "tool": "like_remove",
+      "description": "Remove the signed-in user's like from a post.",
+      "family": "crud.delete",
+      "op": "delete",
+      "entity": "Like",
+      "input_schema": {
+        "post_id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the post to unlike."
+        }
+      },
+      "exec_spec": {
+        "entity": "Like",
+        "lookup_by": {
+          "post_id": {
+            "$arg": "post_id"
+          },
+          "user_id": {
+            "$session": "account_id"
+          }
+        }
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Permission",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "code",
+                      "op": "eq",
+                      "value": "unlike_post"
+                    },
+                    {
+                      "node": "field",
+                      "col": "group_id",
+                      "op": "eq",
+                      "value": {
+                        "session": "group_id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "post_id"
+        ],
+        "messages": {
+          "auth": "You must be signed in to unlike a post.",
+          "precondition": "Your group does not have the 'unlike_post' permission.",
+          "not_found": "You have not liked this post."
+        }
+      },
+      "_evidence": {
+        "locator": "modules/likes/likes.php:194",
+        "id_local": "Like.remove",
+        "entry": {
+          "kind": "http",
+          "route": "GET /?action=unlike",
+          "locator": "modules/likes/likes.php:171"
+        },
+        "ref_code": "$post = new Post($_GET['post_id']); if ($post->no_results) show_404(...);\nLike::remove($post->id);\n# Like::remove deletes $_SESSION['likes'][$post_id]",
+        "edges": [
+          "main_unlike: BOT_UA or !can('unlike_post') -> 403 (likes.php:180)"
+        ]
+      }
+    },
+    {
+      "tool": "page_add",
+      "description": "Create a new page (an admin-only operation). The slug must be unique.",
+      "family": "crud.insert",
+      "op": "create",
+      "entity": "Page",
+      "input_schema": {
+        "title": {
+          "type": "text",
+          "required": true,
+          "description": "Page title."
+        },
+        "body": {
+          "type": "text",
+          "required": true,
+          "description": "Page body."
+        },
+        "parent_id": {
+          "type": "int",
+          "description": "Id of a parent page to nest this one under."
+        },
+        "status": {
+          "type": "text",
+          "description": "One of listed, public, teased, or private."
+        },
+        "list_order": {
+          "type": "int",
+          "description": "Sort order in the navigation list."
+        },
+        "slug": {
+          "type": "text",
+          "description": "URL slug; must be unique."
+        },
+        "private": {
+          "type": "bool",
+          "description": "When set, the page is hidden and unlisted regardless of status."
+        }
+      },
+      "exec_spec": {
+        "entity": "Page",
+        "fields": [
+          "title",
+          "body",
+          "parent_id",
+          "list_order"
+        ],
+        "set_on_create": {
+          "public": true,
+          "show_in_list": true,
+          "url": {
+            "$arg": "slug"
+          },
+          "clean": {
+            "$arg": "slug"
+          },
+          "user_id": {
+            "$session": "account_id"
+          }
+        },
+        "unique_on": [
+          "url"
+        ],
+        "messages": {
+          "unique": "That slug (URL) is already taken."
+        }
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Permission",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "code",
+                      "op": "eq",
+                      "value": "add_page"
+                    },
+                    {
+                      "node": "field",
+                      "col": "group_id",
+                      "op": "eq",
+                      "value": {
+                        "session": "group_id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "title",
+          "body"
+        ],
+        "messages": {
+          "auth": "You must be signed in as an admin to add a page.",
+          "precondition": "Your group does not have the 'add_page' permission.",
+          "required": "A page title and body are required.",
+          "unique": "That slug (URL) is already taken.",
+          "constraint": "That slug (URL) is already taken."
+        }
+      },
+      "_evidence": {
+        "locator": "includes/controller/Admin.php:687",
+        "id_local": "Page.add",
+        "entry": {
+          "kind": "http",
+          "route": "POST /admin/?action=add_page",
+          "locator": "includes/controller/Admin.php:652"
+        },
+        "ref_code": "$public = in_array($_POST['status'], array(Page::STATUS_LISTED, Page::STATUS_PUBLIC));\n$listed = in_array($_POST['status'], array(Page::STATUS_LISTED, Page::STATUS_TEASED));\nif (isset($_POST['private'])) { $public=false; $listed=false; }\n$page = Page::add(title:$_POST['title'], body:$_POST['body'], parent_id:$_POST['parent_id'], public:$public, show_in_list:$listed, list_order:$list_order, clean:sanitize($_POST['slug'],true,true,128));",
+        "edges": [
+          "admin_add_page checks can('add_page') (Admin.php:656)"
+        ]
+      }
+    },
+    {
+      "tool": "page_delete",
+      "description": "Delete a page (an admin-only operation). Child pages are deleted as well when destroy_children is set; otherwise they are re-parented to the root.",
+      "family": "crud.delete",
+      "op": "delete",
+      "entity": "Page",
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the page to delete."
+        },
+        "destroy": {
+          "type": "text",
+          "required": true,
+          "description": "Confirmation text; must be 'confirm'."
+        },
+        "destroy_children": {
+          "type": "bool",
+          "description": "When set, also delete the page's child pages."
+        }
+      },
+      "exec_spec": {
+        "entity": "Page",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Permission",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "code",
+                      "op": "eq",
+                      "value": "delete_page"
+                    },
+                    {
+                      "node": "field",
+                      "col": "group_id",
+                      "op": "eq",
+                      "value": {
+                        "session": "group_id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "id",
+          "destroy"
+        ],
+        "messages": {
+          "auth": "You must be signed in as an admin to delete a page.",
+          "precondition": "Your group does not have the 'delete_page' permission.",
+          "not_found": "That page does not exist."
+        }
+      },
+      "_evidence": {
+        "locator": "includes/controller/Admin.php:942",
+        "id_local": "Page.delete",
+        "entry": {
+          "kind": "http",
+          "route": "POST /admin/?action=destroy_page",
+          "locator": "includes/controller/Admin.php:908"
+        },
+        "ref_code": "foreach ($page->children as $child) if (isset($_POST['destroy_children'])) Page::delete($child->id, true); else $child->update(title:$child->title, body:$child->body, parent_id:0, ...);\nPage::delete($page->id);",
+        "edges": [
+          "admin_destroy_page checks can('delete_page') (Admin.php:912)"
+        ]
+      }
+    },
+    {
+      "tool": "page_update",
+      "description": "Edit an existing page (an admin-only operation): title, body, parent, status and slug.",
+      "family": "update.field_set",
+      "op": "update",
+      "entity": "Page",
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the page to edit."
+        },
+        "title": {
+          "type": "text",
+          "required": true,
+          "description": "New page title."
+        },
+        "body": {
+          "type": "text",
+          "required": true,
+          "description": "New page body."
+        },
+        "parent_id": {
+          "type": "int",
+          "description": "Id of a parent page."
+        },
+        "status": {
+          "type": "text",
+          "description": "One of listed, public, teased, or private."
+        },
+        "list_order": {
+          "type": "int",
+          "description": "Sort order in the navigation list."
+        },
+        "slug": {
+          "type": "text",
+          "description": "New URL slug; must be unique."
+        }
+      },
+      "exec_spec": {
+        "entity": "Page",
+        "row_key": {
+          "id": {
+            "$arg": "id"
+          }
+        },
+        "fields": [
+          "title",
+          "body",
+          "parent_id",
+          "list_order"
+        ],
+        "set": {
+          "public": true,
+          "show_in_list": true,
+          "url": {
+            "$arg": "slug"
+          },
+          "clean": {
+            "$arg": "slug"
+          }
+        }
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Permission",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "code",
+                      "op": "eq",
+                      "value": "edit_page"
+                    },
+                    {
+                      "node": "field",
+                      "col": "group_id",
+                      "op": "eq",
+                      "value": {
+                        "session": "group_id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "id",
+          "title",
+          "body"
+        ],
+        "messages": {
+          "auth": "You must be signed in as an admin to edit a page.",
+          "precondition": "Your group does not have the 'edit_page' permission.",
+          "not_found": "That page does not exist.",
+          "unique": "That slug (URL) is already taken.",
+          "constraint": "That slug (URL) is already taken."
+        }
+      },
+      "_evidence": {
+        "locator": "includes/controller/Admin.php:821",
+        "id_local": "Page.update",
+        "entry": {
+          "kind": "http",
+          "route": "POST /admin/?action=update_page",
+          "locator": "includes/controller/Admin.php:780"
+        },
+        "ref_code": "$page = new Page($_POST['id']); if ($page->no_results) show_404(...);\n$page = $page->update(title:$_POST['title'], body:$_POST['body'], parent_id:$_POST['parent_id'], public:$public, show_in_list:$listed, list_order:$list_order, clean:sanitize($_POST['slug'],true,true,128));",
+        "edges": [
+          "admin_update_page checks can('edit_page') (Admin.php:785)"
+        ]
+      }
+    },
+    {
+      "tool": "pingback_delete",
+      "description": "Delete a pingback (an admin-only operation).",
+      "family": "crud.delete",
+      "op": "delete",
+      "entity": "Pingback",
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the pingback to delete."
+        },
+        "destroy": {
+          "type": "text",
+          "required": true,
+          "description": "Confirmation text; must be 'confirm'."
+        }
+      },
+      "exec_spec": {
+        "entity": "Pingback",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Permission",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "code",
+                      "op": "eq",
+                      "value": "delete_pingback"
+                    },
+                    {
+                      "node": "field",
+                      "col": "group_id",
+                      "op": "eq",
+                      "value": {
+                        "session": "group_id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "id",
+          "destroy"
+        ],
+        "messages": {
+          "auth": "You must be signed in as an admin to delete a pingback.",
+          "precondition": "Your group does not have the 'delete_pingback' permission.",
+          "not_found": "That pingback does not exist."
+        }
+      },
+      "_evidence": {
+        "locator": "modules/pingable/pingable.php:185",
+        "id_local": "Pingback.delete",
+        "entry": {
+          "kind": "http",
+          "route": "POST /admin/?action=destroy_pingback",
+          "locator": "modules/pingable/pingable.php:174"
+        },
+        "ref_code": "$pingback = new Pingback($_POST['id']); if ($pingback->no_results) show_404(...); if (!$pingback->deletable()) show_403(...);\nPingback::delete($pingback->id);",
+        "edges": [
+          "admin_destroy_pingback calls $pingback->deletable() = can('delete_pingback') (pingable.php:186; Model.php:488)"
+        ]
+      }
+    },
+    {
+      "tool": "pingback_receive",
+      "description": "Receive and record a webmention / pingback for a post. Returns an error if pingbacks are disabled, or the mentioned post is not published and public, or a pingback from that source for that post already exists.",
+      "family": "crud.insert",
+      "op": "create",
+      "entity": "Pingback",
+      "input_schema": {
+        "source": {
+          "type": "text",
+          "required": true,
+          "description": "URL that mentions the post; the hostname becomes the pingback title."
+        },
+        "target": {
+          "type": "text",
+          "required": true,
+          "description": "The post's URL. Its id is resolved internally from the post url; post_id is bound to the matching post."
+        }
+      },
+      "exec_spec": {
+        "entity": "Pingback",
+        "fields": [
+          "source"
+        ],
+        "set_on_create": {
+          "post_id": {
+            "$arg": "post_id"
+          },
+          "title": "hostname",
+          "created_at": "2026-01-01T00:00:00"
+        }
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Config",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "key",
+                      "op": "eq",
+                      "value": "send_pingbacks"
+                    },
+                    {
+                      "node": "field",
+                      "col": "value",
+                      "op": "eq",
+                      "value": true
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            },
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Post",
+                "where": {
+                  "node": "field",
+                  "col": "clean",
+                  "op": "eq",
+                  "value": {
+                    "arg": "target"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            },
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Pingback",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "post_id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "post_id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "source",
+                      "op": "eq",
+                      "value": {
+                        "arg": "source"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "eq",
+              "n": 0
+            }
+          ]
+        ],
+        "required": [
+          "source",
+          "target"
+        ],
+        "messages": {
+          "required": "A source and target URL are required.",
+          "precondition": "Pingbacks are disabled, or the target does not resolve to a published post, or a pingback from that source for that post already exists."
+        }
+      },
+      "_evidence": {
+        "locator": "modules/pingable/pingable.php:62",
+        "id_local": "Pingback.receive",
+        "entry": {
+          "kind": "http",
+          "route": "POST /?action=webmention",
+          "locator": "includes/controller/Main.php:1322"
+        },
+        "ref_code": "# webmention_receive (helpers.php:2574) -> pingable webmention() (pingable.php:35)\n$count = SQL::current()->count(tables:\"pingbacks\", conds:array(\"post_id\"=>$post->id, \"source\"=>$from)); if (!empty($count)) error(...422);\nPingback::add(post_id:$post->id, source:$from, title:preg_replace(\"~(https?://|^)([^/:]+).*~i\",\"$2\",$from));",
+        "edges": [
+          "webmention_receive 503s when send_pingbacks config is off (helpers.php:2580); the target resolves to an existing post (helpers.php:2617)",
+          "pingable webmention: 422 if a pingback from that source already exists (pingable.php:40-53); the post_id is resolved from the target URL before the dedup check (helpers.php:2617)"
+        ]
+      }
+    },
+    {
+      "tool": "pingback_update",
+      "description": "Edit a pingback's displayed title (an admin-only operation).",
+      "family": "update.field_set",
+      "op": "update",
+      "entity": "Pingback",
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the pingback to edit."
+        },
+        "title": {
+          "type": "text",
+          "required": true,
+          "description": "New title shown for the pingback."
+        }
+      },
+      "exec_spec": {
+        "entity": "Pingback",
+        "row_key": {
+          "id": {
+            "$arg": "id"
+          }
+        },
+        "fields": [
+          "title"
+        ]
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Permission",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "code",
+                      "op": "eq",
+                      "value": "edit_pingback"
+                    },
+                    {
+                      "node": "field",
+                      "col": "group_id",
+                      "op": "eq",
+                      "value": {
+                        "session": "group_id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "id",
+          "title"
+        ],
+        "messages": {
+          "auth": "You must be signed in as an admin to edit a pingback.",
+          "precondition": "Your group does not have the 'edit_pingback' permission.",
+          "not_found": "That pingback does not exist."
+        }
+      },
+      "_evidence": {
+        "locator": "modules/pingable/pingable.php:115",
+        "id_local": "Pingback.update",
+        "entry": {
+          "kind": "http",
+          "route": "POST /admin/?action=update_pingback",
+          "locator": "modules/pingable/pingable.php:99"
+        },
+        "ref_code": "$pingback = new Pingback($_POST['id']); if ($pingback->no_results) show_404(...); if (!$pingback->editable()) show_403(...);\n$pingback = $pingback->update($_POST['title']);",
+        "edges": [
+          "admin_update_pingback calls $pingback->editable() = can('edit_pingback') (pingable.php:121; Model.php:504)"
+        ]
+      }
+    },
+    {
+      "tool": "post_add",
+      "description": "Create a new post and its content attributes. A user with only the 'add_draft' permission can save a draft; publishing to a public status requires the 'add_post' permission.",
+      "family": "crud.insert",
+      "op": "create",
+      "entity": "Post",
+      "input_schema": {
+        "feather": {
+          "type": "text",
+          "required": true,
+          "description": "The feather (format/markup backend) that handles this post, e.g. markdown."
+        },
+        "title": {
+          "type": "text",
+          "description": "Post title."
+        },
+        "body": {
+          "type": "text",
+          "required": true,
+          "description": "Post body / content."
+        },
+        "slug": {
+          "type": "text",
+          "description": "URL slug for the post; must be unique."
+        },
+        "status": {
+          "type": "text",
+          "description": "One of public, draft, registered_only, private, scheduled."
+        },
+        "pinned": {
+          "type": "bool",
+          "description": "Whether the post is pinned."
+        },
+        "created_at": {
+          "type": "datetime",
+          "description": "Publication timestamp."
+        },
+        "option": {
+          "type": "json",
+          "description": "Extra post attributes (key/value)."
+        }
+      },
+      "exec_spec": {
+        "entity": "Post",
+        "fields": [
+          "feather",
+          "pinned",
+          "status"
+        ],
+        "set_on_create": {
+          "user_id": {
+            "$session": "account_id"
+          },
+          "url": {
+            "$arg": "slug"
+          },
+          "clean": {
+            "$arg": "slug"
+          },
+          "updated_at": "2026-01-01T00:00:00"
+        },
+        "unique_on": [
+          "url"
+        ],
+        "messages": {
+          "unique": "That slug (URL) is already taken by another post."
+        }
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Permission",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "code",
+                      "op": "eq",
+                      "value": "add_post"
+                    },
+                    {
+                      "node": "field",
+                      "col": "group_id",
+                      "op": "eq",
+                      "value": {
+                        "session": "group_id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Permission",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "code",
+                      "op": "eq",
+                      "value": "add_draft"
+                    },
+                    {
+                      "node": "field",
+                      "col": "group_id",
+                      "op": "eq",
+                      "value": {
+                        "session": "group_id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "feather",
+          "body"
+        ],
+        "messages": {
+          "auth": "You must be signed in to create a post.",
+          "precondition": "Your group may only save drafts (without the add_post permission you cannot publish).",
+          "required": "A feather and the post body are required.",
+          "unique": "That slug (URL) is already taken by another post.",
+          "constraint": "That slug (URL) is already taken by another post."
+        }
+      },
+      "_evidence": {
+        "locator": "includes/model/Post.php:298",
+        "id_local": "Post.add",
+        "entry": {
+          "kind": "http",
+          "route": "POST /admin/?action=add_post",
+          "locator": "includes/controller/Admin.php:269"
+        },
+        "ref_code": "# Post::add (includes/model/Post.php:254)\n$new_values = array('feather'=>$feather,'user_id'=>$user_id,'pinned'=>$pinned,'status'=>$status,'clean'=>$clean,'url'=>$url,'created_at'=>$created_at,'updated_at'=>$updated_at);\n$sql->insert(table:\"posts\", data:$new_values);\n$id = $sql->latest(\"posts\");\nforeach ($attributes as $name => $value) $sql->insert(table:\"post_attributes\", data:array('post_id'=>$id,'name'=>$name,'value'=>$value));",
+        "edges": [
+          "admin_add_post: can('add_post','add_draft') else 403 (Admin.php:273); without add_post the status is forced to draft (Admin.php:301)",
+          "Post::check_url appends a number to a taken url (includes/model/Post.php:678)"
+        ]
+      }
+    },
+    {
+      "tool": "post_delete",
+      "description": "Delete a post and all of its comments, likes, views, attributes and pingbacks. Who may delete is the same four-way rule as post_update.",
+      "family": "crud.delete",
+      "op": "delete",
+      "entity": "Post",
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the post to delete."
+        },
+        "destroy": {
+          "type": "text",
+          "required": true,
+          "description": "Confirmation text; must be 'confirm'."
+        }
+      },
+      "exec_spec": {
+        "entity": "Post",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Permission",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "code",
+                      "op": "eq",
+                      "value": "delete_post"
+                    },
+                    {
+                      "node": "field",
+                      "col": "group_id",
+                      "op": "eq",
+                      "value": {
+                        "session": "group_id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Permission",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "code",
+                      "op": "eq",
+                      "value": "delete_draft"
+                    },
+                    {
+                      "node": "field",
+                      "col": "group_id",
+                      "op": "eq",
+                      "value": {
+                        "session": "group_id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            },
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Post",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "status",
+                      "op": "eq",
+                      "value": "draft"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Permission",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "code",
+                      "op": "eq",
+                      "value": "delete_own_post"
+                    },
+                    {
+                      "node": "field",
+                      "col": "group_id",
+                      "op": "eq",
+                      "value": {
+                        "session": "group_id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            },
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Post",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Permission",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "code",
+                      "op": "eq",
+                      "value": "delete_own_draft"
+                    },
+                    {
+                      "node": "field",
+                      "col": "group_id",
+                      "op": "eq",
+                      "value": {
+                        "session": "group_id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            },
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Post",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "status",
+                      "op": "eq",
+                      "value": "draft"
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "id",
+          "destroy"
+        ],
+        "messages": {
+          "auth": "You must be signed in to delete a post.",
+          "precondition": "You do not have permission to delete this post (delete_post, or delete_own_post as its author, or delete_draft/delete_own_draft on a draft).",
+          "not_found": "That post does not exist."
+        }
+      },
+      "_evidence": {
+        "locator": "includes/controller/Admin.php:495",
+        "id_local": "Post.delete",
+        "entry": {
+          "kind": "http",
+          "route": "POST /admin/?action=destroy_post",
+          "locator": "includes/controller/Admin.php:461"
+        },
+        "ref_code": "# Admin.php:495\nif (!$post->deletable()) show_403(...);\nPost::delete($post->id);\n# Post::delete (includes/model/Post.php:477)\nparent::destroy(self::class, $id, array(\"skip_where\"=>true));\nSQL::current()->delete(table:\"post_attributes\", conds:array(\"post_id\" => $id));",
+        "edges": [
+          "admin_destroy_post calls $post->deletable() (Post.php:496), analogous branches; Admin.php:489",
+          "comments delete_post deletes the post's comments (comments.php:1588)",
+          "likes delete_post deletes the post's likes (likes.php:276)",
+          "post_views delete_post deletes the post's views (post_views.php:109)"
+        ]
+      }
+    },
+    {
+      "tool": "post_manage",
+      "description": "List posts in the admin console, optionally filtered by feather, status, or a keyword, restricted to posts the current user may see.",
+      "family": "search",
+      "op": "search",
+      "entity": "Post",
+      "input_schema": {
+        "search": {
+          "type": "text",
+          "description": "Optional keyword to match against post content."
+        },
+        "feather": {
+          "type": "text",
+          "description": "Only posts handled by this feather."
+        },
+        "status": {
+          "type": "text",
+          "description": "Only posts in this status."
+        },
+        "page": {
+          "type": "int",
+          "description": "Page of results to return."
+        }
+      },
+      "exec_spec": {
+        "entity": "Post",
+        "scope": {
+          "owner_col": "user_id"
+        },
+        "rank": {
+          "method": "substring",
+          "fields": [
+            "clean",
+            "url"
+          ]
+        },
+        "filter": {
+          "op": "and",
+          "clauses": [
+            {
+              "op": "or",
+              "clauses": [
+                {
+                  "col": "clean",
+                  "mode": "substring",
+                  "val": {
+                    "$arg": "search"
+                  },
+                  "optional": true
+                },
+                {
+                  "col": "url",
+                  "mode": "substring",
+                  "val": {
+                    "$arg": "search"
+                  },
+                  "optional": true
+                }
+              ]
+            },
+            {
+              "col": "status",
+              "mode": "exact",
+              "val": {
+                "$arg": "status"
+              },
+              "optional": true
+            },
+            {
+              "col": "feather",
+              "mode": "exact",
+              "val": {
+                "$arg": "feather"
+              },
+              "optional": true
+            }
+          ]
+        }
+      },
+      "guards": {
+        "messages": {
+          "auth": "You must be signed in to manage posts."
+        }
+      },
+      "_evidence": {
+        "locator": "includes/controller/Admin.php:507",
+        "id_local": "Post.manage",
+        "entry": {
+          "kind": "http",
+          "route": "GET /admin/manage_posts",
+          "locator": "includes/controller/Admin.php:507"
+        },
+        "ref_code": "if (!Post::any_editable() and !Post::any_deletable()) show_403(...);\n... if (\"$feather\") $where['feather']=$feather; if (isset($_GET['status'])) $where['status']=$_GET['status']; ... $posts = new Paginator(Post::find(array('placeholders'=>true,'where'=>$where,'params'=>$params)), $this->post_limit);",
+        "scope_why": "Owner-scoped: the console lists the user's own posts (in real code, those their permissions can touch).",
+        "edges": [
+          "admin_manage_posts requires any_editable or any_deletable (Admin.php)"
+        ]
+      }
+    },
+    {
+      "tool": "post_update",
+      "description": "Edit a post and its content attributes: title, body, slug, status, pin state. Who may edit is the real four-way rule: edit_post anywhere, or edit_draft on a draft, or edit_own_post on your own post, or edit_own_draft on your own draft.",
+      "family": "update.field_set",
+      "op": "update",
+      "entity": "Post",
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the post to edit."
+        },
+        "title": {
+          "type": "text",
+          "description": "New post title."
+        },
+        "body": {
+          "type": "text",
+          "required": true,
+          "description": "New post body."
+        },
+        "slug": {
+          "type": "text",
+          "description": "New URL slug; must be unique."
+        },
+        "status": {
+          "type": "text",
+          "description": "New status: public, draft, registered_only, private, scheduled."
+        },
+        "pinned": {
+          "type": "bool",
+          "description": "New pin state."
+        },
+        "created_at": {
+          "type": "datetime",
+          "description": "New publication timestamp."
+        },
+        "option": {
+          "type": "json",
+          "description": "Replacement extra attributes (key/value)."
+        }
+      },
+      "exec_spec": {
+        "entity": "Post",
+        "row_key": {
+          "id": {
+            "$arg": "id"
+          }
+        },
+        "fields": [
+          "pinned",
+          "status",
+          "clean",
+          "url",
+          "created_at",
+          "updated_at"
+        ],
+        "set": {
+          "user_id": {
+            "$session": "account_id"
+          },
+          "updated_at": "2026-01-01T00:00:00"
+        }
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Permission",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "code",
+                      "op": "eq",
+                      "value": "edit_post"
+                    },
+                    {
+                      "node": "field",
+                      "col": "group_id",
+                      "op": "eq",
+                      "value": {
+                        "session": "group_id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Permission",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "code",
+                      "op": "eq",
+                      "value": "edit_draft"
+                    },
+                    {
+                      "node": "field",
+                      "col": "group_id",
+                      "op": "eq",
+                      "value": {
+                        "session": "group_id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            },
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Post",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "status",
+                      "op": "eq",
+                      "value": "draft"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Permission",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "code",
+                      "op": "eq",
+                      "value": "edit_own_post"
+                    },
+                    {
+                      "node": "field",
+                      "col": "group_id",
+                      "op": "eq",
+                      "value": {
+                        "session": "group_id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            },
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Post",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Permission",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "code",
+                      "op": "eq",
+                      "value": "edit_own_draft"
+                    },
+                    {
+                      "node": "field",
+                      "col": "group_id",
+                      "op": "eq",
+                      "value": {
+                        "session": "group_id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            },
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Post",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "status",
+                      "op": "eq",
+                      "value": "draft"
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "id",
+          "body"
+        ],
+        "messages": {
+          "auth": "You must be signed in to edit a post.",
+          "precondition": "You do not have permission to edit this post (edit_post, or edit_own_post as its author, or edit_draft/edit_own_draft on a draft).",
+          "not_found": "That post does not exist.",
+          "unique": "That slug (URL) is already taken.",
+          "constraint": "That slug (URL) is already taken."
+        }
+      },
+      "_evidence": {
+        "locator": "includes/model/Post.php:409",
+        "id_local": "Post.update",
+        "entry": {
+          "kind": "http",
+          "route": "POST /admin/?action=update_post",
+          "locator": "includes/controller/Admin.php:368"
+        },
+        "ref_code": "# Post::update (includes/model/Post.php:358)\n$new_values = array('user_id'=>$user_id,'pinned'=>$pinned,'status'=>$status,'clean'=>$clean,'url'=>$url,'created_at'=>$created_at,'updated_at'=>$updated_at);\n$sql->update(table:\"posts\", conds:array(\"id\"=>$this->id), data:$new_values);\nforeach ($attributes as $name => $value) $sql->replace(table:\"post_attributes\", keys:array(\"post_id\",\"name\"), data:array('post_id'=>$this->id,'name'=>$name,'value'=>$value));",
+        "edges": [
+          "admin_update_post calls $post->editable() (Post.php:528): edit_post || (draft && edit_draft) || (edit_own_post && user_id) || (own draft && edit_own_draft); Admin.php:400"
+        ]
+      }
+    },
+    {
+      "tool": "user_activate",
+      "description": "Approve a pending user account so it can sign in, using the email-verification token. Succeeds even if the account is already approved.",
+      "family": "update.field_set",
+      "op": "update",
+      "entity": "User",
+      "input_schema": {
+        "login": {
+          "type": "text",
+          "required": true,
+          "description": "Login name of the account to activate."
+        },
+        "token": {
+          "type": "text",
+          "required": true,
+          "description": "The activation token emailed to the user."
+        }
+      },
+      "exec_spec": {
+        "entity": "User",
+        "row_key": {
+          "login": {
+            "$arg": "login"
+          }
+        },
+        "set": {
+          "approved": true
+        },
+        "fields": []
+      },
+      "guards": {
+        "required": [
+          "login",
+          "token"
+        ],
+        "messages": {
+          "not_found": "No account has that login name.",
+          "required": "An account login and its activation token are required."
+        }
+      },
+      "_evidence": {
+        "locator": "includes/controller/Main.php:962",
+        "id_local": "User.activate",
+        "entry": {
+          "kind": "http",
+          "route": "GET /?action=activate",
+          "locator": "includes/controller/Main.php:951"
+        },
+        "ref_code": "$user = new User(array(\"login\" => $_GET['login']));\n$hash = token($user->login);\nif (!hash_equals($hash, $_GET['token'])) Flash::warning(...);\n$user = $user->update(approved:true);"
+      }
+    },
+    {
+      "tool": "user_add_admin",
+      "description": "Create a new user account (an admin-only operation), placing it in a group and setting whether it is activated.",
+      "family": "crud.insert",
+      "op": "create",
+      "entity": "User",
+      "input_schema": {
+        "login": {
+          "type": "text",
+          "required": true,
+          "description": "Unique login for the new account."
+        },
+        "password1": {
+          "type": "text",
+          "required": true,
+          "description": "Password for the new account."
+        },
+        "password2": {
+          "type": "text",
+          "required": true,
+          "description": "Password confirmation; must match password1."
+        },
+        "email": {
+          "type": "text",
+          "required": true,
+          "description": "Email for the new account."
+        },
+        "full_name": {
+          "type": "text",
+          "description": "Display name."
+        },
+        "website": {
+          "type": "text",
+          "description": "Website URL."
+        },
+        "group": {
+          "type": "int",
+          "description": "Id of the group the account belongs to."
+        },
+        "activated": {
+          "type": "bool",
+          "description": "Whether the account is approved to sign in immediately."
+        }
+      },
+      "exec_spec": {
+        "entity": "User",
+        "fields": {
+          "login": {
+            "$arg": "login"
+          },
+          "email": {
+            "$arg": "email"
+          },
+          "full_name": {
+            "$arg": "full_name"
+          },
+          "website": {
+            "$arg": "website"
+          },
+          "approved": {
+            "$arg": "activated"
+          }
+        },
+        "set_on_create": {
+          "password": {
+            "$arg": "password1"
+          },
+          "group_id": {
+            "$arg": "group"
+          }
+        },
+        "unique_on": [
+          "login"
+        ],
+        "messages": {
+          "unique": "That login is already taken."
+        }
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Permission",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "code",
+                      "op": "eq",
+                      "value": "add_user"
+                    },
+                    {
+                      "node": "field",
+                      "col": "group_id",
+                      "op": "eq",
+                      "value": {
+                        "session": "group_id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "login",
+          "password1",
+          "password2",
+          "email"
+        ],
+        "messages": {
+          "auth": "You must be signed in as an admin to add a user.",
+          "precondition": "Your group does not have the 'add_user' permission.",
+          "required": "Login, both password fields and an email are required.",
+          "unique": "That login is already taken.",
+          "fk": "The target group does not exist.",
+          "constraint": "That login is already taken."
+        }
+      },
+      "_evidence": {
+        "locator": "includes/controller/Admin.php:1118",
+        "id_local": "User.add_admin",
+        "entry": {
+          "kind": "http",
+          "route": "POST /admin/?action=add_user",
+          "locator": "includes/controller/Admin.php:1045"
+        },
+        "ref_code": "$group = new Group($_POST['group']); if ($group->no_results) show_404(...);\n$user = User::add(login:$login, password:User::hash_password($_POST['password1']), email:$_POST['email'], full_name:$_POST['full_name'], website:$_POST['website'], group_id:$group->id, approved:!empty($_POST['activated']));",
+        "edges": [
+          "admin_add_user: Visitor::current()->group->can('add_user') else 403 (Admin.php:1046)"
+        ]
+      }
+    },
+    {
+      "tool": "user_destroy_admin",
+      "description": "Delete a user account (an admin-only operation), reassigning or deleting that user's posts and pages first. The last approved admin account cannot be deleted.",
+      "family": "crud.delete",
+      "op": "delete",
+      "entity": "User",
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the account to delete."
+        },
+        "destroy": {
+          "type": "text",
+          "required": true,
+          "description": "Confirmation text; must be 'confirm'."
+        },
+        "move_posts": {
+          "type": "int",
+          "description": "Id of a user to transfer the deleted user's posts to."
+        },
+        "move_pages": {
+          "type": "int",
+          "description": "Id of a user to transfer the deleted user's pages to."
+        }
+      },
+      "exec_spec": {
+        "entity": "User",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        },
+        "guard_last": {
+          "approved": true
+        }
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Permission",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "code",
+                      "op": "eq",
+                      "value": "delete_user"
+                    },
+                    {
+                      "node": "field",
+                      "col": "group_id",
+                      "op": "eq",
+                      "value": {
+                        "session": "group_id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "id",
+          "destroy"
+        ],
+        "messages": {
+          "auth": "You must be signed in as an admin to delete a user.",
+          "precondition": "Your group does not have the 'delete_user' permission.",
+          "not_found": "That account does not exist.",
+          "guard_last": "You cannot delete the last approved admin account."
+        }
+      },
+      "_evidence": {
+        "locator": "includes/controller/Admin.php:1455",
+        "id_local": "User.destroy_admin",
+        "entry": {
+          "kind": "http",
+          "route": "POST /admin/?action=destroy_user",
+          "locator": "includes/controller/Admin.php:1419"
+        },
+        "ref_code": "if (!empty($user->posts)) { if (!empty($_POST['move_posts'])) { $posts_user = new User($_POST['move_posts']); foreach ($user->posts as $post) $sql->update(table:\"posts\", conds:array(\"id\"=>$post->id), data:array(\"user_id\"=>$posts_user->id)); } else { foreach ($user->posts as $post) Post::delete($post->id); } }\n... same for pages ...\nUser::delete($user->id);",
+        "edges": [
+          "admin_destroy_user checks can('delete_user') (Admin.php:1423)"
+        ]
+      }
+    },
+    {
+      "tool": "user_login",
+      "description": "Sign in with an account login and password. Almost everything that touches a post, page, comment or setting requires an authenticated session first; the session it opens is what $actor resolves to.",
+      "family": "guard.auth",
+      "op": "action",
+      "entity": "User",
+      "input_schema": {
+        "login": {
+          "type": "text",
+          "required": true,
+          "description": "The account login name."
+        },
+        "password": {
+          "type": "text",
+          "required": true,
+          "description": "The account password."
+        }
+      },
+      "exec_spec": {
+        "verify": {
+          "entity": "User",
+          "username_col": "login",
+          "password_col": "password"
+        }
+      },
+      "guards": {
+        "required": [
+          "login",
+          "password"
+        ]
+      },
+      "_evidence": {
+        "locator": "includes/controller/Main.php:1023",
+        "id_local": "User.login",
+        "entry": {
+          "kind": "http",
+          "route": "POST /?action=login",
+          "locator": "includes/controller/Main.php:998"
+        },
+        "ref_code": "if (!User::authenticate($_POST['login'], $_POST['password'])) Flash::warning(\"Incorrect username and/or password.\");\nif (!Flash::exists(\"warning\")) { $user = new User(array(\"login\" => $_POST['login'])); if (!$user->approved) {...} Visitor::log_in($user); }"
+      }
+    },
+    {
+      "tool": "user_logout",
+      "description": "End the current session and sign out the visitor.",
+      "family": "guard.logout",
+      "op": "action",
+      "entity": "User",
+      "input_schema": {},
+      "exec_spec": {
+        "entity": "User"
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in to log out."
+        }
+      },
+      "_evidence": {
+        "locator": "includes/controller/Main.php:1073",
+        "id_local": "User.logout",
+        "entry": {
+          "kind": "http",
+          "route": "GET /?action=logout",
+          "locator": "includes/controller/Main.php:1073"
+        },
+        "ref_code": "if (!logged_in()) Flash::notice(...);\nVisitor::log_out();\nFlash::notice(__(\"Logged out.\"), \"/\");",
+        "edges": [
+          "logout only redirects a non-logged-in visitor (Main.php:1075); session destroyed for logged-in visitor"
+        ]
+      }
+    },
+    {
+      "tool": "user_lost_password",
+      "description": "Request a password-reset link for an account by its login name. Always reports success (whether or not the account exists) so that login names cannot be enumerated.",
+      "family": "crud.fetch",
+      "op": "action",
+      "entity": "User",
+      "input_schema": {
+        "login": {
+          "type": "text",
+          "required": true,
+          "description": "The login name of the account to reset."
+        }
+      },
+      "exec_spec": {
+        "entity": "User",
+        "lookup_by": {
+          "login": {
+            "$arg": "login"
+          }
+        }
+      },
+      "guards": {
+        "required": [
+          "login"
+        ],
+        "messages": {
+          "not_found": "That login does not match any account.",
+          "required": "A login name is required."
+        }
+      }
+    },
+    {
+      "tool": "user_manage",
+      "description": "List user accounts for the admin console, optionally filtered by a substring search on the login name.",
+      "family": "search",
+      "op": "search",
+      "entity": "User",
+      "input_schema": {
+        "search": {
+          "type": "text",
+          "description": "Optional substring to match against the login name."
+        },
+        "page": {
+          "type": "int",
+          "description": "Page of results to return."
+        }
+      },
+      "exec_spec": {
+        "entity": "User",
+        "rank": {
+          "method": "substring",
+          "fields": [
+            "login"
+          ]
+        },
+        "pagination": {
+          "default_limit": 20
+        }
+      },
+      "guards": {
+        "messages": {
+          "auth": "You must be signed in to browse users."
+        }
+      },
+      "_evidence": {
+        "locator": "includes/controller/Admin.php:1513",
+        "id_local": "User.manage",
+        "entry": {
+          "kind": "http",
+          "route": "GET /admin/manage_users",
+          "locator": "includes/controller/Admin.php:1513"
+        },
+        "ref_code": "if (isset($_POST['search'])) redirect(...); list($where,$params,$order)=keywords($_GET['search']??\"\", \"login LIKE :query\", \"users\"); ... $users=new Paginator(User::find(array('placeholders'=>true,'where'=>$where,'params'=>$params)), $admin->post_limit);",
+        "scope_why": "Admin user directory: global by design inside the admin console."
+      }
+    },
+    {
+      "tool": "user_register",
+      "description": "Create a new user account and sign them in. Registration only works while Can.Register is enabled. Approval follows the configured activation mode; the account is created approved (immediate login) here.",
+      "family": "auth.register",
+      "op": "create",
+      "entity": "User",
+      "input_schema": {
+        "login": {
+          "type": "text",
+          "required": true,
+          "description": "Unique login name for the new account."
+        },
+        "password1": {
+          "type": "text",
+          "required": true,
+          "description": "Desired password."
+        },
+        "password2": {
+          "type": "text",
+          "required": true,
+          "description": "Password confirmation; must match password1."
+        },
+        "email": {
+          "type": "text",
+          "required": true,
+          "description": "Contact email for the new account."
+        },
+        "full_name": {
+          "type": "text",
+          "description": "Display name."
+        },
+        "website": {
+          "type": "text",
+          "description": "Website URL."
+        }
+      },
+      "exec_spec": {
+        "entity": "User",
+        "fields": [
+          "login",
+          "email",
+          "full_name",
+          "website"
+        ],
+        "set_on_create": {
+          "password": {
+            "$arg": "password1"
+          },
+          "group_id": 2,
+          "approved": true
+        },
+        "prechecks": [
+          {
+            "entity": "User",
+            "where": {
+              "login": {
+                "$arg": "login"
+              }
+            },
+            "negate": true,
+            "message": "That login name is already taken."
+          },
+          {
+            "entity": "User",
+            "where": {
+              "email": {
+                "$arg": "email"
+              }
+            },
+            "negate": true,
+            "message": "That email is already registered."
+          }
+        ]
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Config",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "key",
+                      "op": "eq",
+                      "value": "can_register"
+                    },
+                    {
+                      "node": "field",
+                      "col": "value",
+                      "op": "eq",
+                      "value": true
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "login",
+          "password1",
+          "password2",
+          "email"
+        ],
+        "messages": {
+          "required": "Login, both password fields and an email are required.",
+          "precondition": "New registration is currently closed on this site.",
+          "unique": "That login name or email is already taken.",
+          "register": "That login name or email is already registered.",
+          "constraint": "That login name or email is already taken."
+        }
+      },
+      "_evidence": {
+        "locator": "includes/controller/Main.php:895",
+        "id_local": "User.register",
+        "entry": {
+          "kind": "http",
+          "route": "POST /?action=register",
+          "locator": "includes/controller/Main.php:810"
+        },
+        "ref_code": "if (!Flash::exists(\"warning\")) {\n  $user = User::add(login:$login, password:User::hash_password($_POST['password1']), email:$_POST['email'], full_name:$_POST['full_name'], website:$_POST['website'], group_id:$config->default_group, approved:($config->user_activation == User::ACTIVATION_NONE));\n  Visitor::log_in($user); }",
+        "edges": [
+          "register requires config can_register (Main.php:815) and is exempt from view_site"
+        ]
+      }
+    },
+    {
+      "tool": "user_reset_password",
+      "description": "Set a new password for an account whose reset token matches. The token was emailed to the account owner.",
+      "family": "update.field_set",
+      "op": "update",
+      "entity": "User",
+      "input_schema": {
+        "login": {
+          "type": "text",
+          "required": true,
+          "description": "The login name of the account."
+        },
+        "token": {
+          "type": "text",
+          "required": true,
+          "description": "The password-reset token emailed to the owner."
+        },
+        "new_password1": {
+          "type": "text",
+          "required": true,
+          "description": "The new password."
+        },
+        "new_password2": {
+          "type": "text",
+          "required": true,
+          "description": "Confirmation of the new password."
+        }
+      },
+      "exec_spec": {
+        "entity": "User",
+        "row_key": {
+          "login": {
+            "$arg": "login"
+          }
+        },
+        "set": {
+          "password": {
+            "$arg": "new_password1"
+          }
+        },
+        "fields": []
+      },
+      "guards": {
+        "required": [
+          "login",
+          "token",
+          "new_password1",
+          "new_password2"
+        ],
+        "messages": {
+          "not_found": "No account has that login name.",
+          "required": "Login, token and both password fields are required."
+        }
+      }
+    },
+    {
+      "tool": "user_update_admin",
+      "description": "Edit an existing user account (an admin-only operation): profile fields, group, activation, and optionally a new password.",
+      "family": "update.field_set",
+      "op": "update",
+      "entity": "User",
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the account to edit."
+        },
+        "login": {
+          "type": "text",
+          "required": true,
+          "description": "Login name for the account."
+        },
+        "email": {
+          "type": "text",
+          "required": true,
+          "description": "Email for the account."
+        },
+        "full_name": {
+          "type": "text",
+          "description": "Display name."
+        },
+        "website": {
+          "type": "text",
+          "description": "Website URL."
+        },
+        "group": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the group the account belongs to."
+        },
+        "activated": {
+          "type": "bool",
+          "description": "Whether the account is approved to sign in."
+        },
+        "new_password1": {
+          "type": "text",
+          "description": "New password, when changing it."
+        },
+        "new_password2": {
+          "type": "text",
+          "description": "Confirmation of the new password."
+        }
+      },
+      "exec_spec": {
+        "entity": "User",
+        "row_key": {
+          "id": {
+            "$arg": "id"
+          }
+        },
+        "fields": {
+          "login": {
+            "$arg": "login"
+          },
+          "email": {
+            "$arg": "email"
+          },
+          "full_name": {
+            "$arg": "full_name"
+          },
+          "website": {
+            "$arg": "website"
+          },
+          "approved": {
+            "$arg": "activated"
+          }
+        },
+        "set": {
+          "group_id": {
+            "$arg": "group"
+          }
+        }
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Permission",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "code",
+                      "op": "eq",
+                      "value": "edit_user"
+                    },
+                    {
+                      "node": "field",
+                      "col": "group_id",
+                      "op": "eq",
+                      "value": {
+                        "session": "group_id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "id",
+          "login",
+          "email",
+          "group"
+        ],
+        "messages": {
+          "auth": "You must be signed in as an admin to edit a user.",
+          "precondition": "Your group does not have the 'edit_user' permission.",
+          "not_found": "That account does not exist.",
+          "fk": "The target group does not exist."
+        }
+      },
+      "_evidence": {
+        "locator": "includes/controller/Admin.php:1272",
+        "id_local": "User.update_admin",
+        "entry": {
+          "kind": "http",
+          "route": "POST /admin/?action=update_user",
+          "locator": "includes/controller/Admin.php:1218"
+        },
+        "ref_code": "$user = new User($_POST['id']); if ($user->no_results) show_404(...);\n$password = (!empty($_POST['new_password1'])) ? User::hash_password($_POST['new_password1']) : $user->password;\n$user = $user->update(login:$login, password:$password, email:$_POST['email'], full_name:$_POST['full_name'], website:$_POST['website'], group_id:$group->id, approved:!empty($_POST['activated']));",
+        "edges": [
+          "admin_update_user checks can('edit_user') (Admin.php:1236)"
+        ]
+      }
+    },
+    {
+      "tool": "user_update_profile",
+      "description": "Update the signed-in user's own profile (email, display name, website) and optionally change their password. You can only edit the account you are signed in as.",
+      "family": "update.field_set",
+      "op": "update",
+      "entity": "User",
+      "input_schema": {
+        "email": {
+          "type": "text",
+          "required": true,
+          "description": "The account's new email address."
+        },
+        "full_name": {
+          "type": "text",
+          "description": "The account's new display name."
+        },
+        "website": {
+          "type": "text",
+          "description": "The account's website URL."
+        },
+        "new_password1": {
+          "type": "text",
+          "description": "New password; must match new_password2."
+        },
+        "new_password2": {
+          "type": "text",
+          "description": "Confirmation of the new password."
+        }
+      },
+      "exec_spec": {
+        "entity": "User",
+        "row_key": {
+          "id": {
+            "$session": "account_id"
+          }
+        },
+        "fields": [
+          "email",
+          "full_name",
+          "website"
+        ],
+        "set": {
+          "login": {
+            "$session": "login"
+          },
+          "group_id": {
+            "$session": "group_id"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "email"
+        ],
+        "messages": {
+          "auth": "You must be signed in to update your profile.",
+          "required": "An email address is required.",
+          "not_found": "Your account could not be found."
+        }
+      }
+    }
+  ],
+  "seed_state": {
+    "Group": [
+      {
+        "id": 1,
+        "name": "Admin"
+      },
+      {
+        "id": 2,
+        "name": "User"
+      },
+      {
+        "id": 3,
+        "name": "Guest"
+      }
+    ],
+    "Permission": [
+      {
+        "id": 1,
+        "name": "Add users",
+        "group_id": 1,
+        "code": "add_user"
+      },
+      {
+        "id": 2,
+        "name": "Edit users",
+        "group_id": 1,
+        "code": "edit_user"
+      },
+      {
+        "id": 3,
+        "name": "Delete users",
+        "group_id": 1,
+        "code": "delete_user"
+      },
+      {
+        "id": 4,
+        "name": "Add groups",
+        "group_id": 1,
+        "code": "add_group"
+      },
+      {
+        "id": 5,
+        "name": "Edit groups",
+        "group_id": 1,
+        "code": "edit_group"
+      },
+      {
+        "id": 6,
+        "name": "Delete groups",
+        "group_id": 1,
+        "code": "delete_group"
+      },
+      {
+        "id": 7,
+        "name": "Add posts",
+        "group_id": 1,
+        "code": "add_post"
+      },
+      {
+        "id": 8,
+        "name": "Edit posts",
+        "group_id": 1,
+        "code": "edit_post"
+      },
+      {
+        "id": 9,
+        "name": "Delete posts",
+        "group_id": 1,
+        "code": "delete_post"
+      },
+      {
+        "id": 10,
+        "name": "Add pages",
+        "group_id": 1,
+        "code": "add_page"
+      },
+      {
+        "id": 11,
+        "name": "Edit pages",
+        "group_id": 1,
+        "code": "edit_page"
+      },
+      {
+        "id": 12,
+        "name": "Delete pages",
+        "group_id": 1,
+        "code": "delete_page"
+      },
+      {
+        "id": 13,
+        "name": "Manage categories",
+        "group_id": 1,
+        "code": "manage_categorize"
+      },
+      {
+        "id": 14,
+        "name": "Add comments",
+        "group_id": 1,
+        "code": "add_comment"
+      },
+      {
+        "id": 15,
+        "name": "Edit comments",
+        "group_id": 1,
+        "code": "edit_comment"
+      },
+      {
+        "id": 16,
+        "name": "Delete comments",
+        "group_id": 1,
+        "code": "delete_comment"
+      },
+      {
+        "id": 17,
+        "name": "Change settings",
+        "group_id": 1,
+        "code": "change_settings"
+      },
+      {
+        "id": 18,
+        "name": "Like posts",
+        "group_id": 1,
+        "code": "like_post"
+      },
+      {
+        "id": 19,
+        "name": "Unlike posts",
+        "group_id": 1,
+        "code": "unlike_post"
+      },
+      {
+        "id": 20,
+        "name": "Edit pingbacks",
+        "group_id": 1,
+        "code": "edit_pingback"
+      },
+      {
+        "id": 21,
+        "name": "Delete pingbacks",
+        "group_id": 1,
+        "code": "delete_pingback"
+      },
+      {
+        "id": 22,
+        "name": "Add uploads",
+        "group_id": 1,
+        "code": "add_upload"
+      },
+      {
+        "id": 23,
+        "name": "Delete uploads",
+        "group_id": 1,
+        "code": "delete_upload"
+      },
+      {
+        "id": 24,
+        "name": "Toggle extensions",
+        "group_id": 1,
+        "code": "toggle_extensions"
+      },
+      {
+        "id": 25,
+        "name": "Add comments",
+        "group_id": 2,
+        "code": "add_comment"
+      },
+      {
+        "id": 26,
+        "name": "Edit own comments",
+        "group_id": 2,
+        "code": "edit_own_comment"
+      },
+      {
+        "id": 27,
+        "name": "Delete own comments",
+        "group_id": 2,
+        "code": "delete_own_comment"
+      },
+      {
+        "id": 28,
+        "name": "Like posts",
+        "group_id": 2,
+        "code": "like_post"
+      },
+      {
+        "id": 29,
+        "name": "Unlike posts",
+        "group_id": 2,
+        "code": "unlike_post"
+      },
+      {
+        "id": 30,
+        "name": "Add drafts",
+        "group_id": 2,
+        "code": "add_draft"
+      },
+      {
+        "id": 31,
+        "name": "Edit own posts",
+        "group_id": 2,
+        "code": "edit_own_post"
+      },
+      {
+        "id": 32,
+        "name": "Edit own drafts",
+        "group_id": 2,
+        "code": "edit_own_draft"
+      },
+      {
+        "id": 33,
+        "name": "Delete own posts",
+        "group_id": 2,
+        "code": "delete_own_post"
+      },
+      {
+        "id": 34,
+        "name": "Delete own drafts",
+        "group_id": 2,
+        "code": "delete_own_draft"
+      },
+      {
+        "id": 35,
+        "name": "Create posts",
+        "group_id": 2,
+        "code": "create_posts"
+      },
+      {
+        "id": 36,
+        "name": "Add comments",
+        "group_id": 3,
+        "code": "add_comment"
+      },
+      {
+        "id": 37,
+        "name": "Create posts",
+        "group_id": 3,
+        "code": "create_posts"
+      }
+    ],
+    "User": [
+      {
+        "id": 1,
+        "login": "ops@chyrp_lite.example",
+        "password": "pw-operations",
+        "full_name": "Ada Admin",
+        "email": "ops@chyrp_lite.example",
+        "website": "",
+        "group_id": 1,
+        "approved": true
+      },
+      {
+        "id": 2,
+        "login": "colleague@chyrp_lite.example",
+        "password": "pw-colleague",
+        "full_name": "Lin User",
+        "email": "colleague@chyrp_lite.example",
+        "website": "",
+        "group_id": 2,
+        "approved": true
+      },
+      {
+        "id": 3,
+        "login": "third@chyrp_lite.example",
+        "password": "pw-third",
+        "full_name": "Grace User",
+        "email": "third@chyrp_lite.example",
+        "website": "",
+        "group_id": 2,
+        "approved": true
+      }
+    ],
+    "Category": [
+      {
+        "id": 1,
+        "name": "News",
+        "clean": "news",
+        "show_on_home": true
+      },
+      {
+        "id": 2,
+        "name": "Tutorials",
+        "clean": "tutorials",
+        "show_on_home": true
+      }
+    ],
+    "Post": [
+      {
+        "id": 1,
+        "feather": "markdown",
+        "clean": "hello-world",
+        "url": "hello-world",
+        "pinned": false,
+        "status": "public",
+        "user_id": 1,
+        "created_at": "2026-01-02T00:00:00",
+        "updated_at": "2026-01-02T00:00:00"
+      },
+      {
+        "id": 2,
+        "feather": "markdown",
+        "clean": "draft-post",
+        "url": "draft-post",
+        "pinned": false,
+        "status": "draft",
+        "user_id": 1,
+        "created_at": "2026-01-03T00:00:00",
+        "updated_at": "2026-01-03T00:00:00"
+      },
+      {
+        "id": 3,
+        "feather": "markdown",
+        "clean": "scheduled-post",
+        "url": "scheduled-post",
+        "pinned": false,
+        "status": "scheduled",
+        "user_id": 1,
+        "created_at": "2026-01-04T00:00:00",
+        "updated_at": "2026-01-04T00:00:00"
+      }
+    ],
+    "PostAttribute": [
+      {
+        "post_id": 1,
+        "name": "title",
+        "value": "Hello, World!",
+        "id": 1
+      },
+      {
+        "post_id": 1,
+        "name": "body",
+        "value": "The first post.",
+        "id": 2
+      },
+      {
+        "post_id": 2,
+        "name": "title",
+        "value": "A Draft",
+        "id": 3
+      },
+      {
+        "post_id": 2,
+        "name": "body",
+        "value": "Work in progress.",
+        "id": 4
+      },
+      {
+        "post_id": 3,
+        "name": "title",
+        "value": "Scheduled",
+        "id": 5
+      },
+      {
+        "post_id": 3,
+        "name": "body",
+        "value": "Coming soon.",
+        "id": 6
+      }
+    ],
+    "Page": [
+      {
+        "id": 1,
+        "title": "About",
+        "body": "About this blog",
+        "public": true,
+        "show_in_list": true,
+        "list_order": 0,
+        "clean": "about",
+        "url": "about",
+        "user_id": 1,
+        "parent_id": 0,
+        "created_at": "2026-01-02T00:00:00",
+        "updated_at": "2026-01-02T00:00:00"
+      }
+    ],
+    "Config": [
+      {
+        "key": "name",
+        "value": "Chyrp Blog",
+        "id": 1
+      },
+      {
+        "key": "can_register",
+        "value": true,
+        "id": 2
+      },
+      {
+        "key": "send_pingbacks",
+        "value": false,
+        "id": 3
+      },
+      {
+        "key": "default_group",
+        "value": 2,
+        "id": 4
+      },
+      {
+        "key": "guest_group",
+        "value": 3,
+        "id": 5
+      }
+    ]
+  },
+  "summary": "Chyrp Lite: a self-hosted PHP blog / web-publishing platform. Users live in groups that carry a flattened set of Permission rows; every admin action is gated by checking that the actor's group holds the right permission. Content = posts (core columns plus a key/value PostAttribute table) and static pages; optional modules add comments, likes, views, tags/categories and webmentions (pingbacks). A key/value Config table stores settings. Auth entity is User (login/password).",
+  "_auth_candidates": [
+    {
+      "entity": "User",
+      "username_col": "login",
+      "password_col": "password"
+    }
+  ],
+  "_session_fields": [
+    "login",
+    "group_id"
+  ],
+  "_fk_gravity": {
+    "entity": "Post",
+    "fk_count": 5
+  },
+  "_read_denied": "not_found",
+  "_no_edges": [
+    {
+      "id_local": "User.reset_password",
+      "why": "public password-reset endpoint; authorization is the HMAC reset token verified inside the body, no group/role wall (Main.php:1231)"
+    },
+    {
+      "id_local": "View.record",
+      "why": "internal hook fired when a post renders; no auth wall beyond skipping the post author, and nothing it calls back on (post_views.php:21-44)"
+    },
+    {
+      "id_local": "Comment.unsubscribe",
+      "why": "public unsubscribe route; the auth is the HMAC token of the email compared inline, no session/group wall (comments.php:1255)"
+    },
+    {
+      "id_local": "User.lost_password",
+      "why": "public endpoint with no auth/guard wall; reads a user by login, sends a password-reset email, calls nothing (Main.php:1178-1218)"
+    },
+    {
+      "id_local": "User.login",
+      "why": "the login IS the authentication operation — it checks password_verify(User.authenticate) and sets the session; exempt from view_site (Main.php:203,998). Has no separate guard/trigger because the credential check IS the operation."
+    },
+    {
+      "id_local": "User.activate",
+      "why": "the activate IS the auth operation — it verifies the HMAC token inline (Main.php:974) and updates User.approved; exempt from view_site. No separate guard layer."
+    }
+  ],
+  "auth": {
+    "account_entity": "User",
+    "username_col": "login",
+    "password_col": "password",
+    "session_fields": {
+      "login": "login",
+      "group_id": "group_id"
+    }
+  }
+}

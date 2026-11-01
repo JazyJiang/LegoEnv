@@ -1,0 +1,115 @@
+{
+  "app": "ledgersmb",
+  "role": "double-entry accounting / ERP (QuickBooks/Sage/Xero-like)",
+  "domains": [
+    "finance",
+    "operations",
+    "other"
+  ],
+  "kinds": {
+    "create_record": [
+      "reconciliation_create",
+      "country_create",
+      "batch_save",
+      "assetitem_save"
+    ],
+    "update_record": [
+      "assetitem_save",
+      "account_save",
+      "setting_set"
+    ],
+    "other:post_batch": [
+      "batch_post"
+    ],
+    "other:generate_report": [
+      "gl_report",
+      "trialbalance_report",
+      "pnl_generate"
+    ]
+  },
+  "check_kinds": [
+    "record_exists",
+    "record_not_exists",
+    "record_field_equals",
+    "record_field_contains",
+    "record_field_unchanged",
+    "action_done",
+    "action_not_done"
+  ],
+  "carriers": {
+    "policy_sheet": {
+      "entity": "Setting",
+      "field": "value"
+    },
+    "notes_field": {
+      "entity": "Setting",
+      "field": "value"
+    }
+  },
+  "login": {
+    "tool": "sign_in",
+    "user_field": "username",
+    "persona_entity": "User"
+  },
+  "content_entities": [
+    "Account",
+    "AccountHeading",
+    "AssetItem",
+    "Part",
+    "Batch",
+    "Reconciliation",
+    "Transaction",
+    "AccTrans",
+    "Jcitems",
+    "Budget"
+  ],
+  "seed_helpers": [
+    "asset_register",
+    "ap_vouchers",
+    "checkpoints",
+    "add_users"
+  ],
+  "tool_families_to_keep": [
+    "account",
+    "asset",
+    "batch",
+    "reconciliation",
+    "invoice",
+    "order",
+    "warehouse",
+    "country",
+    "currency",
+    "exchangerate",
+    "language",
+    "gl_report",
+    "trialbalance_report",
+    "pnl_generate",
+    "goods_list",
+    "menu_generate",
+    "part",
+    "pricegroup",
+    "taxform",
+    "template",
+    "user"
+  ],
+  "obs_reads": [
+    "ledgersmb_ab__assetitem_search",
+    "ledgersmb_ab__goods_list",
+    "ledgersmb_ab__menu_generate",
+    "ledgersmb_ab__country_list"
+  ],
+  "known_patches": [
+    "User(1) is the persona; id-typed input args retyped id->int so integer ids are accepted",
+    "52 write/read tools given requires_auth guards (they carried only an auth message and let an unsigned persona through)",
+    "sign_in(username,password) is the login; User.id=1 persists across merged worlds",
+    "whole-list reads (assetitem_search, goods_list, country_list, menu_generate) stay under the 12k obs cap because their content entities are seeded per pack, not in the base",
+    "no extra tools invented; LedgerSMB's stock write/read surface (reconciliation_create, batch_save/batch_post, assetitem_save, country_create, setting_set) is used"
+  ],
+  "smoke": {
+    "passed": true,
+    "date": "2026-10-24",
+    "report": "ok"
+  },
+  "register_file": "pack/newspecs3/ledgersmb/register.py",
+  "base_spec": "pack/base_specs/ledgersmb.spec.json"
+}

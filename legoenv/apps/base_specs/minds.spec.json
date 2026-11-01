@@ -1,0 +1,4216 @@
+{
+  "env_id": "minds",
+  "_prep_version": 3,
+  "entities": [
+    {
+      "name": "Project",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false,
+          "max": 255
+        },
+        {
+          "name": "path",
+          "type": "text",
+          "nullable": false,
+          "max": 1024
+        },
+        {
+          "name": "is_active",
+          "type": "bool",
+          "nullable": false,
+          "default": false
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "modified_at",
+          "type": "datetime",
+          "audit": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "name"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Conversation",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "topic",
+          "type": "text",
+          "nullable": false,
+          "max": 255
+        },
+        {
+          "name": "project_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Project.id"
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "modified_at",
+          "type": "datetime",
+          "audit": true
+        }
+      ]
+    },
+    {
+      "name": "Message",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "conversation_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Conversation.id"
+        },
+        {
+          "name": "role",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "system",
+            "user",
+            "assistant",
+            "thought.scratchpad.start",
+            "thought.scratchpad.progress",
+            "thought.scratchpad.result",
+            "thought.scratchpad.end",
+            "thought.memorize.start",
+            "thought.memorize.end",
+            "thought.recall.start",
+            "thought.recall.end",
+            "thought.progress",
+            "thought.context_compacted",
+            "thought.tool_call.start",
+            "thought.tool_call.progress",
+            "thought.tool_call.end"
+          ]
+        },
+        {
+          "name": "content",
+          "type": "json",
+          "nullable": true
+        },
+        {
+          "name": "harness",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "modified_at",
+          "type": "datetime",
+          "audit": true
+        }
+      ]
+    },
+    {
+      "name": "MessageEvent",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "message_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Message.id"
+        },
+        {
+          "name": "sequence_number",
+          "type": "int",
+          "nullable": false
+        },
+        {
+          "name": "event_data",
+          "type": "json",
+          "nullable": true
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "modified_at",
+          "type": "datetime",
+          "audit": true
+        }
+      ]
+    },
+    {
+      "name": "File",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "filename",
+          "type": "text",
+          "nullable": false,
+          "max": 255
+        },
+        {
+          "name": "content_type",
+          "type": "text",
+          "nullable": false,
+          "max": 127
+        },
+        {
+          "name": "size",
+          "type": "int",
+          "nullable": false
+        },
+        {
+          "name": "purpose",
+          "type": "text",
+          "nullable": false,
+          "max": 64
+        },
+        {
+          "name": "path",
+          "type": "text",
+          "nullable": false,
+          "max": 1024
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "modified_at",
+          "type": "datetime",
+          "audit": true
+        }
+      ]
+    },
+    {
+      "name": "Schedule",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "prompt",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "cadence",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "once",
+            "hourly",
+            "daily",
+            "weekly"
+          ]
+        },
+        {
+          "name": "timezone",
+          "type": "text",
+          "nullable": false,
+          "default": "UTC",
+          "max": 64
+        },
+        {
+          "name": "next_run_at",
+          "type": "datetime",
+          "nullable": false
+        },
+        {
+          "name": "enabled",
+          "type": "bool",
+          "nullable": false,
+          "default": true
+        },
+        {
+          "name": "project_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Project.id"
+        },
+        {
+          "name": "model",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "last_run_at",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "last_result_conversation_id",
+          "type": "id",
+          "nullable": true,
+          "fk_to": "Conversation.id"
+        },
+        {
+          "name": "last_error",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "missed_runs",
+          "type": "int",
+          "nullable": false,
+          "default": 0
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "modified_at",
+          "type": "datetime",
+          "audit": true
+        }
+      ]
+    },
+    {
+      "name": "ScheduleRun",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "schedule_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Schedule.id"
+        },
+        {
+          "name": "started_at",
+          "type": "datetime",
+          "nullable": false
+        },
+        {
+          "name": "finished_at",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "duration_ms",
+          "type": "int",
+          "nullable": true
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "running",
+            "success",
+            "failed"
+          ]
+        },
+        {
+          "name": "error",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "conversation_id",
+          "type": "id",
+          "nullable": true,
+          "fk_to": "Conversation.id"
+        },
+        {
+          "name": "is_manual",
+          "type": "bool",
+          "nullable": false,
+          "default": false
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "modified_at",
+          "type": "datetime",
+          "audit": true
+        }
+      ],
+      "_lifecycle": {
+        "col": "status",
+        "initial": "running",
+        "states": [
+          "running",
+          "success",
+          "failed"
+        ],
+        "via": {}
+      }
+    },
+    {
+      "name": "Pin",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "item_type",
+          "type": "text",
+          "nullable": false,
+          "max": 64
+        },
+        {
+          "name": "item_id",
+          "type": "text",
+          "nullable": false,
+          "max": 64
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "nullable": true,
+          "max": 255
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "modified_at",
+          "type": "datetime",
+          "audit": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "item_type",
+            "item_id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Setting",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "key",
+          "type": "text",
+          "nullable": false,
+          "max": 128
+        },
+        {
+          "name": "value",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "modified_at",
+          "type": "datetime",
+          "audit": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "key"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Skill",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "label",
+          "type": "text",
+          "nullable": false,
+          "max": 80
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false,
+          "max": 255
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "when_to_use",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "instructions",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "modified_at",
+          "type": "datetime",
+          "audit": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "label"
+          ]
+        },
+        {
+          "kind": "unique",
+          "cols": [
+            "name"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ChannelInstallation",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "channel_type",
+          "type": "text",
+          "nullable": false,
+          "max": 64
+        },
+        {
+          "name": "display_name",
+          "type": "text",
+          "nullable": false,
+          "max": 255
+        },
+        {
+          "name": "enabled",
+          "type": "bool",
+          "nullable": false,
+          "default": false
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "disconnected",
+            "active",
+            "error"
+          ],
+          "default": "disconnected"
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "modified_at",
+          "type": "datetime",
+          "audit": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "channel_type"
+          ]
+        }
+      ],
+      "_lifecycle": {
+        "col": "status",
+        "initial": "disconnected",
+        "states": [
+          "disconnected",
+          "active",
+          "error"
+        ],
+        "via": {}
+      }
+    },
+    {
+      "name": "ChannelBinding",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "channel_type",
+          "type": "text",
+          "nullable": false,
+          "max": 64
+        },
+        {
+          "name": "external_group_id",
+          "type": "text",
+          "nullable": false,
+          "max": 255
+        },
+        {
+          "name": "external_thread_id",
+          "type": "text",
+          "nullable": true,
+          "max": 255
+        },
+        {
+          "name": "external_thread_key",
+          "type": "text",
+          "nullable": false,
+          "default": "__default__",
+          "max": 255
+        },
+        {
+          "name": "display_name",
+          "type": "text",
+          "nullable": true,
+          "max": 255
+        },
+        {
+          "name": "trigger_rule",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "always",
+            "mention_only",
+            "regex"
+          ],
+          "default": "always"
+        },
+        {
+          "name": "trigger_pattern",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "anton_project_id",
+          "type": "id",
+          "nullable": true,
+          "fk_to": "Project.id"
+        },
+        {
+          "name": "anton_conversation_id",
+          "type": "id",
+          "nullable": true,
+          "fk_to": "Conversation.id"
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "modified_at",
+          "type": "datetime",
+          "audit": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "channel_type",
+            "external_group_id",
+            "external_thread_key"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ChannelSession",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "binding_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "ChannelBinding.id"
+        },
+        {
+          "name": "external_session_key",
+          "type": "text",
+          "nullable": false,
+          "max": 512
+        },
+        {
+          "name": "anton_session_id",
+          "type": "text",
+          "nullable": true,
+          "max": 255
+        },
+        {
+          "name": "last_message_at",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "modified_at",
+          "type": "datetime",
+          "audit": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "binding_id",
+            "external_session_key"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ChannelEvent",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "channel_type",
+          "type": "text",
+          "nullable": false,
+          "max": 64
+        },
+        {
+          "name": "external_message_id",
+          "type": "text",
+          "nullable": true,
+          "max": 255
+        },
+        {
+          "name": "direction",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "inbound",
+            "outbound"
+          ]
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "received",
+            "routed",
+            "delivered",
+            "failed",
+            "duplicate"
+          ]
+        },
+        {
+          "name": "dedupe_key",
+          "type": "text",
+          "nullable": true,
+          "max": 255
+        },
+        {
+          "name": "error",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "modified_at",
+          "type": "datetime",
+          "audit": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "channel_type",
+            "dedupe_key"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Memory",
+      "columns": [
+        {
+          "name": "scope",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "enum": [
+            "global",
+            "project"
+          ]
+        },
+        {
+          "name": "category",
+          "type": "text",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "content",
+          "type": "text",
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "name": "Connection",
+      "columns": [
+        {
+          "name": "engine",
+          "type": "text",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "nullable": false,
+          "audit": true
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "nullable": true,
+          "audit": true
+        },
+        {
+          "name": "fields",
+          "type": "json",
+          "nullable": false
+        },
+        {
+          "name": "secure_keys",
+          "type": "json",
+          "nullable": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "engine",
+            "name"
+          ]
+        }
+      ]
+    }
+  ],
+  "tools": [
+    {
+      "tool": "project_list",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Project",
+        "rank": {
+          "method": "substring",
+          "fields": [
+            "name",
+            "path"
+          ]
+        },
+        "filter": {
+          "op": "or",
+          "clauses": [
+            {
+              "col": "name",
+              "mode": "substring",
+              "val": {
+                "$arg": "q"
+              },
+              "optional": true
+            },
+            {
+              "col": "path",
+              "mode": "substring",
+              "val": {
+                "$arg": "q"
+              },
+              "optional": true
+            }
+          ]
+        }
+      },
+      "input_schema": {
+        "q": {
+          "type": "text",
+          "required": false,
+          "description": "Optional substring filter."
+        }
+      },
+      "_evidence": {
+        "locator": "cowork/services/projects.py:96",
+        "id_local": "Project.list",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v1/projects/",
+          "locator": "cowork/api/v1/endpoints/projects.py:16"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "def list_projects(self):\n    return list(self.session.exec(select(Project)).all())"
+      },
+      "entity": "Project",
+      "_output_schema": {
+        "projects": "list of Project rows"
+      },
+      "description": "List all projects."
+    },
+    {
+      "tool": "project_create",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Project",
+        "fields": [
+          "name"
+        ],
+        "set_on_create": {
+          "path": {
+            "$arg": "name"
+          },
+          "is_active": false
+        },
+        "unique_on": [
+          "name"
+        ]
+      },
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "Name of the new project. It is sanitized and made unique here; a name that collides with an existing project is refused."
+        }
+      },
+      "_evidence": {
+        "locator": "cowork/services/projects.py:146",
+        "id_local": "Project.create",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/v1/projects/",
+          "locator": "cowork/api/v1/endpoints/projects.py:21"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "def create_project(self, name: str) -> Project:\n    sanitized = self._sanitize_name(name)\n    final_name = self._unique_name(sanitized)\n    path = self._project_path(final_name)\n    path.mkdir(parents=True)\n    project = Project(name=final_name, path=str(path), is_active=False)\n    self.session.add(project); self.session.commit(); self.session.refresh(project)\n    return project",
+        "edges": [
+          "cowork/services/projects.py:150-153 (_unique_name dedupes against existing names)"
+        ],
+        "wall": {
+          "project name uniqueness": "cowork/services/projects.py:150-153 (_unique_name dedupes against existing names)"
+        }
+      },
+      "entity": "Project",
+      "_binds": {
+        "name": "Project.name"
+      },
+      "_output_schema": {
+        "project": "the created Project row"
+      },
+      "guards": {
+        "required": [
+          "name"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Project",
+                "where": {
+                  "node": "field",
+                  "col": "name",
+                  "op": "eq",
+                  "value": {
+                    "arg": "name"
+                  }
+                }
+              },
+              "op": "eq",
+              "n": 0
+            }
+          ]
+        ],
+        "messages": {
+          "precondition": "A project with that name already exists. Pick a unique project name.",
+          "unique": "A project with that name already exists."
+        }
+      },
+      "description": "Create a new project. The name is sanitized and made unique; a name that already exists is refused."
+    },
+    {
+      "tool": "project_update",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Project",
+        "row_key": {
+          "id": {
+            "$arg": "project_id"
+          }
+        },
+        "fields": [
+          "name",
+          "is_active"
+        ]
+      },
+      "input_schema": {
+        "project_id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the project to update."
+        },
+        "name": {
+          "type": "text",
+          "required": false,
+          "description": "New project name. Renaming also moves the project directory; the built-in 'General' project cannot be renamed."
+        },
+        "is_active": {
+          "type": "bool",
+          "required": false,
+          "description": "Whether the project is active. Setting one active deactivates the others; the active project is where new chats land."
+        }
+      },
+      "_evidence": {
+        "locator": "cowork/services/projects.py:169",
+        "id_local": "Project.update",
+        "entry": {
+          "kind": "http",
+          "route": "PATCH /api/v1/projects/{project_id}",
+          "locator": "cowork/api/v1/endpoints/projects.py:26"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "def update_project(self, project_id, name=None, is_active=None):\n    project = self.session.get(Project, project_id)\n    if project is None: raise ValueError(\"Project not found\")\n    if name is not None:\n        if project.name == GENERAL_PROJECT: raise ValueError(\"Cannot rename the General project\")\n        final_name = self._unique_name(self._sanitize_name(name), exclude=project.name)\n        if final_name != project.name:\n            old_path.rename(new_path); project.name = final_name; project.path = str(new_path)\n    if is_active is not None:\n        if is_active:\n            for other in",
+        "edges": [
+          "cowork/services/projects.py:173 (raises ValueError if project is None)"
+        ]
+      },
+      "entity": "Project",
+      "_binds": {
+        "project_id": "Project.id",
+        "name": "Project.name",
+        "is_active": "Project.is_active"
+      },
+      "_output_schema": {
+        "project": "the updated Project row"
+      },
+      "guards": {
+        "required": [
+          "project_id"
+        ],
+        "messages": {
+          "precondition": "A project with that name already exists.",
+          "transition": "The built-in 'General' project cannot be renamed.",
+          "not_found": "That project does not exist."
+        }
+      },
+      "description": "Update a project's name or active flag. Renaming also moves the project on disk; the built-in 'General' project cannot be renamed or deactivated."
+    },
+    {
+      "tool": "project_delete",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "Project",
+        "lookup_by": {
+          "id": {
+            "$arg": "project_id"
+          }
+        }
+      },
+      "input_schema": {
+        "project_id": {
+          "type": "int",
+          "required": false,
+          "description": "Id of the project to delete."
+        }
+      },
+      "_evidence": {
+        "locator": "cowork/services/projects.py:199",
+        "id_local": "Project.delete",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/v1/projects/{project_id}",
+          "locator": "cowork/api/v1/endpoints/projects.py:36"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "def delete_project(self, project_id: UUID) -> bool:\n    project = self.session.get(Project, project_id)\n    if project is None: return False\n    if project.name == GENERAL_PROJECT: raise ValueError(\"Cannot delete the General project\")\n    path = Path(project.path)\n    if path.exists(): shutil.rmtree(path)\n    was_active = project.is_active\n    self.session.delete(project); self.session.commit()\n    if was_active:\n        general = self.session.get(Project, GENERAL_PROJECT_ID)\n        if general is not None and not general.is_active:\n            general.is_active = True; self.session.add(genera",
+        "edges": [
+          "cowork/services/projects.py:202 (returns False if project is None)"
+        ]
+      },
+      "entity": "Project",
+      "_binds": {
+        "project_id": "Project.id"
+      },
+      "guards": {
+        "required": [
+          "project_id"
+        ],
+        "messages": {
+          "not_found": "That project does not exist.",
+          "transition": "The built-in 'General' project cannot be deleted."
+        }
+      },
+      "description": "Delete a project and remove its directory. Fails if the project does not exist; the built-in 'General' project cannot be deleted."
+    },
+    {
+      "tool": "conversation_list",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Conversation",
+        "filter": {
+          "col": "project_id",
+          "mode": "exact",
+          "val": {
+            "$arg": "project_id"
+          }
+        },
+        "sort": [
+          {
+            "col": "created_at",
+            "dir": "desc"
+          }
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "project_id"
+          ]
+        },
+        "pagination": {
+          "default_limit": 20
+        }
+      },
+      "input_schema": {
+        "project_id": {
+          "type": "int",
+          "required": false,
+          "description": "Id of the project whose conversations to list; omit to list all."
+        },
+        "limit": {
+          "type": "int",
+          "required": false,
+          "description": "Max conversations to return (newest first)."
+        }
+      },
+      "_evidence": {
+        "locator": "cowork/services/conversations.py:20",
+        "id_local": "Conversation.list",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v1/conversations/",
+          "locator": "cowork/api/v1/endpoints/conversations.py:28"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "stmt = select(Conversation)\nif not all_projects:\n    stmt = stmt.where(Conversation.project_id == (project_id or GENERAL_PROJECT_ID))\nstmt = stmt.order_by(Conversation.created_at.desc()).limit(limit)\nreturn list(self.session.exec(stmt).all())"
+      },
+      "entity": "Conversation",
+      "_binds": {
+        "project_id": "Conversation.project_id"
+      },
+      "_output_schema": {
+        "conversations": "list of conversation dicts"
+      },
+      "description": "List conversations, optionally narrowed to one project, newest first.",
+      "guards": {
+        "messages": {}
+      }
+    },
+    {
+      "tool": "conversation_create",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Conversation",
+        "fields": [
+          "topic",
+          "project_id"
+        ]
+      },
+      "input_schema": {
+        "topic": {
+          "type": "text",
+          "required": true,
+          "description": "Topic of the new conversation."
+        },
+        "project_id": {
+          "type": "int",
+          "required": false,
+          "description": "Id of the project the conversation belongs to; defaults to the 'General' project."
+        }
+      },
+      "_evidence": {
+        "locator": "cowork/services/conversations.py:41",
+        "id_local": "Conversation.create",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/v1/conversations/",
+          "locator": "cowork/api/v1/endpoints/conversations.py:48"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "conversation = Conversation(topic=topic, project_id=project_id or GENERAL_PROJECT_ID)\nif conversation_id is not None: conversation.id = conversation_id\nself.session.add(conversation); self.session.commit(); self.session.refresh(conversation)\nreturn conversation",
+        "edges": [
+          "cowork/api/v1/endpoints/conversations.py:50"
+        ]
+      },
+      "entity": "Conversation",
+      "_binds": {
+        "topic": "Conversation.topic",
+        "project_id": "Conversation.project_id",
+        "title": "Conversation.topic"
+      },
+      "_output_schema": {
+        "conversation": "the created Conversation"
+      },
+      "guards": {
+        "required": [
+          "topic"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Project",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "project_id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "precondition": "That project does not exist.",
+          "fk": "That project does not exist."
+        }
+      },
+      "fields": [
+        "topic",
+        "project_id"
+      ],
+      "set_on_create": {
+        "topic": {
+          "$arg": "topic"
+        },
+        "project_id": {
+          "$arg": "project_id"
+        }
+      },
+      "_defaulted": [],
+      "description": "Create a new conversation in a project (defaults to the 'General' project). Fails if the project does not exist."
+    },
+    {
+      "tool": "conversation_get",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Conversation",
+        "lookup_by": {
+          "id": {
+            "$arg": "conversation_id"
+          }
+        }
+      },
+      "input_schema": {
+        "conversation_id": {
+          "type": "int",
+          "required": false,
+          "description": "Id of the conversation to fetch."
+        }
+      },
+      "_evidence": {
+        "locator": "cowork/services/conversations.py:34",
+        "id_local": "Conversation.get",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v1/conversations/{conversation_id}",
+          "locator": "cowork/api/v1/endpoints/conversations.py:63"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "def get_conversation(self, conversation_id: UUID) -> Conversation:\n    conversation = self.session.get(Conversation, conversation_id)\n    if conversation is None: raise ValueError(\"Conversation not found\")\n    return conversation"
+      },
+      "entity": "Conversation",
+      "_binds": {
+        "conversation_id": "Conversation.id"
+      },
+      "_output_schema": {
+        "conversation": "the conversation dict with project info"
+      },
+      "guards": {
+        "required": [
+          "conversation_id"
+        ],
+        "messages": {
+          "not_found": "That conversation does not exist."
+        }
+      },
+      "description": "Fetch a single conversation by id. Fails if it does not exist."
+    },
+    {
+      "tool": "conversation_update",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Conversation",
+        "row_key": {
+          "id": {
+            "$arg": "conversation_id"
+          }
+        },
+        "fields": [
+          "topic",
+          "project_id"
+        ]
+      },
+      "input_schema": {
+        "conversation_id": {
+          "type": "int",
+          "required": false,
+          "description": "Id of the conversation to update."
+        },
+        "topic": {
+          "type": "text",
+          "required": false,
+          "description": "New topic."
+        },
+        "project_id": {
+          "type": "int",
+          "required": false,
+          "description": "New project id."
+        }
+      },
+      "_evidence": {
+        "locator": "cowork/services/conversations.py:58",
+        "id_local": "Conversation.update",
+        "entry": {
+          "kind": "http",
+          "route": "PATCH /api/v1/conversations/{conversation_id}",
+          "locator": "cowork/api/v1/endpoints/conversations.py:71"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "conversation = self.session.get(Conversation, conversation_id)\nif conversation is None: raise ValueError(\"Conversation not found\")\nif topic is not None: conversation.topic = topic\nif project_id is not None: conversation.project_id = project_id\nself.session.add(conversation); self.session.commit(); self.session.refresh(conversation)\nreturn conversation",
+        "edges": [
+          "cowork/services/conversations.py:66 (get_conversation raises ValueError if missing)"
+        ]
+      },
+      "entity": "Conversation",
+      "_binds": {
+        "conversation_id": "Conversation.id",
+        "topic": "Conversation.topic",
+        "project_id": "Conversation.project_id"
+      },
+      "_output_schema": {
+        "conversation": "the updated Conversation"
+      },
+      "guards": {
+        "required": [
+          "conversation_id"
+        ],
+        "messages": {
+          "not_found": "That conversation does not exist."
+        }
+      },
+      "description": "Change a conversation's topic or the project it belongs to. Fails if the conversation does not exist."
+    },
+    {
+      "tool": "conversation_delete",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "Conversation",
+        "lookup_by": {
+          "id": {
+            "$arg": "conversation_id"
+          }
+        },
+        "on_child": {
+          "mode": "cascade"
+        }
+      },
+      "input_schema": {
+        "conversation_id": {
+          "type": "int",
+          "required": false,
+          "description": "Id of the conversation to delete."
+        }
+      },
+      "_evidence": {
+        "locator": "cowork/services/conversations.py:76",
+        "id_local": "Conversation.delete",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/v1/conversations/{conversation_id}",
+          "locator": "cowork/api/v1/endpoints/conversations.py:97"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "conversation = self.session.get(Conversation, conversation_id)\nif conversation is None: return False\nmessages = ... select(Message).where(Message.conversation_id == conversation_id)\nfor message in messages:\n    for event in ... MessageEvent where message_id==message.id: self.session.delete(event)\n    self.session.delete(message)\nself.session.delete(conversation); self.session.commit(); return True"
+      },
+      "entity": "Conversation",
+      "_binds": {
+        "conversation_id": "Conversation.id"
+      },
+      "_output_schema": {
+        "ok": "bool"
+      },
+      "guards": {
+        "required": [
+          "conversation_id"
+        ],
+        "messages": {
+          "not_found": "That conversation does not exist.",
+          "on_child": "This conversation still has messages — delete with message-cascade or remove the messages first."
+        }
+      },
+      "description": "Delete a conversation and (cascading) all its messages. Fails if the conversation does not exist."
+    },
+    {
+      "tool": "conversation_get_messages",
+      "op": "read",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Message",
+        "filter": {
+          "col": "conversation_id",
+          "mode": "exact",
+          "val": {
+            "$arg": "conversation_id"
+          }
+        },
+        "sort": [
+          {
+            "col": "created_at",
+            "dir": "asc"
+          }
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "conversation_id"
+          ]
+        },
+        "pagination": {
+          "default_limit": 500
+        }
+      },
+      "input_schema": {
+        "conversation_id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the conversation whose messages to read."
+        },
+        "limit": {
+          "type": "int",
+          "required": false,
+          "description": "Max messages to return (oldest first within the conversation)."
+        }
+      },
+      "_evidence": {
+        "locator": "cowork/services/conversations.py:157",
+        "id_local": "Conversation.get_messages",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v1/conversations/{conversation_id}/items",
+          "locator": "cowork/api/v1/endpoints/conversations.py:89"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "self.get_conversation(conversation_id)\nmessages = ... where Message.conversation_id==conversation_id order created_at,id\nfor message in messages:\n    events = ... MessageEvent where message_id==message.id order sequence_number\n    item = {\"id\":..., \"role\": message.role, \"content\": message.content, \"created_at\":..., \"events\":[...], \"harness\":...}",
+        "wall": {
+          "conversation must exist": "cowork/services/conversations.py:157"
+        },
+        "edges": [
+          {
+            "ref": "Conversation",
+            "kind": "entity",
+            "evidence": "self.get_conversation(conversation_id) raises if not found — cowork/services/conversations.py:157"
+          }
+        ]
+      },
+      "entity": "Message",
+      "_binds": {
+        "conversation_id": "Conversation.id"
+      },
+      "_output_schema": {
+        "messages": "list of {id, role, content, created_at, events[], harness?}"
+      },
+      "guards": {
+        "required": [
+          "conversation_id"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Conversation",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "conversation_id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "precondition": "That conversation does not exist.",
+          "not_found": "That conversation does not exist."
+        }
+      },
+      "description": "List the messages in a conversation, oldest first, including their event trail. Fails if the conversation does not exist."
+    },
+    {
+      "tool": "file_upload",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "File",
+        "fields": [
+          "filename",
+          "purpose"
+        ],
+        "set_on_create": {
+          "content_type": "application/octet-stream",
+          "size": {
+            "$arg": "size"
+          },
+          "path": {
+            "$arg": "path"
+          }
+        }
+      },
+      "input_schema": {
+        "filename": {
+          "type": "text",
+          "required": true,
+          "description": "Filename for the upload."
+        },
+        "content": {
+          "type": "text",
+          "required": true,
+          "description": "File content bytes to store on disk."
+        },
+        "purpose": {
+          "type": "text",
+          "required": true,
+          "description": "Purpose tag for the file (e.g. avatar, attachment)."
+        },
+        "size": {
+          "type": "int",
+          "required": false,
+          "description": "Reported size in bytes; omitted if unknown."
+        },
+        "path": {
+          "type": "text",
+          "required": false,
+          "description": "Storage path under the file directory; written to the file's own directory by default."
+        }
+      },
+      "_evidence": {
+        "locator": "cowork/services/files.py:96",
+        "id_local": "File.upload",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/v1/files/",
+          "locator": "cowork/api/v1/endpoints/files.py:17"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "contents = await upload.read(); filename = upload.filename or \"upload\"\nfile = File(filename=filename, content_type=upload.content_type or \"application/octet-stream\", size=len(contents), purpose=purpose, path=\"\")\nfile_dir = self._root_dir() / str(file.id); file_dir.mkdir(parents=True)\ndest = file_dir / filename; dest.write_bytes(contents); file.path = str(dest)\nself.session.add(file); self.session.commit(); self.session.refresh(file)"
+      },
+      "entity": "File",
+      "_binds": {
+        "filename": "File.filename",
+        "purpose": "File.purpose"
+      },
+      "_output_schema": {
+        "file": "FileResponse {id, bytes, created_at, filename, purpose}"
+      },
+      "guards": {
+        "required": [
+          "filename",
+          "content",
+          "purpose"
+        ],
+        "messages": {
+          "required": "filename, content and purpose are required to upload a file.",
+          "not_found": "That file was not found."
+        }
+      },
+      "fields": [
+        "filename",
+        "purpose"
+      ],
+      "set_on_create": {
+        "size": {
+          "$arg": "size"
+        },
+        "path": {
+          "$arg": "path"
+        }
+      },
+      "description": "Upload a file: records its metadata and writes its content to disk under the file's directory."
+    },
+    {
+      "tool": "file_list",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "File",
+        "search_fields": [
+          "purpose"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "purpose"
+          ]
+        }
+      },
+      "input_schema": {
+        "purpose": {
+          "type": "text",
+          "required": false,
+          "description": "Optional purpose tag to narrow by."
+        }
+      },
+      "_evidence": {
+        "locator": "cowork/services/files.py:63",
+        "id_local": "File.list",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v1/files/",
+          "locator": "cowork/api/v1/endpoints/files.py:26"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "stmt = select(File)\nif purpose is not None: stmt = stmt.where(File.purpose == purpose)\nreturn [self._to_response(f) for f in self.session.exec(stmt).all()]"
+      },
+      "entity": "File",
+      "_binds": {
+        "purpose": "File.purpose"
+      },
+      "_output_schema": {
+        "files": "list of FileResponse"
+      },
+      "description": "List uploaded files, optionally narrowed by purpose."
+    },
+    {
+      "tool": "file_get",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "File",
+        "lookup_by": {
+          "id": {
+            "$arg": "file_id"
+          }
+        }
+      },
+      "input_schema": {
+        "file_id": {
+          "type": "int",
+          "required": false,
+          "description": "Id of the file to fetch."
+        }
+      },
+      "_evidence": {
+        "locator": "cowork/services/files.py:90",
+        "id_local": "File.get",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v1/files/{file_id}",
+          "locator": "cowork/api/v1/endpoints/files.py:31"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "file = self.session.get(File, file_id)\nif file is None: raise ValueError(\"File not found\")\nreturn self._to_response(file)"
+      },
+      "entity": "File",
+      "_binds": {
+        "file_id": "File.id"
+      },
+      "_output_schema": {
+        "file": "FileResponse"
+      },
+      "guards": {
+        "required": [
+          "file_id"
+        ],
+        "messages": {
+          "not_found": "That file does not exist."
+        }
+      },
+      "description": "Fetch a single uploaded file's metadata by id. Fails if it does not exist."
+    },
+    {
+      "tool": "file_delete",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "File",
+        "lookup_by": {
+          "id": {
+            "$arg": "file_id"
+          }
+        }
+      },
+      "input_schema": {
+        "file_id": {
+          "type": "int",
+          "required": false,
+          "description": "Id of the file to delete."
+        }
+      },
+      "_evidence": {
+        "locator": "cowork/services/files.py:159",
+        "id_local": "File.delete",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/v1/files/{file_id}",
+          "locator": "cowork/api/v1/endpoints/files.py:39"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "file = self.session.get(File, file_id)\nif file is None: return False\nfile_dir = Path(file.path).parent\nself.session.delete(file); self.session.commit()\nif file_dir.exists(): shutil.rmtree(file_dir)\nreturn True",
+        "edges": [
+          "cowork/services/files.py:162 (returns False if not found)"
+        ]
+      },
+      "entity": "File",
+      "_binds": {
+        "file_id": "File.id"
+      },
+      "guards": {
+        "required": [
+          "file_id"
+        ],
+        "messages": {
+          "not_found": "That file does not exist."
+        }
+      },
+      "description": "Delete an uploaded file and remove its directory on disk. Fails if the file does not exist."
+    },
+    {
+      "tool": "file_get_content",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "File",
+        "lookup_by": {
+          "id": {
+            "$arg": "file_id"
+          }
+        }
+      },
+      "input_schema": {
+        "file_id": {
+          "type": "int",
+          "required": false,
+          "description": "Id of the file whose content to read."
+        }
+      },
+      "_evidence": {
+        "locator": "cowork/services/files.py:166",
+        "id_local": "File.get_content",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v1/files/{file_id}/content",
+          "locator": "cowork/api/v1/endpoints/files.py:46"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "file = self._get_file_model(file_id)\npath = Path(file.path)\nif not path.exists(): raise ValueError(\"File content not found on disk\")\nreturn file.content_type, file.filename, path"
+      },
+      "entity": "File",
+      "_binds": {
+        "file_id": "File.id"
+      },
+      "_output_schema": {
+        "content": "the file bytes with content_type header"
+      },
+      "guards": {
+        "required": [
+          "file_id"
+        ],
+        "messages": {
+          "not_found": "That file does not exist."
+        }
+      },
+      "description": "Read the on-disk content of an uploaded file by id. Fails if the file or its content is missing."
+    },
+    {
+      "tool": "pin_list",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Pin",
+        "rank": {
+          "method": "exact"
+        }
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "cowork/services/pins.py:13",
+        "id_local": "Pin.list",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v1/pins/",
+          "locator": "cowork/api/v1/endpoints/pins.py:17"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "return list(self.session.exec(select(Pin).order_by(Pin.created_at.desc())).all())"
+      },
+      "entity": "Pin",
+      "_output_schema": {
+        "pins": "list of Pin rows"
+      },
+      "description": "List all pinned items, newest first."
+    },
+    {
+      "tool": "pin_pin",
+      "op": "create",
+      "family": "crud.upsert",
+      "exec_spec": {
+        "entity": "Pin",
+        "key": {
+          "item_type": {
+            "$arg": "item_type"
+          },
+          "item_id": {
+            "$arg": "item_id"
+          }
+        },
+        "insert_fields": [
+          "item_type",
+          "item_id",
+          "title"
+        ],
+        "set_on_exists": {}
+      },
+      "input_schema": {
+        "item_type": {
+          "type": "text",
+          "required": false,
+          "description": "Type of item (project, conversation, schedule)."
+        },
+        "item_id": {
+          "type": "text",
+          "required": false,
+          "description": "Id of the item to pin."
+        },
+        "title": {
+          "type": "text",
+          "required": false,
+          "description": "Display title (defaults to the item id)."
+        }
+      },
+      "_evidence": {
+        "locator": "cowork/services/pins.py:16",
+        "id_local": "Pin.pin",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/v1/pins/",
+          "locator": "cowork/api/v1/endpoints/pins.py:22"
+        },
+        "entity_why": "primary effect row_upsert lands on this table",
+        "ref_code": "existing = ... where item_type==item_type, item_id==item_id\nif existing:\n    if title is not None: existing.title = title\n    self.session.add(existing); self.session.commit(); return existing\npin = Pin(item_type=item_type, item_id=item_id, title=title or item_id)\nself.session.add(pin); self.session.commit(); self.session.refresh(pin); return pin",
+        "edges": [
+          "cowork/services/pins.py:17-27 (updates existing pin or creates a new one)"
+        ]
+      },
+      "entity": "Pin",
+      "_binds": {
+        "item_type": "Pin.item_type",
+        "item_id": "Pin.item_id",
+        "title": "Pin.title"
+      },
+      "_output_schema": {
+        "pin": "the Pin row (existing row updated if already pinned)"
+      },
+      "guards": {
+        "required": [
+          "item_type",
+          "item_id"
+        ],
+        "messages": {
+          "unique": "That item is already pinned.",
+          "precondition": "That item is already pinned or the pin could not be created."
+        }
+      },
+      "description": "Pin an item (project, conversation or schedule) so it appears in the pin list. Pinning an already-pinned item updates its title instead."
+    },
+    {
+      "tool": "pin_unpin",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "Pin",
+        "lookup_by": {
+          "item_type": {
+            "$arg": "item_type"
+          },
+          "item_id": {
+            "$arg": "item_id"
+          }
+        }
+      },
+      "input_schema": {
+        "item_id": {
+          "type": "text",
+          "required": false,
+          "description": "Id of the pinned item to unpin."
+        },
+        "item_type": {
+          "type": "text",
+          "required": false,
+          "description": "Type of pinned item."
+        }
+      },
+      "_evidence": {
+        "locator": "cowork/services/pins.py:32",
+        "id_local": "Pin.unpin",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/v1/pins/{item_id}",
+          "locator": "cowork/api/v1/endpoints/pins.py:41"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "pin = ... where Pin.item_type==item_type, Pin.item_id==item_id\nif not pin: return False\nself.session.delete(pin); self.session.commit(); return True",
+        "edges": [
+          "cowork/services/pins.py:35 (returns False if pin missing)"
+        ]
+      },
+      "entity": "Pin",
+      "_binds": {
+        "item_id": "Pin.item_id",
+        "item_type": "Pin.item_type"
+      },
+      "_output_schema": {
+        "ok": "bool"
+      },
+      "guards": {
+        "required": [
+          "item_type",
+          "item_id"
+        ],
+        "messages": {
+          "not_found": "That item is not pinned."
+        }
+      },
+      "description": "Remove a pin. Fails if the item is not pinned."
+    },
+    {
+      "tool": "skill_list",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Skill",
+        "rank": {
+          "method": "substring",
+          "fields": [
+            "label",
+            "name",
+            "instructions"
+          ]
+        },
+        "filter": {
+          "op": "or",
+          "clauses": [
+            {
+              "col": "label",
+              "mode": "substring",
+              "val": {
+                "$arg": "q"
+              },
+              "optional": true
+            },
+            {
+              "col": "name",
+              "mode": "substring",
+              "val": {
+                "$arg": "q"
+              },
+              "optional": true
+            },
+            {
+              "col": "instructions",
+              "mode": "substring",
+              "val": {
+                "$arg": "q"
+              },
+              "optional": true
+            }
+          ]
+        }
+      },
+      "input_schema": {
+        "q": {
+          "type": "text",
+          "required": false,
+          "description": "Optional substring filter."
+        }
+      },
+      "_evidence": {
+        "locator": "cowork/services/skills.py:14",
+        "id_local": "Skill.list",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v1/skills/",
+          "locator": "cowork/api/v1/endpoints/skills.py:15"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "return list(self.session.exec(select(Skill).order_by(Skill.created_at.desc())).all())"
+      },
+      "entity": "Skill",
+      "_output_schema": {
+        "skills": "list of Skill rows"
+      },
+      "description": "List all skills, newest first."
+    },
+    {
+      "tool": "skill_get",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Skill",
+        "lookup_by": {
+          "id": {
+            "$arg": "skill_id"
+          }
+        }
+      },
+      "input_schema": {
+        "skill_id": {
+          "type": "int",
+          "required": false,
+          "description": "Id of the skill to fetch."
+        }
+      },
+      "_evidence": {
+        "locator": "cowork/services/skills.py:17",
+        "id_local": "Skill.get",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v1/skills/{skill_id}",
+          "locator": "cowork/api/v1/endpoints/skills.py:36"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "skill = self.session.get(Skill, skill_id)\nif skill is None: raise ValueError(f\"Skill {skill_id} not found.\")\nreturn skill"
+      },
+      "entity": "Skill",
+      "_binds": {
+        "skill_id": "Skill.id"
+      },
+      "_output_schema": {
+        "skill": "SkillResponse"
+      },
+      "guards": {
+        "required": [
+          "skill_id"
+        ],
+        "messages": {
+          "not_found": "That skill does not exist."
+        }
+      },
+      "description": "Fetch a single skill by id. Fails if it does not exist."
+    },
+    {
+      "tool": "skill_create",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Skill",
+        "fields": [
+          "label",
+          "name",
+          "instructions",
+          "description",
+          "when_to_use"
+        ],
+        "unique_on": [
+          "label"
+        ]
+      },
+      "input_schema": {
+        "label": {
+          "type": "text",
+          "required": false,
+          "description": "Human label for the skill."
+        },
+        "name": {
+          "type": "text",
+          "required": false,
+          "description": "Unique name of the skill."
+        },
+        "instructions": {
+          "type": "text",
+          "required": false,
+          "description": "Instructions the agent follows."
+        },
+        "description": {
+          "type": "text",
+          "required": false,
+          "description": "Optional description."
+        },
+        "when_to_use": {
+          "type": "text",
+          "required": false,
+          "description": "Optional guidance on when to use it."
+        }
+      },
+      "_evidence": {
+        "locator": "cowork/services/skills.py:22",
+        "id_local": "Skill.create",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/v1/skills/",
+          "locator": "cowork/api/v1/endpoints/skills.py:21"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "if self.session.exec(select(Skill).where(Skill.label == label)).first(): raise ValueError(...already exists)\nif self.session.exec(select(Skill).where(Skill.name == name)).first(): raise ValueError(...already exists)\nskill = Skill(label=label, name=name, instructions=instructions, description=description, when_to_use=when_to_use)\nself.session.add(skill); self.session.commit(); self.session.refresh(skill); return skill",
+        "edges": [
+          "cowork/services/skills.py:26-31 (raises ValueError if label or name already exists)"
+        ]
+      },
+      "entity": "Skill",
+      "_binds": {
+        "label": "Skill.label",
+        "name": "Skill.name",
+        "instructions": "Skill.instructions",
+        "description": "Skill.description",
+        "when_to_use": "Skill.when_to_use"
+      },
+      "_output_schema": {
+        "skill": "SkillResponse"
+      },
+      "guards": {
+        "required": [
+          "label",
+          "name"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Skill",
+                "where": {
+                  "node": "field",
+                  "col": "label",
+                  "op": "eq",
+                  "value": {
+                    "arg": "label"
+                  }
+                }
+              },
+              "op": "eq",
+              "n": 0
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Skill",
+                "where": {
+                  "node": "field",
+                  "col": "name",
+                  "op": "eq",
+                  "value": {
+                    "arg": "name"
+                  }
+                }
+              },
+              "op": "eq",
+              "n": 0
+            }
+          ]
+        ],
+        "messages": {
+          "precondition": "That skill label or name is already taken.",
+          "unique": "That skill label or name already exists."
+        }
+      },
+      "description": "Register a new skill. A label or name that is already taken is refused."
+    },
+    {
+      "tool": "skill_update",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Skill",
+        "row_key": {
+          "id": {
+            "$arg": "skill_id"
+          }
+        },
+        "fields": [
+          "label",
+          "name",
+          "description",
+          "when_to_use",
+          "instructions"
+        ]
+      },
+      "input_schema": {
+        "skill_id": {
+          "type": "int",
+          "required": false,
+          "description": "Id of the skill to update."
+        },
+        "label": {
+          "type": "text",
+          "required": false,
+          "description": "New label."
+        },
+        "name": {
+          "type": "text",
+          "required": false,
+          "description": "New unique name."
+        },
+        "description": {
+          "type": "text",
+          "required": false,
+          "description": "New description."
+        },
+        "when_to_use": {
+          "type": "text",
+          "required": false,
+          "description": "New when-to-use guidance."
+        },
+        "instructions": {
+          "type": "text",
+          "required": false,
+          "description": "New instructions."
+        }
+      },
+      "_evidence": {
+        "locator": "cowork/services/skills.py:63",
+        "id_local": "Skill.update",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /api/v1/skills/{skill_id}",
+          "locator": "cowork/api/v1/endpoints/skills.py:44"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "skill = self.get_skill(skill_id)\nfor field in ('label','name','description','when_to_use','instructions'):\n    if value is not None: setattr(skill, field, value)\nself.session.add(skill); self.session.commit(); self.session.refresh(skill); return skill",
+        "edges": [
+          "cowork/services/skills.py:66 (get_skill raises ValueError)"
+        ]
+      },
+      "entity": "Skill",
+      "_binds": {
+        "skill_id": "Skill.id",
+        "label": "Skill.label",
+        "name": "Skill.name",
+        "description": "Skill.description",
+        "when_to_use": "Skill.when_to_use",
+        "instructions": "Skill.instructions"
+      },
+      "_output_schema": {
+        "skill": "SkillResponse"
+      },
+      "guards": {
+        "required": [
+          "skill_id"
+        ],
+        "messages": {
+          "not_found": "That skill does not exist."
+        }
+      },
+      "description": "Update a skill's fields. Fails if the skill does not exist."
+    },
+    {
+      "tool": "skill_delete",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "Skill",
+        "lookup_by": {
+          "id": {
+            "$arg": "skill_id"
+          }
+        }
+      },
+      "input_schema": {
+        "skill_id": {
+          "type": "int",
+          "required": false,
+          "description": "Id (or name/label) of the skill to delete."
+        }
+      },
+      "_evidence": {
+        "locator": "cowork/services/skills.py:76",
+        "id_local": "Skill.delete",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/v1/skills/{skill_id}",
+          "locator": "cowork/api/v1/endpoints/skills.py:60"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "def delete_skill(self, skill_id):\n    skill = self.session.get(Skill, skill_id)\n    if skill is None: return False\n    self.session.delete(skill); self.session.commit(); return True",
+        "edges": [
+          "cowork/api/v1/endpoints/skills.py:61-70 (tries UUID, then name/label lookup)"
+        ]
+      },
+      "entity": "Skill",
+      "_binds": {
+        "skill_id": "Skill.id"
+      },
+      "guards": {
+        "required": [
+          "skill_id"
+        ],
+        "messages": {
+          "not_found": "That skill does not exist."
+        }
+      },
+      "description": "Delete a skill. Fails if the skill does not exist."
+    },
+    {
+      "tool": "schedule_list",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Schedule",
+        "filter": {
+          "col": "project_id",
+          "mode": "exact",
+          "val": {
+            "$arg": "project_id"
+          }
+        },
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "project_id"
+          ]
+        }
+      },
+      "input_schema": {
+        "project_id": {
+          "type": "int",
+          "required": false,
+          "description": "Id of the project whose schedules to list; omit to list all."
+        }
+      },
+      "_evidence": {
+        "locator": "cowork/services/schedules.py:20",
+        "id_local": "Schedule.list",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v1/schedules/",
+          "locator": "cowork/api/v1/endpoints/schedules.py:23"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "query = select(Schedule)\nif project_id is not None: query = query.where(Schedule.project_id == project_id)\nreturn list(self.session.exec(query).all())"
+      },
+      "entity": "Schedule",
+      "_binds": {
+        "project_id": "Schedule.project_id"
+      },
+      "_output_schema": {
+        "schedules": "list of Schedule rows"
+      },
+      "description": "List schedules, optionally narrowed to one project.",
+      "guards": {
+        "messages": {}
+      }
+    },
+    {
+      "tool": "schedule_get",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Schedule",
+        "lookup_by": {
+          "id": {
+            "$arg": "schedule_id"
+          }
+        }
+      },
+      "input_schema": {
+        "schedule_id": {
+          "type": "int",
+          "required": false,
+          "description": "Id of the schedule to fetch."
+        }
+      },
+      "_evidence": {
+        "locator": "cowork/services/schedules.py:25",
+        "id_local": "Schedule.get",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v1/schedules/{schedule_id}",
+          "locator": "cowork/api/v1/endpoints/schedules.py:44"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "schedule = self.session.get(Schedule, schedule_id)\nif schedule is None: raise ValueError(\"Schedule not found\")\nreturn schedule"
+      },
+      "entity": "Schedule",
+      "_binds": {
+        "schedule_id": "Schedule.id"
+      },
+      "_output_schema": {
+        "schedule": "ScheduleResponse"
+      },
+      "guards": {
+        "required": [
+          "schedule_id"
+        ],
+        "messages": {
+          "not_found": "That schedule does not exist."
+        }
+      },
+      "description": "Fetch a single schedule by id. Fails if it does not exist."
+    },
+    {
+      "tool": "schedule_create",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Schedule",
+        "fields": [
+          "title",
+          "prompt",
+          "cadence",
+          "next_run_at",
+          "model",
+          "timezone",
+          "project_id",
+          "enabled"
+        ]
+      },
+      "input_schema": {
+        "title": {
+          "type": "text",
+          "required": true,
+          "description": "Title of the scheduled run."
+        },
+        "prompt": {
+          "type": "text",
+          "required": true,
+          "description": "The prompt the scheduled run executes."
+        },
+        "cadence": {
+          "type": "text",
+          "required": true,
+          "description": "How often: once, hourly, daily or weekly."
+        },
+        "next_run_at": {
+          "type": "datetime",
+          "required": true,
+          "description": "When the next run fires."
+        },
+        "model": {
+          "type": "text",
+          "required": false,
+          "description": "Model to run the task on."
+        },
+        "timezone": {
+          "type": "text",
+          "required": false,
+          "description": "Timezone for the schedule (default UTC)."
+        },
+        "project_id": {
+          "type": "int",
+          "required": false,
+          "description": "Project the schedule runs in; defaults to the 'General' project."
+        },
+        "enabled": {
+          "type": "bool",
+          "required": false,
+          "description": "Whether the schedule is enabled (default true)."
+        }
+      },
+      "_evidence": {
+        "locator": "cowork/services/schedules.py:34",
+        "id_local": "Schedule.create",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/v1/schedules/",
+          "locator": "cowork/api/v1/endpoints/schedules.py:29"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "schedule = Schedule(title=..., prompt=..., cadence=..., next_run_at=..., model=..., timezone=timezone, project_id=project_id or GENERAL_PROJECT_ID, enabled=enabled)\nself.session.add(schedule); self.session.commit(); self.session.refresh(schedule); return schedule",
+        "edges": [
+          "cowork/services/schedules.py:42 (defaults project_id to GENERAL_PROJECT_ID)"
+        ]
+      },
+      "entity": "Schedule",
+      "_binds": {
+        "title": "Schedule.title",
+        "prompt": "Schedule.prompt",
+        "cadence": "Schedule.cadence",
+        "next_run_at": "Schedule.next_run_at",
+        "model": "Schedule.model",
+        "timezone": "Schedule.timezone",
+        "project_id": "Schedule.project_id",
+        "enabled": "Schedule.enabled"
+      },
+      "_output_schema": {
+        "schedule": "ScheduleResponse"
+      },
+      "guards": {
+        "required": [
+          "title",
+          "prompt",
+          "cadence",
+          "next_run_at"
+        ],
+        "messages": {
+          "fk": "That project does not exist."
+        }
+      },
+      "fields": [
+        "title",
+        "prompt",
+        "cadence",
+        "next_run_at",
+        "model",
+        "timezone",
+        "project_id",
+        "enabled"
+      ],
+      "set_on_create": {
+        "project_id": {
+          "$arg": "project_id"
+        }
+      },
+      "_defaulted": [],
+      "description": "Create a scheduled run that executes a prompt on a cadence. Fails if the project does not exist."
+    },
+    {
+      "tool": "schedule_update",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Schedule",
+        "row_key": {
+          "id": {
+            "$arg": "schedule_id"
+          }
+        },
+        "fields": [
+          "title",
+          "prompt",
+          "cadence",
+          "next_run_at",
+          "model",
+          "timezone",
+          "enabled"
+        ]
+      },
+      "input_schema": {
+        "schedule_id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the schedule to update."
+        },
+        "title": {
+          "type": "text",
+          "required": false,
+          "description": "New title."
+        },
+        "prompt": {
+          "type": "text",
+          "required": false,
+          "description": "New prompt."
+        },
+        "cadence": {
+          "type": "text",
+          "required": false,
+          "description": "New cadence (once/hourly/daily/weekly)."
+        },
+        "next_run_at": {
+          "type": "datetime",
+          "required": false,
+          "description": "New next run time."
+        },
+        "model": {
+          "type": "text",
+          "required": false,
+          "description": "New model."
+        },
+        "timezone": {
+          "type": "text",
+          "required": false,
+          "description": "New timezone."
+        },
+        "enabled": {
+          "type": "bool",
+          "required": false,
+          "description": "Whether the schedule is enabled."
+        }
+      },
+      "_evidence": {
+        "locator": "cowork/services/schedules.py:61",
+        "id_local": "Schedule.update",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /api/v1/schedules/{schedule_id}",
+          "locator": "cowork/api/v1/endpoints/schedules.py:52"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "schedule = self.get_schedule(schedule_id)\nfor field, value in kwargs.items():\n    if value is not None and hasattr(schedule, field): setattr(schedule, field, value)\nself.session.add(schedule); self.session.commit(); self.session.refresh(schedule); return schedule",
+        "edges": [
+          "cowork/services/schedules.py:62 (get_schedule raises ValueError if missing)"
+        ]
+      },
+      "entity": "Schedule",
+      "_binds": {
+        "schedule_id": "Schedule.id",
+        "title": "Schedule.title",
+        "prompt": "Schedule.prompt",
+        "cadence": "Schedule.cadence",
+        "next_run_at": "Schedule.next_run_at",
+        "model": "Schedule.model",
+        "timezone": "Schedule.timezone",
+        "enabled": "Schedule.enabled",
+        "last_run_at": "Schedule.last_run_at"
+      },
+      "_output_schema": {
+        "schedule": "ScheduleResponse"
+      },
+      "guards": {
+        "required": [
+          "schedule_id"
+        ],
+        "messages": {
+          "not_found": "That schedule does not exist."
+        }
+      },
+      "description": "Update a schedule's fields. Fails if the schedule does not exist."
+    },
+    {
+      "tool": "schedule_delete",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "Schedule",
+        "lookup_by": {
+          "id": {
+            "$arg": "schedule_id"
+          }
+        },
+        "on_child": {
+          "mode": "cascade"
+        }
+      },
+      "input_schema": {
+        "schedule_id": {
+          "type": "int",
+          "required": false,
+          "description": "Id of the schedule to delete."
+        }
+      },
+      "_evidence": {
+        "locator": "cowork/services/schedules.py:68",
+        "id_local": "Schedule.delete",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/v1/schedules/{schedule_id}",
+          "locator": "cowork/api/v1/endpoints/schedules.py:65"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "schedule = self.session.get(Schedule, schedule_id)\nif schedule is None: return False\nfor run in ... ScheduleRun where schedule_id==schedule_id: self.session.delete(run)\nself.session.delete(schedule); self.session.commit(); return True"
+      },
+      "entity": "Schedule",
+      "_binds": {
+        "schedule_id": "Schedule.id"
+      },
+      "guards": {
+        "required": [
+          "schedule_id"
+        ],
+        "messages": {
+          "not_found": "That schedule does not exist.",
+          "on_child": "This schedule still has run records — delete with run-cascade or remove the runs first."
+        }
+      },
+      "description": "Delete a schedule and (cascading) its run history. Fails if the schedule does not exist."
+    },
+    {
+      "tool": "schedule_pause",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Schedule",
+        "row_key": {
+          "id": {
+            "$arg": "schedule_id"
+          }
+        },
+        "set": {
+          "enabled": false
+        }
+      },
+      "input_schema": {
+        "schedule_id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the schedule to pause."
+        }
+      },
+      "_evidence": {
+        "locator": "cowork/services/schedules.py:87",
+        "id_local": "Schedule.pause",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/v1/schedules/{schedule_id}/pause",
+          "locator": "cowork/api/v1/endpoints/schedules.py:72"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "schedule = self.get_schedule(schedule_id)\nschedule.enabled = False\nself.session.add(schedule); self.session.commit(); self.session.refresh(schedule); return schedule",
+        "edges": [
+          "cowork/services/schedules.py:88 (get_schedule raises ValueError if missing)"
+        ]
+      },
+      "entity": "Schedule",
+      "_binds": {
+        "schedule_id": "Schedule.id"
+      },
+      "_output_schema": {
+        "schedule": "ScheduleResponse"
+      },
+      "guards": {
+        "required": [
+          "schedule_id"
+        ],
+        "messages": {
+          "not_found": "That schedule does not exist."
+        }
+      },
+      "description": "Pause a schedule so it stops firing. Fails if the schedule does not exist."
+    },
+    {
+      "tool": "schedule_resume",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Schedule",
+        "row_key": {
+          "id": {
+            "$arg": "schedule_id"
+          }
+        },
+        "set": {
+          "enabled": true
+        }
+      },
+      "input_schema": {
+        "schedule_id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the schedule to resume."
+        }
+      },
+      "_evidence": {
+        "locator": "cowork/services/schedules.py:94",
+        "id_local": "Schedule.resume",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/v1/schedules/{schedule_id}/resume",
+          "locator": "cowork/api/v1/endpoints/schedules.py:80"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "schedule = self.get_schedule(schedule_id)\nschedule.enabled = True\nself.session.add(schedule); self.session.commit(); self.session.refresh(schedule); return schedule",
+        "edges": [
+          "cowork/services/schedules.py:95"
+        ]
+      },
+      "entity": "Schedule",
+      "_binds": {
+        "schedule_id": "Schedule.id"
+      },
+      "_output_schema": {
+        "schedule": "ScheduleResponse"
+      },
+      "guards": {
+        "required": [
+          "schedule_id"
+        ],
+        "messages": {
+          "not_found": "That schedule does not exist."
+        }
+      },
+      "description": "Resume a paused schedule. Fails if the schedule does not exist."
+    },
+    {
+      "tool": "schedule_run_now",
+      "op": "action",
+      "family": "action.trigger",
+      "exec_spec": {
+        "target": {
+          "entity": "Schedule",
+          "lookup_by": {
+            "id": {
+              "$arg": "schedule_id"
+            }
+          }
+        },
+        "spawn": [
+          {
+            "entity": "Conversation",
+            "from_parent": {
+              "topic": "title",
+              "project_id": "project_id"
+            }
+          }
+        ]
+      },
+      "input_schema": {
+        "schedule_id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the schedule to launch immediately. A conversation for the run is created in the schedule's project."
+        }
+      },
+      "_evidence": {
+        "locator": "cowork/api/v1/endpoints/schedules.py:88",
+        "id_local": "Schedule.run_now",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/v1/schedules/{schedule_id}/run-now",
+          "locator": "cowork/api/v1/endpoints/schedules.py:88"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "schedule = ScheduleService(session).get_schedule(schedule_id)\nconversation = ConversationService(session).create_conversation(topic=schedule.title, project_id=schedule.project_id)\nmark_stream_active(str(conversation.id))\nbackground_tasks.add_task(execute_schedule, schedule_id, is_manual=True, conversation_id=conversation.id)\nreturn {\"detail\": \"Run triggered\", \"conversation_id\": str(conversation.id)}",
+        "wall": {
+          "schedule must exist": "cowork/services/schedules.py:88",
+          "conversation from schedule.title/project_id": "cowork/api/v1/endpoints/schedules.py:100-101"
+        }
+      },
+      "entity": "Conversation",
+      "_binds": {
+        "schedule_id": "Schedule.id"
+      },
+      "_output_schema": {
+        "detail": "str",
+        "conversation_id": "str"
+      },
+      "_candidate_preconditions": [
+        [
+          {
+            "entity": "Schedule",
+            "scope": [
+              {
+                "col": "id",
+                "op": "eq",
+                "value": {
+                  "ref": "$arg.schedule_id"
+                }
+              }
+            ],
+            "card": {
+              "op": "gte",
+              "n": 1
+            }
+          }
+        ]
+      ],
+      "guards": {
+        "required": [
+          "schedule_id"
+        ],
+        "messages": {
+          "not_found": "That schedule does not exist."
+        }
+      },
+      "description": "Launch a scheduled task immediately: creates a conversation for the run in the schedule's project. Fails if the schedule does not exist."
+    },
+    {
+      "tool": "schedule_list_runs",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "ScheduleRun",
+        "filter": {
+          "col": "schedule_id",
+          "mode": "exact",
+          "val": {
+            "$arg": "schedule_id"
+          }
+        },
+        "sort": [
+          {
+            "col": "started_at",
+            "dir": "desc"
+          }
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "schedule_id"
+          ]
+        },
+        "pagination": {
+          "default_limit": 20
+        }
+      },
+      "input_schema": {
+        "schedule_id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the schedule whose run history to list."
+        },
+        "limit": {
+          "type": "int",
+          "required": false,
+          "description": "Max runs to return (newest first)."
+        }
+      },
+      "_evidence": {
+        "locator": "cowork/services/schedules.py:118",
+        "id_local": "Schedule.list_runs",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v1/schedules/{schedule_id}/runs",
+          "locator": "cowork/api/v1/endpoints/schedules.py:116"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "return list(self.session.exec(select(ScheduleRun).where(ScheduleRun.schedule_id == schedule_id).order_by(ScheduleRun.started_at.desc()).limit(limit)).all())",
+        "_residual": "Removed the 'schedule must exist' precondition (L0 no-evidence): ref_code schedules.py:118 is a plain filtered select with no existence check. Listing runs of a missing schedule returns empty, which is the real behavior."
+      },
+      "entity": "ScheduleRun",
+      "_binds": {
+        "schedule_id": "Schedule.id"
+      },
+      "_output_schema": {
+        "runs": "list of ScheduleRun rows"
+      },
+      "guards": {
+        "required": [
+          "schedule_id"
+        ],
+        "messages": {}
+      },
+      "description": "List the run history of a schedule, newest first. Fails if the schedule does not exist."
+    },
+    {
+      "tool": "setting_list",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Setting",
+        "rank": {
+          "method": "exact"
+        }
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "cowork/services/settings.py:57",
+        "id_local": "Setting.list",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v1/settings/",
+          "locator": "cowork/api/v1/endpoints/settings.py:43"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "rows = self._fetch_all_rows()\nsettings = self._load(rows)\nset_keys = {row.key for row in rows}\nreturn [self._to_response(key, settings, key in set_keys) for key in UserSettings.model_fields]"
+      },
+      "entity": "Setting",
+      "_output_schema": {
+        "settings": "list of SettingResponse (key, label, is_sensitive, is_set, value?, options?)"
+      },
+      "description": "List all application settings and which of them are currently set.",
+      "guards": {
+        "messages": {}
+      }
+    },
+    {
+      "tool": "setting_set",
+      "op": "update",
+      "family": "crud.upsert",
+      "exec_spec": {
+        "entity": "Setting",
+        "key": {
+          "key": {
+            "$arg": "setting_key"
+          }
+        },
+        "insert_fields": [
+          "key",
+          "value"
+        ],
+        "set_on_exists": {
+          "value": {
+            "$arg": "value"
+          }
+        }
+      },
+      "input_schema": {
+        "setting_key": {
+          "type": "text",
+          "required": true,
+          "description": "The setting key to write (one of the known application settings, e.g. minds_api_key, publish_url)."
+        },
+        "value": {
+          "type": "text",
+          "required": true,
+          "description": "The value to store; sensitive keys are encrypted before storage."
+        }
+      },
+      "_evidence": {
+        "locator": "cowork/services/settings.py:70",
+        "id_local": "Setting.set",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /api/v1/settings/{key}",
+          "locator": "cowork/api/v1/endpoints/settings.py:48"
+        },
+        "entity_why": "primary effect row_upsert lands on this table",
+        "ref_code": "row = self._fetch_row(key)\nif row is None: row = Setting(key=key, value=store_val)\nelse: row.value = store_val\nself.session.add(row); self.session.commit(); invalidate_user_settings_cache()",
+        "edges": [
+          "cowork/services/settings.py:52 (_validate_key raises ValueError for unknown keys); upsert works whether or not the row exists"
+        ],
+        "wall": {
+          "known-key validation": "cowork/services/settings.py:52"
+        }
+      },
+      "entity": "Setting",
+      "_binds": {
+        "key": "Setting.key",
+        "value": "Setting.value"
+      },
+      "_output_schema": {
+        "setting": "SettingResponse"
+      },
+      "guards": {
+        "required": [
+          "setting_key",
+          "value"
+        ],
+        "messages": {
+          "unique": "That setting key already exists.",
+          "fk": "That setting key is not a known application setting."
+        }
+      },
+      "description": "Set an application setting (e.g. minds_api_key, publish_url). Unrecognised keys are refused; sensitive values are encrypted."
+    },
+    {
+      "tool": "setting_delete",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "Setting",
+        "lookup_by": {
+          "key": {
+            "$arg": "setting_key"
+          }
+        }
+      },
+      "input_schema": {
+        "setting_key": {
+          "type": "text",
+          "required": true,
+          "description": "The setting key to remove."
+        }
+      },
+      "_evidence": {
+        "locator": "cowork/services/settings.py:112",
+        "id_local": "Setting.delete",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/v1/settings/{key}",
+          "locator": "cowork/api/v1/endpoints/settings.py:60"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "row = self._fetch_row(key)\nif row is None: return False\nself.session.delete(row); self.session.commit(); invalidate_user_settings_cache(); return True",
+        "edges": [
+          "cowork/services/settings.py:114 (returns False if row missing)"
+        ]
+      },
+      "entity": "Setting",
+      "_binds": {
+        "key": "Setting.key"
+      },
+      "_output_schema": {
+        "ok": "bool"
+      },
+      "guards": {
+        "required": [
+          "setting_key"
+        ],
+        "messages": {
+          "not_found": "That setting has not been set."
+        }
+      },
+      "description": "Remove a previously-set application setting. Fails if it has not been set."
+    },
+    {
+      "tool": "setting_validate",
+      "op": "action",
+      "family": "action.probe",
+      "exec_spec": {
+        "target_key": "config_status"
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "cowork/api/v1/endpoints/settings.py:77",
+        "id_local": "Setting.validate",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/v1/settings/validate",
+          "locator": "cowork/api/v1/endpoints/settings.py:77"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "s = SettingService(session).load()\ncs = check_config_status(s)\nreturn {\"status\": \"ok\" if cs[\"configReady\"] else \"needs_config\", \"provider\": s.planning_provider.value, ...}",
+        "edges": [
+          "cowork/api/v1/endpoints/settings.py:80 (check_config_status reads provider keys)"
+        ],
+        "wall": {
+          "config readiness read from Settings rows": "cowork/api/v1/endpoints/settings.py:77-80"
+        }
+      },
+      "entity": "Setting",
+      "_output_schema": {
+        "status": "str",
+        "configReady": "bool",
+        "provider": "str",
+        "model": "str"
+      },
+      "guards": {
+        "messages": {}
+      },
+      "description": "Report whether the provider configuration (a Minds API key, and / or an Anthropic or OpenAI key) is ready. Returns status ok or needs_config."
+    },
+    {
+      "tool": "memory_update",
+      "op": "action",
+      "family": "crud.upsert",
+      "exec_spec": {
+        "entity": "Memory",
+        "key": {
+          "scope": {
+            "$arg": "scope"
+          },
+          "category": {
+            "$arg": "category"
+          }
+        },
+        "insert_fields": [
+          "content"
+        ],
+        "set_on_exists": {
+          "content": {
+            "$arg": "content"
+          }
+        }
+      },
+      "input_schema": {
+        "scope": {
+          "type": "text",
+          "required": true,
+          "description": "Scope of the memory: 'global' or 'project'."
+        },
+        "category": {
+          "type": "text",
+          "required": true,
+          "description": "Memory category (e.g. lesson, rule, topic)."
+        },
+        "content": {
+          "type": "text",
+          "required": true,
+          "description": "The memory content to store (upserted on scope+category)."
+        }
+      },
+      "_evidence": {
+        "locator": "cowork/api/v1/endpoints/memory.py:108",
+        "id_local": "Memory.update",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/v1/memory/",
+          "locator": "cowork/api/v1/endpoints/memory.py:108"
+        },
+        "entity_why": "primary effect row_upsert lands on this table",
+        "ref_code": "category = _category_from_path(relative_path)\nproject_id = None\nif scope == MemoryScope.project and project_path:\n    project = ... Project where path==project_path\n    project_id = project.id\nawait MemoryService(session).update_memory(scope, category, content, project_id=project_id)",
+        "edges": [
+          "cowork/api/v1/endpoints/memory.py:122 (404 if project not found)"
+        ]
+      },
+      "entity": "Memory",
+      "_binds": {
+        "scope": "Memory.scope",
+        "category": "Memory.category",
+        "content": "Memory.content"
+      },
+      "_output_schema": {
+        "ok": "bool"
+      },
+      "guards": {
+        "required": [
+          "scope",
+          "category",
+          "content"
+        ]
+      },
+      "_defaulted": [],
+      "description": "Store a memory file under a scope+category (upsert)."
+    },
+    {
+      "tool": "memory_list",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Memory",
+        "rank": {
+          "method": "exact"
+        }
+      },
+      "input_schema": {
+        "project_path": {
+          "type": "text",
+          "required": false,
+          "description": "If set, restrict to global memory plus this project's memory."
+        }
+      },
+      "_evidence": {
+        "locator": "cowork/api/v1/endpoints/memory.py:86",
+        "id_local": "Memory.list",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v1/memory/",
+          "locator": "cowork/api/v1/endpoints/memory.py:86"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "items = await MemoryService(session).list_memory()\nif project_path:\n    project = ... Project where path==project_path; items = [i for i in items if i.scope==global_ or i.project_id==project_id]\nsections = _build_sections(items, session)"
+      },
+      "entity": "Memory",
+      "_output_schema": {
+        "sections": "grouped memory sections"
+      },
+      "description": "List the stored memories grouped into sections (global and project scope).",
+      "guards": {
+        "messages": {}
+      }
+    },
+    {
+      "tool": "memory_delete",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "Memory",
+        "lookup_by": {
+          "scope": {
+            "$arg": "scope"
+          },
+          "category": {
+            "$arg": "category"
+          }
+        }
+      },
+      "input_schema": {
+        "scope": {
+          "type": "text",
+          "required": true,
+          "description": "Scope of the memory to remove: 'global' or 'project'."
+        },
+        "category": {
+          "type": "text",
+          "required": true,
+          "description": "Category of the memory to remove."
+        }
+      },
+      "_evidence": {
+        "locator": "cowork/api/v1/endpoints/memory.py:137",
+        "id_local": "Memory.delete",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/v1/memory/",
+          "locator": "cowork/api/v1/endpoints/memory.py:137"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "category = _category_from_path(relative_path)\nproject_id = ...\nawait MemoryService(session).delete_memory(scope=scope_enum, category=category, project_id=project_id)"
+      },
+      "entity": "Memory",
+      "_binds": {
+        "scope": "Memory.scope",
+        "category": "Memory.category"
+      },
+      "_output_schema": {
+        "ok": "bool"
+      },
+      "guards": {
+        "required": [
+          "scope",
+          "category"
+        ],
+        "messages": {
+          "not_found": "That memory has not been set."
+        }
+      },
+      "description": "Remove a stored memory. Fails if it does not exist."
+    },
+    {
+      "tool": "responses_create",
+      "op": "action",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Conversation",
+        "fields": [
+          "topic",
+          "project_id"
+        ],
+        "set_on_create": {
+          "topic": {
+            "$arg": "input"
+          },
+          "project_id": {
+            "$arg": "project_id"
+          }
+        }
+      },
+      "input_schema": {
+        "input": {
+          "type": "text",
+          "required": true,
+          "description": "The prompt / message text to send to the assistant."
+        },
+        "conversation": {
+          "type": "int",
+          "required": false,
+          "description": "Existing conversation id to continue; a new conversation is created if omitted."
+        },
+        "project_id": {
+          "type": "int",
+          "required": false,
+          "description": "Project the conversation belongs to; defaults to the 'General' project."
+        }
+      },
+      "_evidence": {
+        "locator": "cowork/handlers/responses.py:62",
+        "id_local": "Responses.create",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/v1/responses/",
+          "locator": "cowork/api/v1/endpoints/responses.py:72"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "conversation = conversation_service.get_conversation(conv_id) or create_conversation(...)\nuser_message = DBMessage(conversation_id=conversation.id, role=Role.user, content=original_content)\nself.session.add(user_message); self.session.commit()\n... harness.stream_response(...)\ncollected ... ; self._save_assistant_turn(conversation_id, text, events)  # inserts assistant Message + MessageEvents",
+        "wall": {
+          "conversation adopted or created": "cowork/handlers/responses.py:96"
+        }
+      },
+      "entity": "Conversation",
+      "_binds": {
+        "conversation": "Conversation.id",
+        "project_id": "Conversation.project_id"
+      },
+      "_output_schema": {
+        "response": "OpenAI-style Response or SSE stream"
+      },
+      "guards": {
+        "required": [
+          "input"
+        ],
+        "messages": {
+          "fk": "That project does not exist."
+        }
+      },
+      "_defaulted": [],
+      "description": "Send a prompt to the assistant, continuing an existing conversation or starting a new one, and store the user's message."
+    },
+    {
+      "tool": "channelconfig_set",
+      "op": "update",
+      "family": "crud.upsert",
+      "exec_spec": {
+        "entity": "Setting",
+        "key": {
+          "key": {
+            "$arg": "channel_type"
+          }
+        },
+        "insert_fields": [
+          "key",
+          "value"
+        ],
+        "set_on_exists": {
+          "value": {
+            "$arg": "values"
+          }
+        }
+      },
+      "input_schema": {
+        "channel_type": {
+          "type": "text",
+          "required": true,
+          "description": "Channel adapter: telegram, slack, discord or whatsapp."
+        },
+        "values": {
+          "type": "json",
+          "required": true,
+          "description": "Credential map of field name to value; secret fields are encrypted."
+        },
+        "key": {
+          "type": "text",
+          "required": false,
+          "description": "(advanced) raw Setting key override; normally derived from channel_type."
+        }
+      },
+      "_evidence": {
+        "locator": "cowork/services/channels.py:100",
+        "id_local": "ChannelConfig.set",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /api/v1/channels/{channel_type}/config",
+          "locator": "cowork/api/v1/endpoints/channels.py:119"
+        },
+        "entity_why": "primary effect row_upsert lands on this table",
+        "ref_code": "known = set(plugin.credentials.field_names())\nunknown = [n for n in values if n not in known]\nif unknown: raise ValueError(...)\nfor name, raw in values.items():\n    field = plugin.credentials.get(name); store_val = encrypt(raw) if field.secret else raw\n    self._upsert_setting(_cred_key(channel_type, name), store_val)\nself._ensure_installation(plugin); self.session.commit()",
+        "wall": {
+          "unrecognised credential field refused": "cowork/services/channels.py:100"
+        }
+      },
+      "entity": "Setting",
+      "_binds": {
+        "channel_type": "ChannelInstallation.channel_type",
+        "key": "Setting.key"
+      },
+      "_output_schema": {
+        "config": "ChannelConfigResponse"
+      },
+      "guards": {
+        "required": [
+          "channel_type",
+          "values"
+        ],
+        "messages": {
+          "unique": "That channel type already has a configuration.",
+          "fk": "One of the credential fields is not known for this channel type."
+        }
+      },
+      "_defaulted": [],
+      "description": "Store a channel-type's credential configuration (encrypting secret fields)."
+    },
+    {
+      "tool": "channelconfig_delete",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "Setting",
+        "lookup_by": {
+          "key": {
+            "$arg": "channel_type"
+          }
+        },
+        "on_child": {
+          "mode": "detach"
+        }
+      },
+      "input_schema": {
+        "channel_type": {
+          "type": "text",
+          "required": true,
+          "description": "Channel adapter whose configuration to remove."
+        },
+        "key": {
+          "type": "text",
+          "required": false,
+          "description": "(advanced) raw Setting key override; normally derived from channel_type."
+        }
+      },
+      "_evidence": {
+        "locator": "cowork/services/channels.py:111",
+        "id_local": "ChannelConfig.delete",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/v1/channels/{channel_type}/config",
+          "locator": "cowork/api/v1/endpoints/channels.py:140"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "removed = False\nfor name in plugin.credentials.field_names():\n    row = self._fetch_setting(_cred_key(channel_type, name))\n    if row is not None: self.session.delete(row); removed = True\ninstall = self._fetch_installation(channel_type)\nif install is not None: self.session.delete(install); removed = True\nif removed: self.session.commit()"
+      },
+      "entity": "Setting",
+      "_binds": {
+        "channel_type": "ChannelInstallation.channel_type",
+        "key": "Setting.key"
+      },
+      "guards": {
+        "required": [
+          "channel_type"
+        ],
+        "messages": {
+          "not_found": "That channel type has no configuration to remove."
+        }
+      },
+      "description": "Remove a channel type's configuration. Fails if none is set."
+    },
+    {
+      "tool": "channel_set_agent",
+      "op": "update",
+      "family": "crud.upsert",
+      "exec_spec": {
+        "entity": "Setting",
+        "key": {
+          "key": "channels_harness"
+        },
+        "insert_fields": [
+          "key",
+          "value"
+        ],
+        "set_on_exists": {
+          "value": {
+            "$arg": "harness"
+          }
+        }
+      },
+      "input_schema": {
+        "harness": {
+          "type": "text",
+          "required": true,
+          "description": "Agent harness name for all channel conversations; must be a known option."
+        }
+      },
+      "_evidence": {
+        "locator": "cowork/api/v1/endpoints/channels.py:87",
+        "id_local": "Channel.set_agent",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /api/v1/channels/agent",
+          "locator": "cowork/api/v1/endpoints/channels.py:87"
+        },
+        "entity_why": "primary effect row_upsert lands on this table",
+        "ref_code": "harness = (body.harness or \"\").strip()\nif harness not in options: raise HTTPException(400, ...)\nSettingService(session).upsert_setting(\"channels_harness\", harness)\nreset = 0\nif harness != previous:\n    reset = ChannelBindingService(session).reset_conversations()\nreturn ChannelAgentResponse(harness=harness, options=options, reset_conversations=reset)",
+        "wall": {
+          "harness validated against options": "cowork/api/v1/endpoints/channels.py:87"
+        }
+      },
+      "entity": "Setting",
+      "_output_schema": {
+        "harness": "str",
+        "options": "list",
+        "reset_conversations": "int"
+      },
+      "guards": {
+        "required": [
+          "harness"
+        ],
+        "messages": {
+          "unique": "That harness is already set.",
+          "fk": "That harness is not a known option."
+        }
+      },
+      "_defaulted": [],
+      "description": "Set the agent harness used for all channel conversations. The harness must be a known option."
+    },
+    {
+      "tool": "channelbinding_list",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "ChannelBinding",
+        "filter": {
+          "col": "channel_type",
+          "mode": "exact",
+          "val": {
+            "$arg": "channel_type"
+          }
+        },
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "channel_type"
+          ]
+        }
+      },
+      "input_schema": {
+        "channel_type": {
+          "type": "text",
+          "required": false,
+          "description": "Optional adapter name to narrow by."
+        }
+      },
+      "_evidence": {
+        "locator": "cowork/services/channel_bindings.py:41",
+        "id_local": "ChannelBinding.list",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v1/channels/bindings",
+          "locator": "cowork/api/v1/endpoints/channels.py:173"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "stmt = select(ChannelBinding)\nif channel_type: stmt = stmt.where(ChannelBinding.channel_type == channel_type)\nreturn [self._dto(row) for row in self.session.exec(stmt).all()]"
+      },
+      "entity": "ChannelBinding",
+      "_binds": {
+        "channel_type": "ChannelBinding.channel_type"
+      },
+      "_output_schema": {
+        "bindings": "list of BindingResponse"
+      },
+      "description": "List channel bindings, optionally narrowed by adapter."
+    },
+    {
+      "tool": "channelbinding_create",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "ChannelBinding",
+        "fields": [
+          "channel_type",
+          "external_group_id",
+          "external_thread_id",
+          "display_name",
+          "trigger_rule",
+          "trigger_pattern",
+          "anton_project_id",
+          "anton_conversation_id"
+        ],
+        "set_on_create": {
+          "external_thread_key": {
+            "$arg": "external_thread_id"
+          }
+        },
+        "unique_on": [
+          "channel_type",
+          "external_group_id",
+          "external_thread_key"
+        ]
+      },
+      "input_schema": {
+        "channel_type": {
+          "type": "text",
+          "required": true,
+          "description": "Adapter name (e.g. telegram, slack)."
+        },
+        "external_group_id": {
+          "type": "text",
+          "required": true,
+          "description": "External platform conversation or group id."
+        },
+        "external_thread_id": {
+          "type": "text",
+          "required": false,
+          "description": "Optional external thread / sub-context id."
+        },
+        "display_name": {
+          "type": "text",
+          "required": false,
+          "description": "Human-friendly label."
+        },
+        "trigger_rule": {
+          "type": "text",
+          "required": false,
+          "description": "When this binding fires: always, mention_only or regex."
+        },
+        "trigger_pattern": {
+          "type": "text",
+          "required": false,
+          "description": "Regex used when trigger_rule is regex."
+        },
+        "anton_project_id": {
+          "type": "int",
+          "required": false,
+          "description": "Project the channel routes into."
+        },
+        "anton_conversation_id": {
+          "type": "int",
+          "required": false,
+          "description": "Pinned conversation for the channel."
+        }
+      },
+      "_evidence": {
+        "locator": "cowork/services/channel_bindings.py:54",
+        "id_local": "ChannelBinding.create",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/v1/channels/bindings",
+          "locator": "cowork/api/v1/endpoints/channels.py:178"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "self._validate_trigger(req.trigger_rule.value, req.trigger_pattern)\nself._validate_links(req.anton_project_id, req.anton_conversation_id)\nthread_key = req.external_thread_id or _DEFAULT_THREAD_KEY\nif self._find(...) is not None: raise BindingConflictError(...)\nbinding = ChannelBinding(... external_thread_key=thread_key ...)\nself.session.add(binding)\ntry: self.session.commit()\nexcept IntegrityError: self.session.rollback(); raise BindingConflictError(...)",
+        "edges": [
+          "cowork/services/channel_bindings.py:61 (raises BindingConflictError)",
+          "cowork/services/channel_bindings.py:196-201 (_validate_links)",
+          "cowork/services/channel_bindings.py:196-201"
+        ],
+        "wall": {
+          "binding conflict refused": "cowork/services/channel_bindings.py:54",
+          "links validated": "cowork/services/channel_bindings.py:196-201"
+        },
+        "_residual": "unique wall (channel_type+external_group_id+external_thread_key) is REAL and fires in the runtime; the probe reports wall_missing because external_thread_key is derived from the optional arg external_thread_id, so its arg-synthesis never collides. Verified manually: duplicate telegram/grp is refused."
+      },
+      "entity": "ChannelBinding",
+      "_binds": {
+        "channel_type": "ChannelBinding.channel_type",
+        "external_group_id": "ChannelBinding.external_group_id",
+        "external_thread_id": "ChannelBinding.external_thread_id",
+        "display_name": "ChannelBinding.display_name",
+        "trigger_rule": "ChannelBinding.trigger_rule",
+        "trigger_pattern": "ChannelBinding.trigger_pattern",
+        "anton_project_id": "ChannelBinding.anton_project_id",
+        "anton_conversation_id": "ChannelBinding.anton_conversation_id"
+      },
+      "_output_schema": {
+        "binding": "BindingResponse"
+      },
+      "guards": {
+        "required": [
+          "channel_type",
+          "external_group_id"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "ChannelBinding",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "channel_type",
+                      "op": "eq",
+                      "value": {
+                        "arg": "channel_type"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "external_group_id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "external_group_id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "external_thread_key",
+                      "op": "eq",
+                      "value": "__default__"
+                    }
+                  ]
+                }
+              },
+              "op": "eq",
+              "n": 0
+            }
+          ]
+        ],
+        "messages": {
+          "precondition": "That channel / group / thread is already bound.",
+          "unique": "That channel / group / thread is already bound.",
+          "fk": "The referenced project or conversation does not exist."
+        }
+      },
+      "description": "Bind an external channel conversation to this workspace. A duplicate channel/group/thread binding is refused."
+    },
+    {
+      "tool": "channelbinding_update",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "ChannelBinding",
+        "row_key": {
+          "id": {
+            "$arg": "binding_id"
+          }
+        },
+        "fields": [
+          "display_name",
+          "trigger_rule",
+          "trigger_pattern",
+          "anton_project_id",
+          "anton_conversation_id"
+        ]
+      },
+      "input_schema": {
+        "binding_id": {
+          "type": "int",
+          "required": false,
+          "description": "Id of the binding to update."
+        },
+        "display_name": {
+          "type": "text",
+          "required": false,
+          "description": "New display name."
+        },
+        "trigger_rule": {
+          "type": "text",
+          "required": false,
+          "description": "New trigger rule."
+        },
+        "trigger_pattern": {
+          "type": "text",
+          "required": false,
+          "description": "New trigger pattern."
+        },
+        "anton_project_id": {
+          "type": "int",
+          "required": false,
+          "description": "New target project."
+        },
+        "anton_conversation_id": {
+          "type": "int",
+          "required": false,
+          "description": "New pinned conversation."
+        }
+      },
+      "_evidence": {
+        "locator": "cowork/services/channel_bindings.py:82",
+        "id_local": "ChannelBinding.update",
+        "entry": {
+          "kind": "http",
+          "route": "PATCH /api/v1/channels/bindings/{binding_id}",
+          "locator": "cowork/api/v1/endpoints/channels.py:188"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "binding = self.session.get(ChannelBinding, binding_id)\nif binding is None: raise BindingNotFoundError\n# validate trigger + links against effective values\n...assign provided fields...\nself.session.add(binding); self.session.commit(); self.session.refresh(binding)",
+        "edges": [
+          "cowork/services/channel_bindings.py:86 (raises BindingNotFoundError)"
+        ]
+      },
+      "entity": "ChannelBinding",
+      "_binds": {
+        "binding_id": "ChannelBinding.id",
+        "display_name": "ChannelBinding.display_name",
+        "trigger_rule": "ChannelBinding.trigger_rule",
+        "trigger_pattern": "ChannelBinding.trigger_pattern",
+        "anton_project_id": "ChannelBinding.anton_project_id",
+        "anton_conversation_id": "ChannelBinding.anton_conversation_id"
+      },
+      "_output_schema": {
+        "binding": "BindingResponse"
+      },
+      "guards": {
+        "required": [
+          "binding_id"
+        ],
+        "messages": {
+          "not_found": "That channel binding does not exist.",
+          "fk": "The referenced project or conversation does not exist."
+        }
+      },
+      "description": "Update a channel binding's display name, trigger rule or target links. Fails if the binding does not exist."
+    },
+    {
+      "tool": "channelbinding_delete",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "ChannelBinding",
+        "lookup_by": {
+          "id": {
+            "$arg": "binding_id"
+          }
+        },
+        "on_child": {
+          "mode": "cascade"
+        }
+      },
+      "input_schema": {
+        "binding_id": {
+          "type": "int",
+          "required": false,
+          "description": "Id of the binding to delete."
+        }
+      },
+      "_evidence": {
+        "locator": "cowork/services/channel_bindings.py:183",
+        "id_local": "ChannelBinding.delete",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/v1/channels/bindings/{binding_id}",
+          "locator": "cowork/api/v1/endpoints/channels.py:198"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "binding = self.session.get(ChannelBinding, binding_id)\nif binding is None: return False\nfor sess in ... ChannelSession where binding_id==binding_id: self.session.delete(sess)\nself.session.delete(binding); self.session.commit(); return True",
+        "edges": [
+          "cowork/services/channel_bindings.py:184"
+        ]
+      },
+      "entity": "ChannelBinding",
+      "_binds": {
+        "binding_id": "ChannelBinding.id"
+      },
+      "guards": {
+        "required": [
+          "binding_id"
+        ],
+        "messages": {
+          "not_found": "That channel binding does not exist.",
+          "on_child": "This binding still has channel sessions — delete with session-cascade or remove the sessions first."
+        }
+      },
+      "description": "Remove a channel binding and (cascading) its sessions. Fails if the binding does not exist."
+    },
+    {
+      "tool": "connection_list",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Connection",
+        "rank": {
+          "method": "exact"
+        }
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "cowork/services/connectors/connections.py:16",
+        "id_local": "Connection.list",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v1/connectors/connections/",
+          "locator": "cowork/api/v1/endpoints/connectors/connections.py:11"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "items = self._vault().list_connections()\nresult = []\nfor item in items:\n    result.append(ConnectionSummaryResponse(engine=item[\"engine\"], name=item[\"name\"], created_at=item[\"created_at\"], ...))"
+      },
+      "entity": "Connection",
+      "_output_schema": {
+        "connections": "list of ConnectionSummaryResponse"
+      },
+      "description": "List all configured data connections.",
+      "guards": {
+        "messages": {}
+      }
+    },
+    {
+      "tool": "connection_get",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Connection",
+        "lookup_by": {
+          "engine": {
+            "$arg": "engine"
+          },
+          "name": {
+            "$arg": "name"
+          }
+        }
+      },
+      "input_schema": {
+        "engine": {
+          "type": "text",
+          "required": false,
+          "description": "Connector/engine name."
+        },
+        "name": {
+          "type": "text",
+          "required": false,
+          "description": "Connection name."
+        }
+      },
+      "_evidence": {
+        "locator": "cowork/services/connectors/connections.py:31",
+        "id_local": "Connection.get",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v1/connectors/connections/{engine}/{name}",
+          "locator": "cowork/api/v1/endpoints/connectors/connections.py:14"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "record = vault.read_record(engine, name)\nfields = dict(record.get(\"fields\") or {})\nfor key in record.get(\"secure_keys\") or []:\n    if key in fields: fields[key] = _SENTINEL\nreturn ConnectionDetailResponse(engine=..., name=..., created_at=..., fields=fields)"
+      },
+      "entity": "Connection",
+      "_binds": {
+        "engine": "Connection.engine",
+        "name": "Connection.name"
+      },
+      "_output_schema": {
+        "connection": "ConnectionDetailResponse (secure fields masked)"
+      },
+      "guards": {
+        "required": [
+          "engine",
+          "name"
+        ],
+        "messages": {
+          "not_found": "That connection does not exist."
+        }
+      },
+      "description": "Read one configured connection by engine+name; secure fields are masked. Fails if it does not exist."
+    },
+    {
+      "tool": "connection_delete",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "Connection",
+        "lookup_by": {
+          "engine": {
+            "$arg": "engine"
+          },
+          "name": {
+            "$arg": "name"
+          }
+        }
+      },
+      "input_schema": {
+        "engine": {
+          "type": "text",
+          "required": false,
+          "description": "Connector/engine name."
+        },
+        "name": {
+          "type": "text",
+          "required": false,
+          "description": "Connection name."
+        }
+      },
+      "_evidence": {
+        "locator": "cowork/services/connectors/connections.py:61",
+        "id_local": "Connection.delete",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/v1/connectors/connections/{engine}/{name}",
+          "locator": "cowork/api/v1/endpoints/connectors/connections.py:18"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "return self._vault().delete(engine, name)",
+        "edges": [
+          "cowork/services/connectors/connections.py:63 (returns True only if the file existed)"
+        ]
+      },
+      "entity": "Connection",
+      "_binds": {
+        "engine": "Connection.engine",
+        "name": "Connection.name"
+      },
+      "guards": {
+        "required": [
+          "engine",
+          "name"
+        ],
+        "messages": {
+          "not_found": "That connection does not exist."
+        }
+      },
+      "description": "Remove a configured connection. Fails if it does not exist."
+    },
+    {
+      "tool": "connection_create",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Connection",
+        "fields": [
+          "fields"
+        ],
+        "set_on_create": {
+          "engine": {
+            "$arg": "connector_id"
+          },
+          "name": {
+            "$arg": "name"
+          },
+          "fields": {
+            "$arg": "values"
+          },
+          "secure_keys": null
+        },
+        "unique_on": [
+          "engine",
+          "name"
+        ]
+      },
+      "input_schema": {
+        "connector_id": {
+          "type": "text",
+          "required": true,
+          "description": "The connector / engine id (e.g. postgres)."
+        },
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "Name of the connection (unique per engine)."
+        },
+        "values": {
+          "type": "json",
+          "required": true,
+          "description": "Connection fields (host, port, credentials, ...); secure values are masked on read."
+        },
+        "method": {
+          "type": "text",
+          "required": false,
+          "description": "Authentication method for the connector."
+        },
+        "conversation_id": {
+          "type": "text",
+          "required": false,
+          "description": "Associated conversation id."
+        }
+      },
+      "_evidence": {
+        "locator": "cowork/api/v1/endpoints/connectors/submissions.py:64",
+        "id_local": "Connection.create",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/v1/connectors/submissions/",
+          "locator": "cowork/api/v1/endpoints/connectors/submissions.py:64"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "submission_id = store.stage(...)\nhandler = ProbeHandler(session)\nreturn StreamingResponse(handler.run(submission_id, connector_id, method, req.name, req.conversation_id))",
+        "wall": {
+          "submission stored": "cowork/api/v1/endpoints/connectors/submissions.py:64",
+          "vault.save on probe": "cowork/handlers/probe.py:300"
+        },
+        "_residual": "unique wall (engine+name) is REAL and fires in the runtime; the probe reports wall_missing because engine is bound to the renamed arg 'connector_id', so its arg-synthesis never collides. Verified manually: connection_create(connector_id='postgres',name='prod') is refused when a Connection(engine='postgres',name='prod') exists."
+      },
+      "entity": "Connection",
+      "_binds": {
+        "name": "Connection.name"
+      },
+      "_output_schema": {
+        "connection": "ConnectionDetailResponse"
+      },
+      "guards": {
+        "required": [
+          "connector_id",
+          "name",
+          "values"
+        ],
+        "messages": {
+          "unique": "A connection with that engine and name already exists."
+        }
+      },
+      "_defaulted": [],
+      "description": "Create a data connection for a connector. A connection with the same engine and name already existing is refused."
+    }
+  ],
+  "seed_state": {},
+  "summary": "Minds Platform (mindsdb/minds superproject): the cowork-server FastAPI+SQLModel backend that persists projects, conversations/messages, skills, schedules+scheduled runs, files, pins, settings, channel installations/bindings/events, plus flat-file memory, a connection vault (LocalDataVault JSON), and artifact publish records. Has full write+read CRUD paths on both a SQLite/Postgres DB and file-backed stores.",
+  "_dropped": [
+    "conversation_delete_turn",
+    "pin_visit",
+    "responses_cancel",
+    "publish_list",
+    "publish_create",
+    "publish_delete",
+    "channel_setup"
+  ],
+  "auth": {}
+}

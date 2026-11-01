@@ -1,0 +1,7506 @@
+{
+ "env_id": "listmonk",
+ "_prep_version": 3,
+ "entities": [
+  {
+   "name": "Bounces",
+   "columns": [
+    {
+     "name": "id",
+     "type": "id",
+     "pk": true
+    },
+    {
+     "name": "subscriber_id",
+     "type": "id",
+     "nullable": false,
+     "fk_to": "Subscribers.id",
+     "on_delete": "cascade"
+    },
+    {
+     "name": "campaign_id",
+     "type": "id",
+     "nullable": true,
+     "fk_to": "Campaigns.id",
+     "on_delete": "set_null"
+    },
+    {
+     "name": "type",
+     "type": "text",
+     "nullable": false,
+     "enum": [
+      "soft",
+      "hard",
+      "complaint"
+     ],
+     "default": "hard"
+    },
+    {
+     "name": "source",
+     "type": "text",
+     "nullable": false,
+     "default": ""
+    },
+    {
+     "name": "meta",
+     "type": "json",
+     "nullable": false,
+     "default": "{}"
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "audit": true,
+     "immutable": true
+    }
+   ]
+  },
+  {
+   "name": "CampaignLists",
+   "columns": [
+    {
+     "name": "id",
+     "type": "id",
+     "pk": true
+    },
+    {
+     "name": "campaign_id",
+     "type": "id",
+     "nullable": false,
+     "fk_to": "Campaigns.id",
+     "on_delete": "cascade"
+    },
+    {
+     "name": "list_id",
+     "type": "id",
+     "nullable": true,
+     "fk_to": "Lists.id",
+     "on_delete": "set_null"
+    },
+    {
+     "name": "list_name",
+     "type": "text",
+     "nullable": false,
+     "default": ""
+    }
+   ],
+   "constraints": [
+    {
+     "kind": "unique",
+     "cols": [
+      "campaign_id",
+      "list_id"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "CampaignMedia",
+   "columns": [
+    {
+     "name": "campaign_id",
+     "type": "id",
+     "pk": true,
+     "nullable": false,
+     "fk_to": "Campaigns.id",
+     "on_delete": "cascade"
+    },
+    {
+     "name": "media_id",
+     "type": "id",
+     "pk": true,
+     "nullable": true,
+     "fk_to": "Media.id",
+     "on_delete": "set_null"
+    },
+    {
+     "name": "filename",
+     "type": "text",
+     "nullable": false,
+     "default": ""
+    }
+   ],
+   "constraints": [
+    {
+     "kind": "unique",
+     "cols": [
+      "campaign_id",
+      "media_id"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "CampaignViews",
+   "columns": [
+    {
+     "name": "id",
+     "type": "id",
+     "pk": true
+    },
+    {
+     "name": "campaign_id",
+     "type": "id",
+     "nullable": false,
+     "fk_to": "Campaigns.id",
+     "on_delete": "cascade"
+    },
+    {
+     "name": "subscriber_id",
+     "type": "id",
+     "nullable": true,
+     "fk_to": "Subscribers.id",
+     "on_delete": "set_null"
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "audit": true,
+     "immutable": true
+    }
+   ]
+  },
+  {
+   "name": "Campaigns",
+   "columns": [
+    {
+     "name": "id",
+     "type": "id",
+     "pk": true
+    },
+    {
+     "name": "uuid",
+     "type": "text",
+     "nullable": false
+    },
+    {
+     "name": "name",
+     "type": "text",
+     "nullable": false
+    },
+    {
+     "name": "subject",
+     "type": "text",
+     "nullable": false
+    },
+    {
+     "name": "from_email",
+     "type": "text",
+     "nullable": false
+    },
+    {
+     "name": "body",
+     "type": "text",
+     "nullable": false
+    },
+    {
+     "name": "body_source",
+     "type": "text",
+     "nullable": true
+    },
+    {
+     "name": "altbody",
+     "type": "text",
+     "nullable": true
+    },
+    {
+     "name": "content_type",
+     "type": "text",
+     "nullable": false,
+     "enum": [
+      "richtext",
+      "html",
+      "plain",
+      "markdown",
+      "visual"
+     ],
+     "default": "richtext"
+    },
+    {
+     "name": "send_at",
+     "type": "datetime",
+     "nullable": true
+    },
+    {
+     "name": "headers",
+     "type": "json",
+     "nullable": false,
+     "default": "[]"
+    },
+    {
+     "name": "attribs",
+     "type": "json",
+     "nullable": false,
+     "default": "{}"
+    },
+    {
+     "name": "status",
+     "type": "text",
+     "nullable": false,
+     "enum": [
+      "draft",
+      "running",
+      "scheduled",
+      "paused",
+      "cancelled",
+      "finished"
+     ],
+     "default": "draft"
+    },
+    {
+     "name": "tags",
+     "type": "text",
+     "nullable": true
+    },
+    {
+     "name": "type",
+     "type": "text",
+     "nullable": false,
+     "enum": [
+      "regular",
+      "optin"
+     ],
+     "default": "regular"
+    },
+    {
+     "name": "messenger",
+     "type": "text",
+     "nullable": false
+    },
+    {
+     "name": "template_id",
+     "type": "id",
+     "nullable": true,
+     "fk_to": "Templates.id",
+     "on_delete": "set_null"
+    },
+    {
+     "name": "to_send",
+     "type": "int",
+     "nullable": false,
+     "default": 0
+    },
+    {
+     "name": "sent",
+     "type": "int",
+     "nullable": false,
+     "default": 0
+    },
+    {
+     "name": "max_subscriber_id",
+     "type": "int",
+     "nullable": false,
+     "default": 0
+    },
+    {
+     "name": "last_subscriber_id",
+     "type": "int",
+     "nullable": false,
+     "default": 0
+    },
+    {
+     "name": "archive",
+     "type": "bool",
+     "nullable": false,
+     "default": false
+    },
+    {
+     "name": "archive_slug",
+     "type": "text",
+     "nullable": true
+    },
+    {
+     "name": "archive_template_id",
+     "type": "id",
+     "nullable": true,
+     "fk_to": "Templates.id",
+     "on_delete": "set_null"
+    },
+    {
+     "name": "archive_meta",
+     "type": "json",
+     "nullable": false,
+     "default": "{}"
+    },
+    {
+     "name": "started_at",
+     "type": "datetime",
+     "nullable": true
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "audit": true,
+     "immutable": true
+    },
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "audit": true
+    }
+   ],
+   "constraints": [
+    {
+     "kind": "unique",
+     "cols": [
+      "uuid"
+     ]
+    },
+    {
+     "kind": "unique",
+     "cols": [
+      "archive_slug"
+     ]
+    }
+   ],
+   "_lifecycle": {
+    "col": "status",
+    "initial": "draft",
+    "states": [
+     "draft",
+     "running",
+     "scheduled",
+     "paused",
+     "cancelled",
+     "finished"
+    ],
+    "via": {
+     "Campaigns.update_status": {
+      "col": "status",
+      "from": [
+       "draft",
+       "paused",
+       "running"
+      ],
+      "to": "cancelled"
+     },
+     "Campaigns.update": {
+      "col": "status",
+      "from": [
+       "scheduled"
+      ],
+      "to": "draft"
+     },
+     "Campaigns.deliver": {
+      "col": "status",
+      "from": [
+       "scheduled",
+       "running"
+      ],
+      "to": null
+     }
+    }
+   }
+  },
+  {
+   "name": "LinkClicks",
+   "columns": [
+    {
+     "name": "id",
+     "type": "id",
+     "pk": true
+    },
+    {
+     "name": "campaign_id",
+     "type": "id",
+     "nullable": true,
+     "fk_to": "Campaigns.id",
+     "on_delete": "cascade"
+    },
+    {
+     "name": "link_id",
+     "type": "id",
+     "nullable": false,
+     "fk_to": "Links.id",
+     "on_delete": "cascade"
+    },
+    {
+     "name": "subscriber_id",
+     "type": "id",
+     "nullable": true,
+     "fk_to": "Subscribers.id",
+     "on_delete": "set_null"
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "audit": true,
+     "immutable": true
+    }
+   ]
+  },
+  {
+   "name": "Links",
+   "columns": [
+    {
+     "name": "id",
+     "type": "id",
+     "pk": true
+    },
+    {
+     "name": "uuid",
+     "type": "text",
+     "nullable": false
+    },
+    {
+     "name": "url",
+     "type": "text",
+     "nullable": false
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "audit": true,
+     "immutable": true
+    }
+   ],
+   "constraints": [
+    {
+     "kind": "unique",
+     "cols": [
+      "uuid"
+     ]
+    },
+    {
+     "kind": "unique",
+     "cols": [
+      "url"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Lists",
+   "columns": [
+    {
+     "name": "id",
+     "type": "id",
+     "pk": true
+    },
+    {
+     "name": "uuid",
+     "type": "text",
+     "nullable": false
+    },
+    {
+     "name": "name",
+     "type": "text",
+     "nullable": false
+    },
+    {
+     "name": "type",
+     "type": "text",
+     "nullable": false,
+     "enum": [
+      "public",
+      "private",
+      "temporary"
+     ],
+     "default": "private"
+    },
+    {
+     "name": "optin",
+     "type": "text",
+     "nullable": false,
+     "enum": [
+      "single",
+      "double"
+     ],
+     "default": "single"
+    },
+    {
+     "name": "status",
+     "type": "text",
+     "nullable": false,
+     "enum": [
+      "active",
+      "archived"
+     ],
+     "default": "active"
+    },
+    {
+     "name": "tags",
+     "type": "text",
+     "nullable": true
+    },
+    {
+     "name": "description",
+     "type": "text",
+     "nullable": false,
+     "default": ""
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "audit": true,
+     "immutable": true
+    },
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "audit": true
+    }
+   ],
+   "constraints": [
+    {
+     "kind": "unique",
+     "cols": [
+      "uuid"
+     ]
+    }
+   ],
+   "_lifecycle": {
+    "col": "status",
+    "initial": "active",
+    "states": [
+     "active",
+     "archived"
+    ],
+    "via": {
+     "List.update": {
+      "col": "status",
+      "from": [
+       "active"
+      ],
+      "to": "archived"
+     }
+    }
+   }
+  },
+  {
+   "name": "MatDashboardCharts",
+   "columns": [
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "pk": true,
+     "audit": true
+    },
+    {
+     "name": "data",
+     "type": "json",
+     "nullable": false
+    }
+   ]
+  },
+  {
+   "name": "MatDashboardCounts",
+   "columns": [
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "pk": true,
+     "audit": true
+    },
+    {
+     "name": "data",
+     "type": "json",
+     "nullable": false
+    }
+   ]
+  },
+  {
+   "name": "MatListSubscriberStats",
+   "columns": [
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "pk": false,
+     "audit": true
+    },
+    {
+     "name": "list_id",
+     "type": "id",
+     "pk": true
+    },
+    {
+     "name": "status",
+     "type": "text",
+     "pk": true,
+     "nullable": true
+    },
+    {
+     "name": "subscriber_count",
+     "type": "int",
+     "pk": false
+    }
+   ]
+  },
+  {
+   "name": "Media",
+   "columns": [
+    {
+     "name": "id",
+     "type": "id",
+     "pk": true
+    },
+    {
+     "name": "uuid",
+     "type": "text",
+     "nullable": false
+    },
+    {
+     "name": "provider",
+     "type": "text",
+     "nullable": false,
+     "default": ""
+    },
+    {
+     "name": "filename",
+     "type": "text",
+     "nullable": false
+    },
+    {
+     "name": "content_type",
+     "type": "text",
+     "nullable": false,
+     "default": "application/octet-stream"
+    },
+    {
+     "name": "thumb",
+     "type": "text",
+     "nullable": false
+    },
+    {
+     "name": "meta",
+     "type": "json",
+     "nullable": false,
+     "default": "{}"
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "audit": true,
+     "immutable": true
+    }
+   ],
+   "constraints": [
+    {
+     "kind": "unique",
+     "cols": [
+      "uuid"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Roles",
+   "columns": [
+    {
+     "name": "id",
+     "type": "id",
+     "pk": true
+    },
+    {
+     "name": "type",
+     "type": "text",
+     "nullable": false,
+     "enum": [
+      "user",
+      "list"
+     ],
+     "default": "user"
+    },
+    {
+     "name": "parent_id",
+     "type": "id",
+     "nullable": true,
+     "fk_to": "Roles.id",
+     "on_delete": "cascade"
+    },
+    {
+     "name": "list_id",
+     "type": "id",
+     "nullable": true,
+     "fk_to": "Lists.id",
+     "on_delete": "cascade"
+    },
+    {
+     "name": "permissions",
+     "type": "text",
+     "nullable": false,
+     "default": "{}"
+    },
+    {
+     "name": "name",
+     "type": "text",
+     "nullable": true
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "audit": true,
+     "immutable": true
+    },
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "audit": true
+    }
+   ],
+   "constraints": [
+    {
+     "kind": "unique",
+     "cols": [
+      "parent_id",
+      "list_id"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Sessions",
+   "columns": [
+    {
+     "name": "id",
+     "type": "text",
+     "pk": true,
+     "nullable": false
+    },
+    {
+     "name": "data",
+     "type": "json",
+     "nullable": false,
+     "default": "{}"
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "nullable": false,
+     "audit": true,
+     "immutable": true,
+     "default": "now()"
+    }
+   ]
+  },
+  {
+   "name": "Settings",
+   "columns": [
+    {
+     "name": "key",
+     "type": "text",
+     "pk": true,
+     "nullable": false
+    },
+    {
+     "name": "value",
+     "type": "json",
+     "nullable": false,
+     "default": "{}"
+    },
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "audit": true
+    }
+   ]
+  },
+  {
+   "name": "SubscriberLists",
+   "columns": [
+    {
+     "name": "subscriber_id",
+     "type": "id",
+     "pk": true,
+     "nullable": false,
+     "fk_to": "Subscribers.id",
+     "on_delete": "cascade"
+    },
+    {
+     "name": "list_id",
+     "type": "id",
+     "pk": true,
+     "nullable": true,
+     "fk_to": "Lists.id",
+     "on_delete": "cascade"
+    },
+    {
+     "name": "meta",
+     "type": "json",
+     "nullable": false,
+     "default": "{}"
+    },
+    {
+     "name": "status",
+     "type": "text",
+     "nullable": false,
+     "enum": [
+      "unconfirmed",
+      "confirmed",
+      "unsubscribed"
+     ],
+     "default": "unconfirmed"
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "audit": true,
+     "immutable": true
+    },
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "audit": true
+    }
+   ]
+  },
+  {
+   "name": "Subscribers",
+   "columns": [
+    {
+     "name": "id",
+     "type": "id",
+     "pk": true
+    },
+    {
+     "name": "uuid",
+     "type": "text",
+     "nullable": false
+    },
+    {
+     "name": "email",
+     "type": "text",
+     "nullable": false
+    },
+    {
+     "name": "name",
+     "type": "text",
+     "nullable": false
+    },
+    {
+     "name": "attribs",
+     "type": "json",
+     "nullable": false,
+     "default": "{}"
+    },
+    {
+     "name": "status",
+     "type": "text",
+     "nullable": false,
+     "enum": [
+      "enabled",
+      "disabled",
+      "blocklisted"
+     ],
+     "default": "enabled"
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "audit": true,
+     "immutable": true
+    },
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "audit": true
+    }
+   ],
+   "constraints": [
+    {
+     "kind": "unique",
+     "cols": [
+      "uuid"
+     ]
+    },
+    {
+     "kind": "unique",
+     "cols": [
+      "email"
+     ]
+    }
+   ],
+   "_lifecycle": {
+    "col": "status",
+    "initial": "enabled",
+    "states": [
+     "enabled",
+     "disabled",
+     "blocklisted"
+    ],
+    "via": {
+     "Subscriber.update": {
+      "col": "status",
+      "from": [
+       "enabled",
+       "disabled"
+      ],
+      "to": null
+     },
+     "Subscriber.blocklist": {
+      "col": "status",
+      "from": [
+       "enabled",
+       "disabled"
+      ],
+      "to": "blocklisted"
+     },
+     "Bounces.record": {
+      "col": "status",
+      "from": [
+       "enabled"
+      ],
+      "to": "blocklisted"
+     },
+     "Bounces.blocklistBouncedSubscribers": {
+      "col": "status",
+      "from": [
+       "enabled"
+      ],
+      "to": "blocklisted"
+     }
+    }
+   }
+  },
+  {
+   "name": "Templates",
+   "columns": [
+    {
+     "name": "id",
+     "type": "id",
+     "pk": true
+    },
+    {
+     "name": "name",
+     "type": "text",
+     "nullable": false
+    },
+    {
+     "name": "type",
+     "type": "text",
+     "nullable": false,
+     "enum": [
+      "campaign",
+      "campaign_visual",
+      "tx"
+     ],
+     "default": "campaign"
+    },
+    {
+     "name": "subject",
+     "type": "text",
+     "nullable": false
+    },
+    {
+     "name": "body",
+     "type": "text",
+     "nullable": false
+    },
+    {
+     "name": "body_source",
+     "type": "text",
+     "nullable": true
+    },
+    {
+     "name": "is_default",
+     "type": "bool",
+     "nullable": false,
+     "enum": [
+      "False",
+      "True"
+     ],
+     "default": false
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "audit": true,
+     "immutable": true
+    },
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "audit": true
+    }
+   ],
+   "_lifecycle": {
+    "col": "is_default",
+    "initial": "False",
+    "states": [
+     "False",
+     "True"
+    ],
+    "via": {
+     "Templates.setDefault": {
+      "col": "is_default",
+      "from": [
+       "False"
+      ],
+      "to": "True"
+     }
+    }
+   }
+  },
+  {
+   "name": "Users",
+   "columns": [
+    {
+     "name": "id",
+     "type": "id",
+     "pk": true
+    },
+    {
+     "name": "username",
+     "type": "text",
+     "nullable": false
+    },
+    {
+     "name": "password_login",
+     "type": "bool",
+     "nullable": false,
+     "default": false
+    },
+    {
+     "name": "password",
+     "type": "text",
+     "nullable": true
+    },
+    {
+     "name": "email",
+     "type": "text",
+     "nullable": false
+    },
+    {
+     "name": "name",
+     "type": "text",
+     "nullable": false
+    },
+    {
+     "name": "avatar",
+     "type": "text",
+     "nullable": true
+    },
+    {
+     "name": "type",
+     "type": "text",
+     "nullable": false,
+     "enum": [
+      "user",
+      "api"
+     ],
+     "default": "user"
+    },
+    {
+     "name": "user_role_id",
+     "type": "id",
+     "nullable": false,
+     "fk_to": "Roles.id",
+     "on_delete": "restrict"
+    },
+    {
+     "name": "list_role_id",
+     "type": "id",
+     "nullable": true,
+     "fk_to": "Roles.id",
+     "on_delete": "cascade"
+    },
+    {
+     "name": "status",
+     "type": "text",
+     "nullable": false,
+     "enum": [
+      "enabled",
+      "disabled"
+     ],
+     "default": "disabled"
+    },
+    {
+     "name": "twofa_type",
+     "type": "text",
+     "nullable": false,
+     "enum": [
+      "none",
+      "totp"
+     ],
+     "default": "none"
+    },
+    {
+     "name": "twofa_key",
+     "type": "text",
+     "nullable": true
+    },
+    {
+     "name": "loggedin_at",
+     "type": "datetime",
+     "nullable": true,
+     "audit": false
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "audit": true,
+     "immutable": true
+    },
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "audit": true
+    }
+   ],
+   "constraints": [
+    {
+     "kind": "unique",
+     "cols": [
+      "username"
+     ]
+    },
+    {
+     "kind": "unique",
+     "cols": [
+      "email"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "SubscriberTag",
+   "columns": [
+    {
+     "name": "id",
+     "type": "id",
+     "pk": true
+    },
+    {
+     "name": "subscriber_id",
+     "type": "id",
+     "fk_to": "Subscribers.id"
+    },
+    {
+     "name": "tag",
+     "type": "text"
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "nullable": true
+    }
+   ]
+  }
+ ],
+ "tools": [
+  {
+   "tool": "campaigns_search",
+   "op": "search",
+   "family": "search",
+   "exec_spec": {
+    "entity": "Campaigns",
+    "search_fields": [
+     "name",
+     "subject"
+    ],
+    "rank": {
+     "method": "keyword",
+     "fields": [
+      "name",
+      "subject"
+     ]
+    },
+    "pagination": {}
+   },
+   "input_schema": {
+    "query": "text",
+    "status": "text",
+    "tag": "text",
+    "order_by": "text",
+    "order": "text",
+    "page": "int",
+    "per_page": "int",
+    "no_body": "bool"
+   },
+   "_evidence": {
+    "locator": "cmd/campaigns.go:55",
+    "id_local": "Campaigns.search",
+    "entry": {
+     "kind": "http",
+     "route": "GET /api/campaigns",
+     "locator": "cmd/handlers.go:161"
+    },
+    "entity_why": "primary effect row_search lands on this table",
+    "ref_code": "res, total, err := a.core.QueryCampaigns(query, status, tags, orderBy, order, hasAllPerm, permittedLists, pg.Offset, pg.Limit)\nif noBody { for i := range res { res[i].Body = \"\"; res[i].BodySource.Valid = false } }",
+    "edges": [
+     "admin-authenticated GET /api/campaigns route in the /api admin router (session auth + route Perm middleware) cmd/campaigns.go:55"
+    ]
+   },
+   "entity": "Campaigns",
+   "_binds": {
+    "status": "Campaigns.status",
+    "tag": "Campaigns.tags"
+   },
+   "_output_schema": {
+    "data": "PageResults of Campaign rows with stats"
+   },
+   "guards": {
+    "requires_auth": true,
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "Users",
+        "where": {
+         "node": "field",
+         "col": "user_role_id",
+         "op": "eq",
+         "value": 1
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "messages": {
+     "auth": "You must be signed in as a listmonk admin to do that.",
+     "not_found": "That record does not exist.",
+     "fk": "You passed an id that does not exist.",
+     "precondition": "You don't have the required permission for that."
+    }
+   },
+   "description": "Search campaigns by name/subject with optional status and tag filters; returns paged campaign rows."
+  },
+  {
+   "tool": "campaigns_read",
+   "op": "read",
+   "family": "crud.fetch",
+   "exec_spec": {
+    "entity": "Campaigns",
+    "lookup_by": {
+     "id": {
+      "$arg": "id"
+     }
+    }
+   },
+   "input_schema": {
+    "id": "id"
+   },
+   "_evidence": {
+    "locator": "cmd/campaigns.go:112",
+    "id_local": "Campaigns.read",
+    "entry": {
+     "kind": "http",
+     "route": "GET /api/campaigns/:id",
+     "locator": "cmd/handlers.go:163"
+    },
+    "entity_why": "primary effect row_read lands on this table",
+    "ref_code": "if err := a.checkCampaignPerm(auth.PermTypeGet, id, c); err != nil { return err }\nout, err := a.core.GetCampaign(id, \"\", \"\")",
+    "edges": [
+     "admin-authenticated GET /api/campaigns/:id route in the /api admin router (session auth + route Perm middleware) cmd/campaigns.go:112"
+    ]
+   },
+   "entity": "Campaigns",
+   "_binds": {
+    "id": "Campaigns.id"
+   },
+   "_output_schema": {
+    "data": "Campaign row with stats"
+   },
+   "guards": {
+    "required": [
+     "id"
+    ],
+    "requires_auth": true,
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "Users",
+        "where": {
+         "node": "field",
+         "col": "user_role_id",
+         "op": "eq",
+         "value": 1
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "messages": {
+     "auth": "You must be signed in as a listmonk admin to do that.",
+     "not_found": "That record does not exist.",
+     "fk": "You passed an id that does not exist.",
+     "precondition": "You don't have the required permission for that."
+    }
+   },
+   "description": "Fetch a single campaign with its send/tracking stats by id."
+  },
+  {
+   "tool": "campaigns_create",
+   "op": "create",
+   "family": "crud.insert",
+   "exec_spec": {
+    "entity": "Campaigns",
+    "fields": [
+     "type",
+     "name",
+     "subject",
+     "from_email",
+     "body",
+     "altbody",
+     "content_type",
+     "send_at",
+     "headers",
+     "attribs",
+     "tags",
+     "messenger",
+     "template_id",
+     "archive",
+     "archive_slug",
+     "archive_template_id",
+     "archive_meta"
+    ],
+    "set_on_create": {
+     "status": "draft",
+     "to_send": 0,
+     "sent": 0,
+     "max_subscriber_id": 0,
+     "last_subscriber_id": 0,
+     "created_at": "2026-01-01T00:00:00",
+     "updated_at": "2026-01-01T00:00:00",
+     "uuid": {
+      "$auto": "100000+max(id)+1"
+     }
+    }
+   },
+   "input_schema": {
+    "type": "text",
+    "name": "text",
+    "subject": "text",
+    "from_email": "text",
+    "body": "text",
+    "altbody": "text",
+    "content_type": "text",
+    "send_at": "datetime",
+    "headers": "json",
+    "attribs": "json",
+    "tags": "json",
+    "messenger": "text",
+    "template_id": "id",
+    "lists": "json",
+    "media": "json",
+    "archive": "bool",
+    "archive_slug": "text",
+    "archive_template_id": "id",
+    "archive_meta": "json"
+   },
+   "_evidence": {
+    "locator": "cmd/campaigns.go:254",
+    "id_local": "Campaigns.create",
+    "entry": {
+     "kind": "http",
+     "route": "POST /api/campaigns",
+     "locator": "cmd/handlers.go:171"
+    },
+    "entity_why": "primary effect row_insert lands on this table",
+    "ref_code": "if !hasAllPerm { for _, l := range listIDs { if err := user.HasListPerm(auth.PermTypeManage, l); err != nil { return err } } }\nout, err := a.core.CreateCampaign(o.Campaign, listIDs, mediaIDs)",
+    "edges": [
+     "route-level Perm middleware requires any of ['campaigns:manage_all', 'campaigns:manage'] or SuperAdmin (user_role_id=1) bypass (cmd/handlers.go:171)"
+    ]
+   },
+   "entity": "Campaigns",
+   "_binds": {
+    "type": "Campaigns.type",
+    "name": "Campaigns.name",
+    "subject": "Campaigns.subject",
+    "from_email": "Campaigns.from_email",
+    "body": "Campaigns.body",
+    "altbody": "Campaigns.altbody",
+    "content_type": "Campaigns.content_type",
+    "send_at": "Campaigns.send_at",
+    "headers": "Campaigns.headers",
+    "attribs": "Campaigns.attribs",
+    "tags": "Campaigns.tags",
+    "messenger": "Campaigns.messenger",
+    "template_id": "Campaigns.template_id",
+    "lists": "CampaignLists.list_id",
+    "media": "CampaignMedia.media_id",
+    "archive": "Campaigns.archive",
+    "archive_slug": "Campaigns.archive_slug",
+    "archive_template_id": "Campaigns.archive_template_id",
+    "archive_meta": "Campaigns.archive_meta"
+   },
+   "_output_schema": {
+    "data": "created Campaign"
+   },
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "Users",
+        "where": {
+         "node": "field",
+         "col": "user_role_id",
+         "op": "eq",
+         "value": 1
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "required": [
+     "name",
+     "subject",
+     "lists"
+    ],
+    "requires_auth": true,
+    "messages": {
+     "auth": "You must be signed in as a listmonk admin to do that.",
+     "unique": "A campaign with those identifying values already exists.",
+     "precondition": "You don't have the required permission for that.",
+     "not_found": "That record does not exist.",
+     "fk": "You passed an id that does not exist."
+    }
+   },
+   "description": "Create a new campaign from its fields and its target lists and media; starts as a draft. Fails if a campaign of that name already exists."
+  },
+  {
+   "tool": "campaigns_update",
+   "op": "update",
+   "family": "update.field_set",
+   "exec_spec": {
+    "entity": "Campaigns",
+    "row_key": {
+     "id": {
+      "$arg": "id"
+     }
+    },
+    "fields": [
+     "name",
+     "subject",
+     "from_email",
+     "body",
+     "altbody",
+     "content_type",
+     "send_at",
+     "headers",
+     "attribs",
+     "tags",
+     "messenger",
+     "template_id",
+     "archive",
+     "archive_slug",
+     "archive_template_id",
+     "archive_meta"
+    ],
+    "set": {
+     "updated_at": "2026-01-01T00:00:00"
+    }
+   },
+   "input_schema": {
+    "id": "id",
+    "name": "text",
+    "subject": "text",
+    "from_email": "text",
+    "body": "text",
+    "altbody": "text",
+    "content_type": "text",
+    "send_at": "datetime",
+    "headers": "json",
+    "attribs": "json",
+    "tags": "json",
+    "messenger": "text",
+    "template_id": "id",
+    "lists": "json",
+    "media": "json",
+    "archive": "bool",
+    "archive_slug": "text",
+    "archive_template_id": "id",
+    "archive_meta": "json"
+   },
+   "_evidence": {
+    "locator": "cmd/campaigns.go:301",
+    "id_local": "Campaigns.update",
+    "entry": {
+     "kind": "http",
+     "route": "PUT /api/campaigns/:id",
+     "locator": "cmd/handlers.go:172"
+    },
+    "entity_why": "primary effect row_insert lands on this table",
+    "ref_code": "if !canEditCampaign(cm.Status) { return ...campaigns.cantUpdate }\ncm.Attribs = nil\nc.Bind(&o)\nout, err := a.core.UpdateCampaign(id, o.Campaign, o.ListIDs, o.MediaIDs)",
+    "edges": [
+     "route-level Perm middleware requires any of ['campaigns:manage_all', 'campaigns:manage'] or SuperAdmin (user_role_id=1) bypass (cmd/handlers.go:172)"
+    ]
+   },
+   "entity": "CampaignLists",
+   "_binds": {
+    "id": "Campaigns.id",
+    "name": "Campaigns.name",
+    "subject": "Campaigns.subject",
+    "from_email": "Campaigns.from_email",
+    "body": "Campaigns.body",
+    "altbody": "Campaigns.altbody",
+    "content_type": "Campaigns.content_type",
+    "send_at": "Campaigns.send_at",
+    "headers": "Campaigns.headers",
+    "attribs": "Campaigns.attribs",
+    "tags": "Campaigns.tags",
+    "messenger": "Campaigns.messenger",
+    "template_id": "Campaigns.template_id",
+    "lists": "CampaignLists.list_id",
+    "media": "CampaignMedia.media_id",
+    "archive": "Campaigns.archive",
+    "archive_slug": "Campaigns.archive_slug",
+    "archive_template_id": "Campaigns.archive_template_id",
+    "archive_meta": "Campaigns.archive_meta"
+   },
+   "_output_schema": {
+    "data": "updated Campaign"
+   },
+   "guards": {
+    "required": [
+     "id"
+    ],
+    "requires_auth": true,
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "Users",
+        "where": {
+         "node": "field",
+         "col": "user_role_id",
+         "op": "eq",
+         "value": 1
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "messages": {
+     "auth": "You must be signed in as a listmonk admin to do that.",
+     "not_found": "That campaign does not exist.",
+     "fk": "You passed an id that does not exist.",
+     "precondition": "You don't have the required permission for that."
+    }
+   },
+   "_defaulted": [
+    "fields (mapped to the real parameter names via binds)"
+   ],
+   "description": "Update an existing campaign's fields. Leaving send_at blank on a scheduled campaign drops it back to draft."
+  },
+  {
+   "tool": "campaigns_update_status",
+   "op": "update",
+   "family": "update.status_transition",
+   "exec_spec": {
+    "entity": "Campaigns",
+    "row_key": {
+     "id": {
+      "$arg": "id"
+     }
+    },
+    "status_col": "status",
+    "from": [
+     "draft",
+     "scheduled",
+     "running",
+     "paused"
+    ]
+   },
+   "input_schema": {
+    "id": {
+     "type": "id",
+     "required": true,
+     "description": "The campaign to move."
+    },
+    "status": {
+     "type": "text",
+     "required": true,
+     "description": "Target status: draft, scheduled, running, paused or cancelled."
+    }
+   },
+   "_evidence": {
+    "locator": "cmd/campaigns.go:352",
+    "id_local": "Campaigns.update_status",
+    "entry": {
+     "kind": "http",
+     "route": "PUT /api/campaigns/:id/status",
+     "locator": "cmd/handlers.go:173"
+    },
+    "entity_why": "primary effect row_update lands on this table",
+    "ref_code": "switch status {\ncase CampaignStatusDraft: if cm.Status != Scheduled { errMsg = ... }\ncase CampaignStatusScheduled: if cm.Status != Draft && cm.Status != Paused { errMsg = ... }; if !cm.SendAt.Valid { errMsg = needsSendAt }\ncase CampaignStatusRunning: if cm.Status != Paused && cm.Status != Draft { errMsg = ... }\ncase CampaignStatusPaused: if cm.Status != Running { errMsg = ... }\ncase CampaignStatusCancelled: if cm.Status != Running && cm.Status != Paused { errMsg = ... }\n}\nres, _ := c.q.UpdateCampaignStatus.Exec(cm.ID, status)\nif status == Paused || status == Cancelled { a.manager.StopCampaign(",
+    "edges": [
+     "route-level Perm middleware requires any of ['campaigns:send'] or SuperAdmin (user_role_id=1) bypass (cmd/handlers.go:173)"
+    ]
+   },
+   "entity": "Campaigns",
+   "_binds": {
+    "id": "Campaigns.id",
+    "status": "Campaigns.status"
+   },
+   "_output_schema": {
+    "data": "Campaign with new status"
+   },
+   "guards": {
+    "required": [
+     "id",
+     "status"
+    ],
+    "requires_auth": true,
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "Users",
+        "where": {
+         "node": "field",
+         "col": "user_role_id",
+         "op": "eq",
+         "value": 1
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "messages": {
+     "auth": "You must be signed in as a listmonk admin to do that.",
+     "transition": "That campaign-status transition is not allowed (check the lifecycle rules).",
+     "not_found": "That campaign does not exist.",
+     "precondition": "You don't have the required permission for that."
+    }
+   },
+   "description": "Move a campaign through its lifecycle to the requested status. Supported transitions: draft/paused to scheduled or running, running to paused or cancelled, scheduled to draft or cancelled. Fails if the transition (or a missing send_at when scheduling) is not allowed. Returns the campaign with its new status."
+  },
+  {
+   "tool": "campaigns_update_archive",
+   "op": "update",
+   "family": "update.field_set",
+   "exec_spec": {
+    "entity": "Campaigns",
+    "row_key": {
+     "id": {
+      "$arg": "id"
+     }
+    },
+    "fields": [
+     "archive",
+     "archive_slug",
+     "archive_template_id",
+     "archive_meta"
+    ],
+    "set": {
+     "updated_at": "2026-01-01T00:00:00"
+    }
+   },
+   "input_schema": {
+    "id": "id",
+    "archive": "bool",
+    "archive_template_id": "id",
+    "archive_meta": "json",
+    "archive_slug": "text"
+   },
+   "_evidence": {
+    "locator": "cmd/campaigns.go:383",
+    "id_local": "Campaigns.update_archive",
+    "entry": {
+     "kind": "http",
+     "route": "PUT /api/campaigns/:id/archive",
+     "locator": "cmd/handlers.go:174"
+    },
+    "entity_why": "primary effect row_update lands on this table",
+    "ref_code": "if req.ArchiveSlug != \"\" { s := strings.ToLower(req.ArchiveSlug); s = strings.TrimSpace(reSlug.ReplaceAllString(s, \" \")); req.ArchiveSlug = s }\na.core.UpdateCampaignArchive(id, req.Archive, req.TemplateID, req.Meta, req.ArchiveSlug)",
+    "edges": [
+     "route-level Perm middleware requires any of ['campaigns:manage_all', 'campaigns:manage'] or SuperAdmin (user_role_id=1) bypass (cmd/handlers.go:174)"
+    ]
+   },
+   "entity": "Campaigns",
+   "_binds": {
+    "id": "Campaigns.id",
+    "archive": "Campaigns.archive",
+    "archive_template_id": "Campaigns.archive_template_id",
+    "archive_meta": "Campaigns.archive_meta",
+    "archive_slug": "Campaigns.archive_slug"
+   },
+   "_output_schema": {
+    "data": "updated archive fields"
+   },
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "Users",
+        "where": {
+         "node": "field",
+         "col": "user_role_id",
+         "op": "eq",
+         "value": 1
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "required": [
+     "id",
+     "archive"
+    ],
+    "requires_auth": true,
+    "messages": {
+     "auth": "You must be signed in as a listmonk admin to do that.",
+     "not_found": "That record does not exist.",
+     "fk": "You passed an id that does not exist.",
+     "precondition": "You don't have the required permission for that."
+    }
+   },
+   "description": "Set whether a campaign is published to the public archive, plus the optional archive slug, template and meta."
+  },
+  {
+   "tool": "campaigns_delete",
+   "op": "delete",
+   "family": "crud.delete",
+   "exec_spec": {
+    "entity": "Campaigns",
+    "lookup_by": {
+     "id": {
+      "$arg": "id"
+     }
+    }
+   },
+   "input_schema": {
+    "id": "id"
+   },
+   "_evidence": {
+    "locator": "cmd/campaigns.go:418",
+    "id_local": "Campaigns.delete",
+    "entry": {
+     "kind": "http",
+     "route": "DELETE /api/campaigns/:id",
+     "locator": "cmd/handlers.go:176"
+    },
+    "entity_why": "primary effect row_delete lands on this table",
+    "ref_code": "if err := a.checkCampaignPerm(auth.PermTypeManage, id, c); err != nil { return err }\nif err := a.core.DeleteCampaign(id); err != nil { return err }",
+    "edges": [
+     "route-level Perm middleware requires any of ['campaigns:manage_all', 'campaigns:manage'] or SuperAdmin (user_role_id=1) bypass (cmd/handlers.go:176)"
+    ]
+   },
+   "entity": "Campaigns",
+   "_binds": {
+    "id": "Campaigns.id"
+   },
+   "_output_schema": {
+    "data": "true"
+   },
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "Users",
+        "where": {
+         "node": "field",
+         "col": "user_role_id",
+         "op": "eq",
+         "value": 1
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "required": [
+     "id"
+    ],
+    "requires_auth": true,
+    "messages": {
+     "auth": "You must be signed in as a listmonk admin to do that.",
+     "not_found": "That record does not exist.",
+     "fk": "You passed an id that does not exist.",
+     "precondition": "You don't have the required permission for that."
+    }
+   },
+   "description": "Delete a campaign and its attachments."
+  },
+  {
+   "tool": "campaigns_delete_bulk",
+   "op": "delete",
+   "family": "crud.delete",
+   "exec_spec": {
+    "entity": "Campaigns",
+    "lookup_by": {
+     "id": {
+      "$arg": "id"
+     }
+    }
+   },
+   "input_schema": {
+    "id": "id",
+    "query": "text"
+   },
+   "_evidence": {
+    "locator": "cmd/campaigns.go:436",
+    "id_local": "Campaigns.delete_bulk",
+    "entry": {
+     "kind": "http",
+     "route": "DELETE /api/campaigns",
+     "locator": "cmd/handlers.go:175"
+    },
+    "entity_why": "primary effect row_delete lands on this table",
+    "ref_code": "if len(ids)==0 && (query==\"\" && !all) { return error }\nif err := a.core.DeleteCampaigns(ids, query, hasAllPerm, permittedLists); err != nil { return err }",
+    "edges": [
+     "route-level Perm middleware requires any of ['campaigns:manage_all', 'campaigns:manage'] or SuperAdmin (user_role_id=1) bypass (cmd/handlers.go:175)"
+    ]
+   },
+   "entity": "Campaigns",
+   "_binds": {
+    "id": "Campaigns.id"
+   },
+   "_output_schema": {
+    "data": "true"
+   },
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "Users",
+        "where": {
+         "node": "field",
+         "col": "user_role_id",
+         "op": "eq",
+         "value": 1
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "requires_auth": true,
+    "messages": {
+     "auth": "You must be signed in as a listmonk admin to do that.",
+     "not_found": "That record does not exist.",
+     "fk": "You passed an id that does not exist.",
+     "precondition": "You don't have the required permission for that."
+    }
+   },
+   "description": "Delete campaigns by id or by a matching query."
+  },
+  {
+   "tool": "campaigns_test",
+   "op": "action",
+   "family": "action.trigger",
+   "exec_spec": {
+    "entity": "Campaigns",
+    "target": {
+     "entity": "Campaigns",
+     "lookup_by": {
+      "id": {
+       "$arg": "id"
+      }
+     }
+    },
+    "dispatch_events": [
+     {
+      "campaign_test_sent": {
+       "to": {
+        "$arg": "subscribers"
+       }
+      }
+     }
+    ]
+   },
+   "input_schema": {
+    "id": {
+     "type": "id",
+     "required": true,
+     "description": "Id of the campaign to test."
+    },
+    "email": {
+     "type": "text",
+     "required": false,
+     "description": "A single recipient email."
+    },
+    "subscribers": {
+     "type": "json",
+     "required": true,
+     "description": "Recipient email addresses (or subscriber ids) to send the test to."
+    }
+   },
+   "_evidence": {
+    "locator": "cmd/campaigns.go:520",
+    "id_local": "Campaigns.test",
+    "entry": {
+     "kind": "http",
+     "route": "POST /api/campaigns/:id/test",
+     "locator": "cmd/handlers.go:170"
+    },
+    "entity_why": "primary effect row_read lands on this table",
+    "ref_code": "subs, _ := a.core.GetSubscribersByEmail(req.SubscriberEmails)\ncamp, _ := a.core.GetCampaignForPreview(id, tplID)\nfor _, s := range subs { if err := a.sendTestMessage(sub, &camp); err != nil { return err } }",
+    "edges": [
+     "route-level Perm middleware requires any of ['campaigns:manage_all', 'campaigns:manage'] or SuperAdmin (user_role_id=1) bypass (cmd/handlers.go:170)"
+    ]
+   },
+   "entity": "Subscribers",
+   "_binds": {
+    "id": "Campaigns.id",
+    "email": "Subscribers.email",
+    "name": "Campaigns.name",
+    "subject": "Campaigns.subject",
+    "from_email": "Campaigns.from_email",
+    "body": "Campaigns.body",
+    "template_id": "Campaigns.template_id"
+   },
+   "_output_schema": {
+    "data": "true"
+   },
+   "guards": {
+    "required": [
+     "id",
+     "subscribers"
+    ],
+    "requires_auth": true,
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "Users",
+        "where": {
+         "node": "field",
+         "col": "user_role_id",
+         "op": "eq",
+         "value": 1
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "messages": {
+     "auth": "You must be signed in as a listmonk admin to do that.",
+     "not_found": "That record does not exist.",
+     "fk": "You passed an id that does not exist.",
+     "precondition": "You don't have the required permission for that."
+    }
+   },
+   "description": "Send a test email of a campaign to one or more recipient addresses. Requires the campaign id and recipient emails; does not alter the campaign (the message is the effect)."
+  },
+  {
+   "tool": "campaigns_send_tx",
+   "op": "action",
+   "family": "action.trigger",
+   "exec_spec": {
+    "entity": "Templates",
+    "target": {
+     "entity": "Templates",
+     "lookup_by": {
+      "id": {
+       "$arg": "template_id"
+      }
+     }
+    },
+    "dispatch_events": [
+     {
+      "tx_message_dispatched": {
+       "subject": {
+        "$arg": "subject"
+       },
+       "to": {
+        "$arg": "subscriber_emails"
+       }
+      }
+     }
+    ]
+   },
+   "input_schema": {
+    "subscriber_ids": {
+     "type": "json",
+     "required": false,
+     "description": "Subscriber ids to send to."
+    },
+    "subscriber_emails": {
+     "type": "json",
+     "required": false,
+     "description": "External email addresses to send to."
+    },
+    "subscriber_mode": {
+     "type": "text",
+     "required": false,
+     "description": "'external' to send to raw emails, otherwise look up real subscribers."
+    },
+    "template_id": {
+     "type": "id",
+     "required": true,
+     "description": "Id of the transactional template."
+    },
+    "subject": {
+     "type": "text",
+     "required": true,
+     "description": "Message subject."
+    },
+    "from_email": {
+     "type": "text",
+     "required": false,
+     "description": "Sender address."
+    },
+    "messenger": {
+     "type": "text",
+     "required": false,
+     "description": "Messenger name."
+    },
+    "email": {
+     "type": "text",
+     "required": false,
+     "description": "Single external recipient email."
+    }
+   },
+   "_evidence": {
+    "locator": "cmd/tx.go:17",
+    "id_local": "Campaigns.send_tx",
+    "entry": {
+     "kind": "http",
+     "route": "POST /api/tx",
+     "locator": "cmd/handlers.go:197"
+    },
+    "entity_why": "primary effect row_read lands on this table",
+    "ref_code": "if m.SubscriberMode == TxSubModeExternal { sub = models.Subscriber{Email: m.SubscriberEmail} } else { sub, err = a.core.GetSubscriber(subID, \"\", subEmail) }\nmsg.Subscriber = sub; msg.To = []string{sub.Email}\nmsg.From = m.FromEmail; msg.Subject = m.Subject; msg.Body = m.Body\nif err := a.manager.PushMessage(msg); err != nil { return err }",
+    "edges": [
+     "route-level Perm middleware requires any of ['tx:send'] or SuperAdmin (user_role_id=1) bypass (cmd/handlers.go:197)"
+    ]
+   },
+   "entity": "Subscribers",
+   "_binds": {
+    "id": "Subscribers.id",
+    "email": "Subscribers.email",
+    "subscriber_emails": "Subscribers.email",
+    "subscriber_ids": "Subscribers.id",
+    "template_id": "Templates.id"
+   },
+   "_output_schema": {
+    "data": "true"
+   },
+   "guards": {
+    "required": [
+     "template_id",
+     "subject"
+    ],
+    "requires_auth": true,
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "Users",
+        "where": {
+         "node": "field",
+         "col": "user_role_id",
+         "op": "eq",
+         "value": 1
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "messages": {
+     "auth": "You must be signed in as a listmonk admin to do that.",
+     "not_found": "That record does not exist.",
+     "fk": "You passed an id that does not exist.",
+     "precondition": "You don't have the required permission for that."
+    }
+   },
+   "description": "Send a one-off transactional message to subscribers or an external address using a transactional template. Creates no database rows (the message dispatch is the effect)."
+  },
+  {
+   "tool": "campaignviews_register",
+   "op": "action",
+   "family": "crud.insert",
+   "exec_spec": {
+    "entity": "CampaignViews",
+    "fields": [
+     "campaign_id",
+     "subscriber_id"
+    ],
+    "set_on_create": {
+     "campaign_id": {
+      "$ref": {
+       "entity": "Campaigns",
+       "where": {
+        "uuid": {
+         "$arg": "campUUID"
+        }
+       },
+       "col": "id"
+      }
+     },
+     "subscriber_id": {
+      "$ref": {
+       "entity": "Subscribers",
+       "where": {
+        "uuid": {
+         "$arg": "subUUID"
+        }
+       },
+       "col": "id"
+      }
+     }
+    }
+   },
+   "input_schema": {
+    "campUUID": {
+     "type": "text",
+     "required": true,
+     "description": "The campaign's UUID."
+    },
+    "subUUID": {
+     "type": "text",
+     "required": true,
+     "description": "The subscriber's UUID (blank disables individual tracking)."
+    }
+   },
+   "_evidence": {
+    "locator": "cmd/public.go:589",
+    "id_local": "CampaignViews.register",
+    "entry": {
+     "kind": "http",
+     "route": "GET /campaign/:campUUID/:subUUID/px.png",
+     "locator": "cmd/handlers.go:293"
+    },
+    "entity_why": "primary effect row_insert lands on this table",
+    "ref_code": "if a.cfg.Privacy.DisableTracking { return a.blob(pixel) }\nsubUUID := c.Param(\"subUUID\")\nif !a.cfg.Privacy.IndividualTracking { subUUID = \"\" }\nif campUUID != dummyUUID && subUUID != dummyUUID {\n  if err := a.core.RegisterCampaignView(campUUID, subUUID); err != nil { a.log.Printf(...) }\n}\nreturn c.Blob(200, \"image/png\", pixelPNG)"
+   },
+   "entity": "CampaignViews",
+   "_binds": {
+    "campUUID": "Campaigns.uuid",
+    "subUUID": "Subscribers.uuid"
+   },
+   "_output_schema": {},
+   "guards": {
+    "required": [
+     "campUUID",
+     "subUUID"
+    ],
+    "requires_auth": false,
+    "messages": {
+     "not_found": "That record does not exist.",
+     "fk": "You passed an id that does not exist.",
+     "auth": "You must be signed in as a listmonk admin to do that.",
+     "precondition": "You don't have the required permission for that."
+    }
+   },
+   "_defaulted": [
+    "family (matched by an id_local regex, not by the effects)",
+    "fields"
+   ],
+   "description": "Record an open (pixel) event for a campaign."
+  },
+  {
+   "tool": "subscribers_search",
+   "op": "search",
+   "family": "search",
+   "exec_spec": {
+    "entity": "Subscribers",
+    "filter": {
+     "op": "or",
+     "clauses": [
+      {
+       "col": "email",
+       "mode": "substring",
+       "val": {
+        "$arg": "search"
+       },
+       "optional": true
+      },
+      {
+       "col": "name",
+       "mode": "substring",
+       "val": {
+        "$arg": "search"
+       },
+       "optional": true
+      }
+     ]
+    },
+    "rank": {
+     "method": "exact"
+    }
+   },
+   "input_schema": {
+    "search": {
+     "type": "text",
+     "required": false,
+     "description": "Substring of email or name (optional: omit to list every subscriber)."
+    }
+   },
+   "_evidence": {
+    "locator": "cmd/subscribers.go:99",
+    "id_local": "Subscribers.search",
+    "entry": {
+     "kind": "http",
+     "route": "GET /api/subscribers",
+     "locator": "cmd/handlers.go:117"
+    },
+    "entity_why": "primary effect row_search lands on this table",
+    "ref_code": "listIDs, err := a.filterListQueryByPerm(\"list_id\", c.QueryParams(), user)\nres, total, err := a.core.QuerySubscribers(searchStr, query, listIDs, subStatus, order, orderBy, pg.Offset, pg.Limit)",
+    "edges": [
+     "admin-authenticated GET /api/subscribers route in the /api admin router (session auth + route Perm middleware) cmd/subscribers.go:99"
+    ]
+   },
+   "entity": "Subscribers",
+   "_binds": {
+    "list_id": "SubscriberLists.list_id",
+    "subscription_status": "SubscriberLists.status"
+   },
+   "_output_schema": {
+    "results": "paged Subscriber rows with lists",
+    "total": "int",
+    "page": "int",
+    "per_page": "int"
+   },
+   "guards": {
+    "requires_auth": true,
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "Users",
+        "where": {
+         "node": "field",
+         "col": "user_role_id",
+         "op": "eq",
+         "value": 1
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "messages": {
+     "auth": "You must be signed in as a listmonk admin to do that.",
+     "not_found": "That record does not exist.",
+     "fk": "You passed an id that does not exist.",
+     "precondition": "You don't have the required permission for that."
+    }
+   },
+   "description": "List subscribers (id, email, name, status, attribs). Optional search = email/name substring. List memberships: subscription_list; tags: subscriber_tag_list."
+  },
+  {
+   "tool": "subscribers_read",
+   "op": "read",
+   "family": "crud.fetch",
+   "exec_spec": {
+    "entity": "Subscribers",
+    "lookup_by": {
+     "id": {
+      "$arg": "id"
+     }
+    }
+   },
+   "input_schema": {
+    "id": "id"
+   },
+   "_evidence": {
+    "locator": "cmd/subscribers.go:59",
+    "id_local": "Subscribers.read",
+    "entry": {
+     "kind": "http",
+     "route": "GET /api/subscribers/:id",
+     "locator": "cmd/handlers.go:118"
+    },
+    "entity_why": "primary effect row_read lands on this table",
+    "ref_code": "if err := a.hasSubPerm(user, []int{id}); err != nil { return err }\nout, err := a.core.GetSubscriber(id, \"\", \"\")",
+    "edges": [
+     "admin-authenticated GET /api/subscribers/:id route in the /api admin router (session auth + route Perm middleware) cmd/subscribers.go:59"
+    ]
+   },
+   "entity": "Subscribers",
+   "_binds": {
+    "id": "Subscribers.id"
+   },
+   "_output_schema": {
+    "data": "Subscriber row with subscription lists"
+   },
+   "guards": {
+    "required": [
+     "id"
+    ],
+    "requires_auth": true,
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "Users",
+        "where": {
+         "node": "field",
+         "col": "user_role_id",
+         "op": "eq",
+         "value": 1
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "messages": {
+     "auth": "You must be signed in as a listmonk admin to do that.",
+     "not_found": "That record does not exist.",
+     "fk": "You passed an id that does not exist.",
+     "precondition": "You don't have the required permission for that."
+    }
+   },
+   "description": "Fetch a single subscriber with all their subscriptions by id."
+  },
+  {
+   "tool": "subscribers_create",
+   "op": "create",
+   "family": "crud.insert",
+   "exec_spec": {
+    "entity": "Subscribers",
+    "fields": [
+     "email",
+     "name",
+     "status",
+     "attribs"
+    ],
+    "set_on_create": {
+     "created_at": "2026-01-05T09:00:00",
+     "updated_at": "2026-01-05T09:00:00",
+     "uuid": {
+      "$auto": "100000+max(id)+1"
+     },
+     "status": "enabled",
+     "attribs": {}
+    }
+   },
+   "input_schema": {
+    "email": {
+     "type": "text",
+     "required": true,
+     "description": "Email address."
+    },
+    "name": {
+     "type": "text",
+     "required": false,
+     "description": "Full name (optional)."
+    },
+    "attribs": {
+     "type": "json",
+     "required": false,
+     "description": "Extra attributes object, e.g. {\"company\": \"Acme\"} (optional)."
+    }
+   },
+   "_evidence": {
+    "locator": "cmd/subscribers.go:225",
+    "id_local": "Subscribers.create",
+    "entry": {
+     "kind": "http",
+     "route": "POST /api/subscribers",
+     "locator": "cmd/handlers.go:123"
+    },
+    "entity_why": "primary effect row_insert lands on this table",
+    "ref_code": "listIDs := user.FilterListsByPerm(auth.PermTypeManage, req.Lists)\nif len(req.Lists) > 0 && len(listIDs) == 0 { ...Forbidden... }\nsub, _, err := a.core.InsertSubscriber(req.Subscriber, listIDs, nil, req.PreconfirmSubs, false)",
+    "edges": [
+     "route-level Perm middleware requires any of ['subscribers:manage'] or SuperAdmin (user_role_id=1) bypass (cmd/handlers.go:123)"
+    ]
+   },
+   "entity": "Subscribers",
+   "_binds": {
+    "email": "Subscribers.email",
+    "name": "Subscribers.name",
+    "attribs": "Subscribers.attribs",
+    "status": "Subscribers.status",
+    "lists": "SubscriberLists.list_id"
+   },
+   "_output_schema": {
+    "data": "created Subscriber + has_optin bool"
+   },
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "Users",
+        "where": {
+         "node": "field",
+         "col": "user_role_id",
+         "op": "eq",
+         "value": 1
+        }
+       },
+       "op": "gte",
+       "n": 1
+      },
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "Subscribers",
+        "where": {
+         "node": "field",
+         "col": "email",
+         "op": "eq",
+         "value": {
+          "arg": "email"
+         }
+        }
+       },
+       "op": "eq",
+       "n": 0
+      }
+     ]
+    ],
+    "required": [
+     "email"
+    ],
+    "requires_auth": true,
+    "messages": {
+     "auth": "You must be signed in as a listmonk admin to do that.",
+     "unique": "That email is already a subscriber.",
+     "precondition": "That email is already a subscriber.",
+     "not_found": "That record does not exist.",
+     "fk": "You passed an id that does not exist."
+    }
+   },
+   "description": "Create a subscriber (email, name, attribs). Then put them on a list with subscription_set(subscriber_id, list_id, status='confirmed'). Fails if the email already exists."
+  },
+  {
+   "tool": "subscribers_update",
+   "op": "update",
+   "family": "update.field_set",
+   "exec_spec": {
+    "entity": "Subscribers",
+    "row_key": {
+     "id": {
+      "$arg": "id"
+     }
+    },
+    "fields": [
+     "email",
+     "name",
+     "status",
+     "attribs"
+    ],
+    "set": {
+     "updated_at": "2026-01-01T00:00:00"
+    }
+   },
+   "input_schema": {
+    "id": {
+     "type": "id",
+     "required": true,
+     "description": "Subscriber id."
+    },
+    "email": {
+     "type": "text",
+     "required": false,
+     "description": "Email."
+    },
+    "name": {
+     "type": "text",
+     "required": false,
+     "description": "Name."
+    },
+    "status": {
+     "type": "text",
+     "required": false,
+     "description": "enabled | blocklisted."
+    },
+    "attribs": {
+     "type": "json",
+     "required": false,
+     "description": "Attributes object."
+    }
+   },
+   "_evidence": {
+    "locator": "cmd/subscribers.go:259",
+    "id_local": "Subscribers.update",
+    "entry": {
+     "kind": "http",
+     "route": "PUT /api/subscribers/:id",
+     "locator": "cmd/handlers.go:124"
+    },
+    "entity_why": "primary effect row_delete lands on this table",
+    "ref_code": "if err := a.hasSubPerm(user, []int{id}); err != nil { return err }\nallPerm, permittedLists := user.GetPermittedLists(auth.PermTypeManage)\nif allPerm { permittedLists = []int{} }\nout, _, err := a.core.UpdateSubscriberWithLists(id, req.Subscriber, listIDs, nil, req.PreconfirmSubs, true, false, permittedLists, false)",
+    "edges": [
+     "route-level Perm middleware requires any of ['subscribers:manage'] or SuperAdmin (user_role_id=1) bypass (cmd/handlers.go:124)"
+    ]
+   },
+   "entity": "SubscriberLists",
+   "_binds": {
+    "id": "Subscribers.id",
+    "email": "Subscribers.email",
+    "name": "Subscribers.name",
+    "status": "Subscribers.status",
+    "attribs": "Subscribers.attribs",
+    "lists": "SubscriberLists.list_id"
+   },
+   "_output_schema": {
+    "data": "updated Subscriber"
+   },
+   "guards": {
+    "required": [
+     "id"
+    ],
+    "requires_auth": true,
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "Users",
+        "where": {
+         "node": "field",
+         "col": "user_role_id",
+         "op": "eq",
+         "value": 1
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "messages": {
+     "auth": "You must be signed in as a listmonk admin to do that.",
+     "not_found": "That subscriber does not exist.",
+     "fk": "You passed an id that does not exist.",
+     "precondition": "You don't have the required permission for that."
+    }
+   },
+   "description": "Update a subscriber's profile fields (email, name, status, attribs). Setting status to blocklisted moves them onto the blocklist."
+  },
+  {
+   "tool": "subscribers_blocklist",
+   "op": "update",
+   "family": "update.field_set",
+   "exec_spec": {
+    "entity": "Subscribers",
+    "row_key": {
+     "id": {
+      "$arg": "id"
+     }
+    },
+    "fields": [
+     "uuid",
+     "email",
+     "name",
+     "attribs",
+     "status"
+    ],
+    "set": {
+     "status": "blocklisted",
+     "updated_at": "2026-01-01T00:00:00"
+    }
+   },
+   "input_schema": {
+    "id": "id",
+    "uuid": "text",
+    "email": "text",
+    "name": "text",
+    "attribs": "json"
+   },
+   "_evidence": {
+    "locator": "cmd/subscribers.go:410",
+    "id_local": "Subscribers.blocklist",
+    "entry": {
+     "kind": "http",
+     "route": "PUT /api/subscribers/:id/blocklist",
+     "locator": "cmd/handlers.go:128"
+    },
+    "entity_why": "primary effect row_update lands on this table",
+    "ref_code": "if err := a.hasSubPerm(user, []int{id}); err != nil { return err }\nif err := a.core.BlocklistSubscribers([]int{id}); err != nil { return err }",
+    "edges": [
+     "route-level Perm middleware requires any of ['subscribers:manage'] or SuperAdmin (user_role_id=1) bypass (cmd/handlers.go:128)"
+    ]
+   },
+   "entity": "Subscribers",
+   "_binds": {
+    "id": "Subscribers.id"
+   },
+   "_output_schema": {
+    "data": "true"
+   },
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "Users",
+        "where": {
+         "node": "field",
+         "col": "user_role_id",
+         "op": "eq",
+         "value": 1
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "required": [
+     "id"
+    ],
+    "requires_auth": true,
+    "messages": {
+     "auth": "You must be signed in as a listmonk admin to do that.",
+     "not_found": "That record does not exist.",
+     "fk": "You passed an id that does not exist.",
+     "precondition": "You don't have the required permission for that."
+    }
+   },
+   "_defaulted": [
+    "argument invented from the write column",
+    "fields"
+   ],
+   "description": "Move a subscriber to the blocklist and unsubscribe them from every list."
+  },
+  {
+   "tool": "subscribers_delete",
+   "op": "delete",
+   "family": "crud.delete",
+   "exec_spec": {
+    "entity": "Subscribers",
+    "lookup_by": {
+     "id": {
+      "$arg": "id"
+     }
+    }
+   },
+   "input_schema": {
+    "id": "id"
+   },
+   "_evidence": {
+    "locator": "cmd/subscribers.go:520",
+    "id_local": "Subscribers.delete",
+    "entry": {
+     "kind": "http",
+     "route": "DELETE /api/subscribers/:id",
+     "locator": "cmd/handlers.go:131"
+    },
+    "entity_why": "primary effect row_delete lands on this table",
+    "ref_code": "id := getID(c)\nif err := a.hasSubPerm(user, []int{id}); err != nil { return err }\nif err := a.core.DeleteSubscribers([]int{id}, nil); err != nil { return err }",
+    "edges": [
+     "route-level Perm middleware requires any of ['subscribers:manage'] or SuperAdmin (user_role_id=1) bypass (cmd/handlers.go:131)"
+    ]
+   },
+   "entity": "Subscribers",
+   "_binds": {
+    "id": "Subscribers.id"
+   },
+   "_output_schema": {
+    "data": "true"
+   },
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "Users",
+        "where": {
+         "node": "field",
+         "col": "user_role_id",
+         "op": "eq",
+         "value": 1
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "required": [
+     "id"
+    ],
+    "requires_auth": true,
+    "messages": {
+     "auth": "You must be signed in as a listmonk admin to do that.",
+     "not_found": "That record does not exist.",
+     "fk": "You passed an id that does not exist.",
+     "precondition": "You don't have the required permission for that."
+    }
+   },
+   "description": "Delete a subscriber and all their subscriptions."
+  },
+  {
+   "tool": "subscribers_delete_bulk",
+   "op": "delete",
+   "family": "crud.delete",
+   "exec_spec": {
+    "entity": "Subscribers",
+    "lookup_by": {
+     "id": {
+      "$arg": "id"
+     }
+    }
+   },
+   "input_schema": {
+    "id": "id"
+   },
+   "_evidence": {
+    "locator": "cmd/subscribers.go:537",
+    "id_local": "Subscribers.delete_bulk",
+    "entry": {
+     "kind": "http",
+     "route": "DELETE /api/subscribers",
+     "locator": "cmd/handlers.go:132"
+    },
+    "entity_why": "primary effect row_delete lands on this table",
+    "ref_code": "ids, err := parseStringIDs(c.Request().URL.Query()[\"id\"])\nif err := a.hasSubPerm(user, ids); err != nil { return err }\nif err := a.core.DeleteSubscribers(ids, nil); err != nil { return err }",
+    "edges": [
+     "route-level Perm middleware requires any of ['subscribers:manage'] or SuperAdmin (user_role_id=1) bypass (cmd/handlers.go:132)"
+    ]
+   },
+   "entity": "Subscribers",
+   "_binds": {
+    "id": "Subscribers.id"
+   },
+   "_output_schema": {
+    "data": "true"
+   },
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "Users",
+        "where": {
+         "node": "field",
+         "col": "user_role_id",
+         "op": "eq",
+         "value": 1
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "required": [
+     "id"
+    ],
+    "requires_auth": true,
+    "messages": {
+     "auth": "You must be signed in as a listmonk admin to do that.",
+     "not_found": "That record does not exist.",
+     "fk": "You passed an id that does not exist.",
+     "precondition": "You don't have the required permission for that."
+    }
+   },
+   "description": "Delete subscribers by a list of ids."
+  },
+  {
+   "tool": "subscribers_delete_by_query",
+   "op": "delete",
+   "family": "crud.delete",
+   "exec_spec": {
+    "entity": "Subscribers",
+    "lookup_by": {
+     "id": {
+      "$arg": "search"
+     }
+    }
+   },
+   "input_schema": {
+    "search": "text",
+    "query": "text",
+    "list_id": "json",
+    "subscription_status": "text"
+   },
+   "_evidence": {
+    "locator": "cmd/subscribers.go:565",
+    "id_local": "Subscribers.delete_by_query",
+    "entry": {
+     "kind": "http",
+     "route": "POST /api/subscribers/query/delete",
+     "locator": "cmd/handlers.go:142"
+    },
+    "entity_why": "primary effect row_delete lands on this table",
+    "ref_code": "listIDs := user.GetPermittedListIDs(req.ListIDs)\nif err := a.core.DeleteSubscribersByQuery(req.Search, req.Query, listIDs, req.SubscriptionStatus); err != nil { return err }",
+    "edges": [
+     "route-level Perm middleware requires any of ['subscribers:manage'] or SuperAdmin (user_role_id=1) bypass (cmd/handlers.go:142)"
+    ]
+   },
+   "entity": "Subscribers",
+   "_binds": {
+    "list_id": "SubscriberLists.list_id",
+    "subscription_status": "SubscriberLists.status"
+   },
+   "_output_schema": {
+    "data": "true"
+   },
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "Users",
+        "where": {
+         "node": "field",
+         "col": "user_role_id",
+         "op": "eq",
+         "value": 1
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "requires_auth": true,
+    "messages": {
+     "auth": "You must be signed in as a listmonk admin to do that.",
+     "not_found": "That record does not exist.",
+     "fk": "You passed an id that does not exist.",
+     "precondition": "You don't have the required permission for that."
+    }
+   },
+   "description": "Delete every subscriber matching a search query and optional list/status filters."
+  },
+  {
+   "tool": "subscription_optin_confirm",
+   "op": "update",
+   "family": "update.field_set",
+   "exec_spec": {
+    "entity": "SubscriberLists",
+    "row_key": {
+     "subscriber_id": {
+      "$arg": "subUUID"
+     }
+    },
+    "fields": [
+     "meta",
+     "status"
+    ],
+    "set": {
+     "status": "confirmed",
+     "updated_at": "2026-01-01T00:00:00"
+    }
+   },
+   "input_schema": {
+    "subUUID": "text",
+    "l": "json",
+    "meta": "json"
+   },
+   "_evidence": {
+    "locator": "cmd/public.go:350",
+    "id_local": "Subscription.optin_confirm",
+    "entry": {
+     "kind": "http",
+     "route": "GET /subscription/optin/:subUUID",
+     "locator": "cmd/handlers.go:319"
+    },
+    "entity_why": "primary effect row_update lands on this table",
+    "ref_code": "lists, err := a.core.GetSubscriberLists(0, subUUID, nil, req.ListUUIDs, models.SubscriptionStatusUnconfirmed, \"\")\nmeta := models.JSON{}\nif a.cfg.Privacy.RecordOptinIP { meta[\"optin_ip\"] = ... }\nif err := a.core.ConfirmOptionSubscription(subUUID, listUUIDs, meta); err != nil { ... }",
+    "edges": [
+     "hasSub middleware looks up subscriber by subUUID (cmd/handlers.go:319)"
+    ]
+   },
+   "entity": "SubscriberLists",
+   "_binds": {
+    "subUUID": "Subscribers.uuid",
+    "l": "SubscriberLists.list_id"
+   },
+   "_output_schema": {
+    "html": "confirmation page"
+   },
+   "guards": {
+    "required": [
+     "subUUID"
+    ],
+    "requires_auth": false,
+    "messages": {
+     "not_found": "That record does not exist.",
+     "fk": "You passed an id that does not exist.",
+     "auth": "You must be signed in as a listmonk admin to do that.",
+     "precondition": "You don't have the required permission for that."
+    }
+   },
+   "_defaulted": [
+    "argument invented from the write column",
+    "fields"
+   ],
+   "description": "Confirm a double opt-in subscription for a subscriber (by UUID) on the given lists. Public endpoint called from the emailed confirmation link."
+  },
+  {
+   "tool": "subscription_public_subscribe",
+   "op": "create",
+   "family": "crud.insert",
+   "exec_spec": {
+    "entity": "Subscribers",
+    "fields": [
+     "email",
+     "name"
+    ],
+    "set_on_create": {
+     "uuid": {
+      "$auto": "100000+max(id)+1"
+     },
+     "status": "enabled",
+     "attribs": "{}",
+     "created_at": "2026-01-01T00:00:00",
+     "updated_at": "2026-01-01T00:00:00"
+    }
+   },
+   "input_schema": {
+    "email": "text",
+    "name": "text",
+    "list_uuids": "json"
+   },
+   "_evidence": {
+    "locator": "cmd/public.go:536",
+    "id_local": "Subscription.public_subscribe",
+    "entry": {
+     "kind": "http",
+     "route": "POST /api/public/subscription",
+     "locator": "cmd/handlers.go:285"
+    },
+    "entity_why": "primary effect row_insert lands on this table",
+    "ref_code": "_, hasOptin, err := a.core.InsertSubscriber(models.Subscriber{Name: req.Name, Email: req.Email, Status: models.SubscriberStatusEnabled}, nil, listUUIDs, false, true)\nif e, ok := err.(*echo.HTTPError); ok && e.Code == http.StatusConflict {\n  sub, _ := a.core.GetSubscriber(0, \"\", req.Email)\n  _, hasOptin, _ := a.core.UpdateSubscriberWithLists(sub.ID, sub, nil, listUUIDs, false, false, true, nil, true)\n}",
+    "edges": [
+     "public endpoint (no user auth); on email conflict re-uses existing subscriber; captcha gate when enabled (cmd/public.go:536)"
+    ]
+   },
+   "entity": "Subscribers",
+   "_binds": {
+    "email": "Subscribers.email",
+    "name": "Subscribers.name",
+    "list_uuids": "SubscriberLists.list_id"
+   },
+   "_output_schema": {
+    "data": {
+     "has_optin": "bool"
+    }
+   },
+   "guards": {
+    "required": [
+     "email",
+     "list_uuids"
+    ],
+    "requires_auth": false,
+    "messages": {
+     "not_found": "That record does not exist.",
+     "fk": "You passed an id that does not exist.",
+     "auth": "You must be signed in as a listmonk admin to do that.",
+     "precondition": "You don't have the required permission for that."
+    }
+   },
+   "description": "Public subscribe form: create (or reuse) a subscriber by email and add them to the given lists by UUID; on an existing email the subscriptions are updated instead. Returns whether double opt-in confirmation is required."
+  },
+  {
+   "tool": "subscription_unsubscribe",
+   "op": "update",
+   "family": "update.relation_link",
+   "exec_spec": {
+    "entity": "SubscriberLists",
+    "mode": "add",
+    "relation_type": "m2m",
+    "through_table": "SubscriberLists",
+    "subject_key": {},
+    "object_key": {}
+   },
+   "input_schema": {
+    "campUUID": "text",
+    "subUUID": "text",
+    "blocklist": "bool"
+   },
+   "_evidence": {
+    "locator": "cmd/public.go:255",
+    "id_local": "Subscription.unsubscribe",
+    "entry": {
+     "kind": "http",
+     "route": "POST /subscription/:campUUID/:subUUID",
+     "locator": "cmd/handlers.go:306"
+    },
+    "entity_why": "primary effect link lands on this table",
+    "ref_code": "if !req.Manage || blocklist {\n  if err := a.core.UnsubscribeByCampaign(subUUID, campUUID, blocklist); err != nil { ... }\n}\nif _, err := a.core.UpdateSubscriber(sub.ID, sub); err != nil { ... }",
+    "edges": [
+     "hasSub middleware (cmd/handlers.go:306)"
+    ]
+   },
+   "entity": "SubscriberLists",
+   "_binds": {
+    "campUUID": "Campaigns.uuid",
+    "subUUID": "Subscribers.uuid"
+   },
+   "_output_schema": {
+    "html": "unsubscribed page"
+   },
+   "guards": {
+    "required": [
+     "campUUID",
+     "subUUID"
+    ],
+    "requires_auth": false,
+    "messages": {
+     "not_found": "That record does not exist.",
+     "fk": "You passed an id that does not exist.",
+     "auth": "You must be signed in as a listmonk admin to do that.",
+     "precondition": "You don't have the required permission for that."
+    }
+   },
+   "description": "Unsubscribe a subscriber (by UUID) from a campaign's list, optionally blocklisting them. Public endpoint called from the unsubscribe link."
+  },
+  {
+   "tool": "subscribers_export_csv",
+   "op": "read",
+   "family": "search",
+   "exec_spec": {
+    "entity": "Subscribers",
+    "search_fields": [
+     "email",
+     "name"
+    ],
+    "rank": {
+     "method": "substring",
+     "fields": [
+      "email",
+      "name"
+     ]
+    },
+    "filter": {
+     "op": "and",
+     "clauses": [
+      {
+       "col": "email",
+       "mode": "substring",
+       "val": {
+        "$arg": "search"
+       },
+       "optional": true
+      },
+      {
+       "col": "name",
+       "mode": "substring",
+       "val": {
+        "$arg": "search"
+       },
+       "optional": true
+      }
+     ]
+    }
+   },
+   "input_schema": {
+    "search": "text",
+    "query": "text",
+    "list_id": "json",
+    "subscription_status": "text"
+   },
+   "_evidence": {
+    "locator": "cmd/subscribers.go:149",
+    "id_local": "Subscribers.export_csv",
+    "entry": {
+     "kind": "http",
+     "route": "GET /api/subscribers/export",
+     "locator": "cmd/handlers.go:145"
+    },
+    "entity_why": "primary effect row_search lands on this table",
+    "ref_code": "exp, err := a.core.ExportSubscribers(searchStr, query, subIDs, listIDs, subStatus, a.cfg.DBBatchSize)\nfor { out, err := exp(); if len(out)==0 { break }; for _, r := range out { wr.Write(...) }; wr.Flush() }",
+    "edges": [
+     "admin-authenticated GET /api/subscribers/export route in the /api admin router (session auth + route Perm middleware) cmd/subscribers.go:149"
+    ]
+   },
+   "entity": "Subscribers",
+   "_binds": {
+    "list_id": "SubscriberLists.list_id",
+    "subscription_status": "SubscriberLists.status"
+   },
+   "_output_schema": {
+    "csv": "batched CSV rows"
+   },
+   "guards": {
+    "requires_auth": true,
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "Users",
+        "where": {
+         "node": "field",
+         "col": "user_role_id",
+         "op": "eq",
+         "value": 1
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "messages": {
+     "auth": "You must be signed in as a listmonk admin to do that.",
+     "not_found": "That record does not exist.",
+     "fk": "You passed an id that does not exist.",
+     "precondition": "You don't have the required permission for that."
+    }
+   },
+   "description": "Export subscribers matching a query to CSV rows."
+  },
+  {
+   "tool": "subscribers_self_export",
+   "op": "action",
+   "family": "crud.fetch",
+   "exec_spec": {
+    "entity": "Subscribers",
+    "lookup_by": {
+     "uuid": {
+      "$arg": "subUUID"
+     }
+    }
+   },
+   "input_schema": {
+    "subUUID": "text"
+   },
+   "_evidence": {
+    "locator": "cmd/public.go:618",
+    "id_local": "Subscribers.self_export",
+    "entry": {
+     "kind": "http",
+     "route": "POST /subscription/export/:subUUID",
+     "locator": "cmd/handlers.go:329"
+    },
+    "entity_why": "primary effect row_read lands on this table",
+    "ref_code": "data, b, err := a.exportSubscriberData(0, subUUID, a.cfg.Privacy.Exportable)\nif err := a.emailMsgr.Push(models.Message{From: a.cfg.FromEmail, To: []string{data.Email}, Subject: subject, Body: body, Attachments: [...]}); err != nil { ... }"
+   },
+   "entity": "Subscribers",
+   "_binds": {
+    "subUUID": "Subscribers.uuid"
+   },
+   "_output_schema": {
+    "html": "confirmation"
+   },
+   "guards": {
+    "required": [
+     "subUUID"
+    ],
+    "requires_auth": false,
+    "messages": {
+     "auth": "This recovery/self-service flow needs no active session; it is keyed on an emailed UUID or token.",
+     "not_found": "That record does not exist.",
+     "fk": "You passed an id that does not exist.",
+     "precondition": "You don't have the required permission for that."
+    }
+   },
+   "description": "Email the subscriber (identified by UUID) their stored personal data (GDPR export)."
+  },
+  {
+   "tool": "subscribers_wipe",
+   "op": "delete",
+   "family": "crud.delete",
+   "exec_spec": {
+    "entity": "Subscribers",
+    "lookup_by": {
+     "uuid": {
+      "$arg": "subUUID"
+     }
+    }
+   },
+   "input_schema": {
+    "subUUID": "text"
+   },
+   "_evidence": {
+    "locator": "cmd/public.go:674",
+    "id_local": "Subscribers.wipe",
+    "entry": {
+     "kind": "http",
+     "route": "POST /subscription/wipe/:subUUID",
+     "locator": "cmd/handlers.go:330"
+    },
+    "entity_why": "primary effect row_delete lands on this table",
+    "ref_code": "if !a.cfg.Privacy.AllowWipe { ... }\nif err := a.core.DeleteSubscribers(nil, []string{subUUID}); err != nil { ... }",
+    "edges": [
+     "privacy.allow_wipe config + hasSub middleware (cmd/public.go:674)"
+    ]
+   },
+   "entity": "Subscribers",
+   "_binds": {
+    "subUUID": "Subscribers.uuid"
+   },
+   "_output_schema": {
+    "html": "confirmation"
+   },
+   "guards": {
+    "required": [
+     "subUUID"
+    ],
+    "requires_auth": false,
+    "messages": {
+     "auth": "This recovery/self-service flow needs no active session; it is keyed on an emailed UUID or token.",
+     "not_found": "That record does not exist.",
+     "fk": "You passed an id that does not exist.",
+     "precondition": "You don't have the required permission for that."
+    }
+   },
+   "description": "Permanently delete a subscriber's record and all associated data (GDPR wipe). Only allowed when privacy.allow_wipe is enabled."
+  },
+  {
+   "tool": "lists_search",
+   "op": "search",
+   "family": "search",
+   "exec_spec": {
+    "entity": "Lists",
+    "filter": {
+     "col": "name",
+     "mode": "substring",
+     "val": {
+      "$arg": "query"
+     },
+     "optional": true
+    },
+    "rank": {
+     "method": "exact"
+    }
+   },
+   "input_schema": {
+    "query": {
+     "type": "text",
+     "required": false,
+     "description": "Substring of the list name (optional)."
+    }
+   },
+   "_evidence": {
+    "locator": "cmd/lists.go:14",
+    "id_local": "Lists.search",
+    "entry": {
+     "kind": "http",
+     "route": "GET /api/lists",
+     "locator": "cmd/handlers.go:154"
+    },
+    "entity_why": "primary effect row_search lands on this table",
+    "ref_code": "hasAllPerm, permittedIDs := user.GetPermittedLists(auth.PermTypeGet)\nres, total, err := a.core.QueryLists(query, typ, optin, status, tags, orderBy, order, hasAllPerm, permittedIDs, pg.Offset, pg.Limit)",
+    "edges": [
+     "admin-authenticated GET /api/lists route in the /api admin router (session auth + route Perm middleware) cmd/lists.go:14"
+    ]
+   },
+   "entity": "Lists",
+   "_binds": {
+    "type": "Lists.type",
+    "optin": "Lists.optin",
+    "status": "Lists.status",
+    "tag": "Lists.tags"
+   },
+   "_output_schema": {
+    "results": "paged List rows with subscriber counts",
+    "total": "int"
+   },
+   "guards": {
+    "requires_auth": true,
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "Users",
+        "where": {
+         "node": "field",
+         "col": "user_role_id",
+         "op": "eq",
+         "value": 1
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "messages": {
+     "auth": "You must be signed in as a listmonk admin to do that.",
+     "not_found": "That record does not exist.",
+     "fk": "You passed an id that does not exist.",
+     "precondition": "You don't have the required permission for that."
+    }
+   },
+   "description": "List mailing lists (audiences): id, name, type, optin, tags, description."
+  },
+  {
+   "tool": "lists_read",
+   "op": "read",
+   "family": "crud.fetch",
+   "exec_spec": {
+    "entity": "Lists",
+    "lookup_by": {
+     "id": {
+      "$arg": "id"
+     }
+    }
+   },
+   "input_schema": {
+    "id": "id"
+   },
+   "_evidence": {
+    "locator": "cmd/lists.go:75",
+    "id_local": "Lists.read",
+    "entry": {
+     "kind": "http",
+     "route": "GET /api/lists/:id",
+     "locator": "cmd/handlers.go:155"
+    },
+    "entity_why": "primary effect row_read lands on this table",
+    "ref_code": "if err := user.HasListPerm(auth.PermTypeGet, id); err != nil { return err }\nout, err := a.core.GetList(id, \"\")\nreturn c.JSON(200, okResp{out})",
+    "edges": [
+     "admin-authenticated GET /api/lists/:id route in the /api admin router (session auth + route Perm middleware) cmd/lists.go:75"
+    ]
+   },
+   "entity": "Lists",
+   "_binds": {
+    "id": "Lists.id"
+   },
+   "_output_schema": {
+    "data": "List row"
+   },
+   "guards": {
+    "required": [
+     "id"
+    ],
+    "requires_auth": true,
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "Users",
+        "where": {
+         "node": "field",
+         "col": "user_role_id",
+         "op": "eq",
+         "value": 1
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "messages": {
+     "auth": "You must be signed in as a listmonk admin to do that.",
+     "not_found": "That record does not exist.",
+     "fk": "You passed an id that does not exist.",
+     "precondition": "You don't have the required permission for that."
+    }
+   },
+   "description": "Fetch a single list by id."
+  },
+  {
+   "tool": "lists_create",
+   "op": "create",
+   "family": "crud.insert",
+   "exec_spec": {
+    "entity": "Lists",
+    "fields": [
+     "name",
+     "type",
+     "optin",
+     "status",
+     "tags",
+     "description"
+    ],
+    "set_on_create": {
+     "created_at": "2026-01-01T00:00:00",
+     "updated_at": "2026-01-01T00:00:00",
+     "uuid": {
+      "$auto": "100000+max(id)+1"
+     },
+     "type": "private",
+     "optin": "single",
+     "status": "active"
+    }
+   },
+   "input_schema": {
+    "name": "text",
+    "type": "text",
+    "optin": "text",
+    "status": "text",
+    "tags": "json",
+    "description": "text"
+   },
+   "_evidence": {
+    "locator": "cmd/lists.go:95",
+    "id_local": "Lists.create",
+    "entry": {
+     "kind": "http",
+     "route": "POST /api/lists",
+     "locator": "cmd/handlers.go:156"
+    },
+    "entity_why": "primary effect row_insert lands on this table",
+    "ref_code": "if l.Type == \"\" { l.Type = models.ListTypePrivate }\nif l.Optin == \"\" { l.Optin = models.ListOptinSingle }\nif l.Status == \"\" { l.Status = models.ListStatusActive }\nif err := c.q.CreateList.Get(&newID, l.UUID, l.Name, l.Type, l.Optin, l.Status, pq.StringArray(normalizeTags(l.Tags)), l.Description); err != nil { return err }",
+    "edges": [
+     "route-level Perm middleware requires any of ['lists:manage_all'] or SuperAdmin (user_role_id=1) bypass (cmd/handlers.go:156)"
+    ]
+   },
+   "entity": "Lists",
+   "_binds": {
+    "name": "Lists.name",
+    "type": "Lists.type",
+    "optin": "Lists.optin",
+    "status": "Lists.status",
+    "tags": "Lists.tags",
+    "description": "Lists.description"
+   },
+   "_output_schema": {
+    "data": "created List"
+   },
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "Users",
+        "where": {
+         "node": "field",
+         "col": "user_role_id",
+         "op": "eq",
+         "value": 1
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "required": [
+     "name"
+    ],
+    "requires_auth": true,
+    "messages": {
+     "auth": "You must be signed in as a listmonk admin to do that.",
+     "unique": "A list with those identifying values already exists.",
+     "precondition": "You don't have the required permission for that.",
+     "not_found": "That record does not exist.",
+     "fk": "You passed an id that does not exist."
+    }
+   },
+   "description": "Create a list from name/type/optin/status/tags/description. Fails if a list of that name already exists."
+  },
+  {
+   "tool": "lists_update",
+   "op": "update",
+   "family": "update.field_set",
+   "exec_spec": {
+    "entity": "Lists",
+    "row_key": {
+     "id": {
+      "$arg": "id"
+     }
+    },
+    "fields": [
+     "name",
+     "type",
+     "optin",
+     "status",
+     "tags",
+     "description"
+    ],
+    "set": {
+     "updated_at": "2026-01-01T00:00:00"
+    }
+   },
+   "input_schema": {
+    "id": "id",
+    "name": "text",
+    "type": "text",
+    "optin": "text",
+    "status": "text",
+    "tags": "json",
+    "description": "text"
+   },
+   "_evidence": {
+    "locator": "cmd/lists.go:116",
+    "id_local": "Lists.update",
+    "entry": {
+     "kind": "http",
+     "route": "PUT /api/lists/:id",
+     "locator": "cmd/handlers.go:157"
+    },
+    "entity_why": "primary effect row_update lands on this table",
+    "ref_code": "res, err := c.q.UpdateList.Exec(id, l.Name, l.Type, l.Optin, l.Status, pq.StringArray(normalizeTags(l.Tags)), l.Description)\nif n, _ := res.RowsAffected(); n == 0 { return ... }",
+    "edges": [
+     "route-level Perm middleware requires any of ['lists:manage_all'] or SuperAdmin (user_role_id=1) bypass (cmd/handlers.go:157)"
+    ]
+   },
+   "entity": "Lists",
+   "_binds": {
+    "id": "Lists.id",
+    "name": "Lists.name",
+    "type": "Lists.type",
+    "optin": "Lists.optin",
+    "status": "Lists.status",
+    "tags": "Lists.tags",
+    "description": "Lists.description"
+   },
+   "_output_schema": {
+    "data": "updated List"
+   },
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "Users",
+        "where": {
+         "node": "field",
+         "col": "user_role_id",
+         "op": "eq",
+         "value": 1
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "required": [
+     "id",
+     "name"
+    ],
+    "requires_auth": true,
+    "messages": {
+     "auth": "You must be signed in as a listmonk admin to do that.",
+     "not_found": "That record does not exist.",
+     "fk": "You passed an id that does not exist.",
+     "precondition": "You don't have the required permission for that."
+    }
+   },
+   "description": "Update a list's name, type, optin mode, status, tags and description."
+  },
+  {
+   "tool": "lists_delete",
+   "op": "delete",
+   "family": "crud.delete",
+   "exec_spec": {
+    "entity": "Lists",
+    "lookup_by": {
+     "id": {
+      "$arg": "id"
+     }
+    }
+   },
+   "input_schema": {
+    "id": "id"
+   },
+   "_evidence": {
+    "locator": "cmd/lists.go:147",
+    "id_local": "Lists.delete",
+    "entry": {
+     "kind": "http",
+     "route": "DELETE /api/lists/:id",
+     "locator": "cmd/handlers.go:159"
+    },
+    "entity_why": "primary effect row_delete lands on this table",
+    "ref_code": "if err := user.HasListPerm(auth.PermTypeManage, id); err != nil { return err }\nif err := a.core.DeleteLists([]int{id}, \"\", true, nil); err != nil { return err }",
+    "edges": [
+     "route-level Perm middleware requires any of ['lists:manage_all'] or SuperAdmin (user_role_id=1) bypass (cmd/handlers.go:159)"
+    ]
+   },
+   "entity": "Lists",
+   "_binds": {
+    "id": "Lists.id"
+   },
+   "_output_schema": {
+    "data": "true"
+   },
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "Users",
+        "where": {
+         "node": "field",
+         "col": "user_role_id",
+         "op": "eq",
+         "value": 1
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "required": [
+     "id"
+    ],
+    "requires_auth": true,
+    "messages": {
+     "auth": "You must be signed in as a listmonk admin to do that.",
+     "not_found": "That record does not exist.",
+     "fk": "You passed an id that does not exist.",
+     "precondition": "You don't have the required permission for that."
+    }
+   },
+   "description": "Delete a list; fails if the list still has subscribers."
+  },
+  {
+   "tool": "lists_delete_bulk",
+   "op": "delete",
+   "family": "crud.delete",
+   "exec_spec": {
+    "entity": "Lists",
+    "lookup_by": {
+     "id": {
+      "$arg": "id"
+     }
+    }
+   },
+   "input_schema": {
+    "id": "id",
+    "query": "text",
+    "all": "bool"
+   },
+   "_evidence": {
+    "locator": "cmd/lists.go:166",
+    "id_local": "Lists.delete_bulk",
+    "entry": {
+     "kind": "http",
+     "route": "DELETE /api/lists",
+     "locator": "cmd/handlers.go:158"
+    },
+    "entity_why": "primary effect row_delete lands on this table",
+    "ref_code": "if len(ids) > 0 { if err := user.HasListPerm(auth.PermTypeManage, ids...); err != nil { return err }; a.core.DeleteLists(ids, \"\", true, nil) } else { hasAllPerm, permittedIDs := user.GetPermittedLists(auth.PermTypeManage); a.core.DeleteLists(nil, query, hasAllPerm, permittedIDs) }",
+    "edges": [
+     "route-level Perm middleware requires any of ['lists:manage_all'] or SuperAdmin (user_role_id=1) bypass (cmd/handlers.go:158)"
+    ]
+   },
+   "entity": "Lists",
+   "_binds": {
+    "id": "Lists.id"
+   },
+   "_output_schema": {
+    "data": "true"
+   },
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "Users",
+        "where": {
+         "node": "field",
+         "col": "user_role_id",
+         "op": "eq",
+         "value": 1
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "requires_auth": true,
+    "messages": {
+     "auth": "You must be signed in as a listmonk admin to do that.",
+     "not_found": "That record does not exist.",
+     "fk": "You passed an id that does not exist.",
+     "precondition": "You don't have the required permission for that."
+    }
+   },
+   "description": "Delete lists by id or by a matching query."
+  },
+  {
+   "tool": "users_search",
+   "op": "search",
+   "family": "search",
+   "exec_spec": {
+    "entity": "Users",
+    "search_fields": [
+     "username",
+     "email"
+    ],
+    "rank": {
+     "method": "exact",
+     "fields": [
+      "username",
+      "email"
+     ]
+    }
+   },
+   "input_schema": {},
+   "_evidence": {
+    "locator": "cmd/users.go:37",
+    "id_local": "Users.search",
+    "entry": {
+     "kind": "http",
+     "route": "GET /api/users",
+     "locator": "cmd/handlers.go:201"
+    },
+    "entity_why": "primary effect row_search lands on this table",
+    "ref_code": "out := []auth.User{}\nif err := c.q.GetUsers.Select(&out); err != nil { return err }\nreturn c.setupUserFields(out), nil",
+    "edges": [
+     "admin-authenticated GET /api/users route in the /api admin router (session auth + route Perm middleware) cmd/users.go:37"
+    ]
+   },
+   "entity": "Users",
+   "_output_schema": {
+    "data": "[]User with roles and perms"
+   },
+   "guards": {
+    "requires_auth": true,
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "Users",
+        "where": {
+         "node": "field",
+         "col": "user_role_id",
+         "op": "eq",
+         "value": 1
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "messages": {
+     "auth": "You must be signed in as a listmonk admin to do that.",
+     "not_found": "That record does not exist.",
+     "fk": "You passed an id that does not exist.",
+     "precondition": "You don't have the required permission for that."
+    }
+   },
+   "description": "List all admin users with their assigned roles."
+  },
+  {
+   "tool": "users_read",
+   "op": "read",
+   "family": "crud.fetch",
+   "exec_spec": {
+    "entity": "Users",
+    "lookup_by": {
+     "id": {
+      "$arg": "id"
+     }
+    }
+   },
+   "input_schema": {
+    "id": "id"
+   },
+   "_evidence": {
+    "locator": "cmd/users.go:22",
+    "id_local": "Users.read",
+    "entry": {
+     "kind": "http",
+     "route": "GET /api/users/:id",
+     "locator": "cmd/handlers.go:202"
+    },
+    "entity_why": "primary effect row_read lands on this table",
+    "ref_code": "out, err := a.core.GetUser(id, \"\", \"\")\nif err != nil { return err }\nout.Password = null.String{}\nreturn c.JSON(200, okResp{out})",
+    "edges": [
+     "admin-authenticated GET /api/users/:id route in the /api admin router (session auth + route Perm middleware) cmd/users.go:22"
+    ]
+   },
+   "entity": "Users",
+   "_binds": {
+    "id": "Users.id"
+   },
+   "_output_schema": {
+    "data": "single User"
+   },
+   "guards": {
+    "required": [
+     "id"
+    ],
+    "requires_auth": true,
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "Users",
+        "where": {
+         "node": "field",
+         "col": "user_role_id",
+         "op": "eq",
+         "value": 1
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "messages": {
+     "auth": "You must be signed in as a listmonk admin to do that.",
+     "not_found": "That record does not exist.",
+     "fk": "You passed an id that does not exist.",
+     "precondition": "You don't have the required permission for that."
+    }
+   },
+   "description": "Fetch a single admin user by id; the password is never returned."
+  },
+  {
+   "tool": "users_create",
+   "op": "create",
+   "family": "crud.insert",
+   "exec_spec": {
+    "entity": "Users",
+    "fields": [
+     "username",
+     "name",
+     "email",
+     "type",
+     "password_login",
+     "user_role_id",
+     "list_role_id",
+     "status"
+    ],
+    "set_on_create": {
+     "created_at": "2026-01-01T00:00:00",
+     "updated_at": "2026-01-01T00:00:00"
+    },
+    "unique_on": [
+     "username"
+    ]
+   },
+   "input_schema": {
+    "username": "text",
+    "name": "text",
+    "email": "text",
+    "type": "text",
+    "password_login": "bool",
+    "password": "text",
+    "user_role_id": "id",
+    "list_role_id": "id",
+    "status": "text"
+   },
+   "_evidence": {
+    "locator": "cmd/users.go:53",
+    "id_local": "Users.create",
+    "entry": {
+     "kind": "http",
+     "route": "POST /api/users",
+     "locator": "cmd/handlers.go:203"
+    },
+    "entity_why": "primary effect row_insert lands on this table",
+    "ref_code": "if u.Type == auth.UserTypeAPI { tk, _ := utils.GenerateRandomString(48); u.Email = null.String{String: u.Username+\"@api\", Valid:true}; u.PasswordLogin = false; dbPassword = null.String{String: auth.HashAPIToken(tk), Valid:true} }\nif err := c.q.CreateUser.Get(&id, ...); err != nil { return err }",
+    "edges": [
+     "route-level Perm middleware requires any of ['users:manage'] or SuperAdmin (user_role_id=1) bypass (cmd/handlers.go:203)"
+    ]
+   },
+   "entity": "Users",
+   "_binds": {
+    "username": "Users.username",
+    "name": "Users.name",
+    "email": "Users.email",
+    "type": "Users.type",
+    "password_login": "Users.password_login",
+    "user_role_id": "Users.user_role_id",
+    "list_role_id": "Users.list_role_id",
+    "status": "Users.status"
+   },
+   "_output_schema": {
+    "data": "created User (api token returned once)"
+   },
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "Users",
+        "where": {
+         "node": "field",
+         "col": "user_role_id",
+         "op": "eq",
+         "value": 1
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "required": [
+     "username",
+     "type",
+     "user_role_id"
+    ],
+    "requires_auth": true,
+    "messages": {
+     "auth": "You must be signed in as a listmonk admin to do that.",
+     "not_found": "That record does not exist.",
+     "fk": "You passed an id that does not exist.",
+     "precondition": "You don't have the required permission for that."
+    }
+   },
+   "description": "Create an admin user and assign a role. An api user gets a one-time token; a regular user gets a hashed password. Username is unique."
+  },
+  {
+   "tool": "users_update",
+   "op": "update",
+   "family": "update.field_set",
+   "exec_spec": {
+    "entity": "Users",
+    "row_key": {
+     "id": {
+      "$arg": "id"
+     }
+    },
+    "fields": [
+     "username",
+     "name",
+     "email",
+     "type",
+     "password_login",
+     "user_role_id",
+     "list_role_id",
+     "status"
+    ],
+    "set": {
+     "updated_at": "2026-01-01T00:00:00"
+    }
+   },
+   "input_schema": {
+    "id": "id",
+    "username": "text",
+    "name": "text",
+    "email": "text",
+    "password_login": "bool",
+    "password": "text",
+    "type": "text",
+    "user_role_id": "id",
+    "list_role_id": "id",
+    "status": "text"
+   },
+   "_evidence": {
+    "locator": "cmd/users.go:107",
+    "id_local": "Users.update",
+    "entry": {
+     "kind": "http",
+     "route": "PUT /api/users/:id",
+     "locator": "cmd/handlers.go:204"
+    },
+    "entity_why": "primary effect row_delete lands on this table",
+    "ref_code": "user, err := a.core.UpdateUser(id, u)\nif u.Password.String != \"\" { if err := a.core.DeleteUserSessions(id, \"\"); err != nil { return err } }\nif _, err := cacheUsers(a.core, a.auth); err != nil { return err }",
+    "edges": [
+     "route-level Perm middleware requires any of ['users:manage'] or SuperAdmin (user_role_id=1) bypass (cmd/handlers.go:204)"
+    ]
+   },
+   "entity": "Sessions",
+   "_binds": {
+    "id": "Users.id",
+    "username": "Users.username",
+    "name": "Users.name",
+    "email": "Users.email",
+    "password_login": "Users.password_login",
+    "type": "Users.type",
+    "user_role_id": "Users.user_role_id",
+    "list_role_id": "Users.list_role_id",
+    "status": "Users.status"
+   },
+   "_output_schema": {
+    "data": "updated User"
+   },
+   "guards": {
+    "required": [
+     "id"
+    ],
+    "requires_auth": true,
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "Users",
+        "where": {
+         "node": "field",
+         "col": "user_role_id",
+         "op": "eq",
+         "value": 1
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "messages": {
+     "auth": "You must be signed in as a listmonk admin to do that.",
+     "not_found": "That user does not exist.",
+     "fk": "You passed an id that does not exist.",
+     "precondition": "You don't have the required permission for that."
+    }
+   },
+   "description": "Update an admin user's details and role."
+  },
+  {
+   "tool": "users_delete",
+   "op": "delete",
+   "family": "crud.delete",
+   "exec_spec": {
+    "entity": "Users",
+    "lookup_by": {
+     "id": {
+      "$arg": "id"
+     }
+    },
+    "guard_last": {
+     "type": "user"
+    }
+   },
+   "input_schema": {
+    "id": "id"
+   },
+   "_evidence": {
+    "locator": "cmd/users.go:188",
+    "id_local": "Users.delete",
+    "entry": {
+     "kind": "http",
+     "route": "DELETE /api/users/:id",
+     "locator": "cmd/handlers.go:206"
+    },
+    "entity_why": "primary effect row_delete lands on this table",
+    "ref_code": "if err := a.core.DeleteUsers([]int{id}); err != nil { return err }\nif _, err := cacheUsers(a.core, a.auth); err != nil { return err }",
+    "edges": [
+     "route-level Perm middleware requires any of ['users:manage'] or SuperAdmin (user_role_id=1) bypass (cmd/handlers.go:206)"
+    ]
+   },
+   "entity": "Users",
+   "_binds": {
+    "id": "Users.id"
+   },
+   "_output_schema": {
+    "data": "true"
+   },
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "Users",
+        "where": {
+         "node": "field",
+         "col": "user_role_id",
+         "op": "eq",
+         "value": 1
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "required": [
+     "id"
+    ],
+    "requires_auth": true,
+    "messages": {
+     "auth": "You must be signed in as a listmonk admin to do that.",
+     "not_found": "That record does not exist.",
+     "fk": "You passed an id that does not exist.",
+     "guard_last": "You cannot delete the last user with global permissions (it would lock everyone out).",
+     "precondition": "You don't have the required permission for that."
+    }
+   },
+   "description": "Delete an admin user. Fails if it would remove the last one."
+  },
+  {
+   "tool": "users_profile_read",
+   "op": "read",
+   "family": "crud.fetch",
+   "exec_spec": {
+    "entity": "Users",
+    "lookup_by": {
+     "id": {
+      "$session": "account_id"
+     }
+    }
+   },
+   "input_schema": {},
+   "_evidence": {
+    "locator": "cmd/users.go:224",
+    "id_local": "Users.profile_read",
+    "entry": {
+     "kind": "http",
+     "route": "GET /api/profile",
+     "locator": "cmd/handlers.go:199"
+    },
+    "entity_why": "primary effect row_read lands on this table",
+    "ref_code": "user := auth.GetUser(c)\nuser.Password.String = \"\"; user.Password.Valid = false\nreturn c.JSON(200, okResp{user})",
+    "edges": [
+     "admin-authenticated GET /api/profile route in the /api admin router (session auth + route Perm middleware) cmd/users.go:224"
+    ]
+   },
+   "entity": "Users",
+   "_output_schema": {
+    "data": "current user profile"
+   },
+   "guards": {
+    "requires_auth": true,
+    "messages": {
+     "auth": "You must be signed in as a listmonk admin to do that.",
+     "not_found": "Your account does not exist.",
+     "precondition": "You don't have the required permission for that."
+    },
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "Users",
+        "where": {
+         "node": "field",
+         "col": "user_role_id",
+         "op": "eq",
+         "value": 1
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ]
+   },
+   "description": "Fetch your own profile (the signed-in user)."
+  },
+  {
+   "tool": "users_profile_update",
+   "op": "update",
+   "family": "update.field_set",
+   "exec_spec": {
+    "entity": "Users",
+    "row_key": {
+     "id": {
+      "$session": "account_id"
+     }
+    },
+    "set": {
+     "name": {
+      "$arg": "name"
+     },
+     "email": {
+      "$arg": "email"
+     },
+     "updated_at": "2026-01-01T00:00:00"
+    }
+   },
+   "input_schema": {
+    "name": {
+     "type": "text",
+     "required": true,
+     "description": "The new display name."
+    },
+    "email": {
+     "type": "text",
+     "required": true,
+     "description": "The new email address."
+    },
+    "password": {
+     "type": "text",
+     "required": false,
+     "description": "Optional new password (bcrypt-hashed)."
+    }
+   },
+   "_evidence": {
+    "locator": "cmd/users.go:236",
+    "id_local": "Users.profile_update",
+    "entry": {
+     "kind": "http",
+     "route": "PUT /api/profile",
+     "locator": "cmd/handlers.go:200"
+    },
+    "entity_why": "primary effect row_delete lands on this table",
+    "ref_code": "out, err := a.core.UpdateUserProfile(user.ID, u)\nif u.Password.String != \"\" { if err := a.core.DeleteUserSessions(user.ID, auth.GetSessionID(c)); err != nil { ... } }",
+    "edges": [
+     "route-level Perm middleware requires any of ['self'] or SuperAdmin (user_role_id=1) bypass (cmd/handlers.go:200)"
+    ]
+   },
+   "entity": "Sessions",
+   "_binds": {
+    "name": "Users.name",
+    "email": "Users.email"
+   },
+   "_output_schema": {
+    "data": "updated profile"
+   },
+   "guards": {
+    "required": [
+     "name",
+     "email"
+    ],
+    "requires_auth": true,
+    "messages": {
+     "auth": "You must be signed in as a listmonk admin to do that.",
+     "not_found": "That record does not exist.",
+     "fk": "You passed an id that does not exist.",
+     "precondition": "You don't have the required permission for that."
+    },
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "Users",
+        "where": {
+         "node": "field",
+         "col": "user_role_id",
+         "op": "eq",
+         "value": 1
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ]
+   },
+   "description": "Update your own name/email and optionally your password."
+  },
+  {
+   "tool": "users_totp_enable",
+   "op": "update",
+   "family": "update.field_set",
+   "exec_spec": {
+    "entity": "Users",
+    "row_key": {
+     "id": {
+      "$arg": "id"
+     }
+    },
+    "set": {
+     "twofa_key": {
+      "$arg": "secret"
+     },
+     "twofa_type": "totp",
+     "updated_at": "2026-01-01T00:00:00"
+    }
+   },
+   "input_schema": {
+    "id": {
+     "type": "id",
+     "required": true,
+     "description": "Your own user id."
+    },
+    "secret": {
+     "type": "text",
+     "required": true,
+     "description": "The TOTP shared secret to store."
+    },
+    "code": {
+     "type": "text",
+     "required": true,
+     "description": "A current TOTP code used to verify the secret."
+    }
+   },
+   "_evidence": {
+    "locator": "cmd/users.go:283",
+    "id_local": "Users.totp_enable",
+    "entry": {
+     "kind": "http",
+     "route": "PUT /api/users/:id/twofa",
+     "locator": "cmd/handlers.go:211"
+    },
+    "entity_why": "primary effect row_update lands on this table",
+    "ref_code": "valid := totp.Validate(code, secret)\nif !valid { return ...users.invalidTOTPCode }\nif err := a.core.SetTwoFA(u.ID, models.TwofaTypeTOTP, secret); err != nil { return err }",
+    "edges": [
+     "admin-authenticated PUT /api/users/:id/twofa route in the /api admin router (session auth + route Perm middleware) cmd/users.go:283"
+    ]
+   },
+   "entity": "Users",
+   "_binds": {
+    "id": "Users.id",
+    "secret": "Users.twofa_key"
+   },
+   "_output_schema": {
+    "data": "true"
+   },
+   "guards": {
+    "required": [
+     "id",
+     "secret",
+     "code"
+    ],
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "Users",
+        "where": {
+         "node": "and",
+         "args": [
+          {
+           "node": "field",
+           "col": "id",
+           "op": "eq",
+           "value": {
+            "arg": "id"
+           }
+          },
+          {
+           "node": "field",
+           "col": "id",
+           "op": "eq",
+           "value": {
+            "actor": "id"
+           }
+          }
+         ]
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "requires_auth": true,
+    "messages": {
+     "auth": "You must be signed in as a listmonk admin to do that.",
+     "not_found": "That record does not exist.",
+     "fk": "You passed an id that does not exist.",
+     "precondition": "You can only enable two-factor authentication on your own account."
+    }
+   },
+   "_defaulted": [
+    "fields",
+    "fields (mapped to the real parameter names via binds)"
+   ],
+   "description": "Enable Time-based One-Time-Password two-factor auth for your own account. Verifies the supplied TOTP code against the secret first, then stores the secret and switches twofa_type to totp."
+  },
+  {
+   "tool": "users_totp_disable",
+   "op": "update",
+   "family": "update.field_set",
+   "exec_spec": {
+    "entity": "Users",
+    "row_key": {
+     "id": {
+      "$arg": "id"
+     }
+    },
+    "set": {
+     "twofa_type": "none",
+     "twofa_key": "",
+     "updated_at": "2026-01-01T00:00:00"
+    }
+   },
+   "input_schema": {
+    "id": {
+     "type": "id",
+     "required": true,
+     "description": "Your own user id."
+    },
+    "password": {
+     "type": "text",
+     "required": true,
+     "description": "Your current password, re-verified before disabling 2FA."
+    }
+   },
+   "_evidence": {
+    "locator": "cmd/users.go:319",
+    "id_local": "Users.totp_disable",
+    "entry": {
+     "kind": "http",
+     "route": "DELETE /api/users/:id/twofa",
+     "locator": "cmd/handlers.go:212"
+    },
+    "entity_why": "primary effect row_update lands on this table",
+    "ref_code": "if _, err := a.core.LoginUser(u.Username, password); err != nil { return echo.NewHTTPError(403, ...) }\nif err := a.core.SetTwoFA(u.ID, models.TwofaTypeNone, \"\"); err != nil { return err }",
+    "edges": [
+     "admin-authenticated DELETE /api/users/:id/twofa route in the /api admin router (session auth + route Perm middleware) cmd/users.go:319"
+    ]
+   },
+   "entity": "Users",
+   "_binds": {
+    "id": "Users.id"
+   },
+   "_output_schema": {
+    "data": "true"
+   },
+   "guards": {
+    "required": [
+     "id",
+     "password"
+    ],
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "Users",
+        "where": {
+         "node": "and",
+         "args": [
+          {
+           "node": "field",
+           "col": "id",
+           "op": "eq",
+           "value": {
+            "arg": "id"
+           }
+          },
+          {
+           "node": "field",
+           "col": "id",
+           "op": "eq",
+           "value": {
+            "actor": "id"
+           }
+          }
+         ]
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "requires_auth": true,
+    "messages": {
+     "auth": "You must be signed in as a listmonk admin to do that.",
+     "not_found": "That record does not exist.",
+     "fk": "You passed an id that does not exist.",
+     "precondition": "You can only disable two-factor authentication on your own account."
+    }
+   },
+   "_defaulted": [
+    "argument invented from the write column",
+    "fields"
+   ],
+   "description": "Disable two-factor auth on your own account. Re-verifies the account password before clearing the TOTP secret."
+  },
+  {
+   "tool": "sign_in",
+   "op": "action",
+   "family": "guard.auth",
+   "exec_spec": {
+    "verify": {
+     "entity": "Users"
+    }
+   },
+   "input_schema": {
+    "username": {
+     "type": "text",
+     "required": true,
+     "description": "The admin username."
+    },
+    "password": {
+     "type": "text",
+     "required": true,
+     "description": "The admin password (plaintext)."
+    }
+   },
+   "_evidence": {
+    "locator": "cmd/auth.go:449",
+    "id_local": "Session.login",
+    "entry": {
+     "kind": "http",
+     "route": "POST /admin/login",
+     "locator": "cmd/handlers.go:249"
+    },
+    "entity_why": "primary effect row_insert lands on this table",
+    "ref_code": "user, err := a.core.LoginUser(username, password)\nif err != nil { return err }\nif user.TwofaType == models.TwofaTypeTOTP { token, _ := generateRandomString(tmpAuthTokenLen); tmptokens.Set(token, twofaTokenTTL, user.ID); return c.Redirect(302, ...) }\nif err := a.auth.SaveSession(user, \"\", c); err != nil { return err }",
+    "edges": [
+     "login-user query CRYPT compare + password_login flag; TOTP branches to temp token (cmd/auth.go:449)"
+    ]
+   },
+   "entity": "Sessions",
+   "_binds": {
+    "username": "Users.username"
+   },
+   "_output_schema": {
+    "redirect": "302 to admin or 2FA page"
+   },
+   "guards": {
+    "required": [
+     "username",
+     "password"
+    ],
+    "messages": {
+     "auth": "Please sign in first.",
+     "not_found": "That record does not exist.",
+     "fk": "You passed an id that does not exist.",
+     "precondition": "This account is disabled or does not allow password login, so it cannot be used to sign in."
+    },
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "Users",
+        "where": {
+         "node": "and",
+         "args": [
+          {
+           "node": "field",
+           "col": "status",
+           "op": "eq",
+           "value": "enabled"
+          },
+          {
+           "node": "field",
+           "col": "password_login",
+           "op": "eq",
+           "value": true
+          }
+         ]
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ]
+   },
+   "description": "Sign in as a listmonk admin with a username and password. Everything in the admin API (campaigns, subscribers, lists, templates, settings, users) requires this session; it is what $actor resolves to."
+  },
+  {
+   "tool": "session_logout",
+   "op": "action",
+   "family": "guard.logout",
+   "exec_spec": {
+    "entity": "Sessions"
+   },
+   "input_schema": {},
+   "_evidence": {
+    "locator": "cmd/auth.go:168",
+    "id_local": "Session.logout",
+    "entry": {
+     "kind": "http",
+     "route": "POST /api/logout",
+     "locator": "cmd/handlers.go:207"
+    },
+    "entity_why": "primary effect row_delete lands on this table",
+    "ref_code": "sess := c.Get(auth.SessionKey).(*simplesessions.Session)\n_ = sess.Destroy()\nreturn c.JSON(200, okResp{true})"
+   },
+   "entity": "Sessions",
+   "_output_schema": {
+    "data": "true"
+   },
+   "description": "End the current admin session.",
+   "guards": {
+    "requires_auth": true,
+    "messages": {
+     "auth": "You must be signed in as a listmonk admin to do that."
+    }
+   }
+  },
+  {
+   "tool": "password_forgot",
+   "op": "action",
+   "family": "crud.fetch",
+   "exec_spec": {
+    "entity": "Users",
+    "lookup_by": {
+     "email": {
+      "$arg": "email"
+     }
+    }
+   },
+   "input_schema": {
+    "email": "text"
+   },
+   "_evidence": {
+    "locator": "cmd/auth.go:581",
+    "id_local": "Password.forgot",
+    "entry": {
+     "kind": "http",
+     "route": "POST /admin/forgot",
+     "locator": "cmd/handlers.go:250"
+    },
+    "entity_why": "primary effect row_read lands on this table",
+    "ref_code": "token, err := generateRandomString(tmpAuthTokenLen)\ntmptokens.Set(email, passwordResetTTL, token)\nresetURL := fmt.Sprintf(\"%s/admin/reset?token=%s&email=%s\", a.urlCfg.RootURL, token, url.QueryEscape(email))\na.emailMsgr.Push(models.Message{ To: []string{email}, Subject: ..., Body: body })",
+    "edges": [
+     "forgot emails reset link only if user exists + password_login (cmd/auth.go:581)"
+    ]
+   },
+   "entity": "Users",
+   "_binds": {
+    "email": "Users.email"
+   },
+   "_output_schema": {
+    "render": "reset link sent page (regardless of existence)"
+   },
+   "guards": {
+    "required": [
+     "email"
+    ],
+    "messages": {
+     "not_found": "That record does not exist.",
+     "fk": "You passed an id that does not exist.",
+     "auth": "This recovery/self-service flow needs no active session; it is keyed on an emailed UUID or token.",
+     "precondition": "You don't have the required permission for that."
+    },
+    "requires_auth": false
+   },
+   "description": "Email a password-reset link to the given account if it exists and allows password login. Always renders the same response whether or not the account exists."
+  },
+  {
+   "tool": "password_reset",
+   "op": "action",
+   "family": "update.field_set",
+   "exec_spec": {
+    "entity": "Users",
+    "row_key": {
+     "email": {
+      "$arg": "email"
+     }
+    },
+    "set": {
+     "password": {
+      "$arg": "password"
+     },
+     "updated_at": "2026-01-01T00:00:00"
+    }
+   },
+   "input_schema": {
+    "email": {
+     "type": "text",
+     "required": true,
+     "description": "The email that requested the reset."
+    },
+    "token": {
+     "type": "text",
+     "required": true,
+     "description": "The reset token from the emailed link."
+    },
+    "password": {
+     "type": "text",
+     "required": true,
+     "description": "The new password."
+    },
+    "password2": {
+     "type": "text",
+     "required": true,
+     "description": "Confirmation of the new password."
+    }
+   },
+   "_evidence": {
+    "locator": "cmd/auth.go:648",
+    "id_local": "Password.reset",
+    "entry": {
+     "kind": "http",
+     "route": "POST /admin/reset",
+     "locator": "cmd/handlers.go:252"
+    },
+    "entity_why": "primary effect row_insert lands on this table",
+    "ref_code": "data, err := tmptokens.Get(email)\ntk, ok := data.(string)\nif !ok || tk != token { return invalidResetLink }\nuser.Password = null.NewString(password, true)\na.core.UpdateUserProfile(user.ID, user)\na.core.DeleteUserSessions(user.ID, \"\")\na.auth.SaveSession(user, \"\", c)",
+    "edges": [
+     "reset consumes 30-min token keyed by email before changing password (cmd/auth.go:648)"
+    ]
+   },
+   "entity": "Sessions",
+   "_binds": {
+    "email": "Users.email"
+   },
+   "_output_schema": {
+    "redirect": "302 to /admin"
+   },
+   "guards": {
+    "required": [
+     "email",
+     "token",
+     "password",
+     "password2"
+    ],
+    "messages": {
+     "precondition": "You don't have the required permission for that.",
+     "not_found": "That record does not exist.",
+     "fk": "You passed an id that does not exist.",
+     "auth": "This recovery/self-service flow needs no active session; it is keyed on an emailed UUID or token."
+    },
+    "requires_auth": false
+   },
+   "_defaulted": [
+    "fields"
+   ],
+   "description": "Finish a password reset using the emailed token."
+  },
+  {
+   "tool": "roles_search_user",
+   "op": "search",
+   "family": "search",
+   "exec_spec": {
+    "entity": "Roles",
+    "search_fields": [
+     "type",
+     "name"
+    ],
+    "rank": {
+     "method": "exact",
+     "fields": [
+      "type",
+      "name"
+     ]
+    }
+   },
+   "input_schema": {},
+   "_evidence": {
+    "locator": "cmd/roles.go:13",
+    "id_local": "Roles.search_user",
+    "entry": {
+     "kind": "http",
+     "route": "GET /api/roles/users",
+     "locator": "cmd/handlers.go:214"
+    },
+    "entity_why": "primary effect row_search lands on this table",
+    "ref_code": "out, err := a.core.GetRoles()\nif err != nil { return err }\nreturn c.JSON(200, okResp{out})",
+    "edges": [
+     "admin-authenticated GET /api/roles/users route in the /api admin router (session auth + route Perm middleware) cmd/roles.go:13"
+    ]
+   },
+   "entity": "Roles",
+   "_output_schema": {
+    "data": "[]user roles with list_permissions"
+   },
+   "guards": {
+    "requires_auth": true,
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "Users",
+        "where": {
+         "node": "field",
+         "col": "user_role_id",
+         "op": "eq",
+         "value": 1
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "messages": {
+     "auth": "You must be signed in as a listmonk admin to do that.",
+     "not_found": "That record does not exist.",
+     "fk": "You passed an id that does not exist.",
+     "precondition": "You don't have the required permission for that."
+    }
+   },
+   "description": "List all user roles."
+  },
+  {
+   "tool": "roles_search_list",
+   "op": "search",
+   "family": "search",
+   "exec_spec": {
+    "entity": "Roles",
+    "search_fields": [
+     "type",
+     "name"
+    ],
+    "rank": {
+     "method": "exact",
+     "fields": [
+      "type",
+      "name"
+     ]
+    }
+   },
+   "input_schema": {},
+   "_evidence": {
+    "locator": "cmd/roles.go:24",
+    "id_local": "Roles.search_list",
+    "entry": {
+     "kind": "http",
+     "route": "GET /api/roles/lists",
+     "locator": "cmd/handlers.go:215"
+    },
+    "entity_why": "primary effect row_search lands on this table",
+    "ref_code": "out, err := a.core.GetListRoles()\nif err != nil { return err }\nreturn c.JSON(200, okResp{out})",
+    "edges": [
+     "admin-authenticated GET /api/roles/lists route in the /api admin router (session auth + route Perm middleware) cmd/roles.go:24"
+    ]
+   },
+   "entity": "Roles",
+   "_output_schema": {
+    "data": "[]list roles"
+   },
+   "guards": {
+    "requires_auth": true,
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "Users",
+        "where": {
+         "node": "field",
+         "col": "user_role_id",
+         "op": "eq",
+         "value": 1
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "messages": {
+     "auth": "You must be signed in as a listmonk admin to do that.",
+     "not_found": "That record does not exist.",
+     "fk": "You passed an id that does not exist.",
+     "precondition": "You don't have the required permission for that."
+    }
+   },
+   "description": "List all list roles."
+  },
+  {
+   "tool": "roles_create_user",
+   "op": "create",
+   "family": "crud.insert",
+   "exec_spec": {
+    "entity": "Roles",
+    "fields": [
+     "name",
+     "permissions"
+    ],
+    "set_on_create": {
+     "type": "user",
+     "created_at": "2026-01-01T00:00:00",
+     "updated_at": "2026-01-01T00:00:00"
+    }
+   },
+   "input_schema": {
+    "name": "text",
+    "permissions": "json"
+   },
+   "_evidence": {
+    "locator": "cmd/roles.go:35",
+    "id_local": "Roles.create_user",
+    "entry": {
+     "kind": "http",
+     "route": "POST /api/roles/users",
+     "locator": "cmd/handlers.go:216"
+    },
+    "entity_why": "primary effect row_insert lands on this table",
+    "ref_code": "if err := a.validateUserRole(r); err != nil { return err }\nout, err := a.core.CreateRole(r)\nreturn c.JSON(200, okResp{out})",
+    "edges": [
+     "route-level Perm middleware requires any of ['roles:manage'] or SuperAdmin (user_role_id=1) bypass (cmd/handlers.go:216)"
+    ]
+   },
+   "entity": "Roles",
+   "_binds": {
+    "name": "Roles.name",
+    "permissions": "Roles.permissions"
+   },
+   "_output_schema": {
+    "data": "created role"
+   },
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "Users",
+        "where": {
+         "node": "field",
+         "col": "user_role_id",
+         "op": "eq",
+         "value": 1
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "required": [
+     "name"
+    ],
+    "requires_auth": true,
+    "messages": {
+     "auth": "You must be signed in as a listmonk admin to do that.",
+     "unique": "A role with those identifying values already exists.",
+     "precondition": "You don't have the required permission for that.",
+     "not_found": "That record does not exist.",
+     "fk": "You passed an id that does not exist."
+    }
+   },
+   "description": "Create a user role from a name and a permissions map."
+  },
+  {
+   "tool": "roles_create_list_role",
+   "op": "create",
+   "family": "crud.insert",
+   "exec_spec": {
+    "entity": "Roles",
+    "fields": [
+     "name"
+    ],
+    "set_on_create": {
+     "type": "list",
+     "created_at": "2026-01-01T00:00:00",
+     "updated_at": "2026-01-01T00:00:00",
+     "permissions": {
+      "$arg": "lists"
+     }
+    }
+   },
+   "input_schema": {
+    "role_id": "id",
+    "name": "text",
+    "lists": "json"
+   },
+   "_evidence": {
+    "locator": "cmd/roles.go:54",
+    "id_local": "Roles.create_list_role",
+    "entry": {
+     "kind": "http",
+     "route": "POST /api/roles/lists",
+     "locator": "cmd/handlers.go:217"
+    },
+    "entity_why": "primary effect row_insert lands on this table",
+    "ref_code": "if err := c.q.CreateRole.Get(&out, r.Name, auth.RoleTypeList, pq.Array([]string{})); err != nil {...}\nif err := c.UpsertListPermissions(out.ID, r.Lists); err != nil {...}",
+    "edges": [
+     "route-level Perm middleware requires any of ['roles:manage'] or SuperAdmin (user_role_id=1) bypass (cmd/handlers.go:217)"
+    ]
+   },
+   "entity": "Roles",
+   "_binds": {
+    "role_id": "Roles.id",
+    "name": "Roles.name",
+    "lists": "Roles.list_id"
+   },
+   "_output_schema": {
+    "data": "created list role"
+   },
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "Users",
+        "where": {
+         "node": "field",
+         "col": "user_role_id",
+         "op": "eq",
+         "value": 1
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "required": [
+     "role_id",
+     "name"
+    ],
+    "requires_auth": true,
+    "messages": {
+     "auth": "You must be signed in as a listmonk admin to do that.",
+     "unique": "A role with those identifying values already exists.",
+     "precondition": "You don't have the required permission for that.",
+     "not_found": "That record does not exist.",
+     "fk": "You passed an id that does not exist."
+    }
+   },
+   "description": "Create a list role granting access to a set of lists."
+  },
+  {
+   "tool": "roles_update",
+   "op": "update",
+   "family": "update.field_set",
+   "exec_spec": {
+    "entity": "Roles",
+    "row_key": {
+     "id": {
+      "$arg": "id"
+     }
+    },
+    "fields": [
+     "name",
+     "permissions"
+    ],
+    "set": {
+     "updated_at": "2026-01-01T00:00:00"
+    }
+   },
+   "input_schema": {
+    "id": "id",
+    "name": "text",
+    "permissions": "json"
+   },
+   "_evidence": {
+    "locator": "cmd/roles.go:73",
+    "id_local": "Roles.update",
+    "entry": {
+     "kind": "http",
+     "route": "PUT /api/roles/users/:id",
+     "locator": "cmd/handlers.go:218"
+    },
+    "entity_why": "primary effect row_update lands on this table",
+    "ref_code": "if id == auth.SuperAdminRoleID { return ...invalidID }\nout, err := a.core.UpdateUserRole(id, r)\nif _, err := cacheUsers(a.core, a.auth); err != nil { ... }",
+    "edges": [
+     "route-level Perm middleware requires any of ['roles:manage'] or SuperAdmin (user_role_id=1) bypass (cmd/handlers.go:218)"
+    ]
+   },
+   "entity": "Roles",
+   "_binds": {
+    "id": "Roles.id",
+    "name": "Roles.name",
+    "permissions": "Roles.permissions"
+   },
+   "_output_schema": {
+    "data": "updated role"
+   },
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "Users",
+        "where": {
+         "node": "field",
+         "col": "user_role_id",
+         "op": "eq",
+         "value": 1
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "required": [
+     "id",
+     "name"
+    ],
+    "requires_auth": true,
+    "messages": {
+     "auth": "You must be signed in as a listmonk admin to do that.",
+     "not_found": "That record does not exist.",
+     "fk": "You passed an id that does not exist.",
+     "precondition": "You don't have the required permission for that."
+    }
+   },
+   "description": "Update a user role's name and permissions. The built-in owner role cannot be edited."
+  },
+  {
+   "tool": "roles_update_list",
+   "op": "update",
+   "family": "update.field_set",
+   "exec_spec": {
+    "entity": "Roles",
+    "row_key": {
+     "id": {
+      "$arg": "id"
+     }
+    },
+    "fields": [
+     "name"
+    ],
+    "set": {
+     "updated_at": "2026-01-01T00:00:00"
+    }
+   },
+   "input_schema": {
+    "id": {
+     "type": "id",
+     "required": true,
+     "description": "Id of the list role to rename."
+    },
+    "name": {
+     "type": "text",
+     "required": true,
+     "description": "New display name."
+    }
+   },
+   "_evidence": {
+    "locator": "cmd/roles.go:108",
+    "id_local": "Roles.update_list",
+    "entry": {
+     "kind": "http",
+     "route": "PUT /api/roles/lists/:id",
+     "locator": "cmd/handlers.go:219"
+    },
+    "entity_why": "primary effect row_insert lands on this table",
+    "ref_code": "out, err := a.core.UpdateListRole(id, r)\nif _, err := cacheUsers(a.core, a.auth); err != nil { ... }",
+    "edges": [
+     "route-level Perm middleware requires any of ['roles:manage'] or SuperAdmin (user_role_id=1) bypass (cmd/handlers.go:219)"
+    ]
+   },
+   "entity": "Roles",
+   "_binds": {
+    "id": "Roles.id",
+    "name": "Roles.name",
+    "lists": "Roles.list_id"
+   },
+   "_output_schema": {
+    "data": "updated list role"
+   },
+   "guards": {
+    "required": [
+     "id",
+     "name"
+    ],
+    "requires_auth": true,
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "Users",
+        "where": {
+         "node": "field",
+         "col": "user_role_id",
+         "op": "eq",
+         "value": 1
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "messages": {
+     "auth": "You must be signed in as a listmonk admin to do that.",
+     "unique": "A list role with that name already exists.",
+     "not_found": "That record does not exist.",
+     "fk": "You passed an id that does not exist.",
+     "precondition": "You don't have the required permission for that."
+    }
+   },
+   "_defaulted": [
+    "fields (mapped to the real parameter names via binds)"
+   ],
+   "description": "Rename a list role."
+  },
+  {
+   "tool": "roles_delete",
+   "op": "delete",
+   "family": "crud.delete",
+   "exec_spec": {
+    "entity": "Roles",
+    "lookup_by": {
+     "id": {
+      "$arg": "id"
+     }
+    }
+   },
+   "input_schema": {
+    "id": "id"
+   },
+   "_evidence": {
+    "locator": "cmd/roles.go:145",
+    "id_local": "Roles.delete",
+    "entry": {
+     "kind": "http",
+     "route": "DELETE /api/roles/:id",
+     "locator": "cmd/handlers.go:220"
+    },
+    "entity_why": "primary effect row_delete lands on this table",
+    "ref_code": "if id == auth.SuperAdminRoleID { return ...invalidID }\nif err := a.core.DeleteRole(int(id)); err != nil { return err }",
+    "edges": [
+     "route-level Perm middleware requires any of ['roles:manage'] or SuperAdmin (user_role_id=1) bypass (cmd/handlers.go:220)"
+    ]
+   },
+   "entity": "Roles",
+   "_binds": {
+    "id": "Roles.id"
+   },
+   "_output_schema": {
+    "data": "true"
+   },
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "Users",
+        "where": {
+         "node": "field",
+         "col": "user_role_id",
+         "op": "eq",
+         "value": 1
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "required": [
+     "id"
+    ],
+    "requires_auth": true,
+    "messages": {
+     "auth": "You must be signed in as a listmonk admin to do that.",
+     "not_found": "That record does not exist.",
+     "fk": "You passed an id that does not exist.",
+     "precondition": "You don't have the required permission for that."
+    }
+   },
+   "description": "Delete a role. Fails if it is the built-in owner role."
+  },
+  {
+   "tool": "settings_search",
+   "op": "read",
+   "family": "search",
+   "exec_spec": {
+    "entity": "Settings",
+    "search_fields": [
+     "key",
+     "value"
+    ],
+    "rank": {
+     "method": "exact",
+     "fields": [
+      "key",
+      "value"
+     ]
+    }
+   },
+   "input_schema": {},
+   "_evidence": {
+    "locator": "cmd/settings.go:58",
+    "id_local": "Settings.search",
+    "entry": {
+     "kind": "http",
+     "route": "GET /api/settings",
+     "locator": "cmd/handlers.go:108"
+    },
+    "entity_why": "primary effect row_search lands on this table",
+    "ref_code": "s, err := a.core.GetSettings()\nfor i := range s.SMTP { s.SMTP[i].Password = strings.Repeat(pwdMask, ...) }\nreturn c.JSON(200, okResp{s})",
+    "edges": [
+     "admin-authenticated GET /api/settings route in the /api admin router (session auth + route Perm middleware) cmd/settings.go:58"
+    ]
+   },
+   "entity": "Settings",
+   "_output_schema": {
+    "data": "settings object (secrets masked)"
+   },
+   "guards": {
+    "requires_auth": true,
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "Users",
+        "where": {
+         "node": "field",
+         "col": "user_role_id",
+         "op": "eq",
+         "value": 1
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "messages": {
+     "auth": "You must be signed in as a listmonk admin to do that.",
+     "not_found": "That record does not exist.",
+     "fk": "You passed an id that does not exist.",
+     "precondition": "You don't have the required permission for that."
+    }
+   },
+   "description": "Read the whole settings object; secret values are masked."
+  },
+  {
+   "tool": "settings_update_key",
+   "op": "update",
+   "family": "update.field_set",
+   "exec_spec": {
+    "entity": "Settings",
+    "row_key": {
+     "key": {
+      "$arg": "key"
+     }
+    },
+    "fields": [
+     "value"
+    ],
+    "set": {
+     "updated_at": "2026-01-01T00:00:00"
+    }
+   },
+   "input_schema": {
+    "key": "text",
+    "value": "json"
+   },
+   "_evidence": {
+    "locator": "cmd/settings.go:322",
+    "id_local": "Settings.update_key",
+    "entry": {
+     "kind": "http",
+     "route": "PUT /api/settings/:key",
+     "locator": "cmd/handlers.go:110"
+    },
+    "entity_why": "primary effect row_update lands on this table",
+    "ref_code": "key := c.Param(\"key\")\nif key == \"\" { return ... }\nb, _ := json.Marshal(...)\nif err := a.core.UpdateSettingsByKey(key, b); err != nil { return err }",
+    "edges": [
+     "route-level Perm middleware requires any of ['settings:manage'] or SuperAdmin (user_role_id=1) bypass (cmd/handlers.go:110)"
+    ]
+   },
+   "entity": "Settings",
+   "_binds": {
+    "key": "Settings.key",
+    "value": "Settings.value"
+   },
+   "_output_schema": {
+    "data": "true"
+   },
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "Users",
+        "where": {
+         "node": "field",
+         "col": "user_role_id",
+         "op": "eq",
+         "value": 1
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "required": [
+     "key",
+     "value"
+    ],
+    "requires_auth": true,
+    "messages": {
+     "auth": "You must be signed in as a listmonk admin to do that.",
+     "not_found": "That record does not exist.",
+     "fk": "You passed an id that does not exist.",
+     "precondition": "You don't have the required permission for that."
+    }
+   },
+   "description": "Update a single setting by its dot-key."
+  },
+  {
+   "tool": "media_search",
+   "op": "search",
+   "family": "search",
+   "exec_spec": {
+    "entity": "Media",
+    "search_fields": [
+     "filename"
+    ],
+    "rank": {
+     "method": "substring",
+     "fields": [
+      "filename"
+     ]
+    },
+    "pagination": {},
+    "filter": {
+     "col": "filename",
+     "mode": "substring",
+     "val": {
+      "$arg": "query"
+     },
+     "optional": true
+    }
+   },
+   "input_schema": {
+    "query": "text",
+    "page": "int",
+    "per_page": "int"
+   },
+   "_evidence": {
+    "locator": "cmd/media.go:143",
+    "id_local": "Media.search",
+    "entry": {
+     "kind": "http",
+     "route": "GET /api/media",
+     "locator": "cmd/handlers.go:178"
+    },
+    "entity_why": "primary effect row_search lands on this table",
+    "ref_code": "res, total, err := a.core.QueryMedia(a.cfg.MediaUpload.Provider, a.media, query, pg.Offset, pg.Limit)\nout := models.PageResults{Results: res, Total: total, Page: pg.Page, PerPage: pg.PerPage}",
+    "edges": [
+     "admin-authenticated GET /api/media route in the /api admin router (session auth + route Perm middleware) cmd/media.go:143"
+    ]
+   },
+   "entity": "Media",
+   "_output_schema": {
+    "results": "paged Media rows",
+    "total": "int"
+   },
+   "guards": {
+    "requires_auth": true,
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "Users",
+        "where": {
+         "node": "field",
+         "col": "user_role_id",
+         "op": "eq",
+         "value": 1
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "messages": {
+     "auth": "You must be signed in as a listmonk admin to do that.",
+     "not_found": "That record does not exist.",
+     "fk": "You passed an id that does not exist.",
+     "precondition": "You don't have the required permission for that."
+    }
+   },
+   "description": "Search uploaded media by filename."
+  },
+  {
+   "tool": "media_read",
+   "op": "read",
+   "family": "crud.fetch",
+   "exec_spec": {
+    "entity": "Media",
+    "lookup_by": {
+     "id": {
+      "$arg": "id"
+     }
+    }
+   },
+   "input_schema": {
+    "id": "id"
+   },
+   "_evidence": {
+    "locator": "cmd/media.go:166",
+    "id_local": "Media.read",
+    "entry": {
+     "kind": "http",
+     "route": "GET /api/media/:id",
+     "locator": "cmd/handlers.go:179"
+    },
+    "entity_why": "primary effect row_read lands on this table",
+    "ref_code": "out, err := a.core.GetMedia(id, \"\", \"\", a.media)\nif err != nil { return err }",
+    "edges": [
+     "admin-authenticated GET /api/media/:id route in the /api admin router (session auth + route Perm middleware) cmd/media.go:166"
+    ]
+   },
+   "entity": "Media",
+   "_binds": {
+    "id": "Media.id"
+   },
+   "_output_schema": {
+    "data": "Media row"
+   },
+   "guards": {
+    "required": [
+     "id"
+    ],
+    "requires_auth": true,
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "Users",
+        "where": {
+         "node": "field",
+         "col": "user_role_id",
+         "op": "eq",
+         "value": 1
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "messages": {
+     "auth": "You must be signed in as a listmonk admin to do that.",
+     "not_found": "That record does not exist.",
+     "fk": "You passed an id that does not exist.",
+     "precondition": "You don't have the required permission for that."
+    }
+   },
+   "description": "Fetch a single uploaded media row by id."
+  },
+  {
+   "tool": "media_upload",
+   "op": "create",
+   "family": "crud.insert",
+   "exec_spec": {
+    "entity": "Media",
+    "fields": {
+     "filename": {
+      "$arg": "file"
+     }
+    },
+    "set_on_create": {
+     "created_at": "2026-01-01T00:00:00",
+     "meta": "{}",
+     "uuid": {
+      "$auto": "100000+max(id)+1"
+     }
+    }
+   },
+   "input_schema": {
+    "file": "text"
+   },
+   "_evidence": {
+    "locator": "cmd/media.go:26",
+    "id_local": "Media.upload",
+    "entry": {
+     "kind": "http",
+     "route": "POST /api/media",
+     "locator": "cmd/handlers.go:180"
+    },
+    "entity_why": "primary effect row_insert lands on this table",
+    "ref_code": "fName, err = a.media.Put(fName, contentType, src)\ntf, err := a.media.Put(thumbPrefix+fName, contentType, thumbFile)\nm, err := a.core.InsertMedia(fName, thumbfName, contentType, meta, a.cfg.MediaUpload.Provider, a.media)",
+    "edges": [
+     "route-level Perm middleware requires any of ['media:manage'] or SuperAdmin (user_role_id=1) bypass (cmd/handlers.go:180)"
+    ]
+   },
+   "entity": "Media",
+   "_binds": {
+    "file": "Media.filename"
+   },
+   "_output_schema": {
+    "data": "Media row (uuid, filename, thumb, url)"
+   },
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "Users",
+        "where": {
+         "node": "field",
+         "col": "user_role_id",
+         "op": "eq",
+         "value": 1
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "required": [
+     "file"
+    ],
+    "requires_auth": true,
+    "messages": {
+     "auth": "You must be signed in as a listmonk admin to do that.",
+     "unique": "A media with those identifying values already exists.",
+     "precondition": "You don't have the required permission for that.",
+     "not_found": "That record does not exist.",
+     "fk": "You passed an id that does not exist."
+    }
+   },
+   "_defaulted": [
+    "fields (mapped to the real parameter names via binds)"
+   ],
+   "description": "Upload a media file; returns the media row with its URL and thumbnail. Fails if a file of that name already exists."
+  },
+  {
+   "tool": "media_delete",
+   "op": "delete",
+   "family": "crud.delete",
+   "exec_spec": {
+    "entity": "Media",
+    "lookup_by": {
+     "id": {
+      "$arg": "id"
+     }
+    }
+   },
+   "input_schema": {
+    "id": "id"
+   },
+   "_evidence": {
+    "locator": "cmd/media.go:178",
+    "id_local": "Media.delete",
+    "entry": {
+     "kind": "http",
+     "route": "DELETE /api/media/:id",
+     "locator": "cmd/handlers.go:181"
+    },
+    "entity_why": "primary effect row_delete lands on this table",
+    "ref_code": "fname, err := a.core.DeleteMedia(id)\nif err != nil { return err }\na.media.Delete(fname); a.media.Delete(thumbPrefix+fname)",
+    "edges": [
+     "route-level Perm middleware requires any of ['media:manage'] or SuperAdmin (user_role_id=1) bypass (cmd/handlers.go:181)"
+    ]
+   },
+   "entity": "Media",
+   "_binds": {
+    "id": "Media.id"
+   },
+   "_output_schema": {
+    "data": "true"
+   },
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "Users",
+        "where": {
+         "node": "field",
+         "col": "user_role_id",
+         "op": "eq",
+         "value": 1
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "required": [
+     "id"
+    ],
+    "requires_auth": true,
+    "messages": {
+     "auth": "You must be signed in as a listmonk admin to do that.",
+     "not_found": "That record does not exist.",
+     "fk": "You passed an id that does not exist.",
+     "precondition": "You don't have the required permission for that."
+    }
+   },
+   "description": "Delete an uploaded media file and its thumbnail."
+  },
+  {
+   "tool": "templates_search",
+   "op": "search",
+   "family": "search",
+   "exec_spec": {
+    "entity": "Templates",
+    "search_fields": [
+     "name",
+     "type"
+    ],
+    "rank": {
+     "method": "exact",
+     "fields": [
+      "name",
+      "type"
+     ]
+    }
+   },
+   "input_schema": {
+    "no_body": "bool"
+   },
+   "_evidence": {
+    "locator": "cmd/templates.go:49",
+    "id_local": "Templates.search",
+    "entry": {
+     "kind": "http",
+     "route": "GET /api/templates",
+     "locator": "cmd/handlers.go:183"
+    },
+    "entity_why": "primary effect row_search lands on this table",
+    "ref_code": "noBody, _ := strconv.ParseBool(c.QueryParam(\"no_body\"))\nout, err := a.core.GetTemplates(\"\", noBody)\nreturn c.JSON(200, okResp{out})",
+    "edges": [
+     "admin-authenticated GET /api/templates route in the /api admin router (session auth + route Perm middleware) cmd/templates.go:49"
+    ]
+   },
+   "entity": "Templates",
+   "_output_schema": {
+    "data": "[]Template"
+   },
+   "guards": {
+    "requires_auth": true,
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "Users",
+        "where": {
+         "node": "field",
+         "col": "user_role_id",
+         "op": "eq",
+         "value": 1
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "messages": {
+     "auth": "You must be signed in as a listmonk admin to do that.",
+     "not_found": "That record does not exist.",
+     "fk": "You passed an id that does not exist.",
+     "precondition": "You don't have the required permission for that."
+    }
+   },
+   "description": "List templates (optionally excluding bodies)."
+  },
+  {
+   "tool": "templates_read",
+   "op": "read",
+   "family": "crud.fetch",
+   "exec_spec": {
+    "entity": "Templates",
+    "lookup_by": {
+     "id": {
+      "$arg": "id"
+     }
+    }
+   },
+   "input_schema": {
+    "id": "id"
+   },
+   "_evidence": {
+    "locator": "cmd/templates.go:35",
+    "id_local": "Templates.read",
+    "entry": {
+     "kind": "http",
+     "route": "GET /api/templates/:id",
+     "locator": "cmd/handlers.go:184"
+    },
+    "entity_why": "primary effect row_read lands on this table",
+    "ref_code": "out, err := a.core.GetTemplate(id, noBody)\nif err != nil { return err }",
+    "edges": [
+     "admin-authenticated GET /api/templates/:id route in the /api admin router (session auth + route Perm middleware) cmd/templates.go:35"
+    ]
+   },
+   "entity": "Templates",
+   "_binds": {
+    "id": "Templates.id"
+   },
+   "_output_schema": {
+    "data": "Template"
+   },
+   "guards": {
+    "required": [
+     "id"
+    ],
+    "requires_auth": true,
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "Users",
+        "where": {
+         "node": "field",
+         "col": "user_role_id",
+         "op": "eq",
+         "value": 1
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "messages": {
+     "auth": "You must be signed in as a listmonk admin to do that.",
+     "not_found": "That record does not exist.",
+     "fk": "You passed an id that does not exist.",
+     "precondition": "You don't have the required permission for that."
+    }
+   },
+   "description": "Fetch a single template by id."
+  },
+  {
+   "tool": "templates_create",
+   "op": "create",
+   "family": "crud.insert",
+   "exec_spec": {
+    "entity": "Templates",
+    "fields": [
+     "name",
+     "type",
+     "subject",
+     "body",
+     "body_source"
+    ],
+    "set_on_create": {
+     "is_default": false,
+     "created_at": "2026-01-01T00:00:00",
+     "updated_at": "2026-01-01T00:00:00"
+    }
+   },
+   "input_schema": {
+    "name": "text",
+    "type": "text",
+    "subject": "text",
+    "body": "text",
+    "body_source": "text"
+   },
+   "_evidence": {
+    "locator": "cmd/templates.go:108",
+    "id_local": "Templates.create",
+    "entry": {
+     "kind": "http",
+     "route": "POST /api/templates",
+     "locator": "cmd/handlers.go:187"
+    },
+    "entity_why": "primary effect row_insert lands on this table",
+    "ref_code": "if err := o.Compile(funcs); err != nil { return ... }\nout, err := a.core.CreateTemplate(o.Name, o.Type, o.Subject, []byte(o.Body), o.BodySource)\nif o.Type == models.TemplateTypeTx { a.manager.CacheTpl(out.ID, &o) }",
+    "edges": [
+     "route-level Perm middleware requires any of ['templates:manage'] or SuperAdmin (user_role_id=1) bypass (cmd/handlers.go:187)"
+    ]
+   },
+   "entity": "Templates",
+   "_binds": {
+    "name": "Templates.name",
+    "type": "Templates.type",
+    "subject": "Templates.subject",
+    "body": "Templates.body",
+    "body_source": "Templates.body_source"
+   },
+   "_output_schema": {
+    "data": "created Template"
+   },
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "Users",
+        "where": {
+         "node": "field",
+         "col": "user_role_id",
+         "op": "eq",
+         "value": 1
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "required": [
+     "name",
+     "type",
+     "body"
+    ],
+    "requires_auth": true,
+    "messages": {
+     "auth": "You must be signed in as a listmonk admin to do that.",
+     "not_found": "That record does not exist.",
+     "fk": "You passed an id that does not exist.",
+     "precondition": "You don't have the required permission for that."
+    }
+   },
+   "description": "Create a template. A transactional (tx) template is cached for use by campaigns_send_tx."
+  },
+  {
+   "tool": "templates_update",
+   "op": "update",
+   "family": "update.field_set",
+   "exec_spec": {
+    "entity": "Templates",
+    "row_key": {
+     "id": {
+      "$arg": "id"
+     }
+    },
+    "fields": [
+     "name",
+     "subject",
+     "body",
+     "body_source"
+    ],
+    "set": {
+     "updated_at": "2026-01-01T00:00:00"
+    }
+   },
+   "input_schema": {
+    "id": "id",
+    "name": "text",
+    "subject": "text",
+    "body": "text",
+    "body_source": "text"
+   },
+   "_evidence": {
+    "locator": "cmd/templates.go:148",
+    "id_local": "Templates.update",
+    "entry": {
+     "kind": "http",
+     "route": "PUT /api/templates/:id",
+     "locator": "cmd/handlers.go:188"
+    },
+    "entity_why": "primary effect row_update lands on this table",
+    "ref_code": "if err := o.Compile(funcs); err != nil { return ... }\nout, err := a.core.UpdateTemplate(id, o.Name, o.Subject, []byte(o.Body), o.BodySource)\nif out.Type == models.TemplateTypeTx { a.manager.CacheTpl(out.ID, &o) }",
+    "edges": [
+     "route-level Perm middleware requires any of ['templates:manage'] or SuperAdmin (user_role_id=1) bypass (cmd/handlers.go:188)"
+    ]
+   },
+   "entity": "Templates",
+   "_binds": {
+    "id": "Templates.id",
+    "name": "Templates.name",
+    "subject": "Templates.subject",
+    "body": "Templates.body",
+    "body_source": "Templates.body_source"
+   },
+   "_output_schema": {
+    "data": "updated Template"
+   },
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "Users",
+        "where": {
+         "node": "field",
+         "col": "user_role_id",
+         "op": "eq",
+         "value": 1
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "required": [
+     "id"
+    ],
+    "requires_auth": true,
+    "messages": {
+     "auth": "You must be signed in as a listmonk admin to do that.",
+     "not_found": "That record does not exist.",
+     "fk": "You passed an id that does not exist.",
+     "precondition": "You don't have the required permission for that."
+    }
+   },
+   "description": "Update a template's name, subject, body and body source."
+  },
+  {
+   "tool": "templates_set_default",
+   "op": "update",
+   "family": "update.field_set",
+   "exec_spec": {
+    "entity": "Templates",
+    "row_key": {
+     "id": {
+      "$arg": "id"
+     }
+    },
+    "fields": [
+     "name",
+     "type",
+     "subject",
+     "body",
+     "body_source",
+     "is_default"
+    ],
+    "set": {
+     "is_default": true
+    }
+   },
+   "input_schema": {
+    "id": "id",
+    "name": "text",
+    "type": "text",
+    "subject": "text",
+    "body": "text",
+    "body_source": "text"
+   },
+   "_evidence": {
+    "locator": "cmd/templates.go:189",
+    "id_local": "Templates.set_default",
+    "entry": {
+     "kind": "http",
+     "route": "PUT /api/templates/:id/default",
+     "locator": "cmd/handlers.go:189"
+    },
+    "entity_why": "primary effect row_update lands on this table",
+    "ref_code": "if err := a.core.SetDefaultTemplate(id); err != nil { return err }\nreturn a.GetTemplates(c)\n-- SQL: WITH u AS (UPDATE templates SET is_default=true WHERE id=$1 AND type='campaign') UPDATE templates SET is_default=false WHERE id != $1",
+    "edges": [
+     "route-level Perm middleware requires any of ['templates:manage'] or SuperAdmin (user_role_id=1) bypass (cmd/handlers.go:189)"
+    ]
+   },
+   "entity": "Templates",
+   "_binds": {
+    "id": "Templates.id"
+   },
+   "_output_schema": {
+    "data": "all templates"
+   },
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "Users",
+        "where": {
+         "node": "field",
+         "col": "user_role_id",
+         "op": "eq",
+         "value": 1
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "required": [
+     "id"
+    ],
+    "requires_auth": true,
+    "messages": {
+     "auth": "You must be signed in as a listmonk admin to do that.",
+     "not_found": "That record does not exist.",
+     "fk": "You passed an id that does not exist.",
+     "precondition": "You don't have the required permission for that."
+    }
+   },
+   "_defaulted": [
+    "argument invented from the write column",
+    "fields"
+   ],
+   "description": "Make a campaign template the default; the previously-default template is unset."
+  },
+  {
+   "tool": "templates_delete",
+   "op": "delete",
+   "family": "crud.delete",
+   "exec_spec": {
+    "entity": "Templates",
+    "lookup_by": {
+     "id": {
+      "$arg": "id"
+     }
+    }
+   },
+   "input_schema": {
+    "id": "id"
+   },
+   "_evidence": {
+    "locator": "cmd/templates.go:200",
+    "id_local": "Templates.delete",
+    "entry": {
+     "kind": "http",
+     "route": "DELETE /api/templates/:id",
+     "locator": "cmd/handlers.go:190"
+    },
+    "entity_why": "primary effect row_delete lands on this table",
+    "ref_code": "if err := a.core.DeleteTemplate(id); err != nil { return err }\na.manager.DeleteTpl(id)\nreturn c.JSON(200, okResp{true})\n-- SQL: deletes tpl; campaigns referencing it re-pointed to default template",
+    "edges": [
+     "route-level Perm middleware requires any of ['templates:manage'] or SuperAdmin (user_role_id=1) bypass (cmd/handlers.go:190)"
+    ]
+   },
+   "entity": "Templates",
+   "_binds": {
+    "id": "Templates.id"
+   },
+   "_output_schema": {
+    "data": "true"
+   },
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "Users",
+        "where": {
+         "node": "field",
+         "col": "user_role_id",
+         "op": "eq",
+         "value": 1
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "required": [
+     "id"
+    ],
+    "requires_auth": true,
+    "messages": {
+     "auth": "You must be signed in as a listmonk admin to do that.",
+     "not_found": "That record does not exist.",
+     "fk": "You passed an id that does not exist.",
+     "precondition": "You don't have the required permission for that."
+    }
+   },
+   "description": "Delete a template; campaigns referencing it are re-pointed to the default template."
+  },
+  {
+   "tool": "templates_preview",
+   "op": "read",
+   "family": "crud.fetch",
+   "exec_spec": {
+    "entity": "Templates",
+    "lookup_by": {
+     "id": {
+      "$arg": "id"
+     }
+    }
+   },
+   "input_schema": {
+    "id": "id"
+   },
+   "_evidence": {
+    "locator": "cmd/templates.go:64",
+    "id_local": "Templates.preview",
+    "entry": {
+     "kind": "http",
+     "route": "GET /api/templates/:id/preview",
+     "locator": "cmd/handlers.go:185"
+    },
+    "entity_why": "primary effect row_read lands on this table",
+    "ref_code": "tpl, err := a.core.GetTemplate(id, false)\nif err != nil { return err }\nout, err := a.previewTemplate(tpl)\nreturn c.HTML(200, string(out))",
+    "edges": [
+     "admin-authenticated GET /api/templates/:id/preview route in the /api admin router (session auth + route Perm middleware) cmd/templates.go:64"
+    ]
+   },
+   "entity": "Templates",
+   "_binds": {
+    "id": "Templates.id"
+   },
+   "_output_schema": {
+    "html": "rendered preview"
+   },
+   "guards": {
+    "required": [
+     "id"
+    ],
+    "requires_auth": true,
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "Users",
+        "where": {
+         "node": "field",
+         "col": "user_role_id",
+         "op": "eq",
+         "value": 1
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "messages": {
+     "auth": "You must be signed in as a listmonk admin to do that.",
+     "not_found": "That record does not exist.",
+     "fk": "You passed an id that does not exist.",
+     "precondition": "You don't have the required permission for that."
+    }
+   },
+   "description": "Render a template body with sample data and return HTML."
+  },
+  {
+   "tool": "bounces_search",
+   "op": "search",
+   "family": "search",
+   "exec_spec": {
+    "entity": "Bounces",
+    "search_fields": [
+     "campaign_id",
+     "subscriber_id",
+     "source",
+     "type"
+    ],
+    "rank": {
+     "method": "exact",
+     "fields": [
+      "campaign_id",
+      "subscriber_id",
+      "source",
+      "type"
+     ]
+    },
+    "pagination": {},
+    "filter": {
+     "op": "and",
+     "clauses": [
+      {
+       "col": "campaign_id",
+       "mode": "exact",
+       "val": {
+        "$arg": "campaign_id"
+       },
+       "optional": true
+      },
+      {
+       "col": "source",
+       "mode": "exact",
+       "val": {
+        "$arg": "source"
+       },
+       "optional": true
+      }
+     ]
+    }
+   },
+   "input_schema": {
+    "campaign_id": "id",
+    "source": "text",
+    "order_by": "text",
+    "order": "text",
+    "page": "int",
+    "per_page": "int"
+   },
+   "_evidence": {
+    "locator": "cmd/bounce.go:28",
+    "id_local": "Bounces.search",
+    "entry": {
+     "kind": "http",
+     "route": "GET /api/bounces",
+     "locator": "cmd/handlers.go:134"
+    },
+    "entity_why": "primary effect row_search lands on this table",
+    "ref_code": "res, total, err := a.core.QueryBounces(campID, 0, source, orderBy, order, pg.Offset, pg.Limit)\nout := models.PageResults{Results: res, Total: total, ...}",
+    "edges": [
+     "admin-authenticated GET /api/bounces route in the /api admin router (session auth + route Perm middleware) cmd/bounce.go:28"
+    ]
+   },
+   "entity": "Bounces",
+   "_binds": {
+    "campaign_id": "Bounces.campaign_id",
+    "source": "Bounces.source"
+   },
+   "_output_schema": {
+    "results": "paged Bounce rows",
+    "total": "int"
+   },
+   "guards": {
+    "requires_auth": true,
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "Users",
+        "where": {
+         "node": "field",
+         "col": "user_role_id",
+         "op": "eq",
+         "value": 1
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "messages": {
+     "auth": "You must be signed in as a listmonk admin to do that.",
+     "not_found": "That record does not exist.",
+     "fk": "You passed an id that does not exist.",
+     "precondition": "You don't have the required permission for that."
+    }
+   },
+   "description": "Search bounces by campaign and source."
+  },
+  {
+   "tool": "bounces_ingest_webhook",
+   "op": "action",
+   "family": "action.emit",
+   "exec_spec": {
+    "channel": "notification",
+    "record": {
+     "table": "Bounces"
+    }
+   },
+   "input_schema": {
+    "service": "text",
+    "body": "json"
+   },
+   "_evidence": {
+    "locator": "cmd/bounce.go:124",
+    "id_local": "Bounces.ingest_webhook",
+    "entry": {
+     "kind": "http",
+     "route": "POST /webhooks/bounce",
+     "locator": "cmd/handlers.go:223"
+    },
+    "entity_why": "primary effect dispatch lands on this table",
+    "ref_code": "case \"ses\" && a.bounce.SES != nil:\n  switch c.Request().Header.Get(\"X-Amz-Sns-Message-Type\") { ... }\nfor _, b := range bounces { if err := a.bounce.Record(b); err != nil { a.log.Printf(...) } }\nreturn c.JSON(200, okResp{true})",
+    "edges": [
+     "route /webhooks/bounce and /webhooks/service/:service registered only when BounceWebhooksEnabled; per-provider signature validation (cmd/handlers.go:222-226, cmd/bounce.go:124)"
+    ]
+   },
+   "entity": "Bounces",
+   "_output_schema": {
+    "data": "true"
+   },
+   "guards": {
+    "required": [
+     "body"
+    ],
+    "requires_auth": false,
+    "messages": {
+     "not_found": "That record does not exist.",
+     "fk": "You passed an id that does not exist.",
+     "auth": "You must be signed in as a listmonk admin to do that.",
+     "precondition": "You don't have the required permission for that."
+    }
+   },
+   "description": "Ingest a delivery-status webhook from ses/sendgrid/etc and record bounces. Only reachable when bounce webhooks are enabled; payloads are signature-validated."
+  },
+  {
+   "tool": "bounces_blocklist_bounced",
+   "op": "update",
+   "family": "update.field_set",
+   "exec_spec": {
+    "entity": "Subscribers",
+    "row_key": {
+     "id": {
+      "$arg": "subscriber_id"
+     }
+    },
+    "fields": [
+     "uuid",
+     "email",
+     "name",
+     "attribs",
+     "status"
+    ],
+    "set": {
+     "status": "blocklisted",
+     "updated_at": "2026-01-01T00:00:00"
+    }
+   },
+   "input_schema": {
+    "subscriber_id": "id",
+    "uuid": "text",
+    "email": "text",
+    "name": "text",
+    "attribs": "json"
+   },
+   "_evidence": {
+    "locator": "cmd/bounce.go:115",
+    "id_local": "Bounces.blocklist_bounced",
+    "entry": {
+     "kind": "http",
+     "route": "PUT /api/bounces/blocklist",
+     "locator": "cmd/handlers.go:135"
+    },
+    "entity_why": "primary effect row_update lands on this table",
+    "ref_code": "-- WITH subs AS (SELECT subscriber_id FROM bounces)\n-- UPDATE subscribers SET status='blocklisted' WHERE id = ANY(SELECT subscriber_id FROM subs)\n-- UPDATE subscriber_lists SET status='unsubscribed' WHERE subscriber_id = ANY(...)",
+    "edges": [
+     "route-level Perm middleware requires any of ['bounces:manage'] or SuperAdmin (user_role_id=1) bypass (cmd/handlers.go:135)"
+    ]
+   },
+   "entity": "Subscribers",
+   "_binds": {
+    "subscriber_id": "Subscribers.id"
+   },
+   "_output_schema": {
+    "data": "true"
+   },
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "Users",
+        "where": {
+         "node": "field",
+         "col": "user_role_id",
+         "op": "eq",
+         "value": 1
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "requires_auth": true,
+    "messages": {
+     "auth": "You must be signed in as a listmonk admin to do that.",
+     "not_found": "That record does not exist.",
+     "fk": "You passed an id that does not exist.",
+     "precondition": "You don't have the required permission for that."
+    }
+   },
+   "_defaulted": [
+    "argument invented from the write column",
+    "fields"
+   ],
+   "description": "Blocklist every subscriber that has bounced and unsubscribe them from all lists."
+  },
+  {
+   "tool": "bounces_delete",
+   "op": "delete",
+   "family": "crud.delete",
+   "exec_spec": {
+    "entity": "Bounces",
+    "lookup_by": {
+     "id": {
+      "$arg": "id"
+     }
+    }
+   },
+   "input_schema": {
+    "id": "id"
+   },
+   "_evidence": {
+    "locator": "cmd/bounce.go:104",
+    "id_local": "Bounces.delete",
+    "entry": {
+     "kind": "http",
+     "route": "DELETE /api/bounces/:id",
+     "locator": "cmd/handlers.go:138"
+    },
+    "entity_why": "primary effect row_delete lands on this table",
+    "ref_code": "if err := a.core.DeleteBounces([]int{id}, false); err != nil { return err }",
+    "edges": [
+     "route-level Perm middleware requires any of ['bounces:manage'] or SuperAdmin (user_role_id=1) bypass (cmd/handlers.go:138)"
+    ]
+   },
+   "entity": "Bounces",
+   "_binds": {
+    "id": "Bounces.id"
+   },
+   "_output_schema": {
+    "data": "true"
+   },
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "Users",
+        "where": {
+         "node": "field",
+         "col": "user_role_id",
+         "op": "eq",
+         "value": 1
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "required": [
+     "id"
+    ],
+    "requires_auth": true,
+    "messages": {
+     "auth": "You must be signed in as a listmonk admin to do that.",
+     "not_found": "That record does not exist.",
+     "fk": "You passed an id that does not exist.",
+     "precondition": "You don't have the required permission for that."
+    }
+   },
+   "description": "Delete a single bounce by id."
+  },
+  {
+   "tool": "bounces_delete_many",
+   "op": "delete",
+   "family": "crud.delete",
+   "exec_spec": {
+    "entity": "Bounces",
+    "lookup_by": {
+     "id": {
+      "$arg": "id"
+     }
+    }
+   },
+   "input_schema": {
+    "id": "text",
+    "all": "bool"
+   },
+   "_evidence": {
+    "locator": "cmd/bounce.go:78",
+    "id_local": "Bounces.delete_many",
+    "entry": {
+     "kind": "http",
+     "route": "DELETE /api/bounces",
+     "locator": "cmd/handlers.go:137"
+    },
+    "entity_why": "primary effect row_delete lands on this table",
+    "ref_code": "all, _ := strconv.ParseBool(c.QueryParam(\"all\"))\nif err := a.core.DeleteBounces(ids, all); err != nil { return err }",
+    "edges": [
+     "route-level Perm middleware requires any of ['bounces:manage'] or SuperAdmin (user_role_id=1) bypass (cmd/handlers.go:137)"
+    ]
+   },
+   "entity": "Bounces",
+   "_binds": {
+    "id": "Bounces.id"
+   },
+   "_output_schema": {
+    "data": "true"
+   },
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "Users",
+        "where": {
+         "node": "field",
+         "col": "user_role_id",
+         "op": "eq",
+         "value": 1
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "requires_auth": true,
+    "messages": {
+     "auth": "You must be signed in as a listmonk admin to do that.",
+     "not_found": "That record does not exist.",
+     "fk": "You passed an id that does not exist.",
+     "precondition": "You don't have the required permission for that."
+    }
+   },
+   "description": "Delete bounces by ids, or all bounces when all is true."
+  },
+  {
+   "tool": "linkclicks_register",
+   "op": "create",
+   "family": "crud.insert",
+   "exec_spec": {
+    "entity": "LinkClicks",
+    "fields": [
+     "link_id",
+     "campaign_id",
+     "subscriber_id"
+    ],
+    "set_on_create": {
+     "link_id": {
+      "$ref": {
+       "entity": "Links",
+       "where": {
+        "uuid": {
+         "$arg": "linkUUID"
+        }
+       },
+       "col": "id"
+      }
+     },
+     "campaign_id": {
+      "$ref": {
+       "entity": "Campaigns",
+       "where": {
+        "uuid": {
+         "$arg": "campUUID"
+        }
+       },
+       "col": "id"
+      }
+     },
+     "subscriber_id": {
+      "$ref": {
+       "entity": "Subscribers",
+       "where": {
+        "uuid": {
+         "$arg": "subUUID"
+        }
+       },
+       "col": "id"
+      }
+     }
+    }
+   },
+   "input_schema": {
+    "linkUUID": {
+     "type": "text",
+     "required": true,
+     "description": "The tracked link's UUID."
+    },
+    "campUUID": {
+     "type": "text",
+     "required": true,
+     "description": "The campaign's UUID."
+    },
+    "subUUID": {
+     "type": "text",
+     "required": true,
+     "description": "The subscriber's UUID."
+    }
+   },
+   "_evidence": {
+    "locator": "cmd/public.go:554",
+    "id_local": "LinkClicks.register",
+    "entry": {
+     "kind": "http",
+     "route": "GET /link/:linkUUID/:campUUID/:subUUID",
+     "locator": "cmd/handlers.go:327"
+    },
+    "entity_why": "primary effect row_insert lands on this table",
+    "ref_code": "if a.cfg.Privacy.DisableTracking { url, err := a.core.GetLinkURL(linkUUID); return c.Redirect(307, url) }\nsubUUID := c.Param(\"subUUID\")\nif !a.cfg.Privacy.IndividualTracking { subUUID = \"\" }\nurl, err := a.core.RegisterCampaignLinkClick(linkUUID, campUUID, subUUID)\nreturn c.Redirect(http.StatusTemporaryRedirect, url)"
+   },
+   "entity": "LinkClicks",
+   "_binds": {
+    "linkUUID": "Links.uuid",
+    "campUUID": "Campaigns.uuid",
+    "subUUID": "Subscribers.uuid"
+   },
+   "_output_schema": {
+    "url": "redirect URL"
+   },
+   "guards": {
+    "required": [
+     "linkUUID",
+     "campUUID",
+     "subUUID"
+    ],
+    "requires_auth": false,
+    "messages": {
+     "not_found": "That record does not exist.",
+     "fk": "You passed an id that does not exist.",
+     "auth": "You must be signed in as a listmonk admin to do that.",
+     "precondition": "You don't have the required permission for that."
+    }
+   },
+   "_defaulted": [
+    "family (matched by an id_local regex, not by the effects)",
+    "fields"
+   ],
+   "description": "Record a link click for a campaign."
+  },
+  {
+   "tool": "campaigns_read_archived",
+   "op": "search",
+   "family": "search",
+   "exec_spec": {
+    "entity": "Campaigns",
+    "search_fields": [
+     "archive",
+     "type",
+     "status"
+    ],
+    "rank": {
+     "method": "exact",
+     "fields": [
+      "archive",
+      "type",
+      "status"
+     ]
+    },
+    "pagination": {}
+   },
+   "input_schema": {
+    "offset": "int",
+    "limit": "int"
+   },
+   "_evidence": {
+    "locator": "cmd/archive.go:27",
+    "id_local": "Campaigns.read_archived",
+    "entry": {
+     "kind": "http",
+     "route": "GET /api/public/archive",
+     "locator": "cmd/handlers.go:289"
+    },
+    "entity_why": "primary effect row_search lands on this table",
+    "ref_code": "camps, total, err := a.getCampaignArchives(pg.Offset, pg.Limit, false)\nreturn c.JSON(200, okResp{models.PageResults{Results: camps, Total: total, ...}})"
+   },
+   "entity": "Campaigns",
+   "_output_schema": {
+    "results": "archived Campaign summaries",
+    "total": "int"
+   },
+   "guards": {
+    "requires_auth": false,
+    "messages": {
+     "not_found": "That record does not exist.",
+     "fk": "You passed an id that does not exist.",
+     "auth": "You must be signed in as a listmonk admin to do that.",
+     "precondition": "You don't have the required permission for that."
+    }
+   },
+   "description": "List published archive campaign summaries. Public, no login."
+  },
+  {
+   "tool": "dashboard_counts",
+   "op": "read",
+   "family": "search",
+   "exec_spec": {
+    "entity": "MatDashboardCounts",
+    "search_fields": [
+     "data"
+    ],
+    "rank": {
+     "method": "exact",
+     "fields": [
+      "data"
+     ]
+    }
+   },
+   "input_schema": {},
+   "_evidence": {
+    "locator": "cmd/admin.go:112",
+    "id_local": "Dashboard.counts",
+    "entry": {
+     "kind": "http",
+     "route": "GET /api/dashboard/counts",
+     "locator": "cmd/handlers.go:105"
+    },
+    "entity_why": "primary effect row_search lands on this table",
+    "ref_code": "func (c *Core) GetDashboardCounts() (types.JSONText, error) {\n  _ = c.refreshCache(matDashboardCounts, false)\n  if err := c.q.GetDashboardCounts.Get(&out); err != nil { ... }\n  return out, nil\n}"
+   },
+   "entity": "MatDashboardCounts",
+   "_output_schema": {
+    "data": "dashboard JSON counts"
+   },
+   "guards": {
+    "requires_auth": false,
+    "messages": {
+     "not_found": "That record does not exist.",
+     "fk": "You passed an id that does not exist.",
+     "auth": "You must be signed in as a listmonk admin to do that.",
+     "precondition": "You don't have the required permission for that."
+    }
+   },
+   "description": "Read the materialized dashboard counts (cached view)."
+  },
+  {
+   "tool": "maintenance_gc_subscribers",
+   "op": "delete",
+   "family": "crud.delete",
+   "exec_spec": {
+    "entity": "Subscribers",
+    "lookup_by": {
+     "status": {
+      "$arg": "type"
+     }
+    }
+   },
+   "input_schema": {
+    "type": {
+     "type": "text",
+     "required": true,
+     "description": "blocklisted (delete every blocklisted subscriber) or orphan."
+    }
+   },
+   "_evidence": {
+    "locator": "cmd/maintenance.go:15",
+    "id_local": "Maintenance.gc_subscribers",
+    "entry": {
+     "kind": "http",
+     "route": "DELETE /api/maintenance/subscribers/:type",
+     "locator": "cmd/handlers.go:192"
+    },
+    "entity_why": "primary effect row_delete lands on this table",
+    "ref_code": "switch typ {\ncase \"blocklisted\": n, err = a.core.DeleteBlocklistedSubscribers()\ncase \"orphan\": n, err = a.core.DeleteOrphanSubscribers()\n}",
+    "edges": [
+     "route-level Perm middleware requires any of ['settings:maintain'] or SuperAdmin (user_role_id=1) bypass (cmd/handlers.go:192)"
+    ]
+   },
+   "entity": "Subscribers",
+   "_output_schema": {
+    "data": {
+     "count": "int"
+    }
+   },
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "Users",
+        "where": {
+         "node": "field",
+         "col": "user_role_id",
+         "op": "eq",
+         "value": 1
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "required": [
+     "type"
+    ],
+    "requires_auth": true,
+    "messages": {
+     "auth": "You must be signed in as a listmonk admin to do that.",
+     "not_found": "That record does not exist.",
+     "fk": "You passed an id that does not exist.",
+     "precondition": "You don't have the required permission for that."
+    }
+   },
+   "description": "Garbage-collect subscribers of the given type. type 'blocklisted' deletes every blocklisted subscriber (the primary path); 'orphan' intends subscribers with no list subscriptions. Returns the count removed."
+  },
+  {
+   "tool": "maintenance_gc_subscriptions",
+   "op": "delete",
+   "family": "crud.delete",
+   "exec_spec": {
+    "entity": "SubscriberLists",
+    "lookup_by": {
+     "status": {
+      "lit": "unconfirmed"
+     }
+    }
+   },
+   "input_schema": {
+    "before_date": {
+     "type": "datetime",
+     "required": false,
+     "description": "Only unconfirmed subscriptions older than this date are removed."
+    }
+   },
+   "_evidence": {
+    "locator": "cmd/maintenance.go:42",
+    "id_local": "Maintenance.gc_subscriptions",
+    "entry": {
+     "kind": "http",
+     "route": "DELETE /api/maintenance/subscriptions/unconfirmed",
+     "locator": "cmd/handlers.go:195"
+    },
+    "entity_why": "primary effect row_delete lands on this table",
+    "ref_code": "func (a *App) GCSubscriptions(c echo.Context) error {\n  t, err := time.Parse(time.RFC3339, c.FormValue(\"before_date\"))\n  n, err := a.core.DeleteUnconfirmedSubscriptions(t)\n  return c.JSON(200, okResp{struct{Count int `json:\"count\"`}{n}})\n}",
+    "edges": [
+     "route-level Perm middleware requires any of ['settings:maintain'] or SuperAdmin (user_role_id=1) bypass (cmd/handlers.go:195)"
+    ]
+   },
+   "entity": "SubscriberLists",
+   "_binds": {
+    "before_date": "SubscriberLists.created_at"
+   },
+   "_output_schema": {
+    "data": {
+     "count": "int"
+    }
+   },
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "Users",
+        "where": {
+         "node": "field",
+         "col": "user_role_id",
+         "op": "eq",
+         "value": 1
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "required": [
+     "before_date"
+    ],
+    "requires_auth": true,
+    "messages": {
+     "auth": "You must be signed in as a listmonk admin to do that.",
+     "not_found": "That record does not exist.",
+     "fk": "You passed an id that does not exist.",
+     "precondition": "You don't have the required permission for that."
+    }
+   },
+   "description": "Delete unconfirmed subscriptions (those still awaiting a double opt-in). The date is carried to the real sweep which also drops ones older than it. Returns the count removed."
+  },
+  {
+   "tool": "maintenance_gc_analytics",
+   "op": "delete",
+   "family": "action.trigger",
+   "exec_spec": {
+    "entity": "CampaignViews",
+    "dispatch_events": [
+     {
+      "analytics_gc": {
+       "type": {
+        "$arg": "type"
+       },
+       "before": {
+        "$arg": "before_date"
+       }
+      }
+     }
+    ],
+    "target": {
+     "entity": "CampaignViews",
+     "lookup_by": {
+      "id": {
+       "$arg": "before_date"
+      }
+     }
+    }
+   },
+   "input_schema": {
+    "type": {
+     "type": "text",
+     "required": true,
+     "description": "all (views and clicks), views, or clicks."
+    },
+    "before_date": {
+     "type": "datetime",
+     "required": true,
+     "description": "Events older than this date are deleted."
+    }
+   },
+   "_evidence": {
+    "locator": "cmd/maintenance.go:61",
+    "id_local": "Maintenance.gc_analytics",
+    "entry": {
+     "kind": "http",
+     "route": "DELETE /api/maintenance/analytics/:type",
+     "locator": "cmd/handlers.go:193"
+    },
+    "entity_why": "primary effect row_delete lands on this table",
+    "ref_code": "switch c.Param(\"type\") {\ncase \"all\": a.core.DeleteCampaignViews(t); a.core.DeleteCampaignLinkClicks(t)\ncase \"views\": a.core.DeleteCampaignViews(t)\ncase \"clicks\": a.core.DeleteCampaignLinkClicks(t)\n}",
+    "edges": [
+     "route-level Perm middleware requires any of ['settings:maintain'] or SuperAdmin (user_role_id=1) bypass (cmd/handlers.go:193)"
+    ]
+   },
+   "entity": "CampaignViews",
+   "_binds": {
+    "before_date": "CampaignViews.created_at"
+   },
+   "_output_schema": {
+    "data": "true"
+   },
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "Users",
+        "where": {
+         "node": "field",
+         "col": "user_role_id",
+         "op": "eq",
+         "value": 1
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "required": [
+     "type",
+     "before_date"
+    ],
+    "requires_auth": true,
+    "messages": {
+     "auth": "You must be signed in as a listmonk admin to do that.",
+     "not_found": "That record does not exist.",
+     "fk": "You passed an id that does not exist.",
+     "precondition": "You don't have the required permission for that."
+    }
+   },
+   "description": "Run the analytics garbage-collector, deleting campaign views/clicks older than a date. type is all / views / clicks."
+  },
+  {
+   "tool": "subscription_set",
+   "op": "update",
+   "family": "crud.upsert",
+   "entity": "SubscriberLists",
+   "exec_spec": {
+    "entity": "SubscriberLists",
+    "key": {
+     "subscriber_id": {
+      "$arg": "subscriber_id"
+     },
+     "list_id": {
+      "$arg": "list_id"
+     }
+    },
+    "insert_fields": {
+     "status": {
+      "$arg": "status"
+     },
+     "meta": {},
+     "created_at": "2026-01-05T09:00:00",
+     "updated_at": "2026-01-05T09:00:00"
+    },
+    "set_on_exists": {
+     "status": {
+      "$arg": "status"
+     },
+     "updated_at": "2026-01-05T09:00:00"
+    }
+   },
+   "input_schema": {
+    "subscriber_id": {
+     "type": "id",
+     "required": true,
+     "description": "Subscriber id."
+    },
+    "list_id": {
+     "type": "id",
+     "required": true,
+     "description": "List id."
+    },
+    "status": {
+     "type": "text",
+     "required": true,
+     "description": "confirmed (subscribed) | unconfirmed (pending) | unsubscribed | archived."
+    }
+   },
+   "guards": {
+    "requires_auth": true,
+    "required": [
+     "subscriber_id",
+     "list_id",
+     "status"
+    ],
+    "messages": {
+     "auth": "Sign in first.",
+     "fk": "No such subscriber or list."
+    }
+   },
+   "description": "Subscribe a subscriber to a list or change their status on it: confirmed = subscribed, unconfirmed = pending, unsubscribed, archived (removed from the audience, record kept)."
+  },
+  {
+   "tool": "subscription_list",
+   "op": "search",
+   "family": "search",
+   "entity": "SubscriberLists",
+   "exec_spec": {
+    "entity": "SubscriberLists",
+    "rank": {
+     "method": "exact"
+    },
+    "filter": {
+     "op": "and",
+     "clauses": [
+      {
+       "col": "list_id",
+       "mode": "exact",
+       "val": {
+        "$arg": "list_id"
+       },
+       "optional": true
+      },
+      {
+       "col": "subscriber_id",
+       "mode": "exact",
+       "val": {
+        "$arg": "subscriber_id"
+       },
+       "optional": true
+      },
+      {
+       "col": "status",
+       "mode": "exact",
+       "val": {
+        "$arg": "status"
+       },
+       "optional": true
+      }
+     ]
+    }
+   },
+   "input_schema": {
+    "list_id": {
+     "type": "id",
+     "required": false,
+     "description": "List id (optional)."
+    },
+    "subscriber_id": {
+     "type": "id",
+     "required": false,
+     "description": "Subscriber id (optional)."
+    },
+    "status": {
+     "type": "text",
+     "required": false,
+     "description": "Status (optional)."
+    }
+   },
+   "guards": {
+    "requires_auth": true,
+    "messages": {
+     "auth": "Sign in first."
+    }
+   },
+   "description": "List memberships: rows (subscriber_id, list_id, status)."
+  },
+  {
+   "tool": "subscriber_tag_add",
+   "op": "create",
+   "family": "crud.insert",
+   "entity": "SubscriberTag",
+   "exec_spec": {
+    "entity": "SubscriberTag",
+    "fields": [
+     "subscriber_id",
+     "tag"
+    ],
+    "set_on_create": {
+     "created_at": "2026-01-05T09:00:00"
+    },
+    "unique_on": [
+     "subscriber_id",
+     "tag"
+    ]
+   },
+   "input_schema": {
+    "subscriber_id": {
+     "type": "id",
+     "required": true,
+     "description": "Subscriber id."
+    },
+    "tag": {
+     "type": "text",
+     "required": true,
+     "description": "Tag name."
+    }
+   },
+   "guards": {
+    "requires_auth": true,
+    "required": [
+     "subscriber_id",
+     "tag"
+    ],
+    "messages": {
+     "auth": "Sign in first.",
+     "fk": "A referenced record does not exist.",
+     "fk_missing": "A required related id is missing."
+    }
+   },
+   "description": "Tag a subscriber (no-op error if already tagged)."
+  },
+  {
+   "tool": "subscriber_tag_remove",
+   "op": "delete",
+   "family": "crud.delete",
+   "entity": "SubscriberTag",
+   "exec_spec": {
+    "entity": "SubscriberTag",
+    "lookup_by": {
+     "subscriber_id": {
+      "$arg": "subscriber_id"
+     },
+     "tag": {
+      "$arg": "tag"
+     }
+    }
+   },
+   "input_schema": {
+    "subscriber_id": {
+     "type": "id",
+     "required": true,
+     "description": "Subscriber id."
+    },
+    "tag": {
+     "type": "text",
+     "required": true,
+     "description": "Tag name."
+    }
+   },
+   "guards": {
+    "requires_auth": true,
+    "required": [
+     "subscriber_id",
+     "tag"
+    ],
+    "messages": {
+     "auth": "Sign in first.",
+     "not_found": "That subscriber does not have that tag."
+    }
+   },
+   "description": "Remove a tag from a subscriber."
+  },
+  {
+   "tool": "subscriber_tag_list",
+   "op": "search",
+   "family": "search",
+   "entity": "SubscriberTag",
+   "exec_spec": {
+    "entity": "SubscriberTag",
+    "rank": {
+     "method": "exact"
+    },
+    "filter": {
+     "op": "and",
+     "clauses": [
+      {
+       "col": "subscriber_id",
+       "mode": "exact",
+       "val": {
+        "$arg": "subscriber_id"
+       },
+       "optional": true
+      },
+      {
+       "col": "tag",
+       "mode": "exact",
+       "val": {
+        "$arg": "tag"
+       },
+       "optional": true
+      }
+     ]
+    }
+   },
+   "input_schema": {
+    "subscriber_id": {
+     "type": "id",
+     "required": false,
+     "description": "Subscriber id (optional)."
+    },
+    "tag": {
+     "type": "text",
+     "required": false,
+     "description": "Tag (optional)."
+    }
+   },
+   "guards": {
+    "requires_auth": true,
+    "messages": {
+     "auth": "Sign in first."
+    }
+   },
+   "description": "Subscriber tags: rows (subscriber_id, tag)."
+  }
+ ],
+ "seed_state": {
+  "Users": [
+   {
+    "id": 1,
+    "username": "operations@company.example.com",
+    "name": "Operations",
+    "email": "operations@company.example.com",
+    "password": "pw-operations",
+    "password_login": true,
+    "user_role_id": 1,
+    "list_role_id": null,
+    "type": "user",
+    "status": "enabled",
+    "twofa_type": "none",
+    "twofa_key": null,
+    "avatar": null,
+    "loggedin_at": null,
+    "created_at": "2026-01-01T00:00:00",
+    "updated_at": "2026-01-01T00:00:00"
+   }
+  ],
+  "Roles": [
+   {
+    "id": 1,
+    "type": "user",
+    "parent_id": null,
+    "list_id": null,
+    "permissions": "{\"all\":true}",
+    "name": "Administrator",
+    "created_at": "2026-01-01T00:00:00",
+    "updated_at": "2026-01-01T00:00:00"
+   },
+   {
+    "id": 2,
+    "type": "user",
+    "parent_id": null,
+    "list_id": null,
+    "permissions": "{}",
+    "name": "All Users",
+    "created_at": "2026-01-01T00:00:00",
+    "updated_at": "2026-01-01T00:00:00"
+   },
+   {
+    "id": 3,
+    "type": "list",
+    "parent_id": 1,
+    "list_id": 1,
+    "permissions": "{}",
+    "name": "Eng List Role",
+    "created_at": "2026-01-01T00:00:00",
+    "updated_at": "2026-01-01T00:00:00"
+   }
+  ],
+  "Lists": [],
+  "Templates": [
+   {
+    "id": 1,
+    "name": "Default Campaign",
+    "type": "campaign",
+    "subject": "Hello {{ Name }}",
+    "body": "<p>Hi {{ Name }}</p>",
+    "body_source": "<p>Hi {{ Name }}</p>",
+    "is_default": true,
+    "created_at": "2026-01-01T00:00:00",
+    "updated_at": "2026-01-01T00:00:00"
+   },
+   {
+    "id": 2,
+    "name": "Welcome Tx",
+    "type": "tx",
+    "subject": "Welcome",
+    "body": "Welcome {{ Name }}",
+    "body_source": "Welcome {{ Name }}",
+    "is_default": false,
+    "created_at": "2026-01-01T00:00:00",
+    "updated_at": "2026-01-01T00:00:00"
+   }
+  ],
+  "Subscribers": [],
+  "SubscriberLists": [],
+  "Bounces": [],
+  "CampaignLists": [],
+  "CampaignMedia": [],
+  "CampaignViews": [],
+  "Campaigns": [],
+  "LinkClicks": [],
+  "Links": [],
+  "Media": [],
+  "Sessions": [],
+  "SubscriberTag": []
+ },
+ "summary": "listmonk is a self-hosted Go+PostgreSQL newsletter/mailing-list manager: admins create lists, import/segment subscribers, author campaign emails (templates, transactional messages), schedule and send campaigns through an in-process send loop, track opens/clicks, record and act on bounces, and manage users/roles/settings; public pages handle subscription/optin/unsubscribe/preferences and a public archive. All state (subscribers, lists, campaigns, bounces, media, templates, users, roles, sessions, settings, and materialized dashboard views) is persisted in PostgreSQL, written and read back by the CRUD API.",
+ "_auth_candidates": [
+  {
+   "entity": "Users",
+   "username_col": "username",
+   "password_col": "password"
+  }
+ ],
+ "_fk_gravity": {
+  "entity": "Campaigns",
+  "fk_count": 5
+ },
+ "_read_denied": "forbidden",
+ "_no_edges": [
+  {
+   "id_local": "Campaigns.read_archived",
+   "why": "public read-only archive listing; no auth, no pre-checks, calls nothing (cmd/archive.go:27)"
+  },
+  {
+   "id_local": "Subscribers.self_export",
+   "why": "public POST /subscription/export/:subUUID; guard is hasSub + privacy.allow_export, dispatch-to-email only"
+  },
+  {
+   "id_local": "Users.totp_enable",
+   "why": "self-service PUT /api/users/:id/twofa; no cross-row wall; verifies TOTP code then writes Users.twofa_type=twofa_key"
+  },
+  {
+   "id_local": "Users.totp_disable",
+   "why": "self-service DELETE /api/users/:id/twofa; re-verifies password (LoginUser) then clears twofa_type"
+  },
+  {
+   "id_local": "CampaignViews.register",
+   "why": "public tracking pixel, no auth wall (cmd/public.go:589)"
+  },
+  {
+   "id_local": "LinkClicks.register",
+   "why": "public tracking redirect, no auth wall (cmd/public.go:554)"
+  },
+  {
+   "id_local": "Session.logout",
+   "why": "POST /api/logout; no auth pre-check, destroys current session; auth signout effect (cmd/auth.go:168)"
+  },
+  {
+   "id_local": "MatViews.refresh",
+   "why": "internal REFRESH MATERIALIZED VIEW (app + cron), no auth wall (internal/core/core.go:91)"
+  },
+  {
+   "id_local": "Campaigns.scan_pending",
+   "why": "in-process manager ticker scanning for campaigns whose send_at passed; no auth wall, no preconditions, internal (internal/manager/manager.go:449)"
+  }
+ ],
+ "auth": {
+  "account_entity": "Users",
+  "username_col": "username",
+  "password_col": "password"
+ },
+ "now": "2026-01-05T09:00:00"
+}

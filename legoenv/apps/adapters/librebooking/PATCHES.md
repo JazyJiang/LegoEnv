@@ -1,0 +1,7 @@
+# LibreBooking local onboarding
+
+`make_base.py` copies the release spec, changes `env_id` to `librebooking_ab`, and changes the existing `reservation_search` tool's rank mode from hybrid to exact. The release rank configuration returned an empty result for every documented date/resource filter unless an undocumented `query` argument was supplied; exact list mode makes the small builder-seeded register and its reference numbers discoverable. The write tools and global runtime are unchanged.
+
+The smoke seeds linked resources, reservation series, instances, and the persona's resource permissions. It checks in one existing booking, approves one existing Pending booking, updates one resource's notes, and verifies that an unrelated Pending booking and resource remain unchanged. Each selected write uses a real release tool.
+
+`reservation_create` is not advertised. The release tool's simulator action inserts only a `ReservationSeries` row and does not create its `ReservationInstance`, assign its resource, or preserve the requested time span. Treating its success response as a completed booking would be false. This local card is suitable for check-in, approval, and resource administration on builder-seeded records; it is not a general booking-creation capability. The release approval and resource-administration guards also use broad role counts, so builders should seed only the intended authorized persona and should not use these scenarios to test fine-grained access control.

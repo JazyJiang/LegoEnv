@@ -1,0 +1,3164 @@
+{
+  "env_id": "haven",
+  "_prep_version": 3,
+  "entities": [
+    {
+      "name": "User",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "email",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        },
+        {
+          "name": "encrypted_password",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "admin",
+          "type": "int",
+          "enum": [
+            0,
+            1,
+            2
+          ]
+        },
+        {
+          "name": "basic_auth_username",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "basic_auth_password",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "image_password",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "reset_password_token",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "reset_password_sent_at",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "remember_created_at",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "audit": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "email"
+          ]
+        },
+        {
+          "kind": "unique",
+          "cols": [
+            "basic_auth_username"
+          ]
+        },
+        {
+          "kind": "unique",
+          "cols": [
+            "reset_password_token"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Post",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "datetime",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "content",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "author_id",
+          "type": "id",
+          "nullable": true,
+          "fk_to": "User.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "audit": true
+        }
+      ]
+    },
+    {
+      "name": "Comment",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "body",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "author_id",
+          "type": "id",
+          "nullable": true,
+          "fk_to": "User.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "post_id",
+          "type": "id",
+          "nullable": true,
+          "fk_to": "Post.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "audit": true
+        }
+      ]
+    },
+    {
+      "name": "Like",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "reaction",
+          "type": "text",
+          "default": "👍"
+        },
+        {
+          "name": "user_id",
+          "type": "id",
+          "nullable": true,
+          "fk_to": "User.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "post_id",
+          "type": "id",
+          "nullable": true,
+          "fk_to": "Post.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "audit": true
+        }
+      ]
+    },
+    {
+      "name": "Feed",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "url",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "last_update",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "status",
+          "type": "int",
+          "enum": [
+            0,
+            1,
+            2
+          ],
+          "default": 0
+        },
+        {
+          "name": "user_id",
+          "type": "id",
+          "nullable": true,
+          "fk_to": "User.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "audit": true
+        }
+      ],
+      "_lifecycle": {
+        "col": "status",
+        "initial": 0,
+        "states": [
+          0,
+          1,
+          2
+        ],
+        "via": {
+          "UpdateFeedJob.run": {
+            "col": "status",
+            "from": [
+              1,
+              2,
+              0
+            ],
+            "to": null
+          }
+        }
+      }
+    },
+    {
+      "name": "FeedEntry",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "content",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "link",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "guid",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "published",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "sort_date",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "audio",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "feed_id",
+          "type": "id",
+          "nullable": true,
+          "fk_to": "Feed.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "audit": true
+        }
+      ]
+    },
+    {
+      "name": "LoginLink",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "token",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "user_id",
+          "type": "id",
+          "nullable": true,
+          "fk_to": "User.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "audit": true
+        }
+      ]
+    },
+    {
+      "name": "IndieAuthRequest",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "user_id",
+          "type": "id",
+          "nullable": true,
+          "fk_to": "User.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "code",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "state",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "code_challenge",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "client_id",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "scope",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "used",
+          "type": "int",
+          "default": 0
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "audit": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "code"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "IndieAuthToken",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "user_id",
+          "type": "id",
+          "nullable": true,
+          "fk_to": "User.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "access_token",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "scope",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "client_id",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "audit": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "access_token"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Image",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "audit": true
+        }
+      ]
+    },
+    {
+      "name": "Setting",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "subtitle",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "visibility",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "css",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "compiled_css",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "css_hash",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "byline",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "comments",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "show_post_date",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "font_hash",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "audit": true
+        }
+      ]
+    }
+  ],
+  "tools": [
+    {
+      "tool": "sign_in",
+      "family": "guard.auth",
+      "exec_spec": {
+        "verify": {
+          "entity": "User",
+          "username_col": "email",
+          "password_col": "encrypted_password"
+        }
+      },
+      "input_schema": {
+        "email": {
+          "type": "text",
+          "required": true,
+          "description": "The account email address."
+        },
+        "password": {
+          "type": "text",
+          "required": true,
+          "description": "The account password."
+        }
+      },
+      "_evidence": {
+        "locator": "app/models/user.rb:20",
+        "id_local": "Session.login",
+        "entry": {
+          "kind": "http",
+          "route": "POST /users/sign_in",
+          "locator": "config/routes.rb:31"
+        },
+        "entity_why": "primary effect auth lands on this table",
+        "ref_code": "devise :database_authenticatable, :registerable, :recoverable, :rememberable, :validatable (app/models/user.rb:20)\ndevise_for :users, :skip => [:registrations] (routes.rb:31)\n# devise SessionsController authenticates email + encrypted_password and starts the session"
+      },
+      "entity": "User",
+      "_binds": {
+        "email": "User.email"
+      },
+      "_output_schema": {
+        "user": "the signed-in User row"
+      },
+      "guards": {
+        "messages": {
+          "auth": "Sign in with your email and password first.",
+          "required": "Both email and password are required to sign in."
+        }
+      },
+      "description": "Sign in with your account email and password. Almost every tool here resolves the signed-in user as $actor, so sign in first. Fails if the email or password does not match a known account."
+    },
+    {
+      "tool": "sign_out",
+      "family": "guard.logout",
+      "exec_spec": {
+        "entity": "User"
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "config/routes.rb:31",
+        "id_local": "Session.logout",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /users/sign_out",
+          "locator": "config/routes.rb:31"
+        },
+        "entity_why": "primary effect auth lands on this table",
+        "ref_code": "devise_for :users, :skip => [:registrations] (routes.rb:31)\n# devise sign_out route destroys the current session"
+      },
+      "entity": "User",
+      "_output_schema": {},
+      "description": "Sign out of the current session, clearing the signed-in identity so private calls are refused until you sign in again.",
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You are already signed out."
+        }
+      }
+    },
+    {
+      "tool": "account_update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "User",
+        "row_key": {
+          "id": {
+            "$session": "account_id"
+          }
+        },
+        "fields": [
+          "name",
+          "email"
+        ],
+        "set": {
+          "encrypted_password": {
+            "$arg": "password"
+          }
+        }
+      },
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": false,
+          "description": "New display name."
+        },
+        "email": {
+          "type": "text",
+          "required": false,
+          "description": "New account email (must be unique)."
+        },
+        "password": {
+          "type": "text",
+          "required": false,
+          "description": "New password, if changing it."
+        },
+        "password_confirmation": {
+          "type": "text",
+          "required": false,
+          "description": "Must match password."
+        }
+      },
+      "_evidence": {
+        "locator": "config/routes.rb:34",
+        "id_local": "Account.update",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /users",
+          "locator": "config/routes.rb:34"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "as :user do\n  put 'users' => 'devise/registrations#update' (routes.rb:34)\nend\n# devise account_update param sanitizer permits :name (application_controller.rb:86)"
+      },
+      "entity": "User",
+      "_binds": {
+        "name": "User.name",
+        "email": "User.email"
+      },
+      "_output_schema": {
+        "user": "the updated User row"
+      },
+      "description": "Update your own account profile — display name and email; optionally change your password. Applies to the signed-in user only. Fails if the new email is already taken.",
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "Sign in before editing your account.",
+          "precondition": "You can only update your own account.",
+          "required": "Provide at least one field to change.",
+          "unique": "That email is already taken."
+        }
+      }
+    },
+    {
+      "tool": "account_delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "User",
+        "lookup_by": {
+          "id": {
+            "$session": "account_id"
+          }
+        }
+      },
+      "input_schema": {
+        "password": {
+          "type": "text",
+          "required": true,
+          "description": "Your current password, to confirm the deletion."
+        }
+      },
+      "_evidence": {
+        "locator": "config/routes.rb:35",
+        "id_local": "Account.destroy",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /users",
+          "locator": "config/routes.rb:35"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "as :user do\n  delete 'users' => 'devise/registrations#destroy', :as => 'destroy_user_registration' (routes.rb:35)\n# devise registrations#destroy deletes the current user's record"
+      },
+      "entity": "User",
+      "_output_schema": {},
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "Sign in before deleting your account.",
+          "required": "Confirm deletion with your current password."
+        }
+      },
+      "description": "Delete your own account (devise registration). The signed-in user is removed along with their posts, comments and likes. Fails if you are not signed in."
+    },
+    {
+      "tool": "create_post",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Post",
+        "fields": [
+          "content"
+        ],
+        "set_on_create": {
+          "datetime": {
+            "$arg": "datetime"
+          },
+          "author_id": {
+            "$session": "account_id"
+          }
+        }
+      },
+      "input_schema": {
+        "content": {
+          "type": "text",
+          "required": true,
+          "description": "The body text of the post (Markdown)."
+        },
+        "datetime": {
+          "type": "text",
+          "required": true,
+          "description": "Publish datetime, e.g. '2026-05-01T12:00:00'."
+        }
+      },
+      "_evidence": {
+        "locator": "app/controllers/posts_controller.rb:66",
+        "id_local": "Post.create",
+        "entry": {
+          "kind": "http",
+          "route": "POST /posts",
+          "locator": "config/routes.rb:44"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "def create\n  @settings = SettingsController.get_setting\n  handle_form_submit(params, 'new')\nend\n...\ndef post_from_form(params)\n  @post.datetime = DateTime.parse(\"#{date} #{time}\")\n  @post.content = params[:post][:content]\n  @post.author = current_user unless !!@post.author\n  @post.save\n  redirect_to @post\nend (posts_controller.rb:66,236)",
+        "edges": [
+          "before_action :verify_publisher -> if current_user.admin < 1 then redirect (posts_controller.rb:5, application_controller.rb:79)"
+        ]
+      },
+      "entity": "Post",
+      "_binds": {
+        "content": "Post.content"
+      },
+      "_output_schema": {
+        "post": "the created Post row; redirect to show"
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "admin",
+                      "op": "gte",
+                      "value": 1
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in before publishing a post.",
+          "precondition": "Only an admin or publisher account can create posts.",
+          "required": "content and datetime are required."
+        }
+      },
+      "description": "Publish a new blog post with its body and publish datetime, attributed to the signed-in author. Requires an admin or publisher. Fails for a plain subscriber."
+    },
+    {
+      "tool": "show_post",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Post",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the post to fetch."
+        }
+      },
+      "_evidence": {
+        "locator": "app/controllers/posts_controller.rb:47",
+        "id_local": "Post.show",
+        "entry": {
+          "kind": "http",
+          "route": "GET /posts/:id",
+          "locator": "config/routes.rb:44"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "before_action :set_post, only: [:show, :edit, :destroy]\n...\ndef set_post\n  @post = Post.find(params[:id])\nend\ndef show\n  @settings = SettingsController.get_setting\nend (posts_controller.rb:7,47,177)"
+      },
+      "entity": "Post",
+      "_binds": {
+        "id": "Post.id"
+      },
+      "_output_schema": {
+        "post": "the Post row"
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "Sign in before reading posts.",
+          "not_found": "No post with that id exists.",
+          "required": "post id is required."
+        }
+      },
+      "description": "Fetch a single post by id: its body, publish datetime and author. Any signed-in user can read any post."
+    },
+    {
+      "tool": "update_post",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Post",
+        "row_key": {
+          "id": {
+            "$arg": "id"
+          }
+        },
+        "fields": [
+          "content"
+        ],
+        "set": {
+          "datetime": {
+            "$arg": "datetime"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the post to edit."
+        },
+        "content": {
+          "type": "text",
+          "required": true,
+          "description": "New body of the post."
+        },
+        "datetime": {
+          "type": "text",
+          "required": true,
+          "description": "New publish datetime."
+        }
+      },
+      "_evidence": {
+        "locator": "app/controllers/posts_controller.rb:72",
+        "id_local": "Post.update",
+        "entry": {
+          "kind": "http",
+          "route": "PATCH /posts/:id",
+          "locator": "config/routes.rb:44"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "def update\n  @settings = SettingsController.get_setting\n  handle_form_submit(params, 'edit')\nend\n# post_from_form sets @post.datetime and @post.content then @post.save (posts_controller.rb:72,236)",
+        "edges": [
+          "verify_can_modify_post: unless @post.id.nil? or current_user.admin==1 or @post.author == current_user then redirect (posts_controller.rb:185); verify_publisher admin>=1 (application_controller.rb:79)"
+        ]
+      },
+      "entity": "Post",
+      "_binds": {
+        "id": "Post.id",
+        "content": "Post.content"
+      },
+      "_output_schema": {
+        "post": "the updated Post row"
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "admin",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          1,
+                          2
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Post",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "author_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in before editing a post.",
+          "precondition": "Only the post's author, or an admin/publisher, can edit it.",
+          "not_found": "No post with that id exists.",
+          "required": "id, content and datetime are required."
+        }
+      },
+      "description": "Edit an existing post: replace its body and republish with a new datetime. Only the post's author, or an admin/publisher, may edit it. Returns the updated post's id."
+    },
+    {
+      "tool": "delete_post",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "Post",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the post to delete."
+        }
+      },
+      "_evidence": {
+        "locator": "app/controllers/posts_controller.rb:78",
+        "id_local": "Post.destroy",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /posts/:id",
+          "locator": "config/routes.rb:44"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "before_action :verify_can_modify_post, only: [:edit, :destroy, :update, :create]\ndef destroy\n  @settings = SettingsController.get_setting\n  @post.destroy\n  redirect_to posts_path\nend (posts_controller.rb:78)",
+        "edges": [
+          "verify_can_modify_post guards [:edit, :destroy, :update, :create] (posts_controller.rb:9,185)"
+        ]
+      },
+      "entity": "Post",
+      "_binds": {
+        "id": "Post.id"
+      },
+      "_output_schema": {},
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "admin",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          1,
+                          2
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Post",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "author_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in before deleting a post.",
+          "precondition": "Only the post's author, or an admin/publisher, can delete it.",
+          "not_found": "No post with that id exists.",
+          "required": "post id is required."
+        }
+      },
+      "description": "Delete a post by id. Its comments and likes cascade away with it. Only the post's author, or an admin/publisher, may delete it."
+    },
+    {
+      "tool": "list_posts",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Post",
+        "sort": {
+          "col": "datetime",
+          "dir": "desc"
+        },
+        "pagination": {
+          "default_limit": 20
+        }
+      },
+      "input_schema": {
+        "page": {
+          "type": "int",
+          "required": false,
+          "description": "Page number for paginated results."
+        }
+      },
+      "_evidence": {
+        "locator": "app/controllers/posts_controller.rb:11",
+        "id_local": "Post.index",
+        "entry": {
+          "kind": "http",
+          "route": "GET /posts",
+          "locator": "config/routes.rb:44"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "def index\n  @posts = Post.order(datetime: :desc).page(params[:page])\n  recent_comments = Comment.where('created_at >= ?', 1.week.ago).order(created_at: :desc).to_a\n  recent_likes = Like.where('created_at >= ?', 1.week.ago).order(created_at: :desc).to_a ... (posts_controller.rb:11)"
+      },
+      "entity": "Post",
+      "_output_schema": {
+        "posts": "list of Post rows ordered by datetime desc",
+        "recent_comments_and_likes": "merged Comment/Like activity of the last week"
+      },
+      "description": "List all posts, most recently published first. The whole blog reads as one public pool to any signed-in user, so there is no owner filter.",
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "Sign in before viewing posts."
+        }
+      }
+    },
+    {
+      "tool": "create_comment",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Comment",
+        "fields": {
+          "body": {
+            "$arg": "comment_body"
+          }
+        },
+        "set_on_create": {
+          "post_id": {
+            "$arg": "post_id"
+          },
+          "author_id": {
+            "$session": "account_id"
+          }
+        }
+      },
+      "input_schema": {
+        "post_id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the post to comment on."
+        },
+        "comment_body": {
+          "type": "text",
+          "required": true,
+          "description": "The text of the comment."
+        }
+      },
+      "_evidence": {
+        "locator": "app/controllers/comments_controller.rb:5",
+        "id_local": "Comment.create",
+        "entry": {
+          "kind": "http",
+          "route": "POST /posts/:post_id/comments",
+          "locator": "config/routes.rb:50"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "before_action :authenticate_user!\ndef create\n  post = Post.find(params[:post_id])\n  @comment = post.comments.create(body: params[:comment_body], author_id: current_user.id)\n  @comment.save!\n  redirect_to post\nend (comments_controller.rb:5)",
+        "edges": [
+          "before_action :authenticate_user! (comments_controller.rb:2)"
+        ]
+      },
+      "entity": "Comment",
+      "_binds": {
+        "post_id": "Post.id",
+        "comment_body": "Comment.body"
+      },
+      "_output_schema": {
+        "comment": "the created Comment row"
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Post",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "post_id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in before commenting.",
+          "precondition": "The post you are commenting on does not exist.",
+          "fk": "The post you are commenting on does not exist.",
+          "required": "post_id and comment_body are required."
+        }
+      },
+      "description": "Add a comment to a post. The signed-in user is recorded as the author. Fails if the post does not exist."
+    },
+    {
+      "tool": "delete_comment",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "Comment",
+        "lookup_by": {
+          "id": {
+            "$arg": "comment_id"
+          }
+        }
+      },
+      "input_schema": {
+        "comment_id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the comment to delete."
+        }
+      },
+      "_evidence": {
+        "locator": "app/controllers/comments_controller.rb:11",
+        "id_local": "Comment.destroy",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /comments/:comment_id",
+          "locator": "config/routes.rb:51"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "before_action :authenticate_user!\ndef destroy\n  @comment = Comment.find(params[:comment_id])\n  post = @comment.post\n  if (@comment.author.id == current_user.id || current_user.admin == 1)\n    @comment.destroy\n  end\n  redirect_to post\nend (comments_controller.rb:11)",
+        "edges": [
+          "if (@comment.author.id == current_user.id || current_user.admin == 1) then @comment.destroy (comments_controller.rb:14)"
+        ]
+      },
+      "entity": "Comment",
+      "_binds": {
+        "comment_id": "Comment.id"
+      },
+      "_output_schema": {},
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "admin",
+                      "op": "eq",
+                      "value": 1
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Comment",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "comment_id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "author_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in before deleting a comment.",
+          "precondition": "Only the comment's author or a full admin can delete it.",
+          "not_found": "No comment with that id exists.",
+          "required": "comment_id is required."
+        }
+      },
+      "description": "Delete a comment by id. Only the comment's author or a full admin (admin=1) may delete it."
+    },
+    {
+      "tool": "create_like",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Like",
+        "fields": [
+          "reaction"
+        ],
+        "set_on_create": {
+          "post_id": {
+            "$arg": "post_id"
+          },
+          "user_id": {
+            "$session": "account_id"
+          },
+          "reaction": {
+            "$const": "👍"
+          }
+        }
+      },
+      "input_schema": {
+        "post_id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the post to react to."
+        },
+        "reaction": {
+          "type": "text",
+          "required": false,
+          "description": "Reaction emoji; defaults to a thumbs-up."
+        }
+      },
+      "_evidence": {
+        "locator": "app/controllers/likes_controller.rb:3",
+        "id_local": "Like.create",
+        "entry": {
+          "kind": "http",
+          "route": "POST /posts/:post_id/likes",
+          "locator": "config/routes.rb:52"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "def create\n  post = Post.find(params[:post_id])\n  @like = post.likes.create(user_id: current_user.id)\n  @like.save!\n  redirect_to post\nend (likes_controller.rb:3)",
+        "edges": [
+          "post.likes.create(user_id: current_user.id) — current_user must be present (likes_controller.rb:3); no before_action declared on likes_controller"
+        ]
+      },
+      "entity": "Like",
+      "_binds": {
+        "post_id": "Post.id"
+      },
+      "_output_schema": {
+        "like": "the created Like row"
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Post",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "post_id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in before reacting to a post.",
+          "precondition": "The post you are reacting to does not exist.",
+          "fk": "The post you are reacting to does not exist.",
+          "required": "post_id is required."
+        }
+      },
+      "description": "React to a post with an emoji reaction (thumbs-up by default). The signed-in user is recorded as the liker. Fails if the post does not exist."
+    },
+    {
+      "tool": "delete_like",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "Like",
+        "lookup_by": {
+          "id": {
+            "$arg": "like_id"
+          }
+        }
+      },
+      "input_schema": {
+        "like_id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the reaction to remove."
+        }
+      },
+      "_evidence": {
+        "locator": "app/controllers/likes_controller.rb:9",
+        "id_local": "Like.destroy",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /likes/:like_id",
+          "locator": "config/routes.rb:53"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "def destroy\n  @like = Like.find(params[:like_id])\n  post = @like.post\n  if (@like.user.id == current_user.id || current_user.admin == 1)\n    @like.destroy\n  end\n  redirect_to post\nend (likes_controller.rb:9)",
+        "edges": [
+          "if (@like.user.id == current_user.id || current_user.admin == 1) then @like.destroy (likes_controller.rb:11)"
+        ]
+      },
+      "entity": "Like",
+      "_binds": {
+        "like_id": "Like.id"
+      },
+      "_output_schema": {},
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "admin",
+                      "op": "eq",
+                      "value": 1
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Like",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "like_id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in before removing a reaction.",
+          "precondition": "Only the reacting user or a full admin can remove it.",
+          "not_found": "No reaction with that id exists.",
+          "required": "like_id is required."
+        }
+      },
+      "description": "Remove a reaction by id. Only the reacting user or a full admin (admin=1) may delete it."
+    },
+    {
+      "tool": "add_feed",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Feed",
+        "fields": {
+          "url": {
+            "$arg": "url"
+          }
+        },
+        "set_on_create": {
+          "user_id": {
+            "$session": "account_id"
+          },
+          "status": 0
+        }
+      },
+      "input_schema": {
+        "url": {
+          "type": "text",
+          "required": true,
+          "description": "The feed URL to subscribe to."
+        }
+      },
+      "_evidence": {
+        "locator": "app/controllers/feeds_controller.rb:61",
+        "id_local": "Feed.create",
+        "entry": {
+          "kind": "http",
+          "route": "POST /feeds",
+          "locator": "config/routes.rb:18"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "res = current_user.feeds.create!(url: feed_url)\nUpdateFeedJob.perform_now(feed)\nif feed.feed_invalid?\n  alerts << \"Error adding #{feed_url}\"\nelse\n  ...\nend (feeds_controller.rb:130)",
+        "edges": [
+          "before_action :verify_admin -> if current_user.admin != 1 then redirect (feeds_controller.rb:4, application_controller.rb:74)"
+        ]
+      },
+      "entity": "Feed",
+      "_binds": {
+        "feed[url]": "Feed.url"
+      },
+      "_output_schema": {
+        "feed": "the created Feed row"
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "admin",
+                      "op": "eq",
+                      "value": 1
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in before adding a feed.",
+          "precondition": "Only a full admin (admin=1) can add feeds.",
+          "required": "A feed url is required."
+        }
+      },
+      "description": "Subscribe to an RSS/Atom feed by URL for the signed-in user, then queue a background fetch of its entries. Requires a full admin (admin=1). Returns the new feed's id."
+    },
+    {
+      "tool": "remove_feed",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "Feed",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the feed to remove."
+        }
+      },
+      "_evidence": {
+        "locator": "app/controllers/feeds_controller.rb:77",
+        "id_local": "Feed.destroy",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /feeds/:id",
+          "locator": "config/routes.rb:18"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "def destroy\n  @feed = current_user.feeds.find(params[:id])\n  if ( (!@feed.nil?) and (current_user == @feed.user) )\n    @feed.destroy!\n    flash[:notice] = \"You have removed #{feed_name} from your feeds\"\n  else\n    flash[:alert] = \"You cannot do that\"\n  end\n  redirect_to :feeds\nend (feeds_controller.rb:77)",
+        "edges": [
+          "current_user.feeds.find(params[:id]); if current_user == @feed.user then @feed.destroy! (feeds_controller.rb:77,81)"
+        ]
+      },
+      "entity": "Feed",
+      "_binds": {
+        "id": "Feed.id"
+      },
+      "_output_schema": {},
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Feed",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in before removing a feed.",
+          "precondition": "You can only remove a feed you own.",
+          "not_found": "No such feed exists.",
+          "required": "feed id is required."
+        }
+      },
+      "description": "Unsubscribe from a feed you own (removing it and its stored entries). Only the feed's owner may remove it. Fails if the feed is not yours."
+    },
+    {
+      "tool": "list_feeds",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Feed",
+        "scope": {
+          "owner_col": "user_id"
+        }
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "app/controllers/feeds_controller.rb:6",
+        "id_local": "Feed.index",
+        "entry": {
+          "kind": "http",
+          "route": "GET /feeds",
+          "locator": "config/routes.rb:18"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "def index\n  @feeds = current_user.feeds\n  @new_feed = Feed.new\nend (feeds_controller.rb:6)",
+        "edges": [
+          "verify_admin before_action (feeds_controller.rb:4)"
+        ]
+      },
+      "entity": "Feed",
+      "_output_schema": {
+        "feeds": "the current user's Feed rows"
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "admin",
+                      "op": "eq",
+                      "value": 1
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in before viewing feeds.",
+          "precondition": "Only a full admin (admin=1) can manage feeds."
+        }
+      },
+      "description": "List the feeds the signed-in user subscribes to. Requires a full admin (admin=1)."
+    },
+    {
+      "tool": "read_feed_entries",
+      "family": "search",
+      "exec_spec": {
+        "entity": "FeedEntry",
+        "sort": {
+          "col": "sort_date",
+          "dir": "desc"
+        },
+        "pagination": {
+          "default_limit": 20
+        }
+      },
+      "input_schema": {
+        "page": {
+          "type": "int",
+          "required": false,
+          "description": "Page number for paginated results."
+        }
+      },
+      "_evidence": {
+        "locator": "app/controllers/feeds_controller.rb:90",
+        "id_local": "Feed.read",
+        "entry": {
+          "kind": "http",
+          "route": "GET /read",
+          "locator": "config/routes.rb:19"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "def read\n  UpdateFeedJob.perform_later\n  @entries = current_user.feed_entries.order(sort_date: :desc).page params[:page]\n  if params[:first]\n    @entries = current_user.feed_entries.where('sort_date <= ?', @first).order(sort_date: :desc).page params[:page]\n  end\nend (feeds_controller.rb:90)",
+        "edges": [
+          "verify_admin before_action (feeds_controller.rb:4)"
+        ],
+        "_note": "cutoff filter dropped: the runtime read-filter language cannot express an optional '< max' range; controller default branch (no first) is plain newest-first"
+      },
+      "entity": "FeedEntry",
+      "_output_schema": {
+        "entries": "the current user's FeedEntry rows ordered by sort_date desc"
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "admin",
+                      "op": "eq",
+                      "value": 1
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in before reading feed entries.",
+          "precondition": "Only a full admin (admin=1) can read feed entries."
+        }
+      },
+      "description": "List the entries of the signed-in user's subscribed feeds, newest first. Triggers a background refresh of the feeds. Requires a full admin (admin=1)."
+    },
+    {
+      "tool": "read_feed_by_id",
+      "family": "search",
+      "exec_spec": {
+        "entity": "FeedEntry",
+        "scope": {
+          "where": {
+            "feed_id": {
+              "$arg": "id"
+            }
+          }
+        },
+        "sort": {
+          "col": "sort_date",
+          "dir": "desc"
+        },
+        "pagination": {
+          "default_limit": 20
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the feed whose entries to read."
+        }
+      },
+      "_evidence": {
+        "locator": "app/controllers/feeds_controller.rb:103",
+        "id_local": "Feed.read_feed",
+        "entry": {
+          "kind": "http",
+          "route": "GET /read/:id",
+          "locator": "config/routes.rb:20"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "def read_feed\n  @feed = Feed.find(params[:id])\n  if ( (!@feed.nil?) and (current_user == @feed.user) )\n    @entries = @feed.feed_entries.order(sort_date: :desc).page params[:page]\n    UpdateFeedJob.perform_later(@feed)\n    render :read\n  end\nend (feeds_controller.rb:103)",
+        "edges": [
+          "if current_user == @feed.user then render :read else redirect (feeds_controller.rb:103,107)"
+        ],
+        "_note": "scope fixed: feed_id comes from $arg.id, not the session"
+      },
+      "entity": "FeedEntry",
+      "_binds": {
+        "id": "Feed.id"
+      },
+      "_output_schema": {
+        "entries": "the feed's FeedEntry rows ordered by sort_date desc"
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Feed",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in before reading a feed.",
+          "precondition": "You can only read a feed you own.",
+          "not_found": "No such feed exists.",
+          "required": "feed id is required."
+        }
+      },
+      "description": "List the entries of one specific feed (by feed id), newest first. Only the feed's owner may read them."
+    },
+    {
+      "tool": "list_users",
+      "family": "search",
+      "exec_spec": {
+        "entity": "User",
+        "sort": {
+          "col": "email",
+          "dir": "asc"
+        }
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "app/controllers/users_controller.rb:5",
+        "id_local": "User.list",
+        "entry": {
+          "kind": "http",
+          "route": "GET /admin/users",
+          "locator": "config/routes.rb:39"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "before_action :authenticate_user!\nbefore_action :verify_admin\ndef index\n  @users = User.order(email: :asc)\nend (users_controller.rb:3)",
+        "edges": [
+          "before_action :verify_admin (users_controller.rb:4)"
+        ]
+      },
+      "entity": "User",
+      "_output_schema": {
+        "users": "all User rows ordered by email asc"
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "admin",
+                      "op": "eq",
+                      "value": 1
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in before viewing users.",
+          "precondition": "Only a full admin (admin=1) can list users."
+        }
+      },
+      "description": "List all user accounts (email, name, role), ordered by email. Admin console — requires a full admin (admin=1); there is no owner scope because it lists the whole directory."
+    },
+    {
+      "tool": "create_user",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "User",
+        "fields": {
+          "email": {
+            "$arg": "email"
+          },
+          "name": {
+            "$arg": "name"
+          }
+        },
+        "set_on_create": {
+          "admin": {
+            "$const": 0
+          },
+          "encrypted_password": {
+            "$const": "generated-password"
+          },
+          "basic_auth_username": {
+            "$const": "gen-basiusername"
+          },
+          "basic_auth_password": {
+            "$const": "gen-basipassword"
+          },
+          "image_password": {
+            "$const": "gen-image-password"
+          }
+        },
+        "unique_on": [
+          "email"
+        ],
+        "side_inserts": [
+          {
+            "entity": "LoginLink",
+            "fields": {
+              "token": {
+                "$const": "gen-login-token"
+              }
+            },
+            "link_col": "user_id"
+          }
+        ]
+      },
+      "input_schema": {
+        "email": {
+          "type": "text",
+          "required": true,
+          "description": "The new account's email (must be unique)."
+        },
+        "name": {
+          "type": "text",
+          "required": false,
+          "description": "Display name for the new account."
+        },
+        "role": {
+          "type": "text",
+          "required": false,
+          "description": "One of 'admin', 'publisher', or subscriber (default)."
+        }
+      },
+      "_evidence": {
+        "locator": "app/controllers/users_controller.rb:13",
+        "id_local": "User.create",
+        "entry": {
+          "kind": "http",
+          "route": "POST /admin/users",
+          "locator": "config/routes.rb:39"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "def create\n  @password = Devise.friendly_token.first(20)\n  admin = 0; admin = 1 if params[:user][:role] == \"admin\"; admin = 2 if params[:user][:role] == \"publisher\"\n  @user = User.create!(email: email, name: name, admin: admin, password: @password,\n    basic_auth_username: Devise.friendly_token.first(10), basic_auth_password: Devise.friendly_token.first(10),\n    image_password: Devise.friendly_token.first(20))\n  login_link = LoginLink.generate(@user)\n  @token = login_link.token\n  render :show\nend (users_controller.rb:13)",
+        "edges": [
+          "before_action :verify_admin (users_controller.rb:4)"
+        ]
+      },
+      "entity": "User",
+      "_binds": {
+        "user[email]": "User.email",
+        "user[name]": "User.name"
+      },
+      "_output_schema": {
+        "user": "the created User row",
+        "token": "a LoginLink.token for the new user's passwordless sign-in"
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "admin",
+                      "op": "eq",
+                      "value": 1
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in before creating a user.",
+          "precondition": "Only a full admin (admin=1) can create users.",
+          "unique": "That email is already registered.",
+          "required": "An email is required."
+        }
+      },
+      "description": "Create a user account with a generated password and a generated passwordless sign-in link. `role` is 'admin' (1), 'publisher' (2) or subscriber (0). Requires a full admin (admin=1). Fails if the email is already registered."
+    },
+    {
+      "tool": "reset_user_password",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "User",
+        "row_key": {
+          "id": {
+            "$arg": "id"
+          }
+        },
+        "fields": [
+          "basic_auth_username",
+          "basic_auth_password",
+          "image_password",
+          "reset_password_token",
+          "reset_password_sent_at"
+        ],
+        "set": {
+          "basic_auth_username": {
+            "$const": "reset-basiuser"
+          },
+          "basic_auth_password": {
+            "$const": "reset-basipass"
+          },
+          "image_password": {
+            "$const": "reset-imagepass"
+          }
+        },
+        "side_inserts": [
+          {
+            "entity": "LoginLink",
+            "fields": {
+              "token": {
+                "$const": "reset-login-token"
+              }
+            },
+            "link_col": "user_id"
+          }
+        ]
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the user whose credentials to reset."
+        }
+      },
+      "_evidence": {
+        "locator": "app/controllers/users_controller.rb:35",
+        "id_local": "User.resetpassword",
+        "entry": {
+          "kind": "http",
+          "route": "POST /admin/users/:id/resetpassword",
+          "locator": "config/routes.rb:40"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "def resetpassword\n  @user = User.find(params[:id])\n  @user.update(password: @password, basic_auth_username: auth_user, basic_auth_password: auth_pass, image_password: image_pass)\n  @user.login_links.each {|ll| ll.destroy}\n  login_link = LoginLink.generate(@user)\n  @token = login_link.token\n  render :show\nend (users_controller.rb:35)",
+        "edges": [
+          "before_action :verify_admin (users_controller.rb:4)"
+        ],
+        "_note": "primary effect is a row_update on User (creds); the LoginLink insert is the sign-in-link side effect"
+      },
+      "entity": "User",
+      "_binds": {
+        "id": "User.id"
+      },
+      "_output_schema": {
+        "user": "the updated User row",
+        "token": "a fresh LoginLink.token"
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "admin",
+                      "op": "eq",
+                      "value": 1
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in before resetting a password.",
+          "precondition": "Only a full admin (admin=1) can reset credentials.",
+          "not_found": "No such user exists.",
+          "required": "user id is required."
+        }
+      },
+      "description": "Reset a user's credentials (regenerating basic-auth and image secrets, clearing old passwordless login links) and issue a fresh passwordless sign-in link. Requires a full admin (admin=1)."
+    },
+    {
+      "tool": "toggle_user_role",
+      "family": "update.status_transition",
+      "exec_spec": {
+        "entity": "User",
+        "row_key": {
+          "id": {
+            "$arg": "id"
+          }
+        },
+        "status_col": "admin",
+        "enum": [
+          0,
+          1,
+          2
+        ],
+        "from": "toggle"
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the user whose role to rotate."
+        }
+      },
+      "_evidence": {
+        "locator": "app/controllers/users_controller.rb:49",
+        "id_local": "User.toggleadmin",
+        "entry": {
+          "kind": "http",
+          "route": "POST /admin/users/:id/toggleadmin",
+          "locator": "config/routes.rb:41"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "def toggleadmin\n  @user = User.find(params[:id])\n  @user.admin = (@user.admin + 1) % 3 #toggle between 1 (Admin), 2 (Subscriber) and 0 (Subscriber)\n  @user.save\n  redirect_to users_path\nend (users_controller.rb:49)",
+        "edges": [
+          "before_action :verify_admin (users_controller.rb:4)"
+        ],
+        "_note": "family corrected to status_transition (primary effect is a state rotate on admin) and defaulted fields dropped"
+      },
+      "entity": "User",
+      "_binds": {
+        "id": "User.id"
+      },
+      "_output_schema": {
+        "user": "the updated User row"
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "admin",
+                      "op": "eq",
+                      "value": 1
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in before changing a role.",
+          "precondition": "Only a full admin (admin=1) can change user roles.",
+          "not_found": "No such user exists.",
+          "required": "user id is required."
+        }
+      },
+      "description": "Rotate a user's role one step through the cycle subscriber (0) -> admin (1) -> publisher (2) -> subscriber (0). Cannot set an arbitrary role — each call moves one step. Requires a full admin (admin=1)."
+    },
+    {
+      "tool": "delete_user",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "User",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the user to delete."
+        }
+      },
+      "_evidence": {
+        "locator": "app/controllers/users_controller.rb:56",
+        "id_local": "User.delete",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /admin/users/:id",
+          "locator": "config/routes.rb:39"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "def destroy\n  @user = User.find(params[:id])\n  @user.destroy\n  redirect_to users_path\nend (users_controller.rb:56)",
+        "edges": [
+          "before_action :verify_admin (users_controller.rb:4)"
+        ]
+      },
+      "entity": "User",
+      "_binds": {
+        "id": "User.id"
+      },
+      "_output_schema": {},
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "admin",
+                      "op": "eq",
+                      "value": 1
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in before deleting a user.",
+          "precondition": "Only a full admin (admin=1) can delete users.",
+          "not_found": "No such user exists.",
+          "required": "user id is required."
+        }
+      },
+      "description": "Delete a user account by id. Their posts, comments and likes cascade away with it. Requires a full admin (admin=1)."
+    },
+    {
+      "tool": "update_settings",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Setting",
+        "row_key": {
+          "id": {
+            "$const": 1
+          }
+        },
+        "fields": {
+          "title": {
+            "$arg": "title"
+          },
+          "subtitle": {
+            "$arg": "subtitle"
+          },
+          "css": {
+            "$arg": "css"
+          },
+          "byline": {
+            "$arg": "byline"
+          },
+          "comments": {
+            "$arg": "comments"
+          }
+        }
+      },
+      "input_schema": {
+        "title": {
+          "type": "text",
+          "required": false,
+          "description": "Site title."
+        },
+        "subtitle": {
+          "type": "text",
+          "required": false,
+          "description": "Site subtitle/blurb."
+        },
+        "css": {
+          "type": "text",
+          "required": false,
+          "description": "Raw CSS; recompiled and served."
+        },
+        "byline": {
+          "type": "bool",
+          "required": false,
+          "description": "Show author bylines."
+        },
+        "comments": {
+          "type": "bool",
+          "required": false,
+          "description": "Enable comments on posts."
+        }
+      },
+      "_evidence": {
+        "locator": "app/controllers/settings_controller.rb:13",
+        "id_local": "Setting.update",
+        "entry": {
+          "kind": "http",
+          "route": "PATCH /settings",
+          "locator": "config/routes.rb:57"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "def update\n  @setting = SettingsController.get_setting\n  ... validate_css(css)\n  @setting.compiled_css = compiled_css\n  @setting.css_hash = Digest::MD5.hexdigest(compiled_css)\n  @setting.save\n  @setting.update(setting_params) # title, subtitle, author, css, byline, comments\n  flash[:notice] = \"Settings Saved\"\n  redirect_to settings_edit_path\nend (settings_controller.rb:13)",
+        "edges": [
+          "before_action :verify_admin, except:[:style, :show_fonts] (settings_controller.rb:4)"
+        ],
+        "_note": "row_key fixed to the singleton id=1 (raw's $session.account_id was wrong)"
+      },
+      "entity": "Setting",
+      "_binds": {
+        "setting[title]": "Setting.title",
+        "setting[subtitle]": "Setting.subtitle",
+        "setting[css]": "Setting.css",
+        "setting[byline]": "Setting.byline",
+        "setting[comments]": "Setting.comments"
+      },
+      "_output_schema": {
+        "setting": "the updated Setting row"
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "admin",
+                      "op": "eq",
+                      "value": 1
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in before updating settings.",
+          "precondition": "Only a full admin (admin=1) can update settings."
+        }
+      },
+      "description": "Update the site's singleton settings — title, subtitle, raw css, byline and comments toggles. Requires a full admin (admin=1)."
+    },
+    {
+      "tool": "get_settings",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Setting",
+        "lookup_by": {
+          "id": {
+            "$const": 1
+          }
+        }
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "app/controllers/settings_controller.rb:5",
+        "id_local": "Setting.show",
+        "entry": {
+          "kind": "http",
+          "route": "GET /settings",
+          "locator": "config/routes.rb:55"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "def show\n  @setting = SettingsController.get_setting\nend\ndef self.get_setting\n  s = Setting.first\n  if s.nil? then s = Setting.new end\n  s\nend (settings_controller.rb:5,71)",
+        "edges": [
+          "before_action :verify_admin, except:[:style, :show_fonts] (settings_controller.rb:4)"
+        ],
+        "_note": "row_key fixed to the singleton id=1"
+      },
+      "entity": "Setting",
+      "_output_schema": {
+        "setting": "the singleton Setting row"
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "admin",
+                      "op": "eq",
+                      "value": 1
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in before reading settings.",
+          "precondition": "Only a full admin (admin=1) can read settings."
+        }
+      },
+      "description": "Read the site's singleton settings row (title, subtitle and the rest of the blog configuration). Requires a full admin (admin=1)."
+    },
+    {
+      "tool": "revoke_indieauth_token",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "IndieAuthToken",
+        "lookup_by": {
+          "id": {
+            "$arg": "token_id"
+          }
+        }
+      },
+      "input_schema": {
+        "token_id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the access token to revoke."
+        }
+      },
+      "_evidence": {
+        "locator": "app/controllers/indieauth_controller.rb:128",
+        "id_local": "IndieAuth.token_destroy",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /indieauth/token/:token_id",
+          "locator": "config/routes.rb:8"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "def token_destroy\n  token = current_user.indie_auth_tokens.find(params[\"token_id\"])\n  token.destroy!\n  redirect_to request.referer\nend (indieauth_controller.rb:128)",
+        "edges": [
+          "before_action :verify_admin; current_user.indie_auth_tokens.find (indieauth_controller.rb:7,128)"
+        ]
+      },
+      "entity": "IndieAuthToken",
+      "_binds": {
+        "token_id": "IndieAuthToken.id"
+      },
+      "_output_schema": {},
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "admin",
+                      "op": "eq",
+                      "value": 1
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in before revoking a token.",
+          "precondition": "Only a full admin (admin=1) can revoke tokens.",
+          "not_found": "No such token exists.",
+          "required": "token_id is required."
+        }
+      },
+      "description": "Revoke (delete) one of the signed-in user's IndieAuth access tokens so an external client can no longer use it. Requires a full admin (admin=1)."
+    },
+    {
+      "tool": "serve_image",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Image",
+        "lookup_by": {
+          "id": {
+            "$arg": "image_id"
+          }
+        }
+      },
+      "input_schema": {
+        "image_id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the image to serve."
+        }
+      },
+      "_evidence": {
+        "locator": "app/controllers/images_controller.rb:6",
+        "id_local": "Image.show",
+        "entry": {
+          "kind": "http",
+          "route": "GET /images/raw/:image_id",
+          "locator": "config/routes.rb:45"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "before_action :verify_auth!, :set_blob\ndef show\n  expires_in ActiveStorage.service_urls_expire_in\n  redirect_to @blob.url(disposition: params[:disposition]), allow_other_host: true\nend\ndef set_blob\n  image = Image.find(params[:image_id])\n  @blob = image.blob_blob\n  ... unless (request_filename == blob_filename); head :not_found \nend (images_controller.rb:6,34)"
+      },
+      "entity": "Image",
+      "_binds": {
+        "image_id": "Image.id",
+        "u": "User.basic_auth_username"
+      },
+      "_output_schema": {
+        "redirect": "redirect to the blob's storage URL"
+      },
+      "guards": {
+        "messages": {
+          "not_found": "No image with that id exists.",
+          "required": "image_id is required."
+        }
+      },
+      "description": "Fetch a previously uploaded image by id. Public content — no authentication required."
+    }
+  ],
+  "seed_state": {
+    "User": [
+      {
+        "id": 1,
+        "email": "ops@haven.example",
+        "encrypted_password": "pw-operations",
+        "name": "Ada",
+        "admin": 1,
+        "basic_auth_username": "basiuser-ada",
+        "basic_auth_password": "basi-pw-ada",
+        "image_password": "img-pw-ada"
+      },
+      {
+        "id": 2,
+        "email": "publisher@haven.example",
+        "encrypted_password": "pw-publisher",
+        "name": "Bob",
+        "admin": 2,
+        "basic_auth_username": "basiuser-bob",
+        "basic_auth_password": "basi-pw-bob",
+        "image_password": "img-pw-bob"
+      },
+      {
+        "id": 3,
+        "email": "member@haven.example",
+        "encrypted_password": "pw-member",
+        "name": "Carol",
+        "admin": 0,
+        "basic_auth_username": "basiuser-carol",
+        "basic_auth_password": "basi-pw-carol",
+        "image_password": "img-pw-carol"
+      }
+    ],
+    "Setting": [
+      {
+        "id": 1,
+        "title": "My Haven",
+        "subtitle": "a personal blog",
+        "visibility": "public",
+        "byline": true,
+        "comments": true
+      }
+    ],
+    "Post": [
+      {
+        "id": 1,
+        "datetime": "2026-05-01T12:00:00",
+        "content": "My first post.",
+        "author_id": 1
+      },
+      {
+        "id": 2,
+        "datetime": "2026-05-05T12:00:00",
+        "content": "A post by Bob.",
+        "author_id": 2
+      }
+    ],
+    "Comment": [
+      {
+        "id": 1,
+        "body": "Nice post!",
+        "author_id": 2,
+        "post_id": 1
+      },
+      {
+        "id": 2,
+        "body": "Thanks!",
+        "author_id": 1,
+        "post_id": 2
+      }
+    ],
+    "Like": [
+      {
+        "id": 1,
+        "reaction": "favourite",
+        "user_id": 3,
+        "post_id": 1
+      },
+      {
+        "id": 2,
+        "reaction": "bookmark",
+        "user_id": 1,
+        "post_id": 2
+      }
+    ],
+    "Feed": [
+      {
+        "id": 1,
+        "name": "Example Feed",
+        "url": "https://example.com/feed.xml",
+        "status": 0,
+        "user_id": 1
+      }
+    ],
+    "FeedEntry": [
+      {
+        "id": 1,
+        "title": "Feed item one",
+        "content": "<p>First</p>",
+        "link": "https://example.com/1",
+        "guid": "https://example.com/1",
+        "sort_date": "2026-05-01T08:00:00",
+        "feed_id": 1
+      }
+    ],
+    "LoginLink": [
+      {
+        "id": 1,
+        "token": "seed-token-1",
+        "user_id": 1
+      }
+    ],
+    "IndieAuthRequest": [
+      {
+        "id": 1,
+        "user_id": 1,
+        "code": "req-code-1",
+        "state": "st-1",
+        "code_challenge": "challenge-1",
+        "client_id": "app.example",
+        "scope": "create",
+        "used": 0
+      }
+    ],
+    "IndieAuthToken": [
+      {
+        "id": 1,
+        "user_id": 1,
+        "access_token": "seed-access-1",
+        "scope": "create update delete media read follow",
+        "client_id": "app.example"
+      }
+    ],
+    "Image": [
+      {
+        "id": 1,
+        "created_at": "2026-05-01T08:00:00",
+        "updated_at": "2026-05-01T08:00:00"
+      }
+    ]
+  },
+  "summary": "Haven is a Rails self-hosted personal blogging platform (posts, comments, likes) with a built-in RSS reader (feeds/feed_entries updated by a background job) and IndieWeb endpoints (IndieAuth OAuth2 authorization-code flow with PKCE, Micropub post creation/update/delete/media, Microsub feed follow/timeline), admin multi-role user accounts (subscriber/publisher/admin), a singleton settings record, and login-link passwordless sign-in.",
+  "_auth_candidates": [
+    {
+      "entity": "User",
+      "username_col": "email",
+      "password_col": "encrypted_password"
+    }
+  ],
+  "_fk_gravity": {
+    "entity": "User",
+    "fk_count": 7
+  },
+  "_no_edges": [
+    {
+      "id_local": "Session.login",
+      "why": "devise SessionsController; no pre-checks it calls further; the wall is devise-internal password verification (config/routes.rb:31)"
+    },
+    {
+      "id_local": "Session.logout",
+      "why": "devise sign_out route; calls nothing, no guard (config/routes.rb:31)"
+    },
+    {
+      "id_local": "Account.destroy",
+      "why": "devise registrations#destroy; current-password confirmation is devise-internal, not a persisted-row check; calls nothing further (config/routes.rb:35)"
+    },
+    {
+      "id_local": "Account.update",
+      "why": "devise registrations#update; current-password check is devise-internal; calls nothing further (config/routes.rb:34)"
+    },
+    {
+      "id_local": "UpdateFeedJob.run",
+      "why": "background job (queue: default); its only pre-check is 'feed.last_update nil or < 10.minutes.ago' — a recency guard that cannot be expressed as a State (time arithmetic is forbidden); no auth plug, no triggers (app/jobs/update_feed_job.rb:38)"
+    },
+    {
+      "id_local": "LoginLink.generate",
+      "why": "internal model helper; no wire entry, no guards, calls nothing (app/models/login_link.rb:6)"
+    },
+    {
+      "id_local": "Post.new_import",
+      "why": "view-only render; no writes; guard is verify_publisher only (posts_controller.rb:102)"
+    },
+    {
+      "id_local": "Feed.new_opml",
+      "why": "view-only render; no writes; guard is verify_admin only (feeds_controller.rb:17)"
+    },
+    {
+      "id_local": "Post.index",
+      "why": "authenticate_user! only; no owner wall, reads all posts; no trigger (posts_controller.rb:11)"
+    },
+    {
+      "id_local": "Post.show",
+      "why": "authenticate_user! only; no owner wall; no trigger (posts_controller.rb:47)"
+    },
+    {
+      "id_local": "Post.rss",
+      "why": "wall is HTTP basic auth on User.basic_auth_username/password (check_basic_auth, application_controller.rb:40) — a request-header credential, not settable as a session or a DB State; no trigger (posts_controller.rb:33)"
+    },
+    {
+      "id_local": "Image.show",
+      "why": "dual auth (session OR HMAC-SHA256(User.image_password, filename) query credential) — neither expressible as a single DB State; calls nothing further (images_controller.rb:18)"
+    },
+    {
+      "id_local": "Image.show_variant",
+      "why": "same dual HMAC/session auth as Image.show; calls nothing further (images_controller.rb:18)"
+    },
+    {
+      "id_local": "Setting.style",
+      "why": "public route (verify_admin skipped), serves compiled CSS by hash; no trigger (settings_controller.rb:4,67)"
+    }
+  ],
+  "auth": {
+    "account_entity": "User",
+    "username_col": "email",
+    "password_col": "encrypted_password"
+  },
+  "_drop_report": {
+    "n_kept": 27,
+    "n_dropped": 22,
+    "dropped": [
+      {
+        "tool": "post_rss",
+        "id_local": "post_rss",
+        "reason": "route-level HTTP basic auth on User.basic_auth_username/password is a request-header credential the runtime cannot carry; RSS is a public web feed, not a task surface"
+      },
+      {
+        "tool": "post_new_import",
+        "id_local": "post_new_import",
+        "reason": "view-only GET that renders a form; no readable state and no writer"
+      },
+      {
+        "tool": "feed_new_opml",
+        "id_local": "feed_new_opml",
+        "reason": "view-only GET that renders an upload form; no readable state and no writer"
+      },
+      {
+        "tool": "feed_opml",
+        "id_local": "feed_opml",
+        "reason": "GET of an OPML XML export (attachment render) — presentation with no state the runtime returns"
+      },
+      {
+        "tool": "feed_ingest_opml",
+        "id_local": "feed_ingest_opml",
+        "reason": "server-side bulk OPML file import; the raw environment cannot deliver the file the endpoint reads"
+      },
+      {
+        "tool": "feed_subscribe_url",
+        "id_local": "feed_subscribe_url",
+        "reason": "duplicate of feed_create (same add_feed helper/effect), both full-admin-gated"
+      },
+      {
+        "tool": "setting_create_font",
+        "id_local": "setting_create_font",
+        "reason": "attaches an ActiveStorage font asset the environment cannot hold (no Blob entity/attachment); its only honest persisted trace is font_hash, kept out of update_settings"
+      },
+      {
+        "tool": "setting_destroy_font",
+        "id_local": "setting_destroy_font",
+        "reason": "same unreachable ActiveStorage attachment as create_font; drop the pair"
+      },
+      {
+        "tool": "indieauth_authorization",
+        "id_local": "indieauth_authorization",
+        "reason": "renders an interactive OAuth approval page to a human; a GET that mints no code and no token"
+      },
+      {
+        "tool": "indieauth_approval",
+        "id_local": "indieauth_approval",
+        "reason": "the OAuth authorization grant needs a human clicking Approve in a browser; the raw environment cannot mint the code every later IndieAuth step consumes"
+      },
+      {
+        "tool": "indieauth_profile",
+        "id_local": "indieauth_profile",
+        "reason": "consumes an IndieAuth code only the dropped interactive approval can mint — unreachable"
+      },
+      {
+        "tool": "indieauth_token",
+        "id_local": "indieauth_token",
+        "reason": "consumes an IndieAuth code only the dropped interactive approval can mint — unreachable bearer flow"
+      },
+      {
+        "tool": "loginlink_validate",
+        "id_local": "loginlink_validate",
+        "reason": "passwordless sign-in (sign_in(login_link.user)) has no runtime executor: guard.auth is hard-wired to username/password, so it can never succeed"
+      },
+      {
+        "tool": "micropub_create",
+        "id_local": "micropub_create",
+        "reason": "bearer-token (scope: create) auth, not session; unreachable by $actor — its write is already exposed via create_post"
+      },
+      {
+        "tool": "micropub_query",
+        "id_local": "micropub_query",
+        "reason": "bearer-token (update) auth, unreachable; its read is already exposed via list_posts"
+      },
+      {
+        "tool": "microsub_timeline",
+        "id_local": "microsub_timeline",
+        "reason": "bearer-token (read) auth, unreachable; its read is already exposed via read_feed_entries"
+      },
+      {
+        "tool": "microsub_subscribe",
+        "id_local": "microsub_subscribe",
+        "reason": "bearer-token (follow) auth, unreachable; its write is already exposed via add_feed"
+      },
+      {
+        "tool": "microsub_unsubscribe",
+        "id_local": "microsub_unsubscribe",
+        "reason": "bearer-token (follow) auth, unreachable; its write is already exposed via remove_feed"
+      },
+      {
+        "tool": "setting_style",
+        "id_local": "setting_style",
+        "reason": "public route serving the compiled CSS by hash (verify_admin skipped) — presentation with no task surface"
+      },
+      {
+        "tool": "image_upload",
+        "id_local": "image_upload",
+        "reason": "micropub media upload authenticated by a bearer token (media scope), not a session — unreachable by $actor; Image would have no other writer"
+      },
+      {
+        "tool": "image_show_variant",
+        "id_local": "image_show_variant",
+        "reason": "dual HMAC/session auth the runtime cannot express, plus a resize/redirect — presentation, not a task surface"
+      },
+      {
+        "tool": "import_posts_from_dir",
+        "id_local": "Post.import",
+        "reason": "server-side markdown-directory import: the raw environment cannot deliver the local filesystem dir the endpoint globs (same objection as feed_ingest_opml); its spawn panel writes Post.content from a directory path and binds target to a nonexistent .id, so it can never run honestly"
+      }
+    ]
+  }
+}

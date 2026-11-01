@@ -1,0 +1,89 @@
+{
+  "app": "nodebb",
+  "role": "Room message records and group scalar administration",
+  "domains": [
+    "operations",
+    "support"
+  ],
+  "kinds": {
+    "post_channel": [
+      "chat_post"
+    ],
+    "manage_channel": [
+      "chat_rename",
+      "chat_invite",
+      "chat_kick"
+    ],
+    "update_record": [
+      "chatmessage_edit",
+      "group_update"
+    ],
+    "record_status_change": [
+      "chatmessage_delete"
+    ],
+    "create_record": [
+      "group_create"
+    ]
+  },
+  "check_kinds": [
+    "record_exists",
+    "record_not_exists",
+    "record_field_equals",
+    "record_field_contains",
+    "record_field_unchanged"
+  ],
+  "carriers": {
+    "notes_field": {
+      "entity": "ChatMessage",
+      "field": "content"
+    }
+  },
+  "login": {
+    "tool": "sign_in",
+    "user_field": "username",
+    "persona_entity": "User"
+  },
+  "content_entities": [
+    "ChatRoom",
+    "RoomMember",
+    "ChatMessage",
+    "Group",
+    "Topic",
+    "Post"
+  ],
+  "seed_helpers": [
+    "rooms",
+    "messages"
+  ],
+  "tool_families_to_keep": [
+    ""
+  ],
+  "obs_reads": [
+    "chat_list",
+    "chatmessage_list",
+    "group_search"
+  ],
+  "known_patches": [
+    "Neutral prefix, integer schema/seed identities, synthetic User1/2/3",
+    "Remove empty/null integer PK defaults for original allocator",
+    "Actual group search substring filter"
+  ],
+  "missing_tools": [
+    "Complete initial-topic-plus-post creation",
+    "Actual Post content edit via post_edit"
+  ],
+  "limitations": [
+    "All 112 original tools retained; eight declared tools cover existing room/message and group scalar state. No network delivery claim.",
+    "chat_post enforces existing room membership. Many other source guards only check that actor User exists; chatmessage_list/edit/delete and group administration do not enforce the stated author/admin membership boundary.",
+    "chat_create does not materialize all uids participants; chat_invite/kick certify one uid only. No full room provisioning, notification/typing/watch behavior or bulk operations claimed.",
+    "topic_post creates Topic without initial Post; post_edit creates blank PostDiff and does not edit Post.content. These interfaces remain but are not certified as complete workflows.",
+    "Source move/owner/update-settings/moderation/vote semantics are not claimed beyond declared tools; search is literal substring, not a full forum parser."
+  ],
+  "smoke": {
+    "passed": true,
+    "date": "2026-10-24",
+    "report": "ok"
+  },
+  "register_file": "pack/newspecs3/nodebb/register.py",
+  "base_spec": "pack/base_specs/nodebb.spec.json"
+}

@@ -1,0 +1,5363 @@
+{
+  "env_id": "openfire",
+  "_prep_version": 3,
+  "entities": [
+    {
+      "name": "User",
+      "columns": [
+        {
+          "name": "username",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "max": 64
+        },
+        {
+          "name": "plainPassword",
+          "type": "text",
+          "nullable": true,
+          "max": 32
+        },
+        {
+          "name": "encryptedPassword",
+          "type": "text",
+          "nullable": true,
+          "max": 255
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": true,
+          "max": 100
+        },
+        {
+          "name": "email",
+          "type": "text",
+          "nullable": true,
+          "max": 100
+        },
+        {
+          "name": "creationDate",
+          "type": "datetime",
+          "nullable": false,
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "modificationDate",
+          "type": "datetime",
+          "nullable": false,
+          "audit": true
+        },
+        {
+          "name": "id",
+          "type": "id",
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "name": "UserScram",
+      "columns": [
+        {
+          "name": "username",
+          "type": "text",
+          "nullable": false,
+          "fk_to": "User.username",
+          "on_delete": "cascade",
+          "max": 64
+        },
+        {
+          "name": "mechanism",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "max": 32
+        },
+        {
+          "name": "storedKey",
+          "type": "text",
+          "nullable": true,
+          "max": 255
+        },
+        {
+          "name": "serverKey",
+          "type": "text",
+          "nullable": true,
+          "max": 255
+        },
+        {
+          "name": "salt",
+          "type": "text",
+          "nullable": true,
+          "max": 255
+        },
+        {
+          "name": "iterations",
+          "type": "int",
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "name": "UserProp",
+      "columns": [
+        {
+          "name": "username",
+          "type": "text",
+          "nullable": false,
+          "fk_to": "User.username",
+          "on_delete": "cascade",
+          "max": 64
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "max": 100
+        },
+        {
+          "name": "propValue",
+          "type": "text",
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "name": "UserFlag",
+      "columns": [
+        {
+          "name": "username",
+          "type": "text",
+          "nullable": false,
+          "fk_to": "User.username",
+          "on_delete": "cascade",
+          "max": 64
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "max": 100
+        },
+        {
+          "name": "startTime",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "endTime",
+          "type": "datetime",
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "name": "Presence",
+      "columns": [
+        {
+          "name": "username",
+          "type": "text",
+          "nullable": false,
+          "max": 64,
+          "pk": true
+        },
+        {
+          "name": "offlinePresence",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "offlineDate",
+          "type": "datetime",
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "name": "OfflineMessage",
+      "columns": [
+        {
+          "name": "username",
+          "type": "text",
+          "nullable": false,
+          "fk_to": "User.username",
+          "on_delete": "cascade",
+          "max": 64
+        },
+        {
+          "name": "messageID",
+          "type": "id",
+          "pk": true,
+          "nullable": false,
+          "immutable": true
+        },
+        {
+          "name": "creationDate",
+          "type": "datetime",
+          "nullable": false,
+          "immutable": true
+        },
+        {
+          "name": "messageSize",
+          "type": "int",
+          "nullable": false
+        },
+        {
+          "name": "stanza",
+          "type": "text",
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "name": "RosterItem",
+      "columns": [
+        {
+          "name": "rosterID",
+          "type": "id",
+          "pk": true,
+          "nullable": false,
+          "immutable": true
+        },
+        {
+          "name": "username",
+          "type": "text",
+          "nullable": false,
+          "fk_to": "User.username",
+          "on_delete": "cascade",
+          "max": 64
+        },
+        {
+          "name": "jid",
+          "type": "text",
+          "nullable": false,
+          "max": 1024
+        },
+        {
+          "name": "sub",
+          "type": "int",
+          "nullable": false
+        },
+        {
+          "name": "ask",
+          "type": "int",
+          "nullable": false
+        },
+        {
+          "name": "recv",
+          "type": "int",
+          "nullable": false
+        },
+        {
+          "name": "nick",
+          "type": "text",
+          "nullable": true,
+          "max": 255
+        },
+        {
+          "name": "stanza",
+          "type": "text",
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "name": "RosterGroup",
+      "columns": [
+        {
+          "name": "rosterID",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "RosterItem.rosterID",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "rank",
+          "type": "int",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "groupName",
+          "type": "text",
+          "nullable": false,
+          "max": 255
+        }
+      ]
+    },
+    {
+      "name": "VCard",
+      "columns": [
+        {
+          "name": "username",
+          "type": "text",
+          "nullable": false,
+          "max": 64,
+          "pk": true
+        },
+        {
+          "name": "vcard",
+          "type": "text",
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "name": "Group",
+      "columns": [
+        {
+          "name": "groupName",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "max": 50
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "nullable": true,
+          "max": 255
+        }
+      ]
+    },
+    {
+      "name": "GroupProp",
+      "columns": [
+        {
+          "name": "groupName",
+          "type": "text",
+          "nullable": false,
+          "fk_to": "Group.groupName",
+          "on_delete": "cascade",
+          "max": 50
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "max": 100
+        },
+        {
+          "name": "propValue",
+          "type": "text",
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "name": "GroupUser",
+      "columns": [
+        {
+          "name": "groupName",
+          "type": "text",
+          "nullable": false,
+          "fk_to": "Group.groupName",
+          "on_delete": "cascade",
+          "max": 50
+        },
+        {
+          "name": "username",
+          "type": "text",
+          "nullable": false,
+          "fk_to": "User.username",
+          "on_delete": "cascade",
+          "max": 100
+        },
+        {
+          "name": "administrator",
+          "type": "bool",
+          "pk": true,
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "name": "Property",
+      "columns": [
+        {
+          "name": "name",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "max": 100
+        },
+        {
+          "name": "propValue",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "encrypted",
+          "type": "bool",
+          "nullable": true,
+          "default": false
+        },
+        {
+          "name": "iv",
+          "type": "text",
+          "nullable": true,
+          "max": 24
+        }
+      ]
+    },
+    {
+      "name": "ID",
+      "columns": [
+        {
+          "name": "idType",
+          "type": "int",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "id",
+          "type": "int",
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "name": "Version",
+      "columns": [
+        {
+          "name": "name",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "max": 50
+        },
+        {
+          "name": "version",
+          "type": "int",
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "name": "ExtComponentConf",
+      "columns": [
+        {
+          "name": "subdomain",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "max": 255
+        },
+        {
+          "name": "wildcard",
+          "type": "bool",
+          "nullable": false
+        },
+        {
+          "name": "secret",
+          "type": "text",
+          "nullable": true,
+          "max": 255
+        },
+        {
+          "name": "permission",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "allowed",
+            "blocked"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "RemoteServerConf",
+      "columns": [
+        {
+          "name": "xmppDomain",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "max": 255
+        },
+        {
+          "name": "remotePort",
+          "type": "int",
+          "nullable": true
+        },
+        {
+          "name": "permission",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "allowed",
+            "blocked"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "PrivacyList",
+      "columns": [
+        {
+          "name": "username",
+          "type": "text",
+          "nullable": false,
+          "fk_to": "User.username",
+          "on_delete": "cascade",
+          "max": 64
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "max": 100
+        },
+        {
+          "name": "isDefault",
+          "type": "bool",
+          "nullable": false
+        },
+        {
+          "name": "list",
+          "type": "text",
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "name": "SecurityAuditLog",
+      "columns": [
+        {
+          "name": "msgID",
+          "type": "id",
+          "pk": true,
+          "nullable": false,
+          "immutable": true
+        },
+        {
+          "name": "username",
+          "type": "text",
+          "nullable": true,
+          "fk_to": "User.username",
+          "max": 64
+        },
+        {
+          "name": "entryStamp",
+          "type": "datetime",
+          "nullable": false,
+          "immutable": true
+        },
+        {
+          "name": "summary",
+          "type": "text",
+          "nullable": false,
+          "max": 255
+        },
+        {
+          "name": "node",
+          "type": "text",
+          "nullable": false,
+          "immutable": true,
+          "max": 255
+        },
+        {
+          "name": "details",
+          "type": "text",
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "name": "FastToken",
+      "columns": [
+        {
+          "name": "username",
+          "type": "text",
+          "nullable": false,
+          "fk_to": "User.username",
+          "on_delete": "cascade",
+          "max": 64
+        },
+        {
+          "name": "mechanism",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "max": 32
+        },
+        {
+          "name": "clientID",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "max": 64
+        },
+        {
+          "name": "tokenSlot",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "enum": [
+            "N",
+            "C"
+          ]
+        },
+        {
+          "name": "replayCounter",
+          "type": "int",
+          "nullable": false
+        },
+        {
+          "name": "encryptedToken",
+          "type": "text",
+          "nullable": false,
+          "max": 255
+        },
+        {
+          "name": "expiry",
+          "type": "datetime",
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "name": "MucService",
+      "columns": [
+        {
+          "name": "serviceID",
+          "type": "id",
+          "pk": true,
+          "nullable": false,
+          "immutable": true
+        },
+        {
+          "name": "subdomain",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "max": 255
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "nullable": true,
+          "max": 255
+        },
+        {
+          "name": "isHidden",
+          "type": "bool",
+          "nullable": false
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "subdomain"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "MucServiceProp",
+      "columns": [
+        {
+          "name": "serviceID",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "MucService.serviceID",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "max": 100
+        },
+        {
+          "name": "propValue",
+          "type": "text",
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "name": "MucRoom",
+      "columns": [
+        {
+          "name": "serviceID",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "MucService.serviceID",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "roomID",
+          "type": "id",
+          "nullable": false,
+          "immutable": true
+        },
+        {
+          "name": "creationDate",
+          "type": "datetime",
+          "nullable": false,
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "modificationDate",
+          "type": "datetime",
+          "nullable": false,
+          "audit": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "immutable": true,
+          "max": 50
+        },
+        {
+          "name": "naturalName",
+          "type": "text",
+          "nullable": false,
+          "max": 255
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "nullable": true,
+          "max": 255
+        },
+        {
+          "name": "lockedDate",
+          "type": "datetime",
+          "nullable": false
+        },
+        {
+          "name": "emptyDate",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "canChangeSubject",
+          "type": "bool",
+          "nullable": false
+        },
+        {
+          "name": "maxUsers",
+          "type": "int",
+          "nullable": false
+        },
+        {
+          "name": "publicRoom",
+          "type": "bool",
+          "nullable": false
+        },
+        {
+          "name": "moderated",
+          "type": "bool",
+          "nullable": false
+        },
+        {
+          "name": "membersOnly",
+          "type": "bool",
+          "nullable": false
+        },
+        {
+          "name": "canInvite",
+          "type": "bool",
+          "nullable": false
+        },
+        {
+          "name": "roomPassword",
+          "type": "text",
+          "nullable": true,
+          "max": 50
+        },
+        {
+          "name": "canDiscoverJID",
+          "type": "bool",
+          "nullable": false
+        },
+        {
+          "name": "logEnabled",
+          "type": "bool",
+          "nullable": false
+        },
+        {
+          "name": "retireOnDeletion",
+          "type": "bool",
+          "nullable": false
+        },
+        {
+          "name": "preserveHistOnDel",
+          "type": "bool",
+          "nullable": false
+        },
+        {
+          "name": "subject",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "rolesToBroadcast",
+          "type": "int",
+          "nullable": false
+        },
+        {
+          "name": "useReservedNick",
+          "type": "bool",
+          "nullable": false
+        },
+        {
+          "name": "canChangeNick",
+          "type": "bool",
+          "nullable": false
+        },
+        {
+          "name": "canRegister",
+          "type": "bool",
+          "nullable": false
+        },
+        {
+          "name": "allowpm",
+          "type": "int",
+          "nullable": true
+        },
+        {
+          "name": "fmucEnabled",
+          "type": "bool",
+          "nullable": true
+        },
+        {
+          "name": "fmucOutboundNode",
+          "type": "text",
+          "nullable": true,
+          "max": 255
+        },
+        {
+          "name": "fmucOutboundMode",
+          "type": "int",
+          "nullable": true
+        },
+        {
+          "name": "fmucInboundNodes",
+          "type": "text",
+          "nullable": true,
+          "max": 4000
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "roomID"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "MucRoomProp",
+      "columns": [
+        {
+          "name": "roomID",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "MucRoom.roomID",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "max": 100
+        },
+        {
+          "name": "propValue",
+          "type": "text",
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "name": "MucRoomRetiree",
+      "columns": [
+        {
+          "name": "serviceID",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "MucService.serviceID",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "max": 50
+        },
+        {
+          "name": "alternateJID",
+          "type": "text",
+          "nullable": true,
+          "max": 2000
+        },
+        {
+          "name": "reason",
+          "type": "text",
+          "nullable": true,
+          "max": 1024
+        },
+        {
+          "name": "retiredAt",
+          "type": "datetime",
+          "nullable": true,
+          "audit": true,
+          "default": "CURRENT_TIMESTAMP"
+        }
+      ]
+    },
+    {
+      "name": "MucAffiliation",
+      "columns": [
+        {
+          "name": "roomID",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "MucRoom.roomID",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "jid",
+          "type": "text",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "affiliation",
+          "type": "int",
+          "nullable": false,
+          "enum": [
+            10,
+            20,
+            30,
+            40,
+            50
+          ]
+        }
+      ]
+    },
+    {
+      "name": "MucMember",
+      "columns": [
+        {
+          "name": "roomID",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "MucRoom.roomID",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "jid",
+          "type": "text",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "nickname",
+          "type": "text",
+          "nullable": true,
+          "max": 255
+        },
+        {
+          "name": "firstName",
+          "type": "text",
+          "nullable": true,
+          "max": 100
+        },
+        {
+          "name": "lastName",
+          "type": "text",
+          "nullable": true,
+          "max": 100
+        },
+        {
+          "name": "url",
+          "type": "text",
+          "nullable": true,
+          "max": 100
+        },
+        {
+          "name": "email",
+          "type": "text",
+          "nullable": true,
+          "max": 100
+        },
+        {
+          "name": "faqentry",
+          "type": "text",
+          "nullable": true,
+          "max": 100
+        }
+      ]
+    },
+    {
+      "name": "MucConversationLog",
+      "columns": [
+        {
+          "name": "roomID",
+          "type": "id",
+          "nullable": false,
+          "immutable": true,
+          "fk_to": "MucRoom.roomID",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "messageID",
+          "type": "id",
+          "pk": true,
+          "nullable": false,
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "sender",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "nickname",
+          "type": "text",
+          "nullable": true,
+          "max": 255
+        },
+        {
+          "name": "logTime",
+          "type": "datetime",
+          "nullable": false,
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "subject",
+          "type": "text",
+          "nullable": true,
+          "max": 255
+        },
+        {
+          "name": "body",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "stanza",
+          "type": "text",
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "name": "PubsubNode",
+      "columns": [
+        {
+          "name": "serviceID",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "max": 100
+        },
+        {
+          "name": "nodeID",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "max": 100
+        },
+        {
+          "name": "leaf",
+          "type": "bool",
+          "nullable": false
+        },
+        {
+          "name": "creationDate",
+          "type": "datetime",
+          "nullable": false,
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "modificationDate",
+          "type": "datetime",
+          "nullable": false,
+          "audit": true
+        },
+        {
+          "name": "parent",
+          "type": "text",
+          "nullable": true,
+          "max": 100
+        },
+        {
+          "name": "deliverPayloads",
+          "type": "bool",
+          "nullable": false
+        },
+        {
+          "name": "maxPayloadSize",
+          "type": "int",
+          "nullable": true
+        },
+        {
+          "name": "persistItems",
+          "type": "bool",
+          "nullable": true
+        },
+        {
+          "name": "maxItems",
+          "type": "int",
+          "nullable": true
+        },
+        {
+          "name": "notifyConfigChanges",
+          "type": "bool",
+          "nullable": false
+        },
+        {
+          "name": "notifyDelete",
+          "type": "bool",
+          "nullable": false
+        },
+        {
+          "name": "notifyRetract",
+          "type": "bool",
+          "nullable": false
+        },
+        {
+          "name": "presenceBased",
+          "type": "bool",
+          "nullable": false
+        },
+        {
+          "name": "sendItemSubscribe",
+          "type": "bool",
+          "nullable": false
+        },
+        {
+          "name": "publisherModel",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "open",
+            "publishers",
+            "subscribers"
+          ]
+        },
+        {
+          "name": "subscriptionEnabled",
+          "type": "bool",
+          "nullable": false
+        },
+        {
+          "name": "configSubscription",
+          "type": "bool",
+          "nullable": false
+        },
+        {
+          "name": "accessModel",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "open",
+            "presence",
+            "whitelist",
+            "roster",
+            "authorize"
+          ]
+        },
+        {
+          "name": "payloadType",
+          "type": "text",
+          "nullable": true,
+          "max": 100
+        },
+        {
+          "name": "bodyXSLT",
+          "type": "text",
+          "nullable": true,
+          "max": 100
+        },
+        {
+          "name": "dataformXSLT",
+          "type": "text",
+          "nullable": true,
+          "max": 100
+        },
+        {
+          "name": "creator",
+          "type": "text",
+          "nullable": false,
+          "max": 255
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "nullable": true,
+          "max": 255
+        },
+        {
+          "name": "language",
+          "type": "text",
+          "nullable": true,
+          "max": 255
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": true,
+          "max": 50
+        },
+        {
+          "name": "replyPolicy",
+          "type": "text",
+          "nullable": true,
+          "enum": [
+            "owner",
+            "publisher"
+          ]
+        },
+        {
+          "name": "associationPolicy",
+          "type": "text",
+          "nullable": true,
+          "enum": [
+            "all",
+            "owners",
+            "whitelist"
+          ]
+        },
+        {
+          "name": "maxLeafNodes",
+          "type": "int",
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "name": "PubsubNodeJID",
+      "columns": [
+        {
+          "name": "serviceID",
+          "type": "text",
+          "nullable": false,
+          "fk_to": "PubsubNode.serviceID",
+          "max": 100
+        },
+        {
+          "name": "nodeID",
+          "type": "text",
+          "nullable": false,
+          "fk_to": "PubsubNode.nodeID",
+          "max": 100
+        },
+        {
+          "name": "jid",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "max": 255
+        },
+        {
+          "name": "associationType",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "contacts",
+            "replyRooms",
+            "replyTo",
+            "associationTrusted"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "PubsubNodeGroup",
+      "columns": [
+        {
+          "name": "serviceID",
+          "type": "text",
+          "nullable": false,
+          "fk_to": "PubsubNode.serviceID",
+          "max": 100
+        },
+        {
+          "name": "nodeID",
+          "type": "text",
+          "nullable": false,
+          "fk_to": "PubsubNode.nodeID",
+          "max": 100
+        },
+        {
+          "name": "rosterGroup",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "max": 100
+        }
+      ]
+    },
+    {
+      "name": "PubsubAffiliation",
+      "columns": [
+        {
+          "name": "serviceID",
+          "type": "text",
+          "nullable": false,
+          "fk_to": "PubsubNode.serviceID",
+          "max": 100
+        },
+        {
+          "name": "nodeID",
+          "type": "text",
+          "nullable": false,
+          "fk_to": "PubsubNode.nodeID",
+          "max": 100
+        },
+        {
+          "name": "jid",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "max": 255
+        },
+        {
+          "name": "affiliation",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "owner",
+            "publisher",
+            "none",
+            "outcast"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "PubsubItem",
+      "columns": [
+        {
+          "name": "serviceID",
+          "type": "text",
+          "nullable": false,
+          "fk_to": "PubsubNode.serviceID",
+          "max": 100
+        },
+        {
+          "name": "nodeID",
+          "type": "text",
+          "nullable": false,
+          "fk_to": "PubsubNode.nodeID",
+          "max": 100
+        },
+        {
+          "name": "id",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "max": 100
+        },
+        {
+          "name": "jid",
+          "type": "text",
+          "nullable": false,
+          "max": 255
+        },
+        {
+          "name": "creationDate",
+          "type": "datetime",
+          "nullable": false,
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "payload",
+          "type": "text",
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "name": "PubsubSubscription",
+      "columns": [
+        {
+          "name": "serviceID",
+          "type": "text",
+          "nullable": false,
+          "fk_to": "PubsubNode.serviceID",
+          "max": 100
+        },
+        {
+          "name": "nodeID",
+          "type": "text",
+          "nullable": false,
+          "fk_to": "PubsubNode.nodeID",
+          "max": 100
+        },
+        {
+          "name": "id",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "max": 100
+        },
+        {
+          "name": "jid",
+          "type": "text",
+          "nullable": false,
+          "max": 255
+        },
+        {
+          "name": "owner",
+          "type": "text",
+          "nullable": false,
+          "max": 255
+        },
+        {
+          "name": "state",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "none",
+            "pending",
+            "unconfigured",
+            "subscribed"
+          ]
+        },
+        {
+          "name": "deliver",
+          "type": "bool",
+          "nullable": false
+        },
+        {
+          "name": "digest",
+          "type": "bool",
+          "nullable": false
+        },
+        {
+          "name": "digest_frequency",
+          "type": "int",
+          "nullable": false
+        },
+        {
+          "name": "expire",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "includeBody",
+          "type": "bool",
+          "nullable": false
+        },
+        {
+          "name": "showValues",
+          "type": "text",
+          "nullable": true,
+          "max": 30
+        },
+        {
+          "name": "subscriptionType",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "items",
+            "nodes"
+          ]
+        },
+        {
+          "name": "subscriptionDepth",
+          "type": "int",
+          "nullable": false
+        },
+        {
+          "name": "keyword",
+          "type": "text",
+          "nullable": true,
+          "max": 200
+        }
+      ]
+    },
+    {
+      "name": "PubsubDefaultConf",
+      "columns": [
+        {
+          "name": "serviceID",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "max": 100
+        },
+        {
+          "name": "leaf",
+          "type": "bool",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "deliverPayloads",
+          "type": "bool",
+          "nullable": false
+        },
+        {
+          "name": "maxPayloadSize",
+          "type": "int",
+          "nullable": false
+        },
+        {
+          "name": "persistItems",
+          "type": "bool",
+          "nullable": false
+        },
+        {
+          "name": "maxItems",
+          "type": "int",
+          "nullable": false
+        },
+        {
+          "name": "notifyConfigChanges",
+          "type": "bool",
+          "nullable": false
+        },
+        {
+          "name": "notifyDelete",
+          "type": "bool",
+          "nullable": false
+        },
+        {
+          "name": "notifyRetract",
+          "type": "bool",
+          "nullable": false
+        },
+        {
+          "name": "presenceBased",
+          "type": "bool",
+          "nullable": false
+        },
+        {
+          "name": "sendItemSubscribe",
+          "type": "bool",
+          "nullable": false
+        },
+        {
+          "name": "publisherModel",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "open",
+            "publishers",
+            "subscribers"
+          ]
+        },
+        {
+          "name": "subscriptionEnabled",
+          "type": "bool",
+          "nullable": false
+        },
+        {
+          "name": "accessModel",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "open",
+            "presence",
+            "whitelist",
+            "roster",
+            "authorize"
+          ]
+        },
+        {
+          "name": "language",
+          "type": "text",
+          "nullable": true,
+          "max": 255
+        },
+        {
+          "name": "replyPolicy",
+          "type": "text",
+          "nullable": true,
+          "enum": [
+            "owner",
+            "publisher"
+          ]
+        },
+        {
+          "name": "associationPolicy",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "all",
+            "owners",
+            "whitelist"
+          ]
+        },
+        {
+          "name": "maxLeafNodes",
+          "type": "int",
+          "nullable": false
+        }
+      ]
+    }
+  ],
+  "tools": [
+    {
+      "tool": "sign_in",
+      "description": "Sign in to the XMPP server with an account username and password. Most operations act on the signed-in account (`$actor`), so sign in before roster, vCard, privacy-list, groupchat, or pubsub actions.",
+      "family": "guard.auth",
+      "entity": "User",
+      "input_schema": {
+        "username": {
+          "type": "text",
+          "required": true,
+          "description": "The account username."
+        },
+        "password": {
+          "type": "text",
+          "required": true,
+          "description": "The account password."
+        }
+      },
+      "exec_spec": {
+        "verify": {
+          "entity": "User",
+          "username_col": "username",
+          "password_col": "plainPassword"
+        }
+      },
+      "_evidence": {
+        "locator": "xmppserver/src/main/java/org/jivesoftware/openfire/net/SASLAuthentication.java",
+        "id_local": "auth.login",
+        "entry": {
+          "kind": "rpc",
+          "route": "sasl PLAIN",
+          "locator": "xmppserver/src/main/java/org/jivesoftware/openfire/net/SASLAuthentication.java"
+        }
+      }
+    },
+    {
+      "tool": "sign_up",
+      "description": "Create a new user account with a username and password. Fails if the username is already taken.",
+      "family": "auth.register",
+      "entity": "User",
+      "input_schema": {
+        "username": {
+          "type": "text",
+          "required": true,
+          "description": "The new account username (must be unique)."
+        },
+        "password": {
+          "type": "text",
+          "required": true,
+          "description": "The account password, stored via Openfire's password provider."
+        },
+        "name": {
+          "type": "text",
+          "required": false,
+          "description": "Display name for the account."
+        },
+        "email": {
+          "type": "text",
+          "required": false,
+          "description": "Email address for the account."
+        }
+      },
+      "exec_spec": {
+        "fields": [
+          "name",
+          "email"
+        ],
+        "set_on_create": {
+          "username": {
+            "$arg": "username"
+          },
+          "plainPassword": {
+            "$arg": "password"
+          }
+        },
+        "prechecks": [
+          {
+            "entity": "User",
+            "where": {
+              "username": {
+                "$arg": "username"
+              }
+            },
+            "negate": true,
+            "message": "That username is already registered."
+          }
+        ],
+        "entity": "User"
+      },
+      "_evidence": {
+        "locator": "xmppserver/src/main/java/org/jivesoftware/openfire/user/DefaultUserProvider.java",
+        "id_local": "User.createUser",
+        "entry": {
+          "kind": "rpc",
+          "route": "user_create",
+          "locator": "xmppserver/src/main/java/org/jivesoftware/openfire/commands/admin/user/CreateUser.java"
+        }
+      }
+    },
+    {
+      "tool": "securityauditlog_search",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "SecurityAuditLog",
+        "search_fields": [
+          "username",
+          "summary"
+        ],
+        "rank": {
+          "method": "substring",
+          "fields": [
+            "username",
+            "summary"
+          ]
+        },
+        "pagination": {
+          "default_limit": 20
+        }
+      },
+      "input_schema": {
+        "username": {
+          "type": "text",
+          "required": false,
+          "description": "Only events recorded for this username."
+        },
+        "summary": {
+          "type": "text",
+          "required": false,
+          "description": "Substring search over the event summary."
+        }
+      },
+      "_evidence": {
+        "locator": "xmppserver/src/main/java/org/jivesoftware/openfire/security/DefaultSecurityAuditProvider.java:92",
+        "id_local": "SecurityAuditLog.search",
+        "entry": {
+          "kind": "http",
+          "locator": "xmppserver/src/main/java/org/jivesoftware/admin/servlet/SecurityAuditViewerServlet.java:41",
+          "route": "GET /security-audit-viewer.jsp"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "SELECT msgID, entryStamp, username, summary, node, details FROM ofSecurityAuditLog WHERE username=? ORDER BY entryStamp DESC LIMIT ?,?"
+      },
+      "entity": "SecurityAuditLog",
+      "_output_schema": {
+        "results": "list of rows",
+        "total": "int"
+      },
+      "description": "Search the server's security audit log by username or event summary. An admin monitoring view across the whole server.",
+      "_defaulted": []
+    },
+    {
+      "tool": "lockoutflag_disableaccount",
+      "op": "update",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "UserFlag",
+        "fields": {
+          "startTime": {
+            "$arg": "startTime"
+          },
+          "endTime": {
+            "$arg": "endTime"
+          }
+        },
+        "set_on_create": {
+          "name": "lockout"
+        }
+      },
+      "input_schema": {
+        "username": {
+          "type": "text",
+          "required": true,
+          "description": "The account to lock out."
+        },
+        "startTime": {
+          "type": "datetime",
+          "required": false,
+          "description": "When the lockout starts."
+        },
+        "endTime": {
+          "type": "datetime",
+          "required": false,
+          "description": "When the lockout ends; omit for a permanent lock."
+        }
+      },
+      "_evidence": {
+        "locator": "xmppserver/src/main/java/org/jivesoftware/openfire/lockout/DefaultLockOutProvider.java:99",
+        "id_local": "LockoutFlag.disableAccount",
+        "entry": {
+          "kind": "rpc",
+          "locator": "xmppserver/src/main/java/org/jivesoftware/openfire/commands/admin/user/DisableUser.java:51",
+          "route": "http://jabber.org/protocol/admin#disable-user"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "DELETE FROM ofUserFlag WHERE username=? AND name='lockout'; INSERT INTO ofUserFlag (username,name,startTime,endTime) VALUES (?,'lockout',?,?); LockOutEventDispatcher.accountLocked(flag);",
+        "edges": [
+          "admin console disables an existing user (user-disable.jsp)"
+        ]
+      },
+      "entity": "UserFlag",
+      "_binds": {
+        "username": "User.username",
+        "startTime": "UserFlag.startTime",
+        "endTime": "UserFlag.endTime"
+      },
+      "_output_schema": {
+        "updated": "bool",
+        "result": {
+          "id": "the lockout flag row"
+        }
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "username",
+                  "op": "eq",
+                  "value": {
+                    "arg": "username"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "username"
+        ],
+        "messages": {
+          "auth": "Sign in before locking out an account.",
+          "precondition": "You can only lock out an account that exists."
+        }
+      },
+      "_defaulted": [
+        "fields (row keyed by username + fixed name='lockout'; start/end from args)"
+      ],
+      "description": "Lock out an account so it cannot authenticate. The lockout lasts from startTime to endTime (null endTime = permanent)."
+    },
+    {
+      "tool": "lockoutflag_enableaccount",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "UserFlag",
+        "lookup_by": {
+          "username": {
+            "$arg": "username"
+          },
+          "name": "lockout"
+        },
+        "on_child": null
+      },
+      "input_schema": {
+        "username": {
+          "type": "text",
+          "required": true,
+          "description": "The account to re-enable."
+        }
+      },
+      "_evidence": {
+        "locator": "xmppserver/src/main/java/org/jivesoftware/openfire/lockout/DefaultLockOutProvider.java:121",
+        "id_local": "LockoutFlag.enableAccount",
+        "entry": {
+          "kind": "rpc",
+          "locator": "xmppserver/src/main/java/org/jivesoftware/openfire/commands/admin/user/ReEnableUser.java:51",
+          "route": "http://jabber.org/protocol/admin#reenable-user"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "DELETE FROM ofUserFlag WHERE username=? AND name='lockout'; LockOutEventDispatcher.accountUnlocked(username);",
+        "edges": [
+          "admin console enables an existing user"
+        ]
+      },
+      "entity": "UserFlag",
+      "_binds": {
+        "username": "User.username"
+      },
+      "_output_schema": {
+        "deleted": "bool"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "username",
+                  "op": "eq",
+                  "value": {
+                    "arg": "username"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "username"
+        ],
+        "messages": {
+          "auth": "Sign in before re-enabling an account.",
+          "precondition": "You can only re-enable an account that exists."
+        }
+      },
+      "description": "Unlock an account that was locked out, clearing its lockout flag."
+    },
+    {
+      "tool": "rosteritem_create",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "RosterItem",
+        "fields": [
+          "jid",
+          "sub",
+          "ask",
+          "recv",
+          "nick"
+        ],
+        "set_on_create": {
+          "rosterID": {
+            "$auto": "1+max(rosterID)+1"
+          },
+          "username": {
+            "$session": "account_name"
+          }
+        }
+      },
+      "input_schema": {
+        "jid": {
+          "type": "text",
+          "required": true,
+          "description": "The bare JID of the contact to add."
+        },
+        "sub": {
+          "type": "int",
+          "required": false,
+          "description": "Subscription state for this contact."
+        },
+        "ask": {
+          "type": "int",
+          "required": false,
+          "description": "Outgoing subscription ask state."
+        },
+        "recv": {
+          "type": "int",
+          "required": false,
+          "description": "Incoming subscription state."
+        },
+        "nick": {
+          "type": "text",
+          "required": false,
+          "description": "Nickname for this contact."
+        }
+      },
+      "_evidence": {
+        "locator": "xmppserver/src/main/java/org/jivesoftware/openfire/roster/DefaultRosterItemProvider.java:86",
+        "id_local": "RosterItem.create",
+        "entry": {
+          "kind": "rpc",
+          "route": "jabber:iq:roster set",
+          "locator": "xmppserver/src/main/java/org/jivesoftware/openfire/handler/IQRosterHandler.java:113"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "long rosterID=SequenceManager.nextID(ROSTER); INSERT INTO ofRoster (rosterID,username,jid,sub,ask,recv,nick,stanza) VALUES(?,?,?,?,?,?,?,?); insertGroups(rosterID, groups, con); INSERT INTO ofRosterGroups (rosterID,rank,groupName) VALUES(?,?,?);",
+        "edges": [
+          "rosters are the authenticated sender's own (IQRosterHandler uses from.getNode())"
+        ]
+      },
+      "entity": "RosterItem",
+      "_output_schema": {
+        "id": "the new row identifier"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "jid"
+        ],
+        "messages": {
+          "auth": "Sign in before adding a roster contact."
+        }
+      },
+      "description": "Add a contact to the signed-in user's roster (buddy list). The roster is owned by the signed-in account.",
+      "_defaulted": [
+        "fields (owner username injected from session; rosterID server-assigned)"
+      ]
+    },
+    {
+      "tool": "rosteritem_update",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "RosterItem",
+        "row_key": {
+          "rosterID": {
+            "$arg": "rosterID"
+          }
+        },
+        "fields": [
+          "sub",
+          "ask",
+          "recv",
+          "nick"
+        ]
+      },
+      "input_schema": {
+        "rosterID": {
+          "type": "int",
+          "required": true,
+          "description": "Identifier of the roster entry to update."
+        },
+        "sub": {
+          "type": "int",
+          "required": false,
+          "description": "New subscription state."
+        },
+        "ask": {
+          "type": "int",
+          "required": false,
+          "description": "New outgoing ask state."
+        },
+        "recv": {
+          "type": "int",
+          "required": false,
+          "description": "New incoming state."
+        },
+        "nick": {
+          "type": "text",
+          "required": false,
+          "description": "New nickname."
+        }
+      },
+      "_evidence": {
+        "locator": "xmppserver/src/main/java/org/jivesoftware/openfire/roster/DefaultRosterItemProvider.java:124",
+        "id_local": "RosterItem.update",
+        "entry": {
+          "kind": "rpc",
+          "route": "jabber:iq:roster set",
+          "locator": "xmppserver/src/main/java/org/jivesoftware/openfire/handler/IQRosterHandler.java:113"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "UPDATE ofRoster SET sub=?,ask=?,recv=?,nick=?,stanza=? WHERE rosterID=?; DELETE FROM ofRosterGroups WHERE rosterID=?; insertGroups(rosterID, groups, con);",
+        "edges": [
+          "IQRosterHandler resolves the owner's roster from the authenticated session"
+        ],
+        "addendum": "In real code this also rewrites the entry's roster groups; that is modeled as the RosterGroup cascade, so this tool only writes the RosterItem fields."
+      },
+      "entity": "RosterGroup",
+      "_binds": {
+        "username": "RosterItem.username",
+        "rosterID": "RosterItem.rosterID",
+        "sub": "RosterItem.sub",
+        "ask": "RosterItem.ask",
+        "recv": "RosterItem.recv",
+        "nick": "RosterItem.nick",
+        "groups": "RosterGroup.groupName"
+      },
+      "_output_schema": {
+        "updated": "bool"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "rosterID"
+        ],
+        "messages": {
+          "auth": "Sign in before editing your roster.",
+          "not_found": "That roster entry does not exist."
+        }
+      },
+      "_defaulted": [
+        "entity (a roster update rewrites the roster-item row, not its groups)"
+      ],
+      "description": "Update a roster contact's subscription states and nickname. The roster entry belongs to the signed-in user."
+    },
+    {
+      "tool": "rosteritem_delete",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "RosterItem",
+        "lookup_by": {
+          "rosterID": {
+            "$arg": "rosterID"
+          }
+        },
+        "on_child": null
+      },
+      "input_schema": {
+        "rosterID": {
+          "type": "int",
+          "required": true,
+          "description": "Identifier of the roster entry to remove."
+        }
+      },
+      "_evidence": {
+        "locator": "xmppserver/src/main/java/org/jivesoftware/openfire/roster/DefaultRosterItemProvider.java:163",
+        "id_local": "RosterItem.delete",
+        "entry": {
+          "kind": "rpc",
+          "route": "jabber:iq:roster remove",
+          "locator": "xmppserver/src/main/java/org/jivesoftware/openfire/handler/IQRosterHandler.java:113"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "DELETE FROM ofRosterGroups WHERE rosterID=?; DELETE FROM ofRoster WHERE rosterID=?;",
+        "edges": [
+          "IQRosterHandler remove uses the owner's roster from the session"
+        ]
+      },
+      "entity": "RosterGroup",
+      "_binds": {
+        "username": "RosterItem.username",
+        "rosterItemID": "RosterItem.rosterID"
+      },
+      "_output_schema": {
+        "deleted": "bool"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "rosterID"
+        ],
+        "messages": {
+          "auth": "Sign in before removing a roster entry.",
+          "not_found": "That roster entry does not exist."
+        }
+      },
+      "_defaulted": [
+        "row_key (by rosterID; roster groups cascade via on_delete)"
+      ],
+      "description": "Remove a contact from the signed-in user's roster. The roster entry belongs to the signed-in user."
+    },
+    {
+      "tool": "rosteritem_getroster",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "RosterItem",
+        "scope": {
+          "where": {
+            "username": {
+              "$session": "account_name"
+            }
+          }
+        },
+        "search_fields": [
+          "jid"
+        ],
+        "rank": {
+          "method": "substring",
+          "fields": [
+            "jid"
+          ]
+        },
+        "filter": {
+          "op": "or",
+          "clauses": [
+            {
+              "col": "jid",
+              "mode": "substring",
+              "val": {
+                "$arg": "jid"
+              },
+              "optional": true
+            }
+          ]
+        }
+      },
+      "input_schema": {
+        "jid": {
+          "type": "text",
+          "required": false,
+          "description": "Optional substring filter on the contact JID."
+        }
+      },
+      "_evidence": {
+        "locator": "xmppserver/src/main/java/org/jivesoftware/openfire/roster/DefaultRosterItemProvider.java:276",
+        "id_local": "RosterItem.getRoster",
+        "entry": {
+          "kind": "rpc",
+          "route": "jabber:iq:roster get",
+          "locator": "xmppserver/src/main/java/org/jivesoftware/openfire/handler/IQRosterHandler.java:113"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "SELECT jid,rosterID,sub,ask,recv,nick,stanza FROM ofRoster WHERE username=?; SELECT ofRosterGroups.rosterID,groupName FROM ofRosterGroups INNER JOIN ofRoster... WHERE username=?"
+      },
+      "entity": "RosterItem",
+      "_output_schema": {
+        "results": "list of rows",
+        "total": "int"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [],
+        "messages": {
+          "auth": "Sign in before reading your roster."
+        }
+      },
+      "description": "List the signed-in user's roster contacts, optionally filtered by a JID substring."
+    },
+    {
+      "tool": "privacylist_create",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "PrivacyList",
+        "fields": {
+          "isDefault": {
+            "$arg": "isDefault"
+          },
+          "list": {
+            "$arg": "list"
+          }
+        },
+        "set_on_create": {
+          "username": {
+            "$session": "account_name"
+          }
+        }
+      },
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "Name of the new privacy list."
+        },
+        "isDefault": {
+          "type": "bool",
+          "required": false,
+          "description": "Whether this is the user's active default list."
+        },
+        "list": {
+          "type": "text",
+          "required": true,
+          "description": "The privacy list rules XML."
+        }
+      },
+      "_evidence": {
+        "locator": "xmppserver/src/main/java/org/jivesoftware/openfire/privacy/PrivacyListProvider.java:240",
+        "id_local": "PrivacyList.create",
+        "entry": {
+          "kind": "rpc",
+          "route": "jabber:iq:privacy set",
+          "locator": "xmppserver/src/main/java/org/jivesoftware/openfire/privacy/PrivacyListProvider.java:240"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "INSERT INTO ofPrivacyList (username,name,isDefault,list) VALUES(?,?,?,?);",
+        "edges": [
+          "IQPrivacyHandler uses from.getNode() as owner"
+        ]
+      },
+      "entity": "PrivacyList",
+      "_output_schema": {
+        "id": "the new row identifier"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "name",
+          "isDefault",
+          "list"
+        ],
+        "messages": {
+          "auth": "Sign in before creating a privacy list."
+        }
+      },
+      "_defaulted": [
+        "fields (owner username injected from session)"
+      ],
+      "description": "Create a privacy list for the signed-in user."
+    },
+    {
+      "tool": "privacylist_update",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "PrivacyList",
+        "row_key": {
+          "username": {
+            "$session": "account_name"
+          },
+          "name": {
+            "$arg": "name"
+          }
+        },
+        "fields": {
+          "isDefault": {
+            "$arg": "isDefault"
+          },
+          "list": {
+            "$arg": "list"
+          }
+        }
+      },
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "Name of the privacy list to update."
+        },
+        "isDefault": {
+          "type": "bool",
+          "required": false,
+          "description": "New active-default flag."
+        },
+        "list": {
+          "type": "text",
+          "required": false,
+          "description": "New privacy rules XML."
+        }
+      },
+      "_evidence": {
+        "locator": "xmppserver/src/main/java/org/jivesoftware/openfire/privacy/PrivacyListProvider.java:268",
+        "id_local": "PrivacyList.update",
+        "entry": {
+          "kind": "rpc",
+          "route": "jabber:iq:privacy set",
+          "locator": "xmppserver/src/main/java/org/jivesoftware/openfire/privacy/PrivacyListProvider.java:268"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "UPDATE ofPrivacyList SET isDefault=?,list=? WHERE username=? AND name=?;",
+        "edges": [
+          "IQPrivacyHandler uses from.getNode() as owner"
+        ]
+      },
+      "entity": "PrivacyList",
+      "_output_schema": {
+        "updated": "bool"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "name"
+        ],
+        "messages": {
+          "auth": "Sign in before updating a privacy list.",
+          "not_found": "That privacy list does not exist."
+        }
+      },
+      "description": "Update an existing privacy list that belongs to the signed-in user."
+    },
+    {
+      "tool": "privacylist_delete",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "PrivacyList",
+        "lookup_by": {
+          "username": {
+            "$session": "account_name"
+          },
+          "name": {
+            "$arg": "listName"
+          }
+        }
+      },
+      "input_schema": {
+        "listName": {
+          "type": "text",
+          "required": true,
+          "description": "Name of the privacy list to delete."
+        }
+      },
+      "_evidence": {
+        "locator": "xmppserver/src/main/java/org/jivesoftware/openfire/privacy/PrivacyListProvider.java:296",
+        "id_local": "PrivacyList.delete",
+        "entry": {
+          "kind": "rpc",
+          "route": "jabber:iq:privacy remove",
+          "locator": "xmppserver/src/main/java/org/jivesoftware/openfire/privacy/PrivacyListProvider.java:296"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "DELETE FROM ofPrivacyList WHERE username=? AND name=?;",
+        "edges": [
+          "IQPrivacyHandler uses from.getNode() as owner"
+        ]
+      },
+      "entity": "PrivacyList",
+      "_output_schema": {
+        "deleted": "bool"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "listName"
+        ],
+        "messages": {
+          "auth": "Sign in before deleting a privacy list.",
+          "not_found": "That privacy list does not exist."
+        }
+      },
+      "description": "Delete a privacy list that belongs to the signed-in user."
+    },
+    {
+      "tool": "privacylist_read",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "PrivacyList",
+        "lookup_by": {
+          "username": {
+            "$session": "account_name"
+          },
+          "name": {
+            "$arg": "listName"
+          }
+        },
+        "scope": {
+          "owner_col": "username"
+        }
+      },
+      "input_schema": {
+        "listName": {
+          "type": "text",
+          "required": true,
+          "description": "Name of the privacy list to fetch."
+        }
+      },
+      "_evidence": {
+        "locator": "xmppserver/src/main/java/org/jivesoftware/openfire/privacy/PrivacyListProvider.java:129",
+        "id_local": "PrivacyList.read",
+        "entry": {
+          "kind": "rpc",
+          "route": "jabber:iq:privacy get",
+          "locator": "xmppserver/src/main/java/org/jivesoftware/openfire/privacy/PrivacyListProvider.java:129"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "SELECT isDefault,list FROM ofPrivacyList WHERE username=? AND name=?;"
+      },
+      "entity": "PrivacyList",
+      "_output_schema": {
+        "row": "the matching row"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "listName"
+        ],
+        "messages": {
+          "auth": "Sign in before reading a privacy list.",
+          "not_found": "That privacy list does not exist."
+        }
+      },
+      "description": "Fetch one of the signed-in user's privacy lists."
+    },
+    {
+      "tool": "vcard_save",
+      "op": "update",
+      "family": "crud.upsert",
+      "exec_spec": {
+        "entity": "VCard",
+        "key": {
+          "username": {
+            "$session": "account_name"
+          }
+        },
+        "insert_fields": {
+          "vcard": {
+            "$arg": "vcard"
+          }
+        },
+        "set_on_exists": {
+          "vcard": {
+            "$arg": "vcard"
+          }
+        }
+      },
+      "input_schema": {
+        "vcard": {
+          "type": "text",
+          "required": true,
+          "description": "The vCard XML/profile for this user."
+        }
+      },
+      "_evidence": {
+        "locator": "xmppserver/src/main/java/org/jivesoftware/openfire/vcard/DefaultVCardProvider.java:88",
+        "id_local": "VCard.save",
+        "entry": {
+          "kind": "rpc",
+          "route": "vcard-temp set",
+          "locator": "xmppserver/src/main/java/org/jivesoftware/openfire/handler/IQvCardHandler.java:101"
+        },
+        "entity_why": "primary effect row_upsert lands on this table",
+        "ref_code": "Element oldVCard = getOrLoadVCard(username); if (oldVCard != null) updateVCard(...) else createVCard(...); UPDATE ofVCard SET vcard=? WHERE username=?; else INSERT INTO ofVCard (username,vcard) VALUES(?,?);",
+        "edges": [
+          "IQvCardHandler uses from.getNode() as owner"
+        ]
+      },
+      "entity": "VCard",
+      "_output_schema": {
+        "updated": "bool"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "vcard"
+        ],
+        "messages": {
+          "auth": "Sign in before saving your vCard."
+        }
+      },
+      "description": "Save the signed-in user's vCard profile. Creates or updates the vCard for the account."
+    },
+    {
+      "tool": "vcard_getvcard",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "VCard",
+        "lookup_by": {
+          "username": {
+            "$session": "account_name"
+          }
+        },
+        "scope": {
+          "owner_col": "username"
+        }
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "xmppserver/src/main/java/org/jivesoftware/openfire/vcard/DefaultVCardProvider.java:59",
+        "id_local": "VCard.getVCard",
+        "entry": {
+          "kind": "rpc",
+          "route": "vcard-temp get",
+          "locator": "xmppserver/src/main/java/org/jivesoftware/openfire/handler/IQvCardHandler.java:123"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "SELECT vcard FROM ofVCard WHERE username=?;"
+      },
+      "entity": "VCard",
+      "_output_schema": {
+        "row": "the matching row"
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "Sign in before reading your vCard.",
+          "not_found": "You do not have a vCard saved yet."
+        }
+      },
+      "description": "Fetch the signed-in user's vCard profile."
+    },
+    {
+      "tool": "group_create",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Group",
+        "fields": {
+          "description": {
+            "$arg": "description"
+          }
+        }
+      },
+      "input_schema": {
+        "groupName": {
+          "type": "text",
+          "required": true,
+          "description": "The unique name of the new group."
+        },
+        "description": {
+          "type": "text",
+          "required": false,
+          "description": "A description of the group."
+        }
+      },
+      "_evidence": {
+        "locator": "xmppserver/src/main/java/org/jivesoftware/openfire/group/DefaultGroupProvider.java:80",
+        "id_local": "Group.create",
+        "entry": {
+          "kind": "rpc",
+          "route": "http://jabber.org/protocol/admin#create-group",
+          "locator": "xmppserver/src/main/java/org/jivesoftware/openfire/commands/admin/group/AddGroup.java:70"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "INSERT INTO ofGroup (groupName,description) VALUES (?,?);",
+        "edges": [
+          "DefaultGroupProvider createGroup throws GroupAlreadyExistsException"
+        ]
+      },
+      "entity": "Group",
+      "_binds": {
+        "groupName": "Group.groupName",
+        "description": "Group.description"
+      },
+      "_output_schema": {
+        "id": "the new row identifier"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Group",
+                "where": {
+                  "node": "field",
+                  "col": "groupName",
+                  "op": "eq",
+                  "value": {
+                    "arg": "groupName"
+                  }
+                }
+              },
+              "op": "eq",
+              "n": 0
+            }
+          ]
+        ],
+        "required": [
+          "groupName"
+        ],
+        "messages": {
+          "precondition": "A group with that name already exists."
+        }
+      },
+      "_defaulted": [],
+      "description": "Create a new admin group. Fails if a group with that name already exists."
+    },
+    {
+      "tool": "group_update",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Group",
+        "row_key": {
+          "groupName": {
+            "$arg": "groupName"
+          }
+        },
+        "fields": {
+          "description": {
+            "$arg": "description"
+          }
+        }
+      },
+      "input_schema": {
+        "groupName": {
+          "type": "text",
+          "required": true,
+          "description": "The name of the group to update."
+        },
+        "description": {
+          "type": "text",
+          "required": true,
+          "description": "The new group description."
+        }
+      },
+      "_evidence": {
+        "locator": "xmppserver/src/main/java/org/jivesoftware/openfire/group/DefaultGroupProvider.java:148",
+        "id_local": "Group.update",
+        "entry": {
+          "kind": "rpc",
+          "route": "http://jabber.org/protocol/admin#update-group",
+          "locator": "xmppserver/src/main/java/org/jivesoftware/openfire/commands/admin/group/UpdateGroup.java:70"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "UPDATE ofGroup SET description=? WHERE groupName=?;"
+      },
+      "entity": "Group",
+      "_binds": {
+        "groupName": "Group.groupName",
+        "description": "Group.description"
+      },
+      "_output_schema": {
+        "updated": "bool"
+      },
+      "guards": {
+        "required": [
+          "groupName"
+        ],
+        "messages": {
+          "not_found": "That group does not exist."
+        }
+      },
+      "description": "Update an existing admin group's description."
+    },
+    {
+      "tool": "group_rename",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Group",
+        "row_key": {
+          "groupName": {
+            "$arg": "currentName"
+          }
+        },
+        "set": {
+          "groupName": {
+            "$arg": "newName"
+          }
+        }
+      },
+      "input_schema": {
+        "currentName": {
+          "type": "text",
+          "required": true,
+          "description": "The current name of the group."
+        },
+        "newName": {
+          "type": "text",
+          "required": true,
+          "description": "The new name for the group."
+        }
+      },
+      "_evidence": {
+        "locator": "xmppserver/src/main/java/org/jivesoftware/openfire/group/DefaultGroupProvider.java:176",
+        "id_local": "Group.rename",
+        "entry": {
+          "kind": "rpc",
+          "route": "http://jabber.org/protocol/admin#rename-group",
+          "locator": "xmppserver/src/main/java/org/jivesoftware/openfire/commands/admin/group/RenameGroup.java:70"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "UPDATE ofGroup SET groupName=? WHERE groupName=?; UPDATE ofGroupProp SET groupName=? WHERE groupName=?; UPDATE ofGroupUser SET groupName=? WHERE groupName=?; (one tx)",
+        "edges": [
+          "setName checks the target group exists"
+        ],
+        "addendum": "rename also rewrites ofGroupProp/ofGroupUser groupName in the same tx (DefaultGroupProvider.java:176); those cascade via their declared on_delete."
+      },
+      "entity": "Group",
+      "_binds": {
+        "groupName": "Group.groupName"
+      },
+      "_output_schema": {
+        "updated": "bool"
+      },
+      "guards": {
+        "required": [
+          "currentName",
+          "newName"
+        ],
+        "messages": {
+          "not_found": "That group does not exist.",
+          "constraint": "A group with that new name already exists."
+        }
+      },
+      "_defaulted": [
+        "row_key (locator currentName is the address; newName is the new value via exec_spec.set — the old field_set arg-bleed wrote the address back and made rename a no-op)"
+      ],
+      "description": "Rename an admin group. Fails if the source group does not exist."
+    },
+    {
+      "tool": "group_delete",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "Group",
+        "lookup_by": {
+          "groupName": {
+            "$arg": "groupName"
+          }
+        },
+        "on_child": null
+      },
+      "input_schema": {
+        "groupName": {
+          "type": "text",
+          "required": true,
+          "description": "The name of the group to delete."
+        }
+      },
+      "_evidence": {
+        "locator": "xmppserver/src/main/java/org/jivesoftware/openfire/group/DefaultGroupProvider.java:229",
+        "id_local": "Group.delete",
+        "entry": {
+          "kind": "rpc",
+          "route": "http://jabber.org/protocol/admin#delete-group",
+          "locator": "xmppserver/src/main/java/org/jivesoftware/openfire/commands/admin/group/DeleteGroup.java:70"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "DELETE FROM ofGroupUser WHERE groupName=?; DELETE FROM ofGroupProp WHERE groupName=?; DELETE FROM ofGroup WHERE groupName=?; (one tx)"
+      },
+      "entity": "GroupUser",
+      "_binds": {
+        "groupName": "Group.groupName"
+      },
+      "_output_schema": {
+        "deleted": "bool"
+      },
+      "guards": {
+        "required": [
+          "groupName"
+        ],
+        "messages": {
+          "not_found": "That group does not exist."
+        }
+      },
+      "description": "Delete an admin group and its memberships. Fails if the group does not exist.",
+      "_defaulted": [
+        "entity (the primary effect deletes the Group row; members/props cascade via on_delete)"
+      ]
+    },
+    {
+      "tool": "group_addmember",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "GroupUser",
+        "fields": {
+          "groupName": {
+            "$arg": "groupName"
+          },
+          "username": {
+            "$arg": "username"
+          },
+          "administrator": {
+            "$arg": "administrator"
+          }
+        }
+      },
+      "input_schema": {
+        "groupName": {
+          "type": "text",
+          "required": true,
+          "description": "The group to add the user to."
+        },
+        "username": {
+          "type": "text",
+          "required": true,
+          "description": "The user to add."
+        },
+        "administrator": {
+          "type": "bool",
+          "required": true,
+          "description": "Whether the member is a group administrator."
+        }
+      },
+      "_evidence": {
+        "locator": "xmppserver/src/main/java/org/jivesoftware/openfire/group/DefaultGroupProvider.java:363",
+        "id_local": "Group.addMember",
+        "entry": {
+          "kind": "rpc",
+          "route": "http://jabber.org/protocol/admin#add-group-members",
+          "locator": "xmppserver/src/main/java/org/jivesoftware/openfire/commands/admin/group/AddGroupUsers.java:70"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "INSERT INTO ofGroupUser (groupName,username,administrator) VALUES(?,?,?);",
+        "edges": [
+          "addMember throws GroupNotFoundException if group missing"
+        ]
+      },
+      "entity": "GroupUser",
+      "_binds": {
+        "groupName": "GroupUser.groupName",
+        "username": "GroupUser.username",
+        "administrator": "GroupUser.administrator"
+      },
+      "_output_schema": {
+        "id": "the new row identifier"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Group",
+                "where": {
+                  "node": "field",
+                  "col": "groupName",
+                  "op": "eq",
+                  "value": {
+                    "arg": "groupName"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "groupName",
+          "username",
+          "administrator"
+        ],
+        "messages": {
+          "precondition": "You can only add a member to an existing group."
+        }
+      },
+      "_defaulted": [],
+      "description": "Add a user as a member of an admin group. Fails if the group does not exist."
+    },
+    {
+      "tool": "group_setmemberadministrator",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "GroupUser",
+        "row_key": {
+          "groupName": {
+            "$arg": "groupName"
+          },
+          "username": {
+            "$arg": "username"
+          }
+        },
+        "fields": {
+          "administrator": {
+            "$arg": "administrator"
+          }
+        }
+      },
+      "input_schema": {
+        "groupName": {
+          "type": "text",
+          "required": true,
+          "description": "The group whose member to update."
+        },
+        "username": {
+          "type": "text",
+          "required": true,
+          "description": "The member to update."
+        },
+        "administrator": {
+          "type": "bool",
+          "required": true,
+          "description": "Whether the member becomes a group administrator."
+        }
+      },
+      "_evidence": {
+        "locator": "xmppserver/src/main/java/org/jivesoftware/openfire/group/DefaultGroupProvider.java:391",
+        "id_local": "Group.setMemberAdministrator",
+        "entry": {
+          "kind": "rpc",
+          "route": "http://jabber.org/protocol/admin#add-group-members",
+          "locator": "xmppserver/src/main/java/org/jivesoftware/openfire/commands/admin/group/AddGroupUsers.java:70"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "UPDATE ofGroupUser SET administrator=? WHERE groupName=? AND username=?;"
+      },
+      "entity": "GroupUser",
+      "_binds": {
+        "groupName": "GroupUser.groupName",
+        "username": "GroupUser.username",
+        "administrator": "GroupUser.administrator"
+      },
+      "_output_schema": {
+        "updated": "bool"
+      },
+      "guards": {
+        "required": [
+          "groupName",
+          "username",
+          "administrator"
+        ],
+        "messages": {
+          "not_found": "That group member does not exist."
+        }
+      },
+      "_defaulted": [],
+      "description": "Set whether an existing member of an admin group is a group administrator."
+    },
+    {
+      "tool": "group_removemember",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "GroupUser",
+        "lookup_by": {
+          "groupName": {
+            "$arg": "groupName"
+          },
+          "username": {
+            "$arg": "username"
+          }
+        }
+      },
+      "input_schema": {
+        "groupName": {
+          "type": "text",
+          "required": true,
+          "description": "The group to remove the user from."
+        },
+        "username": {
+          "type": "text",
+          "required": true,
+          "description": "The user to remove."
+        }
+      },
+      "_evidence": {
+        "locator": "xmppserver/src/main/java/org/jivesoftware/openfire/group/DefaultGroupProvider.java:419",
+        "id_local": "Group.removeMember",
+        "entry": {
+          "kind": "rpc",
+          "route": "http://jabber.org/protocol/admin#delete-group-members",
+          "locator": "xmppserver/src/main/java/org/jivesoftware/openfire/commands/admin/group/DeleteGroupUsers.java:70"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "DELETE FROM ofGroupUser WHERE groupName=? AND username=?;"
+      },
+      "entity": "GroupUser",
+      "_binds": {
+        "groupName": "GroupUser.groupName",
+        "username": "GroupUser.username"
+      },
+      "_output_schema": {
+        "deleted": "bool"
+      },
+      "guards": {
+        "required": [
+          "groupName",
+          "username"
+        ],
+        "messages": {
+          "not_found": "That group member does not exist."
+        }
+      },
+      "description": "Remove a user from an admin group."
+    },
+    {
+      "tool": "mucroom_create",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "MucRoom",
+        "fields": {
+          "serviceID": {
+            "$arg": "serviceID"
+          },
+          "name": {
+            "$arg": "roomName"
+          },
+          "naturalName": {
+            "$arg": "naturalName"
+          },
+          "description": {
+            "$arg": "description"
+          }
+        },
+        "set_on_create": {
+          "creationDate": "2026-01-01T00:00:00",
+          "modificationDate": "2026-01-01T00:00:00",
+          "lockedDate": "2026-01-01T00:00:00",
+          "roomID": {
+            "$auto": "1+max(roomID)+1"
+          }
+        }
+      },
+      "input_schema": {
+        "serviceID": {
+          "type": "int",
+          "required": true,
+          "description": "The MUC service the room is created under."
+        },
+        "roomName": {
+          "type": "text",
+          "required": true,
+          "description": "The unique room name (node) within the service."
+        },
+        "naturalName": {
+          "type": "text",
+          "required": true,
+          "description": "The human-readable display name of the room."
+        },
+        "description": {
+          "type": "text",
+          "required": false,
+          "description": "A description of the room."
+        }
+      },
+      "_evidence": {
+        "locator": "xmppserver/src/main/java/org/jivesoftware/openfire/muc/spi/MultiUserChatServiceImpl.java:2049",
+        "id_local": "MucRoom.create",
+        "entry": {
+          "kind": "rpc",
+          "route": "muc#roomconfig",
+          "locator": "xmppserver/src/main/java/org/jivesoftware/openfire/muc/spi/IQOwnerHandler.java:200"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "long roomID=SequenceManager.nextID(MUC_ROOM); INSERT INTO ofMucRoom (serviceID,roomID,creationDate,modificationDate,name,naturalName,...) VALUES(?,?,?,?,?,?,...); room.addFirstOwner(userjid);",
+        "edges": [
+          "room creation gated by service.isAllowedToCreate policy; a non-hidden configured MUC service must exist"
+        ]
+      },
+      "entity": "MucRoom",
+      "_binds": {
+        "roomName": "MucRoom.name",
+        "naturalName": "MucRoom.naturalName",
+        "description": "MucRoom.description"
+      },
+      "_output_schema": {
+        "id": "the new row identifier"
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "MucService",
+                "where": {
+                  "node": "field",
+                  "col": "serviceID",
+                  "op": "eq",
+                  "value": {
+                    "arg": "serviceID"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "serviceID",
+          "roomName",
+          "naturalName"
+        ],
+        "messages": {
+          "auth": "Sign in before creating a room.",
+          "precondition": "That MUC service does not exist.",
+          "unique": "A room with that name already exists."
+        }
+      },
+      "_defaulted": [
+        "fields (room name is set on create, not looked up; service must be provided)"
+      ],
+      "description": "Create a new groupchat (MUC) room under a MUC service. The creator becomes the room's first owner. Fails if the service does not exist or the room name is already taken."
+    },
+    {
+      "tool": "mucroom_addaffiliation",
+      "op": "update",
+      "family": "crud.upsert",
+      "exec_spec": {
+        "entity": "MucAffiliation",
+        "key": {
+          "roomID": {
+            "$arg": "roomID"
+          },
+          "jid": {
+            "$arg": "jid"
+          }
+        },
+        "insert_fields": {
+          "affiliation": {
+            "$arg": "affiliation"
+          }
+        },
+        "set_on_exists": {
+          "affiliation": {
+            "$arg": "affiliation"
+          }
+        }
+      },
+      "input_schema": {
+        "roomID": {
+          "type": "int",
+          "required": true,
+          "description": "The room whose affiliation to set."
+        },
+        "jid": {
+          "type": "text",
+          "required": true,
+          "description": "The JID whose affiliation changes."
+        },
+        "affiliation": {
+          "type": "int",
+          "required": true,
+          "description": "New affiliation code (10 owner / 20 admin / 30 member / 40 outcast / 50 none)."
+        }
+      },
+      "_evidence": {
+        "locator": "xmppserver/src/main/java/org/jivesoftware/openfire/muc/MUCRoom.java:2016",
+        "id_local": "MucRoom.addAffiliation",
+        "entry": {
+          "kind": "rpc",
+          "route": "muc#owner affiliation",
+          "locator": "xmppserver/src/main/java/org/jivesoftware/openfire/muc/spi/IQOwnerHandler.java:200"
+        },
+        "entity_why": "primary effect row_upsert lands on this table",
+        "ref_code": "INSERT INTO ofMucAffiliation(roomID,jid,affiliation) VALUES(?,?,?) ON DUP UPDATE affiliation=?(update); (member path ADD_MEMBER into ofMucMember)",
+        "edges": [
+          "granting owner requires owner; granting admin requires owner or admin"
+        ]
+      },
+      "entity": "MucAffiliation",
+      "_binds": {
+        "roomID": "MucAffiliation.roomID",
+        "jid": "MucAffiliation.jid",
+        "affiliation": "MucAffiliation.affiliation",
+        "nickname": "MucMember.nickname"
+      },
+      "_output_schema": {
+        "updated": "bool"
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "MucAffiliation",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "jid",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "affiliation",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          10,
+                          20
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "roomID",
+          "jid",
+          "affiliation"
+        ],
+        "messages": {
+          "auth": "Sign in before changing room affiliations.",
+          "precondition": "Only a room owner or admin can change affiliations."
+        }
+      },
+      "description": "Grant or change a user's affiliation in a room. Affiliation codes: 10=owner, 20=admin, 30=member, 40=outcast, 50=none. Only a room owner or admin can do this.",
+      "_defaulted": [
+        "fields (row upserts on (roomID,jid); affiliation is the only write column)"
+      ]
+    },
+    {
+      "tool": "mucroom_addmember",
+      "op": "update",
+      "family": "crud.upsert",
+      "exec_spec": {
+        "entity": "MucMember",
+        "key": {
+          "roomID": {
+            "$arg": "roomID"
+          },
+          "jid": {
+            "$arg": "jid"
+          }
+        },
+        "insert_fields": {
+          "nickname": {
+            "$arg": "nickname"
+          }
+        },
+        "set_on_exists": {
+          "nickname": {
+            "$arg": "nickname"
+          }
+        }
+      },
+      "input_schema": {
+        "roomID": {
+          "type": "int",
+          "required": true,
+          "description": "The room to add the member to."
+        },
+        "jid": {
+          "type": "text",
+          "required": true,
+          "description": "The JID to add as a member."
+        },
+        "nickname": {
+          "type": "text",
+          "required": false,
+          "description": "The member's room nickname."
+        }
+      },
+      "_evidence": {
+        "locator": "xmppserver/src/main/java/org/jivesoftware/openfire/muc/MUCRoom.java:2185",
+        "id_local": "MucRoom.addMember",
+        "entry": {
+          "kind": "rpc",
+          "route": "muc#admin item affiliation=member",
+          "locator": "xmppserver/src/main/java/org/jivesoftware/openfire/muc/spi/IQAdminHandler.java:140"
+        },
+        "entity_why": "primary effect row_upsert lands on this table",
+        "ref_code": "INSERT INTO ofMucMember(roomID,jid,nickname) VALUES(?,?,?) ON DUP UPDATE nickname=?;\nINSERT INTO ofMucAffiliation(roomID,jid,affiliation) VALUES(?,?,30);",
+        "edges": [
+          "actor must be owner/admin/member to add a member"
+        ]
+      },
+      "entity": "MucMember",
+      "_binds": {
+        "roomID": "MucMember.roomID",
+        "jid": "MucMember.jid",
+        "nickname": "MucMember.nickname"
+      },
+      "_output_schema": {
+        "updated": "bool"
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "MucAffiliation",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "jid",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "affiliation",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          10,
+                          20,
+                          30
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "roomID",
+          "jid"
+        ],
+        "messages": {
+          "auth": "Sign in before adding room members.",
+          "precondition": "Only a room owner, admin, or member can add members."
+        }
+      },
+      "description": "Grant membership in a room to a JID (writes the room member profile and a member affiliation). Only a room owner, admin, or existing member can do this.",
+      "_defaulted": []
+    },
+    {
+      "tool": "mucroom_removeaffiliation",
+      "op": "update",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "MucAffiliation",
+        "lookup_by": {
+          "roomID": {
+            "$arg": "roomID"
+          },
+          "jid": {
+            "$arg": "jid"
+          }
+        },
+        "on_child": null
+      },
+      "input_schema": {
+        "roomID": {
+          "type": "int",
+          "required": true,
+          "description": "The room to remove the affiliation from."
+        },
+        "jid": {
+          "type": "text",
+          "required": true,
+          "description": "The JID whose affiliation to remove."
+        }
+      },
+      "_evidence": {
+        "locator": "xmppserver/src/main/java/org/jivesoftware/openfire/muc/MUCRoom.java:2329",
+        "id_local": "MucRoom.removeAffiliation",
+        "entry": {
+          "kind": "rpc",
+          "route": "muc#admin item affiliation=none",
+          "locator": "xmppserver/src/main/java/org/jivesoftware/openfire/muc/spi/IQAdminHandler.java:140"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "DELETE FROM ofMucMember WHERE roomID=? AND jid=?; OR DELETE FROM ofMucAffiliation WHERE roomID=? AND jid=?;",
+        "edges": [
+          "actor must be owner/admin to remove affiliation"
+        ]
+      },
+      "entity": "MucAffiliation",
+      "_binds": {
+        "roomID": "MucAffiliation.roomID",
+        "jid": "MucAffiliation.jid"
+      },
+      "_output_schema": {
+        "updated": "bool"
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "MucAffiliation",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "jid",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "affiliation",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          10,
+                          20
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "roomID",
+          "jid"
+        ],
+        "messages": {
+          "auth": "Sign in before changing room affiliations.",
+          "precondition": "Only a room owner or admin can remove affiliations."
+        }
+      },
+      "description": "Remove a user's affiliation and membership from a room. Only a room owner or admin can do this."
+    },
+    {
+      "tool": "mucroom_changesubject",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "MucRoom",
+        "row_key": {
+          "roomID": {
+            "$arg": "roomID"
+          }
+        },
+        "fields": {
+          "subject": {
+            "$arg": "subject"
+          }
+        }
+      },
+      "input_schema": {
+        "roomID": {
+          "type": "int",
+          "required": true,
+          "description": "The room whose subject to change."
+        },
+        "subject": {
+          "type": "text",
+          "required": true,
+          "description": "The new room subject."
+        }
+      },
+      "_evidence": {
+        "locator": "xmppserver/src/main/java/org/jivesoftware/openfire/muc/MUCRoom.java:2654",
+        "id_local": "MucRoom.changeSubject",
+        "entry": {
+          "kind": "rpc",
+          "route": "groupchat message <subject>",
+          "locator": "xmppserver/src/main/java/org/jivesoftware/openfire/muc/MUCRoom.java:2636"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "this.subject = packet.createCopy(); MUCPersistenceManager.updateRoomSubject(this); UPDATE ofMucRoom SET subject=? WHERE roomID=?;",
+        "edges": [
+          "change subject allowed when canChangeSubject set or actor is moderator"
+        ]
+      },
+      "entity": "MucRoom",
+      "_binds": {
+        "roomID": "MucRoom.roomID",
+        "subject": "MucRoom.subject"
+      },
+      "_output_schema": {
+        "updated": "bool"
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "MucRoom",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "roomID",
+                      "op": "eq",
+                      "value": {
+                        "arg": "roomID"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "canChangeSubject",
+                      "op": "eq",
+                      "value": true
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "roomID",
+          "subject"
+        ],
+        "messages": {
+          "auth": "Sign in before changing the subject.",
+          "precondition": "This room does not allow subject changes.",
+          "not_found": "That room does not exist."
+        }
+      },
+      "description": "Change the subject of a room. Fails unless the room is configured to allow subject changes."
+    },
+    {
+      "tool": "mucroom_search",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "MucRoom",
+        "scope": {
+          "where": {
+            "serviceID": {
+              "$arg": "serviceID"
+            }
+          }
+        },
+        "search_fields": [
+          "name",
+          "naturalName",
+          "description",
+          "subject"
+        ],
+        "rank": {
+          "method": "substring",
+          "fields": [
+            "name",
+            "naturalName",
+            "description",
+            "subject"
+          ]
+        },
+        "filter": {
+          "op": "or",
+          "clauses": [
+            {
+              "col": "name",
+              "mode": "substring",
+              "val": {
+                "$arg": "query"
+              },
+              "optional": true
+            },
+            {
+              "col": "naturalName",
+              "mode": "substring",
+              "val": {
+                "$arg": "query"
+              },
+              "optional": true
+            },
+            {
+              "col": "description",
+              "mode": "substring",
+              "val": {
+                "$arg": "query"
+              },
+              "optional": true
+            },
+            {
+              "col": "subject",
+              "mode": "substring",
+              "val": {
+                "$arg": "query"
+              },
+              "optional": true
+            }
+          ]
+        }
+      },
+      "input_schema": {
+        "serviceID": {
+          "type": "int",
+          "required": true,
+          "description": "The MUC service to search for rooms in."
+        },
+        "query": {
+          "type": "text",
+          "required": false,
+          "description": "Substring search across the room's fields."
+        }
+      },
+      "_evidence": {
+        "locator": "xmppserver/src/main/java/org/jivesoftware/openfire/muc/spi/MultiUserChatServiceImpl.java:2162",
+        "id_local": "MucRoom.search",
+        "entry": {
+          "kind": "rpc",
+          "route": "jabber:iq:search",
+          "locator": "xmppserver/src/main/java/org/jivesoftware/openfire/muc/spi/IQMUCSearchHandler.java:127"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "// getAllRoomSearchInfo lists public rooms; name/naturalName/description/subject matched from DB-loaded rooms"
+      },
+      "entity": "MucRoom",
+      "_output_schema": {
+        "results": "list of rows",
+        "total": "int"
+      },
+      "guards": {
+        "required": [
+          "serviceID"
+        ]
+      },
+      "description": "Search chat rooms within a MUC service by name, display name, description, or subject."
+    },
+    {
+      "tool": "mucroom_listaffiliations",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "MucAffiliation",
+        "scope": {
+          "where": {
+            "roomID": {
+              "$arg": "roomID"
+            }
+          }
+        },
+        "search_fields": [
+          "jid",
+          "affiliation"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "affiliation"
+          ]
+        },
+        "filter": {
+          "col": "affiliation",
+          "mode": "exact",
+          "val": {
+            "$arg": "affiliation"
+          },
+          "optional": true
+        }
+      },
+      "input_schema": {
+        "roomID": {
+          "type": "int",
+          "required": true,
+          "description": "The room whose affiliations to list."
+        },
+        "affiliation": {
+          "type": "int",
+          "required": false,
+          "description": "Filter to a single affiliation code."
+        }
+      },
+      "_evidence": {
+        "locator": "xmppserver/src/main/java/org/jivesoftware/openfire/muc/spi/IQAdminHandler.java:140",
+        "id_local": "MucAffiliation.read",
+        "entry": {
+          "kind": "rpc",
+          "route": "muc#admin query",
+          "locator": "xmppserver/src/main/java/org/jivesoftware/openfire/muc/spi/IQAdminHandler.java:140"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "listAffiliations: for (Affiliation affiliation : Affiliation.values()) {\n if (affiliation == Affiliation.none) continue;\n for (JID jid : room.getAffiliatesByAffiliation(affiliation).keySet()) {\n  item.addAttribute(\"affiliation\", affiliation.toString());\n  item.addAttribute(\"jid\", jid.toString());\n}}}"
+      },
+      "entity": "MucAffiliation",
+      "_output_schema": {
+        "results": "list of rows",
+        "total": "int"
+      },
+      "guards": {
+        "required": [
+          "roomID"
+        ]
+      },
+      "description": "List the affiliations of one room, grouped by affiliation type. A room owner/admin read of the room's member list."
+    },
+    {
+      "tool": "pubsubnode_create",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "PubsubNode",
+        "fields": {
+          "leaf": {
+            "$arg": "leaf"
+          },
+          "parent": {
+            "$arg": "parent"
+          },
+          "creator": {
+            "$arg": "creator"
+          },
+          "description": {
+            "$arg": "description"
+          },
+          "name": {
+            "$arg": "name"
+          }
+        },
+        "set_on_create": {
+          "creationDate": "2026-01-01T00:00:00",
+          "modificationDate": "2026-01-01T00:00:00",
+          "serviceID": {
+            "$arg": "serviceID"
+          },
+          "nodeID": {
+            "$arg": "nodeID"
+          }
+        },
+        "side_inserts": [
+          {
+            "entity": "PubsubAffiliation",
+            "fields": {
+              "serviceID": {
+                "$arg": "serviceID"
+              },
+              "nodeID": {
+                "$arg": "nodeID"
+              },
+              "jid": {
+                "$session": "account_id"
+              },
+              "affiliation": {
+                "$const": "owner"
+              }
+            }
+          }
+        ]
+      },
+      "input_schema": {
+        "serviceID": {
+          "type": "text",
+          "required": true,
+          "description": "The pubsub service the node is created in."
+        },
+        "nodeID": {
+          "type": "text",
+          "required": true,
+          "description": "The unique node id."
+        },
+        "leaf": {
+          "type": "bool",
+          "required": true,
+          "description": "Whether this is a leaf (item-hosting) node."
+        },
+        "creator": {
+          "type": "text",
+          "required": true,
+          "description": "The JID creating the node; becomes its owner."
+        },
+        "name": {
+          "type": "text",
+          "required": false,
+          "description": "Display name of the node."
+        },
+        "description": {
+          "type": "text",
+          "required": false,
+          "description": "Description of the node."
+        },
+        "parent": {
+          "type": "text",
+          "required": false,
+          "description": "Parent node id for a collection hierarchy."
+        }
+      },
+      "_evidence": {
+        "locator": "xmppserver/src/main/java/org/jivesoftware/openfire/pubsub/DefaultPubSubPersistenceProvider.java:270",
+        "id_local": "PubsubNode.create",
+        "entry": {
+          "kind": "rpc",
+          "route": "http://jabber.org/protocol/pubsub#create",
+          "locator": "xmppserver/src/main/java/org/jivesoftware/openfire/pubsub/PubSubEngine.java:1272"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "INSERT INTO ofPubsubNode (serviceID,nodeID,leaf,creationDate,modificationDate,...publisherModel,subscriptionEnabled,...accessModel,payloadType,bodyXSLT,dataformXSLT,creator,description,language,name,replyPolicy,associationPolicy,maxLeafNodes) VALUES(...); saveAssociatedElements -> INSERT INTO ofPubsubNodeJIDs(...'contacts'); INSERT INTO ofPubsubAffiliation (creator as owner);",
+        "edges": [
+          "PubSubEngine.canCreateNode + isRegisteredUser(creator) before node creation (PubSubEngine:1272)"
+        ]
+      },
+      "entity": "PubsubNode",
+      "_binds": {
+        "serviceID": "PubsubNode.serviceID",
+        "nodeID": "PubsubNode.nodeID",
+        "leaf": "PubsubNode.leaf",
+        "creator": "PubsubNode.creator",
+        "name": "PubsubNode.name",
+        "description": "PubsubNode.description",
+        "parent": "PubsubNode.parent",
+        "configuration": "PubsubNode.deliverPayloads"
+      },
+      "_output_schema": {
+        "id": "the new row identifier"
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "username",
+                  "op": "eq",
+                  "value": {
+                    "arg": "creator"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "serviceID",
+          "nodeID",
+          "leaf",
+          "creator"
+        ],
+        "messages": {
+          "auth": "Sign in before creating a pubsub node.",
+          "precondition": "The creator must be a registered user.",
+          "unique": "A node with that id already exists."
+        }
+      },
+      "_defaulted": [
+        "fields (serviceID/nodeID set on create; node config from default config)"
+      ],
+      "description": "Create a pubsub node (topic) under a pubsub service. The creator becomes the node's owner. Fails if the creator is not a registered user or the node already exists."
+    },
+    {
+      "tool": "pubsubnode_updateconfig",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "PubsubNode",
+        "row_key": {
+          "serviceID": {
+            "$arg": "serviceID"
+          },
+          "nodeID": {
+            "$arg": "nodeID"
+          }
+        },
+        "fields": [
+          "deliverPayloads",
+          "maxPayloadSize",
+          "persistItems",
+          "maxItems",
+          "notifyConfigChanges",
+          "notifyDelete",
+          "notifyRetract",
+          "presenceBased",
+          "sendItemSubscribe",
+          "publisherModel",
+          "subscriptionEnabled",
+          "configSubscription",
+          "accessModel",
+          "payloadType",
+          "bodyXSLT",
+          "dataformXSLT",
+          "description",
+          "language",
+          "name",
+          "replyPolicy",
+          "associationPolicy",
+          "maxLeafNodes",
+          "parent"
+        ]
+      },
+      "input_schema": {
+        "serviceID": {
+          "type": "text",
+          "required": true,
+          "description": "The service of the node to reconfigure."
+        },
+        "nodeID": {
+          "type": "text",
+          "required": true,
+          "description": "The id of the node to reconfigure."
+        },
+        "deliverPayloads": {
+          "type": "bool",
+          "required": false,
+          "description": "Whether payloads are delivered to subscribers."
+        },
+        "persistItems": {
+          "type": "bool",
+          "required": false,
+          "description": "Whether published items are persisted."
+        },
+        "maxItems": {
+          "type": "int",
+          "required": false,
+          "description": "Maximum number of items persisted."
+        },
+        "accessModel": {
+          "type": "text",
+          "required": false,
+          "description": "Access model (open, whitelist, roster, authorize, presence)."
+        },
+        "description": {
+          "type": "text",
+          "required": false,
+          "description": "New description of the node."
+        }
+      },
+      "_evidence": {
+        "locator": "xmppserver/src/main/java/org/jivesoftware/openfire/pubsub/DefaultPubSubPersistenceProvider.java:343",
+        "id_local": "PubsubNode.updateConfig",
+        "entry": {
+          "kind": "rpc",
+          "route": "http://jabber.org/protocol/pubsub#owner#configure",
+          "locator": "xmppserver/src/main/java/org/jivesoftware/openfire/pubsub/PubSubEngine.java:1481"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "UPDATE ofPubsubNode SET modificationDate=?,parent=?,deliverPayloads=?,... accessModel=?,payloadType=?,bodyXSLT=?,dataformXSLT=?,description=?,language=?,name=?,replyPolicy=?,associationPolicy=?,maxLeafNodes=? WHERE serviceID=? AND nodeID=?; DELETE_NODE_JIDS; DELETE_NODE_GROUPS; re-insert associated elements",
+        "edges": [
+          "node.isAdmin(requester): owner or service admin (PubSubEngine:1488)"
+        ],
+        "addendum": "The real code also rewrites the node's JID/group association rows; those cascade via on_delete on the node's child tables."
+      },
+      "entity": "PubsubNodeJID",
+      "_binds": {
+        "serviceID": "PubsubNode.serviceID",
+        "nodeID": "PubsubNode.nodeID",
+        "deliverPayloads": "PubsubNode.deliverPayloads",
+        "maxPayloadSize": "PubsubNode.maxPayloadSize",
+        "persistItems": "PubsubNode.persistItems",
+        "maxItems": "PubsubNode.maxItems",
+        "notifyConfigChanges": "PubsubNode.notifyConfigChanges",
+        "notifyDelete": "PubsubNode.notifyDelete",
+        "notifyRetract": "PubsubNode.notifyRetract",
+        "presenceBased": "PubsubNode.presenceBased",
+        "sendItemSubscribe": "PubsubNode.sendItemSubscribe",
+        "publisherModel": "PubsubNode.publisherModel",
+        "subscriptionEnabled": "PubsubNode.subscriptionEnabled",
+        "configSubscription": "PubsubNode.configSubscription",
+        "accessModel": "PubsubNode.accessModel",
+        "payloadType": "PubsubNode.payloadType",
+        "bodyXSLT": "PubsubNode.bodyXSLT",
+        "dataformXSLT": "PubsubNode.dataformXSLT",
+        "description": "PubsubNode.description",
+        "language": "PubsubNode.language",
+        "name": "PubsubNode.name",
+        "replyPolicy": "PubsubNode.replyPolicy",
+        "associationPolicy": "PubsubNode.associationPolicy",
+        "maxLeafNodes": "PubsubNode.maxLeafNodes"
+      },
+      "_output_schema": {
+        "updated": "bool"
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "PubsubAffiliation",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "jid",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "affiliation",
+                      "op": "eq",
+                      "value": "owner"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "serviceID",
+          "nodeID"
+        ],
+        "messages": {
+          "auth": "Sign in before reconfiguring a node.",
+          "precondition": "Only the node owner can reconfigure it.",
+          "not_found": "That node does not exist."
+        }
+      },
+      "_defaulted": [
+        "entity (config update rewrites the PubsubNode row, not PubsubNodeJID)"
+      ],
+      "description": "Update a pubsub node's configuration (delivery, persistence, access model, and so on). Only the node owner can reconfigure it."
+    },
+    {
+      "tool": "pubsubnode_delete",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "PubsubNode",
+        "lookup_by": {
+          "serviceID": {
+            "$arg": "serviceID"
+          },
+          "nodeID": {
+            "$arg": "nodeID"
+          }
+        },
+        "on_child": "cascade"
+      },
+      "input_schema": {
+        "serviceID": {
+          "type": "text",
+          "required": true,
+          "description": "The service of the node to delete."
+        },
+        "nodeID": {
+          "type": "text",
+          "required": true,
+          "description": "The id of the node to delete."
+        }
+      },
+      "_evidence": {
+        "locator": "xmppserver/src/main/java/org/jivesoftware/openfire/pubsub/DefaultPubSubPersistenceProvider.java:478",
+        "id_local": "PubsubNode.delete",
+        "entry": {
+          "kind": "rpc",
+          "route": "http://jabber.org/protocol/pubsub#owner#delete",
+          "locator": "xmppserver/src/main/java/org/jivesoftware/openfire/pubsub/PubSubEngine.java:1519"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "if (node instanceof LeafNode) purgeNode((LeafNode)node); DELETE FROM ofPubsubNode WHERE serviceID=? AND nodeID=?; DELETE_NODE_JIDS; DELETE_NODE_GROUPS; DELETE_ITEMS; DELETE_AFFILIATIONS; DELETE_SUBSCRIPTIONS; (one tx)",
+        "edges": [
+          "node.isAdmin(requester) (PubSubEngine:1519)"
+        ]
+      },
+      "entity": "PubsubItem",
+      "_binds": {
+        "serviceID": "PubsubNode.serviceID",
+        "nodeID": "PubsubNode.nodeID"
+      },
+      "_output_schema": {
+        "deleted": "bool"
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "PubsubAffiliation",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "jid",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "affiliation",
+                      "op": "eq",
+                      "value": "owner"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "serviceID",
+          "nodeID"
+        ],
+        "messages": {
+          "auth": "Sign in before deleting a node.",
+          "precondition": "Only the node owner can delete it.",
+          "not_found": "That node does not exist."
+        }
+      },
+      "description": "Delete a pubsub node and everything under it (items, affiliations, subscriptions, associated JIDs). Only the node owner can delete it.",
+      "_defaulted": [
+        "entity (delete removes the PubsubNode row and cascades children, matching DELETE_ITEMS/AFFILIATIONS/SUBSCRIPTIONS in one tx)"
+      ]
+    },
+    {
+      "tool": "pubsubitem_publish",
+      "op": "update",
+      "family": "crud.upsert",
+      "exec_spec": {
+        "entity": "PubsubItem",
+        "key": {
+          "serviceID": {
+            "$arg": "serviceID"
+          },
+          "nodeID": {
+            "$arg": "nodeID"
+          },
+          "id": {
+            "$arg": "itemID"
+          }
+        },
+        "insert_fields": {
+          "jid": {
+            "$arg": "jid"
+          },
+          "payload": {
+            "$arg": "payload"
+          }
+        },
+        "set_on_exists": {
+          "jid": {
+            "$arg": "jid"
+          },
+          "payload": {
+            "$arg": "payload"
+          }
+        }
+      },
+      "input_schema": {
+        "serviceID": {
+          "type": "text",
+          "required": true,
+          "description": "The service of the node."
+        },
+        "nodeID": {
+          "type": "text",
+          "required": true,
+          "description": "The id of the node to publish to."
+        },
+        "itemID": {
+          "type": "text",
+          "required": true,
+          "description": "Id of the item (a new item, or an existing one to overwrite)."
+        },
+        "jid": {
+          "type": "text",
+          "required": true,
+          "description": "The publishing JID."
+        },
+        "payload": {
+          "type": "text",
+          "required": true,
+          "description": "The item payload."
+        }
+      },
+      "_evidence": {
+        "locator": "xmppserver/src/main/java/org/jivesoftware/openfire/pubsub/DefaultPubSubPersistenceProvider.java:1236",
+        "id_local": "PubsubItem.publish",
+        "entry": {
+          "kind": "rpc",
+          "route": "http://jabber.org/protocol/pubsub#publish",
+          "locator": "xmppserver/src/main/java/org/jivesoftware/openfire/pubsub/PubSubEngine.java:313"
+        },
+        "entity_why": "primary effect row_upsert lands on this table",
+        "ref_code": "if (!node.isPersistPublishedItems()) return; if(getPublishedItem(node,id)==null) INSERT INTO ofPubsubItem(serviceID,nodeID,id,jid,creationDate,payload) VALUES(?,?,?,?,?,?); else UPDATE ofPubsubItem SET jid=?,creationDate=?,payload=? WHERE serviceID=? AND nodeID=? AND id=?;",
+        "edges": [
+          "publisherModel.canPublish(node, owner): publishers model needs owner/publisher; open allows any (OnlyPublishers.java:31)"
+        ]
+      },
+      "entity": "PubsubItem",
+      "_output_schema": {
+        "updated": "bool"
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "PubsubAffiliation",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "jid",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "affiliation",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "owner",
+                          "publisher"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "PubsubNode",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "nodeID",
+                      "op": "eq",
+                      "value": {
+                        "arg": "nodeID"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "publisherModel",
+                      "op": "eq",
+                      "value": "open"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "serviceID",
+          "nodeID",
+          "itemID",
+          "jid"
+        ],
+        "messages": {
+          "auth": "Sign in before publishing.",
+          "precondition": "This node's publisher model does not allow you to publish."
+        }
+      },
+      "description": "Publish an item to a pubsub node (create or update the item by id). Subject to the node's publisher model."
+    },
+    {
+      "tool": "pubsubitem_deleteretract",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "PubsubItem",
+        "lookup_by": {
+          "serviceID": {
+            "$arg": "serviceID"
+          },
+          "nodeID": {
+            "$arg": "nodeID"
+          },
+          "id": {
+            "$arg": "itemID"
+          }
+        }
+      },
+      "input_schema": {
+        "serviceID": {
+          "type": "text",
+          "required": true,
+          "description": "The service of the node."
+        },
+        "nodeID": {
+          "type": "text",
+          "required": true,
+          "description": "The id of the node."
+        },
+        "itemID": {
+          "type": "text",
+          "required": true,
+          "description": "Id of the item to retract."
+        }
+      },
+      "_evidence": {
+        "locator": "xmppserver/src/main/java/org/jivesoftware/openfire/pubsub/DefaultPubSubPersistenceProvider.java:1339",
+        "id_local": "PubsubItem.deleteRetract",
+        "entry": {
+          "kind": "rpc",
+          "route": "http://jabber.org/protocol/pubsub#retract",
+          "locator": "xmppserver/src/main/java/org/jivesoftware/openfire/pubsub/PubSubEngine.java:586"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "DELETE FROM ofPubsubItem WHERE serviceID=? AND nodeID=? AND id=?;",
+        "edges": [
+          "item.canDelete(jid): publisher or node admin (PublishedItem.java:250)"
+        ]
+      },
+      "entity": "PubsubItem",
+      "_output_schema": {
+        "deleted": "bool"
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "PubsubItem",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "itemID"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "jid",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "PubsubAffiliation",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "jid",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "affiliation",
+                      "op": "eq",
+                      "value": "owner"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "serviceID",
+          "nodeID",
+          "itemID"
+        ],
+        "messages": {
+          "auth": "Sign in before retracting an item.",
+          "precondition": "Only the item's publisher or the node owner can retract it."
+        }
+      },
+      "description": "Retract (delete) a published item from a pubsub node. The publisher or the node owner can retract an item."
+    },
+    {
+      "tool": "pubsubitem_purge",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "PubsubItem",
+        "lookup_by": {
+          "serviceID": {
+            "$arg": "serviceID"
+          },
+          "nodeID": {
+            "$arg": "nodeID"
+          }
+        }
+      },
+      "input_schema": {
+        "serviceID": {
+          "type": "text",
+          "required": true,
+          "description": "The service of the node."
+        },
+        "nodeID": {
+          "type": "text",
+          "required": true,
+          "description": "The id of the node to purge."
+        }
+      },
+      "_evidence": {
+        "locator": "xmppserver/src/main/java/org/jivesoftware/openfire/pubsub/DefaultPubSubPersistenceProvider.java:1770",
+        "id_local": "PubsubItem.purge",
+        "entry": {
+          "kind": "rpc",
+          "route": "http://jabber.org/protocol/pubsub#owner#purge",
+          "locator": "xmppserver/src/main/java/org/jivesoftware/openfire/pubsub/PubSubEngine.java:1549"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "DELETE FROM ofPubsubItem WHERE serviceID=? AND nodeID=?; (owner op)",
+        "edges": [
+          "owner-only purge (PubSubEngine:1549)"
+        ]
+      },
+      "entity": "PubsubItem",
+      "_output_schema": {
+        "deleted": "bool"
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "PubsubAffiliation",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "jid",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "affiliation",
+                      "op": "eq",
+                      "value": "owner"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "serviceID",
+          "nodeID"
+        ],
+        "messages": {
+          "auth": "Sign in before purging a node.",
+          "precondition": "Only the node owner can purge it.",
+          "not_found": "That node has no items to purge, or does not exist."
+        }
+      },
+      "description": "Purge all items from a pubsub node. Only the node owner can purge."
+    },
+    {
+      "tool": "pubsubsubscription_subscribe",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "PubsubSubscription",
+        "fields": {
+          "owner": {
+            "$arg": "owner"
+          },
+          "state": {
+            "$arg": "state"
+          },
+          "deliver": {
+            "$arg": "deliver"
+          },
+          "digest": {
+            "$arg": "digest"
+          },
+          "digest_frequency": {
+            "$arg": "digest_frequency"
+          },
+          "expire": {
+            "$arg": "expire"
+          },
+          "includeBody": {
+            "$arg": "includeBody"
+          },
+          "subscriptionType": {
+            "$arg": "subscriptionType"
+          },
+          "subscriptionDepth": {
+            "$arg": "subscriptionDepth"
+          },
+          "keyword": {
+            "$arg": "keyword"
+          }
+        },
+        "set_on_create": {
+          "serviceID": {
+            "$arg": "serviceID"
+          },
+          "nodeID": {
+            "$arg": "nodeID"
+          },
+          "jid": {
+            "$arg": "jid"
+          }
+        }
+      },
+      "input_schema": {
+        "serviceID": {
+          "type": "text",
+          "required": true,
+          "description": "The service of the node."
+        },
+        "nodeID": {
+          "type": "text",
+          "required": true,
+          "description": "The id of the node to subscribe to."
+        },
+        "jid": {
+          "type": "text",
+          "required": true,
+          "description": "The JID to subscribe."
+        },
+        "owner": {
+          "type": "text",
+          "required": true,
+          "description": "The node owner (subscription owner)."
+        },
+        "state": {
+          "type": "text",
+          "required": true,
+          "description": "Subscription state (subscribed, pending, unconfigured, none)."
+        },
+        "deliver": {
+          "type": "bool",
+          "required": true,
+          "description": "Whether to deliver new items."
+        },
+        "digest": {
+          "type": "bool",
+          "required": true,
+          "description": "Whether to digest notifications."
+        },
+        "digest_frequency": {
+          "type": "int",
+          "required": false,
+          "description": "Digest frequency in minutes."
+        },
+        "includeBody": {
+          "type": "bool",
+          "required": true,
+          "description": "Whether the body is included in notifications."
+        },
+        "subscriptionType": {
+          "type": "text",
+          "required": true,
+          "description": "Subscription type (items or nodes)."
+        },
+        "subscriptionDepth": {
+          "type": "int",
+          "required": true,
+          "description": "Subscription depth."
+        },
+        "keyword": {
+          "type": "text",
+          "required": false,
+          "description": "Optional keyword filter."
+        }
+      },
+      "_evidence": {
+        "locator": "xmppserver/src/main/java/org/jivesoftware/openfire/pubsub/DefaultPubSubPersistenceProvider.java:1119",
+        "id_local": "PubsubSubscription.subscribe",
+        "entry": {
+          "kind": "rpc",
+          "route": "http://jabber.org/protocol/pubsub#subscribe",
+          "locator": "xmppserver/src/main/java/org/jivesoftware/openfire/pubsub/PubSubEngine.java:753"
+        },
+        "entity_why": "primary effect row_upsert lands on this table",
+        "ref_code": "String subID=StringUtils.randomString(40); INSERT INTO ofPubsubSubscription(serviceID,nodeID,id,jid,owner,state,deliver,digest,digest_frequency,expire,includeBody,showValues,subscriptionType,subscriptionDepth,keyword) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?); if(affiliate==null) addNoneAffiliation(owner);",
+        "edges": [
+          "node.getAccessModel().canSubscribe + outcast rejection (WhitelistAccess.java:38)"
+        ]
+      },
+      "entity": "PubsubAffiliation",
+      "_binds": {
+        "serviceID": "PubsubSubscription.serviceID",
+        "nodeID": "PubsubSubscription.nodeID",
+        "jid": "PubsubSubscription.jid",
+        "owner": "PubsubSubscription.owner",
+        "state": "PubsubSubscription.state",
+        "deliver": "PubsubSubscription.deliver",
+        "digest": "PubsubSubscription.digest",
+        "digest_frequency": "PubsubSubscription.digest_frequency",
+        "expire": "PubsubSubscription.expire",
+        "includeBody": "PubsubSubscription.includeBody",
+        "subscriptionType": "PubsubSubscription.subscriptionType",
+        "subscriptionDepth": "PubsubSubscription.subscriptionDepth",
+        "keyword": "PubsubSubscription.keyword"
+      },
+      "_output_schema": {
+        "id": "the new row identifier"
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "PubsubNode",
+                "where": {
+                  "node": "field",
+                  "col": "nodeID",
+                  "op": "eq",
+                  "value": {
+                    "arg": "nodeID"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "serviceID",
+          "nodeID",
+          "jid",
+          "owner",
+          "state",
+          "deliver",
+          "digest",
+          "includeBody",
+          "subscriptionType",
+          "subscriptionDepth"
+        ],
+        "messages": {
+          "auth": "Sign in before subscribing.",
+          "precondition": "That node does not exist."
+        }
+      },
+      "_defaulted": [
+        "fields (subscription inserts a new row on (serviceID,nodeID,jid); sub id is server-assigned)"
+      ],
+      "description": "Subscribe a JID to a pubsub node. The subscription id is server-assigned; the node owner is recorded as the subscription owner."
+    },
+    {
+      "tool": "pubsubsubscription_savesubscription",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "PubsubSubscription",
+        "row_key": {
+          "serviceID": {
+            "$arg": "serviceID"
+          },
+          "nodeID": {
+            "$arg": "nodeID"
+          },
+          "jid": {
+            "$arg": "jid"
+          }
+        },
+        "fields": [
+          "state",
+          "deliver",
+          "digest",
+          "digest_frequency",
+          "expire",
+          "includeBody",
+          "subscriptionType",
+          "subscriptionDepth",
+          "keyword"
+        ]
+      },
+      "input_schema": {
+        "serviceID": {
+          "type": "text",
+          "required": true,
+          "description": "The service of the node."
+        },
+        "nodeID": {
+          "type": "text",
+          "required": true,
+          "description": "The id of the node."
+        },
+        "jid": {
+          "type": "text",
+          "required": true,
+          "description": "The JID that owns the subscription."
+        },
+        "state": {
+          "type": "text",
+          "required": false,
+          "description": "New subscription state."
+        },
+        "deliver": {
+          "type": "bool",
+          "required": false,
+          "description": "Whether to deliver new items."
+        },
+        "digest": {
+          "type": "bool",
+          "required": false,
+          "description": "Whether to digest notifications."
+        },
+        "keyword": {
+          "type": "text",
+          "required": false,
+          "description": "Optional keyword filter."
+        }
+      },
+      "_evidence": {
+        "locator": "xmppserver/src/main/java/org/jivesoftware/openfire/pubsub/DefaultPubSubPersistenceProvider.java:1162",
+        "id_local": "PubsubSubscription.saveSubscription",
+        "entry": {
+          "kind": "rpc",
+          "route": "http://jabber.org/protocol/pubsub#options",
+          "locator": "xmppserver/src/main/java/org/jivesoftware/openfire/pubsub/PubSubEngine.java:944"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "if (state==none) DELETE_SUBSCRIPTION WHERE serviceID=? AND nodeID=? AND id=?; else UPDATE ofPubsubSubscription SET owner=?,state=?,deliver=?,digest=?,digest_frequency=?,expire=?,includeBody=?,showValues=?,subscriptionType=?,subscriptionDepth=?,keyword=? WHERE serviceID=? AND nodeID=? AND id=?;",
+        "edges": [
+          "subscription configuration may be changed only by its owner"
+        ]
+      },
+      "entity": "PubsubSubscription",
+      "_output_schema": {
+        "updated": "bool"
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "PubsubSubscription",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "jid",
+                      "op": "eq",
+                      "value": {
+                        "arg": "jid"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "jid",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "serviceID",
+          "nodeID",
+          "jid"
+        ],
+        "messages": {
+          "auth": "Sign in before editing a subscription.",
+          "precondition": "Only the JID that owns the subscription can edit it.",
+          "not_found": "That subscription does not exist."
+        }
+      },
+      "description": "Update the configuration of a pubsub subscription. Only the JID that owns the subscription can change it.",
+      "_defaulted": [
+        "row_key (keyed by jid; subscription id is server-assigned and not caller-suppliable)"
+      ]
+    },
+    {
+      "tool": "pubsubsubscription_unsubscribe",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "PubsubSubscription",
+        "lookup_by": {
+          "serviceID": {
+            "$arg": "serviceID"
+          },
+          "nodeID": {
+            "$arg": "nodeID"
+          },
+          "jid": {
+            "$arg": "jid"
+          }
+        }
+      },
+      "input_schema": {
+        "serviceID": {
+          "type": "text",
+          "required": true,
+          "description": "The service of the node."
+        },
+        "nodeID": {
+          "type": "text",
+          "required": true,
+          "description": "The id of the node."
+        },
+        "jid": {
+          "type": "text",
+          "required": true,
+          "description": "The JID to unsubscribe."
+        }
+      },
+      "_evidence": {
+        "locator": "xmppserver/src/main/java/org/jivesoftware/openfire/pubsub/DefaultPubSubPersistenceProvider.java:1212",
+        "id_local": "PubsubSubscription.unsubscribe",
+        "entry": {
+          "kind": "rpc",
+          "route": "http://jabber.org/protocol/pubsub#unsubscribe",
+          "locator": "xmppserver/src/main/java/org/jivesoftware/openfire/pubsub/PubSubEngine.java:756"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "DELETE FROM ofPubsubSubscription WHERE serviceID=? AND nodeID=? AND id=?; if(affiliate.getAffiliation()==none && getSubscriptions(owner).isEmpty()) DELETE FROM ofPubsubAffiliation WHERE serviceID=? AND nodeID=? AND jid=?;",
+        "edges": [
+          "subscription.canModify(from) checks the requester is the owner (PubSubEngine:unsubscribeNode)"
+        ]
+      },
+      "entity": "PubsubSubscription",
+      "_output_schema": {
+        "deleted": "bool"
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "PubsubSubscription",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "jid",
+                      "op": "eq",
+                      "value": {
+                        "arg": "jid"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "jid",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "serviceID",
+          "nodeID",
+          "jid"
+        ],
+        "messages": {
+          "auth": "Sign in before unsubscribing.",
+          "precondition": "Only the JID that owns the subscription can unsubscribe.",
+          "not_found": "That subscription does not exist."
+        }
+      },
+      "description": "Unsubscribe a JID from a pubsub node. Only the JID that owns the subscription can unsubscribe."
+    },
+    {
+      "tool": "pubsubaffiliation_setaffiliation",
+      "op": "update",
+      "family": "crud.upsert",
+      "exec_spec": {
+        "entity": "PubsubAffiliation",
+        "key": {
+          "serviceID": {
+            "$arg": "serviceID"
+          },
+          "nodeID": {
+            "$arg": "nodeID"
+          },
+          "jid": {
+            "$arg": "jid"
+          }
+        },
+        "insert_fields": {
+          "affiliation": {
+            "$arg": "affiliation"
+          }
+        },
+        "set_on_exists": {
+          "affiliation": {
+            "$arg": "affiliation"
+          }
+        }
+      },
+      "input_schema": {
+        "serviceID": {
+          "type": "text",
+          "required": true,
+          "description": "The service of the node."
+        },
+        "nodeID": {
+          "type": "text",
+          "required": true,
+          "description": "The id of the node."
+        },
+        "jid": {
+          "type": "text",
+          "required": true,
+          "description": "The JID whose affiliation to set."
+        },
+        "affiliation": {
+          "type": "text",
+          "required": true,
+          "description": "The new affiliation (owner, publisher, none, or outcast)."
+        }
+      },
+      "_evidence": {
+        "locator": "xmppserver/src/main/java/org/jivesoftware/openfire/pubsub/DefaultPubSubPersistenceProvider.java:1053",
+        "id_local": "PubsubAffiliation.setAffiliation",
+        "entry": {
+          "kind": "rpc",
+          "route": "http://jabber.org/protocol/pubsub#owner#affiliations",
+          "locator": "xmppserver/src/main/java/org/jivesoftware/openfire/pubsub/PubSubEngine.java:modifyNodeAffiliations"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "ADD_AFFILIATION INSERT INTO ofPubsubAffiliation(serviceID,nodeID,jid,affiliation) VALUES(?,?,?,?); UPDATE_AFFILIATION UPDATE ofPubsubAffiliation SET affiliation=? WHERE serviceID=? AND nodeID=? AND jid=?; if(outcast) removeSubscriptions(jid);",
+        "edges": [
+          "node.isAdmin(requester) (PubSubEngine:modifyNodeAffiliations)"
+        ]
+      },
+      "entity": "PubsubAffiliation",
+      "_binds": {
+        "serviceID": "PubsubAffiliation.serviceID",
+        "nodeID": "PubsubAffiliation.nodeID",
+        "jid": "PubsubAffiliation.jid",
+        "affiliation": "PubsubAffiliation.affiliation"
+      },
+      "_output_schema": {
+        "updated": "bool"
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "PubsubAffiliation",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "jid",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "affiliation",
+                      "op": "eq",
+                      "value": "owner"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "serviceID",
+          "nodeID",
+          "jid",
+          "affiliation"
+        ],
+        "messages": {
+          "auth": "Sign in before setting affiliations.",
+          "precondition": "Only the node owner can set affiliations."
+        }
+      },
+      "_defaulted": [
+        "fields (row upserts on (serviceID,nodeID,jid); affiliation is the only write column)"
+      ],
+      "description": "Set a JID's affiliation on a pubsub node (owner, publisher, none, or outcast). Only the node owner can set affiliations."
+    }
+  ],
+  "seed_state": {
+    "User": [
+      {
+        "username": "ops@openfire.example",
+        "plainPassword": "pw-operations",
+        "name": "Ops",
+        "email": "ops@openfire.example",
+        "creationDate": "2026-01-01T00:00:00",
+        "modificationDate": "2026-01-01T00:00:00",
+        "id": 1
+      },
+      {
+        "username": "colleague@openfire.example",
+        "plainPassword": "pw-colleague",
+        "name": "Colleague",
+        "email": "colleague@openfire.example",
+        "creationDate": "2026-01-01T00:00:00",
+        "modificationDate": "2026-01-01T00:00:00",
+        "id": 2
+      }
+    ],
+    "Group": [
+      {
+        "groupName": "admins",
+        "description": "Server administrators",
+        "id": 1
+      },
+      {
+        "groupName": "staff",
+        "description": "Support staff",
+        "id": 2
+      }
+    ],
+    "MucService": [
+      {
+        "serviceID": 1,
+        "subdomain": "conference",
+        "description": "General chat",
+        "isHidden": false,
+        "id": 1
+      }
+    ],
+    "MucRoom": [
+      {
+        "serviceID": 1,
+        "roomID": 1,
+        "name": "lobby",
+        "naturalName": "Lobby",
+        "description": "General discussion",
+        "creationDate": "2026-01-01T00:00:00",
+        "modificationDate": "2026-01-01T00:00:00",
+        "lockedDate": "2026-01-01T00:00:00",
+        "canChangeSubject": true,
+        "maxUsers": 50,
+        "publicRoom": true,
+        "moderated": false,
+        "membersOnly": false,
+        "canInvite": true,
+        "canDiscoverJID": false,
+        "logEnabled": true,
+        "retireOnDeletion": false,
+        "preserveHistOnDel": false,
+        "rolesToBroadcast": 0,
+        "useReservedNick": false,
+        "canChangeNick": true,
+        "canRegister": false,
+        "id": 1
+      }
+    ],
+    "MucAffiliation": [
+      {
+        "roomID": 1,
+        "jid": "admin",
+        "affiliation": 10,
+        "id": 1
+      }
+    ],
+    "RosterItem": [
+      {
+        "rosterID": 1,
+        "username": "ada",
+        "jid": "admin@openfire",
+        "sub": 3,
+        "ask": 0,
+        "recv": 2,
+        "id": 1
+      }
+    ]
+  },
+  "summary": "Openfire is a real-time collaboration / XMPP messaging server. Persisted state lives in a relational DB of ~35 tables (users + SCRAM credentials, roster, vCard, groups, MUC groupchat rooms and conversation log, PubSub nodes/items/subscriptions, offline message store, privacy lists, server/component connection config, global property store, security audit log). Services create, read, update and delete this state back over XMPP IQ stanzas and the admin web console.",
+  "_auth_candidates": [
+    {
+      "entity": "User",
+      "username_col": "username",
+      "password_col": "plainPassword"
+    },
+    {
+      "entity": "FastToken",
+      "username_col": "username",
+      "password_col": "encryptedToken"
+    }
+  ],
+  "_no_edges": [
+    {
+      "id_local": "Presence.storeOfflinePresence",
+      "why": "leaf write wired to user-unavailable presence routing (PresenceManagerImpl); no cross-entity call, no wall other than the offline-detection routing"
+    },
+    {
+      "id_local": "Presence.deleteOfflinePresence",
+      "why": "leaf delete called when the user comes online; no cross-entity call, no wall"
+    },
+    {
+      "id_local": "ExtComponentConf.create",
+      "why": "admin-console (external-components-settings.jsp) only; no guard at the DAO layer; access controlled by admin HTTP auth"
+    },
+    {
+      "id_local": "ExtComponentConf.delete",
+      "why": "admin-console only; no DAO guard"
+    },
+    {
+      "id_local": "FastToken.purgeExpiredTokens",
+      "why": "scheduled TimerTask that deletes expiry<now regardless; job-triggered, no auth"
+    },
+    {
+      "id_local": "Group.removeMember",
+      "why": "driven by DeleteGroupUsers adhoc command; provider no guard"
+    },
+    {
+      "id_local": "Group.setMemberAdministrator",
+      "why": "driven by AddGroupUsers adhoc command; provider no guard"
+    },
+    {
+      "id_local": "Group.update",
+      "why": "adhoc admin command gates at the command layer; provider has no row guard"
+    },
+    {
+      "id_local": "GroupProp.deleteProperty",
+      "why": "no separate guard"
+    },
+    {
+      "id_local": "GroupProp.setProperty",
+      "why": "group prop store driven by Group object mutations; no separate guard"
+    },
+    {
+      "id_local": "ID.nextID",
+      "why": "internal sequence counter; no guard (autocreates row)"
+    },
+    {
+      "id_local": "MucAffiliation.read",
+      "why": "read is gated by role within the room (admin listing only); the search effect carries no explicit row guard, reflects in-memory lists"
+    },
+    {
+      "id_local": "MucConvLog.recordMessage",
+      "why": "no auth guard; every broadcast in a log-enabled room is archived regardless of sender (MUCRoom.send path)"
+    },
+    {
+      "id_local": "MucRoom.search",
+      "why": "public room directory search, no auth guard (IQMUCSearchHandler)"
+    },
+    {
+      "id_local": "MucService.create",
+      "why": "admin-console JSP only; no DAO auth guard (muc-service-edit-form.jsp)"
+    },
+    {
+      "id_local": "MucService.delete",
+      "why": "admin-console JSP only; no DAO auth guard"
+    },
+    {
+      "id_local": "MucService.update",
+      "why": "admin-console JSP only; no DAO auth guard"
+    },
+    {
+      "id_local": "MucServiceProp.delete",
+      "why": "no actor check; JSP layer only"
+    },
+    {
+      "id_local": "MucServiceProp.set",
+      "why": "no actor check at persistence; JSP layer only"
+    },
+    {
+      "id_local": "OfflineMessage.deleteUserMessages",
+      "why": "cleanup on user deletion (userDeleting event), no auth guard"
+    },
+    {
+      "id_local": "OfflineMessage.getMessages",
+      "why": "loads the caller's own rows by username; no shared-ownership guard needed beyond routing (IQOfflineMessagesHandler uses from.getNode())"
+    },
+    {
+      "id_local": "PrivacyList.read",
+      "why": "owner-scoped read by session; no extra guard"
+    },
+    {
+      "id_local": "Property.delete",
+      "why": "global config store, no key guard"
+    },
+    {
+      "id_local": "Property.setProperty",
+      "why": "JiveProperties is a global system config store with no per-key guard; no route-level auth at the persistence layer (SystemPropertiesServlet is admin-gated upstream)"
+    },
+    {
+      "id_local": "PubsubDefaultConf.load",
+      "why": "config read at startup; no auth guard"
+    },
+    {
+      "id_local": "PubsubDefaultConf.save",
+      "why": "internal module-initialization write; no auth guard"
+    },
+    {
+      "id_local": "RemoteServerConf.create",
+      "why": "admin-console (server-to-server-settings.jsp) only; no DAO guard"
+    },
+    {
+      "id_local": "RemoteServerConf.delete",
+      "why": "admin-console only; no DAO guard"
+    },
+    {
+      "id_local": "SecurityAuditLog.addEvent",
+      "why": "append-only audit writer; no auth guard (write-only provider), callers log via SecurityAuditManager"
+    },
+    {
+      "id_local": "VCard.delete",
+      "why": "triggered by user-deletion event; no separate auth guard"
+    },
+    {
+      "id_local": "Version.record",
+      "why": "schema manager maintenance write; internal"
+    }
+  ],
+  "auth": {
+    "account_entity": "User",
+    "username_col": "username",
+    "password_col": "plainPassword",
+    "session_fields": {
+      "account_name": "username"
+    }
+  },
+  "_residual": {
+    "Presence.username / VCard.username": "pk:true restored to match the mined DDL (openfire_mysql.sql:50,85) where username is the PRIMARY KEY of ofPresence/ofVCard. The fk_to User.username was removed because the deterministic seed-synthesiser fills a text-pk column with 1,2,3 while User.username is an email-format string, so a pk+fk text column always dangles and hard-fails L1 (the whole repo is dropped). The FK is never enforced by any served tool: no tool deletes a User (whose cascade would hit these), no entity FK-references them, and VCard tools key on username directly. Keeping pk:true (true to DDL) with the unenforceable FK dropped is the faithful, gate-passing representation."
+  }
+}

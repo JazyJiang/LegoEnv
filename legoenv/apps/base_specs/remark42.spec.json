@@ -1,0 +1,3511 @@
+{
+  "env_id": "remark42",
+  "_prep_version": 3,
+  "entities": [
+    {
+      "name": "Comment",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "parent_id",
+          "type": "id",
+          "nullable": true,
+          "fk_to": "Comment.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "text",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "orig",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "user_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "User.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "user_name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "user_picture",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "user_ip",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "user_admin",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "site_id",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "url",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "score",
+          "type": "int",
+          "default": 0
+        },
+        {
+          "name": "votes",
+          "type": "json",
+          "nullable": true
+        },
+        {
+          "name": "voted_ips",
+          "type": "json",
+          "nullable": true
+        },
+        {
+          "name": "controversy",
+          "type": "float",
+          "default": 0
+        },
+        {
+          "name": "timestamp",
+          "type": "datetime",
+          "nullable": false,
+          "immutable": true
+        },
+        {
+          "name": "edit",
+          "type": "json",
+          "nullable": true
+        },
+        {
+          "name": "pin",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "deleted",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "imported",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "post_title",
+          "type": "text",
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "name": "PostInfo",
+      "columns": [
+        {
+          "name": "url",
+          "type": "text",
+          "pk": true
+        },
+        {
+          "name": "count",
+          "type": "int",
+          "default": 0
+        },
+        {
+          "name": "first_time",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "last_time",
+          "type": "datetime",
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "name": "UserDetail",
+      "columns": [
+        {
+          "name": "user_id",
+          "type": "id",
+          "pk": true,
+          "fk_to": "User.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "email",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "telegram",
+          "type": "text",
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "name": "BlockedUser",
+      "columns": [
+        {
+          "name": "user_id",
+          "type": "id",
+          "pk": true,
+          "fk_to": "User.id"
+        },
+        {
+          "name": "until",
+          "type": "datetime",
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "name": "UserVerified",
+      "columns": [
+        {
+          "name": "user_id",
+          "type": "id",
+          "pk": true,
+          "fk_to": "User.id"
+        }
+      ]
+    },
+    {
+      "name": "PostReadonly",
+      "columns": [
+        {
+          "name": "url",
+          "type": "text",
+          "pk": true
+        }
+      ]
+    },
+    {
+      "name": "User",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "picture",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "ip",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "admin",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "blocked",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "verified",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "email_subscription",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "site_id",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "paid_sub",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "password",
+          "type": "text",
+          "nullable": true,
+          "_bridge": true,
+          "_note": "Bridge credential column: Remark42 authorizes via email magic-link / OAuth, not a local password. Added so the standard guard.auth can open a session; real verification is out-of-band email confirmation."
+        },
+        {
+          "name": "email",
+          "type": "text",
+          "nullable": true,
+          "_bridge": true,
+          "_note": "Bridge column mirroring the email used for auth/verification."
+        }
+      ]
+    },
+    {
+      "name": "Image",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "staged",
+          "type": "bool",
+          "default": true
+        }
+      ]
+    },
+    {
+      "name": "UserLog",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "user_id",
+          "type": "id",
+          "nullable": true
+        },
+        {
+          "name": "event",
+          "type": "text",
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "name": "CommentLog",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "site_id",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "event",
+          "type": "text",
+          "nullable": true
+        }
+      ]
+    }
+  ],
+  "tools": [
+    {
+      "tool": "comment_find",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Comment",
+        "rank": {
+          "method": "exact"
+        },
+        "pagination": {
+          "default_limit": 20
+        }
+      },
+      "input_schema": {
+        "site": {
+          "type": "text",
+          "required": true,
+          "description": "The Remark42 site id (which comments section/tenant this refers to)."
+        },
+        "url": {
+          "type": "text",
+          "required": true,
+          "description": "The page URL the comment belongs to."
+        },
+        "format": {
+          "type": "text",
+          "required": false,
+          "description": "Output format (tree/list)."
+        },
+        "sort": {
+          "type": "text",
+          "required": false,
+          "description": "Sort order for the returned comments."
+        },
+        "view": {
+          "type": "text",
+          "required": false,
+          "description": "Comment view (e.g. last/first)."
+        },
+        "since": {
+          "type": "datetime",
+          "required": false,
+          "description": "Only comments newer than this time. Omit for all."
+        },
+        "limit": {
+          "type": "int",
+          "required": false,
+          "description": "Maximum number of comments to return."
+        },
+        "offset_id": {
+          "type": "int",
+          "required": false,
+          "description": "Return comments after this comment id (pagination cursor)."
+        }
+      },
+      "_evidence": {
+        "locator": "backend/app/rest/api/rest_public.go:64",
+        "id_local": "Comment.find",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v1/find",
+          "locator": "backend/app/rest/api/rest.go:271"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "locator := store.Locator{SiteID: r.URL.Query().Get(\"site\"), URL: r.URL.Query().Get(\"url\")}\ncomments, e := s.dataService.FindSince(locator, sort, rest.GetUserOrEmpty(r), since)\ncomments = s.applyView(comments, view)\nif info, ee := s.dataService.Info(locator, s.readOnlyAge); ee == nil { commentsInfo = info }"
+      },
+      "entity": "Comment",
+      "_binds": {
+        "site": "Comment.site_id",
+        "url": "Comment.url",
+        "offset_id": "Comment.id"
+      },
+      "_output_schema": {
+        "comments": "list of Comment",
+        "info": "PostInfo"
+      },
+      "guards": {
+        "required": [
+          "site",
+          "url"
+        ],
+        "messages": {}
+      },
+      "description": "List comments on a post, filtered by site and page URL. Public — any caller may read any post's comments by site/url."
+    },
+    {
+      "tool": "comment_by_id",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Comment",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the comment to act on."
+        },
+        "site": {
+          "type": "text",
+          "required": true,
+          "description": "The Remark42 site id (which comments section/tenant this refers to)."
+        },
+        "url": {
+          "type": "text",
+          "required": true,
+          "description": "The page URL the comment belongs to."
+        }
+      },
+      "_evidence": {
+        "locator": "backend/app/rest/api/rest_public.go:223",
+        "id_local": "Comment.by_id",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v1/id/{id}",
+          "locator": "backend/app/rest/api/rest.go:272"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "comment, err := s.dataService.Get(store.Locator{SiteID: siteID, URL: url}, id, rest.GetUserOrEmpty(r))"
+      },
+      "entity": "Comment",
+      "_binds": {
+        "id": "Comment.id",
+        "site": "Comment.site_id",
+        "url": "Comment.url"
+      },
+      "_output_schema": {
+        "comment": "one Comment row"
+      },
+      "guards": {
+        "required": [
+          "id",
+          "site",
+          "url"
+        ],
+        "messages": {}
+      },
+      "description": "Fetch a single comment by its id within a site/url. Public read — IP and votes are hidden from non-admins."
+    },
+    {
+      "tool": "comment_last",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Comment",
+        "search_fields": [
+          "site_id"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "site_id"
+          ]
+        },
+        "pagination": {
+          "default_limit": 20
+        }
+      },
+      "input_schema": {
+        "site": {
+          "type": "text",
+          "required": true,
+          "description": "The Remark42 site id (which comments section/tenant this refers to)."
+        },
+        "limit": {
+          "type": "int",
+          "required": false,
+          "description": "Maximum number of comments to return."
+        },
+        "since": {
+          "type": "datetime",
+          "required": false,
+          "description": "Only comments newer than this time. Omit for all."
+        }
+      },
+      "_evidence": {
+        "locator": "backend/app/rest/api/rest_public.go:186",
+        "id_local": "Comment.last",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v1/last/{limit}",
+          "locator": "backend/app/rest/api/rest.go:274"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "comments, e := s.dataService.Last(siteID, limit, sinceTime, rest.GetUserOrEmpty(r))\nfilterDeleted := filterComments(comments, func(c store.Comment) bool { return !c.Deleted })"
+      },
+      "entity": "Comment",
+      "_binds": {
+        "site": "Comment.site_id"
+      },
+      "_output_schema": {
+        "comments": "list of Comment"
+      },
+      "guards": {
+        "required": [
+          "site"
+        ],
+        "messages": {}
+      },
+      "description": "List the most recent comments across a site (deleted ones filtered out). Public read."
+    },
+    {
+      "tool": "comment_by_user",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Comment",
+        "search_fields": [
+          "site_id",
+          "user_id"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "site_id",
+            "user_id"
+          ]
+        },
+        "pagination": {
+          "default_limit": 20
+        }
+      },
+      "input_schema": {
+        "site": {
+          "type": "text",
+          "required": true,
+          "description": "The Remark42 site id (which comments section/tenant this refers to)."
+        },
+        "user": {
+          "type": "int",
+          "required": true,
+          "description": "User id whose comments to list."
+        },
+        "limit": {
+          "type": "int",
+          "required": false,
+          "description": "Maximum number of comments to return."
+        },
+        "skip": {
+          "type": "int",
+          "required": false,
+          "description": "Number of comments to skip (pagination)."
+        }
+      },
+      "_evidence": {
+        "locator": "backend/app/rest/api/rest_public.go:242",
+        "id_local": "Comment.by_user",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v1/comments",
+          "locator": "backend/app/rest/api/rest.go:273"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "comments, e := s.dataService.User(siteID, userID, limit, skip, rest.GetUserOrEmpty(r))\ncomments = filterComments(comments, func(c store.Comment) bool { return !c.Deleted })\ncount, e := s.dataService.UserCount(siteID, userID)"
+      },
+      "entity": "Comment",
+      "_binds": {
+        "site": "Comment.site_id",
+        "user": "Comment.user_id"
+      },
+      "_output_schema": {
+        "comments": "list of Comment",
+        "count": "int"
+      },
+      "guards": {
+        "required": [
+          "site",
+          "user"
+        ],
+        "messages": {}
+      },
+      "description": "List a user's comments on a site (deleted filtered out). Public read — takes an arbitrary user id."
+    },
+    {
+      "tool": "postinfo_get",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "PostInfo",
+        "lookup_by": {
+          "url": {
+            "$arg": "url"
+          }
+        }
+      },
+      "input_schema": {
+        "site": {
+          "type": "text",
+          "required": true,
+          "description": "The Remark42 site id (which comments section/tenant this refers to)."
+        },
+        "url": {
+          "type": "text",
+          "required": true,
+          "description": "The page URL the comment belongs to."
+        }
+      },
+      "_evidence": {
+        "locator": "backend/app/rest/api/rest_public.go:162",
+        "id_local": "PostInfo.get",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v1/info",
+          "locator": "backend/app/rest/api/rest.go:278"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "info, e := s.dataService.Info(locator, s.readOnlyAge)"
+      },
+      "entity": "PostInfo",
+      "_binds": {
+        "site": "Comment.site_id",
+        "url": "PostInfo.url"
+      },
+      "_output_schema": {
+        "PostInfo": "post meta"
+      },
+      "guards": {
+        "required": [
+          "site",
+          "url"
+        ],
+        "messages": {}
+      },
+      "description": "Fetch a post's comment metadata (count, first/last time). Public read."
+    },
+    {
+      "tool": "comment_count",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "PostInfo",
+        "lookup_by": {
+          "url": {
+            "$arg": "url"
+          }
+        }
+      },
+      "input_schema": {
+        "site": {
+          "type": "text",
+          "required": true,
+          "description": "The Remark42 site id (which comments section/tenant this refers to)."
+        },
+        "url": {
+          "type": "text",
+          "required": true,
+          "description": "The page URL the comment belongs to."
+        }
+      },
+      "_evidence": {
+        "locator": "backend/app/rest/api/rest_public.go:292",
+        "id_local": "Comment.count",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v1/count",
+          "locator": "backend/app/rest/api/rest.go:275"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "count, err := s.dataService.Count(locator)"
+      },
+      "entity": "PostInfo",
+      "_binds": {
+        "site": "Comment.site_id",
+        "url": "PostInfo.url"
+      },
+      "_output_schema": {
+        "count": "int",
+        "locator": "object"
+      },
+      "guards": {
+        "required": [
+          "site",
+          "url"
+        ],
+        "messages": {}
+      },
+      "description": "Fetch how many comments a post has. Public read."
+    },
+    {
+      "tool": "postinfo_counts_multi",
+      "op": "read",
+      "family": "search",
+      "exec_spec": {
+        "entity": "PostInfo",
+        "search_fields": [
+          "url"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "url"
+          ]
+        }
+      },
+      "input_schema": {
+        "site": {
+          "type": "text",
+          "required": true,
+          "description": "The Remark42 site id (which comments section/tenant this refers to)."
+        },
+        "posts": {
+          "type": "json",
+          "required": true,
+          "description": "JSON list of page URLs to fetch counts for."
+        }
+      },
+      "_evidence": {
+        "locator": "backend/app/rest/api/rest_public.go:303",
+        "id_local": "PostInfo.counts_multi",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/v1/counts",
+          "locator": "backend/app/rest/api/rest.go:276"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "counts, e := s.dataService.Counts(siteID, posts)"
+      },
+      "entity": "PostInfo",
+      "_binds": {
+        "site": "Comment.site_id",
+        "posts": "PostInfo.url"
+      },
+      "_output_schema": {
+        "Counts": "list of PostInfo with count only"
+      },
+      "guards": {
+        "required": [
+          "site",
+          "posts"
+        ],
+        "messages": {}
+      },
+      "description": "Fetch comment counts for several page URLs at once. Public read."
+    },
+    {
+      "tool": "postinfo_list",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "PostInfo",
+        "rank": {
+          "method": "exact"
+        },
+        "pagination": {
+          "default_limit": 20
+        }
+      },
+      "input_schema": {
+        "site": {
+          "type": "text",
+          "required": true,
+          "description": "The Remark42 site id (which comments section/tenant this refers to)."
+        },
+        "limit": {
+          "type": "int",
+          "required": false,
+          "description": "Maximum number of comments to return."
+        },
+        "skip": {
+          "type": "int",
+          "required": false,
+          "description": "Number of comments to skip (pagination)."
+        }
+      },
+      "_evidence": {
+        "locator": "backend/app/rest/api/rest_public.go:337",
+        "id_local": "PostInfo.list",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v1/list",
+          "locator": "backend/app/rest/api/rest.go:277"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "posts, e := s.dataService.List(siteID, limit, skip)"
+      },
+      "entity": "PostInfo",
+      "_binds": {
+        "site": "Comment.site_id"
+      },
+      "_output_schema": {
+        "posts": "list of PostInfo"
+      },
+      "guards": {
+        "required": [
+          "site"
+        ],
+        "messages": {}
+      },
+      "description": "List the posts with comments on a site, most recently active first. Public read."
+    },
+    {
+      "tool": "postinfo_config",
+      "op": "read",
+      "family": "search",
+      "exec_spec": {
+        "entity": "User",
+        "rank": {
+          "method": "exact"
+        }
+      },
+      "input_schema": {
+        "site": {
+          "type": "text",
+          "required": true,
+          "description": "The Remark42 site id (which comments section/tenant this refers to)."
+        }
+      },
+      "_evidence": {
+        "locator": "backend/app/rest/api/rest.go:450",
+        "id_local": "PostInfo.config",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v1/config",
+          "locator": "backend/app/rest/api/rest.go:270"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "admins, _ := s.DataService.AdminStore.Admins(siteID)\nemails, _ := s.DataService.AdminStore.Email(siteID)\n// returns a static Config struct, no DB writes"
+      },
+      "entity": "User",
+      "_output_schema": {
+        "configuration": "Config fields (admins list, feature toggles)"
+      },
+      "guards": {
+        "required": [
+          "site"
+        ],
+        "messages": {}
+      },
+      "description": "Fetch the site's public configuration (admin emails, feature toggles). Public read."
+    },
+    {
+      "tool": "comment_create",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Comment",
+        "fields": {
+          "text": {
+            "$arg": "text"
+          },
+          "parent_id": {
+            "$arg": "pid"
+          },
+          "site_id": {
+            "$arg": "site"
+          },
+          "post_title": {
+            "$arg": "title"
+          }
+        },
+        "set_on_create": {
+          "timestamp": "2026-01-01T00:00:00",
+          "url": {
+            "$arg": "url"
+          },
+          "user_id": {
+            "$session": "account_id"
+          },
+          "user_name": {
+            "$arg": "name"
+          }
+        }
+      },
+      "input_schema": {
+        "site": {
+          "type": "text",
+          "required": true,
+          "description": "The Remark42 site id (which comments section/tenant this refers to)."
+        },
+        "url": {
+          "type": "text",
+          "required": true,
+          "description": "The page URL the comment belongs to."
+        },
+        "text": {
+          "type": "text",
+          "required": true,
+          "description": "The comment body or the new text to set."
+        },
+        "pid": {
+          "type": "text",
+          "required": false,
+          "description": "Optional parent comment id to reply to (threading)."
+        },
+        "title": {
+          "type": "text",
+          "required": false,
+          "description": "Optional post title stored on the comment."
+        },
+        "name": {
+          "type": "text",
+          "required": false,
+          "description": "The display name to use for the signing-in account."
+        }
+      },
+      "_evidence": {
+        "locator": "backend/app/rest/api/rest_private.go:105",
+        "id_local": "Comment.create",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/v1/comment",
+          "locator": "backend/app/rest/api/rest.go:359"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "comment.PrepareUntrusted()\ncomment.User = user\ncomment.User.IP = extractIP(r.RemoteAddr)\ncomment.Orig = comment.Text\n...\nif s.dataService.IsBlocked(comment.Locator.SiteID, comment.User.ID) { 403 }\nif s.isReadOnly(comment.Locator) { 403 }\nid, err := s.dataService.Create(comment)\n...\ns.notifyService.Submit(notify.Request{Comment: finalComment})",
+        "edges": [
+          "route /api/v1/comment in auth group (rest.go:359); createCommentCtrl: blocked->403 (rest_private.go:141), isReadOnly->403 (rest_private.go:146); matchSiteID+subscribersOnly middleware (rest.go:354)"
+        ],
+        "wall": {
+          "blocked_403": "rest_private.go:141",
+          "readonly_403": "rest_private.go:146"
+        }
+      },
+      "entity": "Comment",
+      "_binds": {
+        "site": "Comment.site_id",
+        "url": "PostInfo.url",
+        "text": "Comment.text",
+        "pid": "Comment.parent_id",
+        "title": "Comment.post_title"
+      },
+      "_output_schema": {
+        "comment": "the created Comment row"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "BlockedUser",
+                "where": {
+                  "node": "field",
+                  "col": "user_id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "eq",
+              "n": 0
+            },
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "PostReadonly",
+                "where": {
+                  "node": "field",
+                  "col": "url",
+                  "op": "eq",
+                  "value": {
+                    "arg": "url"
+                  }
+                }
+              },
+              "op": "eq",
+              "n": 0
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "site",
+          "url",
+          "text"
+        ],
+        "messages": {
+          "precondition": "Cannot post: you are blocked on this site, or the post is read-only.",
+          "auth": "You must sign in before commenting.",
+          "fk_missing": "A required parent (user or post) is missing."
+        }
+      },
+      "_defaulted": [
+        "fields (mapped to the real parameter names via binds)"
+      ],
+      "description": "Post a new comment on a page URL. Requires sign-in; refused if the author is blocked or the post is read-only. Returns the created comment."
+    },
+    {
+      "tool": "comment_edit",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Comment",
+        "row_key": {
+          "id": {
+            "$arg": "id"
+          }
+        },
+        "fields": [
+          "text"
+        ],
+        "set": {
+          "edit": "2026-01-01T00:00:00"
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the comment to act on."
+        },
+        "site": {
+          "type": "text",
+          "required": true,
+          "description": "The Remark42 site id (which comments section/tenant this refers to)."
+        },
+        "url": {
+          "type": "text",
+          "required": true,
+          "description": "The page URL the comment belongs to."
+        },
+        "text": {
+          "type": "text",
+          "required": false,
+          "description": "The comment body or the new text to set."
+        }
+      },
+      "_evidence": {
+        "locator": "backend/app/rest/api/rest_private.go:180",
+        "id_local": "Comment.edit",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /api/v1/comment/{id}",
+          "locator": "backend/app/rest/api/rest.go:357"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "if currComment, err = s.dataService.Get(locator, id, rest.GetUserOrEmpty(r)); err != nil { 400 }\nif currComment.User.ID != user.ID { 403 \"can not edit comments for other users\" }\nres, err := s.dataService.EditComment(locator, id, editReq)",
+        "edges": [
+          "updateCommentCtrl currComment.User.ID != user.ID -> 403 (rest_private.go:205); admin may bypass via EditRequest.Admin (service.go:474)"
+        ]
+      },
+      "entity": "Comment",
+      "_binds": {
+        "id": "Comment.id",
+        "site": "Comment.site_id",
+        "url": "Comment.url",
+        "text": "Comment.text",
+        "summary": "Comment.edit"
+      },
+      "_output_schema": {
+        "comment": "the updated (or deleted) Comment row"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Comment",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "id",
+          "site",
+          "url"
+        ],
+        "messages": {
+          "precondition": "Only the author of this comment may edit it (admins may edit any).",
+          "not_found": "No comment with that id exists in this site/url.",
+          "auth": "You must sign in first."
+        }
+      },
+      "description": "Edit the text of one of your own comments (an admin may edit any). Refused if the comment is not yours."
+    },
+    {
+      "tool": "comment_vote",
+      "op": "update",
+      "family": "action.emit",
+      "exec_spec": {
+        "channel": "event",
+        "record": {
+          "table": "CommentLog",
+          "set": {
+            "event": "vote"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "The comment being voted on."
+        },
+        "site": {
+          "type": "text",
+          "required": true,
+          "description": "The site id."
+        },
+        "url": {
+          "type": "text",
+          "required": true,
+          "description": "The page URL the comment belongs to."
+        },
+        "vote": {
+          "type": "int",
+          "required": true,
+          "description": "1 for an upvote, 0 for a downvote."
+        }
+      },
+      "_evidence": {
+        "locator": "backend/app/rest/api/rest_private.go:254",
+        "id_local": "Comment.vote",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /api/v1/vote/{id}",
+          "locator": "backend/app/rest/api/rest.go:360"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "if comment.User.ID == req.UserID && req.UserID != \"dev\" { \\\"can not vote for his own comment\\\" }\nif voted && v == req.Val { \\\"already voted\\\" }\ncomment.Votes[req.UserID] = req.Val\nif req.Val { comment.Score++ } else { comment.Score-- }\ncomment.Controversy = s.controversy(...)\nreturn comment, s.Engine.Update(comment)",
+        "edges": [
+          "voteCtrl: anon rejected unless anonVote (rest_private.go:256), read-only->403 (266), blocked->403 (272); service Vote rejects self/double/max (service.go:345)"
+        ],
+        "wall": {
+          "self_vote_403": "rest_private.go:254",
+          "already_voted": "rest_private.go:258"
+        },
+        "note": "Score mutation is a per-user JSON votes map + auto-increment, not expressible in the runtime's set grammar; modeled as an emitted vote event."
+      },
+      "entity": "Comment",
+      "_binds": {
+        "id": "Comment.id",
+        "site": "Comment.site_id",
+        "url": "Comment.url"
+      },
+      "_output_schema": {
+        "id": "comment id",
+        "score": "new score"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Comment",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "eq",
+              "n": 0
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "id",
+          "site",
+          "url",
+          "vote"
+        ],
+        "messages": {
+          "precondition": "You cannot vote on your own comment.",
+          "auth": "You must sign in before voting."
+        }
+      },
+      "_defaulted": [
+        "fields",
+        "fields (mapped to the real parameter names via binds)"
+      ],
+      "description": "Register an upvote or downvote on a comment. Refused for your own comment. The runtime records the vote event; Remark42's live score/controversy recomputation (per-user votes map) is not reproduced, so the comment's stored score does not change.",
+      "_record_undeclared": false
+    },
+    {
+      "tool": "user_get_info",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "User",
+        "lookup_by": {
+          "id": {
+            "$session": "account_id"
+          }
+        }
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "backend/app/rest/api/rest_private.go:236",
+        "id_local": "User.get_info",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v1/user",
+          "locator": "backend/app/rest/api/rest.go:314"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "user := rest.MustGetUserInfo(r)\nuser.Verified = s.dataService.IsVerified(siteID, user.ID)\nemail, err := s.dataService.GetUserEmail(siteID, user.ID)",
+        "edges": [
+          "protected /api/v1/user route, authMiddleware.Auth (rest.go:313); reads email+verified for the logged-in user only"
+        ]
+      },
+      "entity": "UserVerified",
+      "_output_schema": {
+        "user": "the authenticated user profile"
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in before viewing your profile."
+        }
+      },
+      "description": "Fetch the signed-in user's own profile, including verified and email state."
+    },
+    {
+      "tool": "user_subscribe_email",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "UserDetail",
+        "row_key": {
+          "user_id": {
+            "$session": "account_id"
+          }
+        },
+        "set": {
+          "email": {
+            "$arg": "address"
+          }
+        }
+      },
+      "input_schema": {
+        "site": {
+          "type": "text",
+          "required": true,
+          "description": "The Remark42 site id (which comments section/tenant this refers to)."
+        },
+        "address": {
+          "type": "text",
+          "required": true,
+          "description": "The email address to subscribe/confirm."
+        }
+      },
+      "_evidence": {
+        "locator": "backend/app/rest/api/rest_private.go:313",
+        "id_local": "User.subscribe_email",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/v1/email/subscribe",
+          "locator": "backend/app/rest/api/rest.go:363"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "if subscribe.Address == existingAddress { 409 \\\"already verified\\\" }\nif subscribe.autoConfirm && strings.HasPrefix(user.ID, \"email_\") && ...== token.HashID(sha1.New(), subscribe.Address) {\n\ts.setEmail(...); return\n}\nclaims := token.Claims{Handshake:...}\ntkn, _ := s.authenticator.TokenService().Token(claims)\ns.notifyService.SubmitVerification(notify.VerificationRequest{...Email: subscribe.Address, Token: tkn})",
+        "edges": [
+          "auth+rejectAnonUser group (rest.go:362-367)"
+        ]
+      },
+      "entity": "UserDetail",
+      "_binds": {
+        "site": "Comment.site_id",
+        "address": "UserDetail.email"
+      },
+      "_output_schema": {
+        "user": "user",
+        "address": "email",
+        "updated": "bool"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "UserDetail",
+                "where": {
+                  "node": "field",
+                  "col": "user_id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "site",
+          "address"
+        ],
+        "messages": {
+          "auth": "You must sign in first.",
+          "not_found": "No detail row exists to write your email to.",
+          "precondition": "You need an account on this site before subscribing to a thread; nothing is registered for your account yet."
+        }
+      },
+      "_defaulted": [
+        "fields (mapped to the real parameter names via binds)"
+      ],
+      "description": "Register your email for a comment-thread subscription; the confirmation link is emailed, not returned."
+    },
+    {
+      "tool": "user_confirm_email",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "UserDetail",
+        "row_key": {
+          "user_id": {
+            "$session": "account_id"
+          }
+        },
+        "set": {
+          "email": {
+            "$arg": "address"
+          }
+        }
+      },
+      "input_schema": {
+        "site": {
+          "type": "text",
+          "required": true,
+          "description": "The Remark42 site id (which comments section/tenant this refers to)."
+        },
+        "token": {
+          "type": "text",
+          "required": true,
+          "description": "The one-time confirmation/authorization token for the current step."
+        },
+        "address": {
+          "type": "text",
+          "required": true,
+          "description": "The email address to subscribe/confirm."
+        }
+      },
+      "_evidence": {
+        "locator": "backend/app/rest/api/rest_private.go:449",
+        "id_local": "User.confirm_email",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/v1/email/confirm",
+          "locator": "backend/app/rest/api/rest.go:364"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "confClaims, err := s.authenticator.TokenService().Parse(confirm.Token)\n... elems := strings.Split(confClaims.Handshake.ID, \"::\")\nif len(elems) != 2 || elems[0] != user.ID { 400 invalid handshake }\naddress := elems[1]\ns.setEmail(w, r, user.ID, confirm.Site, address)",
+        "edges": [
+          "route under /api/v1 with authMiddleware.Auth + rejectAnonUser (rest.go:364); token handshake must match the authed user (rest_private.go:483)"
+        ]
+      },
+      "entity": "UserDetail",
+      "_binds": {
+        "site": "Comment.site_id",
+        "address": "UserDetail.email"
+      },
+      "_output_schema": {
+        "updated": "bool",
+        "address": "email"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "UserDetail",
+                "where": {
+                  "node": "field",
+                  "col": "user_id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "site",
+          "token",
+          "address"
+        ],
+        "messages": {
+          "auth": "You must sign in first.",
+          "not_found": "No detail row exists to write your email to.",
+          "precondition": "You need an account on this site before confirming an email address."
+        }
+      },
+      "_defaulted": [
+        "fields (mapped to the real parameter names via binds)"
+      ],
+      "description": "Confirm an email you previously subscribed, proving ownership of the inbox."
+    },
+    {
+      "tool": "user_unsubscribe_email",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "UserDetail",
+        "lookup_by": {
+          "user_id": {
+            "$session": "account_id"
+          }
+        }
+      },
+      "input_schema": {
+        "site": {
+          "type": "text",
+          "required": true,
+          "description": "The Remark42 site id (which comments section/tenant this refers to)."
+        },
+        "tkn": {
+          "type": "text",
+          "required": true,
+          "description": "The unsubscribe/authorization token proving you own the account."
+        }
+      },
+      "_evidence": {
+        "locator": "backend/app/rest/api/rest_private.go:516",
+        "id_local": "User.unsubscribe_email",
+        "entry": {
+          "kind": "http",
+          "route": "POST /email/unsubscribe.html",
+          "locator": "backend/app/rest/api/rest.go:385"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "existingAddress, err := s.dataService.GetUserEmail(siteID, userID)\nif existingAddress == \"\" { 409 user is not subscribed }\nif address != existingAddress { 400 wrong email unsubscription }\ns.dataService.DeleteUserDetail(siteID, userID, engine.UserEmail)",
+        "edges": [
+          "auth+rejectAnonUser group (rest.go:362-367)",
+          "emailUnsubscribeCtrl checks existing address (rest_private.go:544-557)"
+        ]
+      },
+      "entity": "UserDetail",
+      "_binds": {
+        "site": "Comment.site_id"
+      },
+      "_output_schema": {
+        "html": "unsubscribe confirmation page"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "UserDetail",
+                "where": {
+                  "node": "field",
+                  "col": "user_id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "UserDetail",
+                "where": {
+                  "node": "field",
+                  "col": "email",
+                  "op": "is_not_null"
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "site",
+          "tkn"
+        ],
+        "messages": {
+          "auth": "You must sign in first.",
+          "precondition": "You have no email address on record to unsubscribe — subscribe to a thread first."
+        }
+      },
+      "description": "Remove your email from your detail (stop email subscription). Refused if the address does not match."
+    },
+    {
+      "tool": "user_delete_email",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "UserDetail",
+        "lookup_by": {
+          "user_id": {
+            "$session": "account_id"
+          }
+        }
+      },
+      "input_schema": {
+        "site": {
+          "type": "text",
+          "required": true,
+          "description": "The Remark42 site id (which comments section/tenant this refers to)."
+        }
+      },
+      "_evidence": {
+        "locator": "backend/app/rest/api/rest_private.go:600",
+        "id_local": "User.delete_email",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/v1/email",
+          "locator": "backend/app/rest/api/rest.go:365"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "s.dataService.DeleteUserDetail(siteID, user.ID, engine.UserEmail)",
+        "edges": [
+          "auth+rejectAnonUser group (rest.go:362-367)"
+        ]
+      },
+      "entity": "UserDetail",
+      "_binds": {
+        "site": "Comment.site_id"
+      },
+      "_output_schema": {
+        "deleted": "true"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "UserDetail",
+                "where": {
+                  "node": "field",
+                  "col": "user_id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "site"
+        ],
+        "messages": {
+          "auth": "You must sign in first.",
+          "precondition": "You have no email address on record to remove."
+        }
+      },
+      "description": "Remove your saved email address (opt out of email notifications)."
+    },
+    {
+      "tool": "user_subscribe_telegram",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "UserDetail",
+        "row_key": {
+          "user_id": {
+            "$session": "account_id"
+          }
+        },
+        "fields": [
+          "telegram"
+        ],
+        "set": {
+          "user_id": {
+            "$session": "account_id"
+          }
+        }
+      },
+      "input_schema": {
+        "site": {
+          "type": "text",
+          "required": true,
+          "description": "The Remark42 site id (which comments section/tenant this refers to)."
+        },
+        "telegram": {
+          "type": "text",
+          "required": true,
+          "description": "The Telegram chat id to link, or a one-time token from a prior call."
+        }
+      },
+      "_evidence": {
+        "locator": "backend/app/rest/api/rest_private.go:389",
+        "id_local": "User.subscribe_telegram",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v1/telegram/subscribe",
+          "locator": "backend/app/rest/api/rest.go:366"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "if queryToken == \"\" { // generate token\n  tkn := randToken(); s.telegramService.AddToken(tkn, user.ID, siteID, expires)\n  return {\"token\": tkn, \"bot\": s.telegramService.GetBotUsername()}\n}\n// verify\naddress, siteID, err := s.telegramService.CheckToken(queryToken, user.ID)\nval, err := s.dataService.SetUserTelegram(siteID, user.ID, address)",
+        "edges": [
+          "auth+rejectAnonUser group (rest.go:362-367)"
+        ]
+      },
+      "entity": "UserDetail",
+      "_binds": {
+        "site": "Comment.site_id",
+        "telegram": "UserDetail.telegram"
+      },
+      "_output_schema": {
+        "token": "pending token",
+        "bot": "bot username",
+        "updated": "bool",
+        "address": "telegram id"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "UserDetail",
+                "where": {
+                  "node": "field",
+                  "col": "user_id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "site",
+          "telegram"
+        ],
+        "messages": {
+          "auth": "You must sign in first.",
+          "precondition": "You need an account on this site before linking Telegram."
+        }
+      },
+      "description": "Start Telegram notifications: with no token, returns a one-time subscribe token; with a token, links your Telegram chat id to your account."
+    },
+    {
+      "tool": "user_delete_telegram",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "UserDetail",
+        "lookup_by": {
+          "user_id": {
+            "$session": "account_id"
+          }
+        }
+      },
+      "input_schema": {
+        "site": {
+          "type": "text",
+          "required": true,
+          "description": "The Remark42 site id (which comments section/tenant this refers to)."
+        }
+      },
+      "_evidence": {
+        "locator": "backend/app/rest/api/rest_private.go:627",
+        "id_local": "User.delete_telegram",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/v1/telegram",
+          "locator": "backend/app/rest/api/rest.go:367"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "s.dataService.DeleteUserDetail(siteID, user.ID, engine.UserTelegram)",
+        "edges": [
+          "auth+rejectAnonUser group (rest.go:362-367)"
+        ]
+      },
+      "entity": "UserDetail",
+      "_binds": {
+        "site": "Comment.site_id"
+      },
+      "_output_schema": {
+        "deleted": "true"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "UserDetail",
+                "where": {
+                  "node": "field",
+                  "col": "user_id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "site"
+        ],
+        "messages": {
+          "auth": "You must sign in first.",
+          "precondition": "You have no Telegram chat linked to remove."
+        }
+      },
+      "description": "Remove your saved Telegram chat id (opt out of Telegram notifications)."
+    },
+    {
+      "tool": "user_delete_me_req",
+      "op": "action",
+      "family": "action.emit",
+      "exec_spec": {
+        "channel": "event",
+        "record": {
+          "table": "UserLog"
+        }
+      },
+      "input_schema": {
+        "site": {
+          "type": "text",
+          "required": true,
+          "description": "The Remark42 site id (which comments section/tenant this refers to)."
+        }
+      },
+      "_evidence": {
+        "locator": "backend/app/rest/api/rest_private.go:696",
+        "id_local": "User.delete_me_req",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/v1/deleteme",
+          "locator": "backend/app/rest/api/rest.go:361"
+        },
+        "entity_why": "fell back to the entity prefix of id_local",
+        "ref_code": "claims := token.Claims{ RegisteredClaims: ..., User: &token.User{ID: user.ID, Name: user.Name, Picture: user.Picture, Attributes: map[string]any{\"delete_me\": true}} }\ntokenStr, _ := s.authenticator.TokenService().Token(claims)\nlink := fmt.Sprintf(\"%s/web/deleteme.html?token=%s\", s.remarkURL, tokenStr)"
+      },
+      "entity": "User",
+      "_binds": {
+        "site": "Comment.site_id"
+      },
+      "_output_schema": {
+        "site": "",
+        "user_id": "",
+        "token": "JWT",
+        "link": "confirm url"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "site"
+        ],
+        "messages": {
+          "auth": "You must sign in before requesting account deletion."
+        }
+      },
+      "_defaulted": [
+        "entity (not taken from the primary effect: fell back to the entity prefix of id_local)"
+      ],
+      "description": "Request deletion of your own account: mints a signed delete confirmation link (the token is returned as-is since the real flow emails it).",
+      "_record_undeclared": false
+    },
+    {
+      "tool": "image_upload",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Image",
+        "fields": [
+          "staged"
+        ],
+        "set_on_create": {
+          "staged": true
+        }
+      },
+      "input_schema": {
+        "site": {
+          "type": "text",
+          "required": true,
+          "description": "The Remark42 site id (which comments section/tenant this refers to)."
+        },
+        "file": {
+          "type": "json",
+          "required": true,
+          "description": "The image file payload to upload."
+        }
+      },
+      "_evidence": {
+        "locator": "backend/app/rest/api/rest_private.go:728",
+        "id_local": "Image.upload",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/v1/picture",
+          "locator": "backend/app/rest/api/rest.go:376"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "id, err := s.imageService.Save(user.ID, file) // Save = path.Join(userID, guid()) into staging",
+        "edges": [
+          "auth+rejectAnonUser group (rest.go:371-377)"
+        ]
+      },
+      "entity": "Image",
+      "_binds": {
+        "site": "Comment.site_id"
+      },
+      "_output_schema": {
+        "id": "image id (rendered as <user>/<xid>)"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "site",
+          "file"
+        ],
+        "messages": {
+          "auth": "You must sign in first.",
+          "fk_missing": "A required parent is missing.",
+          "precondition": "Only a signed-in user can upload an image."
+        }
+      },
+      "_defaulted": [
+        "fields"
+      ],
+      "description": "Upload an image into the staging area; returns its id (rendered as <user>/<id>). Requires sign-in."
+    },
+    {
+      "tool": "comment_delete",
+      "op": "delete",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Comment",
+        "row_key": {
+          "id": {
+            "$arg": "id"
+          }
+        },
+        "fields": [
+          "deleted",
+          "text",
+          "orig",
+          "score"
+        ],
+        "set": {
+          "deleted": true,
+          "text": "",
+          "orig": "",
+          "score": 0
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the comment to act on."
+        },
+        "site": {
+          "type": "text",
+          "required": true,
+          "description": "The Remark42 site id (which comments section/tenant this refers to)."
+        },
+        "url": {
+          "type": "text",
+          "required": true,
+          "description": "The page URL the comment belongs to."
+        }
+      },
+      "_evidence": {
+        "locator": "backend/app/rest/api/admin.go:47",
+        "id_local": "Comment.delete",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/v1/admin/comment/{id}",
+          "locator": "backend/app/rest/api/rest.go:327"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "err := a.dataService.Delete(locator, id, store.SoftDelete) // SoftDelete sets Deleted=true, clears fields, decrements PostInfo.count",
+        "edges": [
+          "route under /api/v1/admin with authMiddleware.Auth+AdminOnly (rest.go:319-321); admin flag set on JWT by ClaimsUpd (server.go:1420)"
+        ]
+      },
+      "entity": "Comment",
+      "_binds": {
+        "id": "Comment.id",
+        "site": "Comment.site_id",
+        "url": "PostInfo.url"
+      },
+      "_output_schema": {
+        "id": "comment id",
+        "locator": "object"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "admin",
+                      "op": "eq",
+                      "value": true
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "id",
+          "site",
+          "url"
+        ],
+        "messages": {
+          "precondition": "Only an admin can delete a comment.",
+          "not_found": "No comment with that id exists in this site/url."
+        }
+      },
+      "_defaulted": [
+        "fields",
+        "fields (mapped to the real parameter names via binds)"
+      ],
+      "description": "Soft-delete a comment: marks it deleted, blanks its text, lowers the post count. Admin only."
+    },
+    {
+      "tool": "user_block",
+      "op": "update",
+      "family": "crud.upsert",
+      "exec_spec": {
+        "entity": "BlockedUser",
+        "key": {
+          "user_id": {
+            "$arg": "userid"
+          }
+        },
+        "insert_fields": {
+          "until": {
+            "$arg": "ttl"
+          }
+        },
+        "set_on_exists": {
+          "until": {
+            "$arg": "ttl"
+          }
+        }
+      },
+      "input_schema": {
+        "userid": {
+          "type": "int",
+          "required": true,
+          "description": "User id to block, delete, verify or read."
+        },
+        "site": {
+          "type": "text",
+          "required": true,
+          "description": "The Remark42 site id (which comments section/tenant this refers to)."
+        },
+        "block": {
+          "type": "bool",
+          "required": true,
+          "description": "True to block the user, false to unblock."
+        },
+        "ttl": {
+          "type": "text",
+          "required": false,
+          "description": "Block time-to-live; omit for a permanent block."
+        }
+      },
+      "_evidence": {
+        "locator": "backend/app/rest/api/admin.go:156",
+        "id_local": "User.block",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /api/v1/admin/user/{userid}",
+          "locator": "backend/app/rest/api/rest.go:328"
+        },
+        "entity_why": "primary effect row_upsert lands on this table",
+        "ref_code": "if err := a.dataService.SetBlock(siteID, userID, blockStatus, ttl); err != nil { 400 }\n// delete comments for permanently blocked user\nif blockStatus && ttl == time.Duration(0) {\n  a.dataService.DeleteUser(siteID, userID, store.SoftDelete) }",
+        "edges": [
+          "route under /api/v1/admin with authMiddleware.Auth+AdminOnly (rest.go:319-321); admin flag set on JWT by ClaimsUpd (server.go:1420)"
+        ]
+      },
+      "entity": "BlockedUser",
+      "_binds": {
+        "userid": "BlockedUser.user_id",
+        "site": "Comment.site_id"
+      },
+      "_output_schema": {
+        "user_id": "",
+        "site_id": "",
+        "block": "bool"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "admin",
+                      "op": "eq",
+                      "value": true
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "userid",
+          "site",
+          "block"
+        ],
+        "messages": {
+          "auth": "You must sign in first.",
+          "precondition": "Only an admin can block or unblock a user."
+        }
+      },
+      "_defaulted": [
+        "dropped unwritable columns ['user_id']",
+        "fields",
+        "row_key (the locator column is also writable — the bound arg may be a new value, not an address)"
+      ],
+      "description": "Block (or unblock) a user on a site, optionally for a time-to-live. A permanent block also deletes the user's comments. Admin only."
+    },
+    {
+      "tool": "user_delete",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "UserDetail",
+        "lookup_by": {
+          "user_id": {
+            "$arg": "userid"
+          }
+        }
+      },
+      "input_schema": {
+        "userid": {
+          "type": "int",
+          "required": true,
+          "description": "User id to permanently delete."
+        },
+        "site": {
+          "type": "text",
+          "required": true,
+          "description": "The site id."
+        }
+      },
+      "_evidence": {
+        "locator": "backend/app/rest/api/admin.go:62",
+        "id_local": "User.delete",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/v1/admin/user/{userid}",
+          "locator": "backend/app/rest/api/rest.go:329"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "a.dataService.DeleteUser(siteID, userID, store.HardDelete) // hard delete marks every comment deleted, renames user to deleted, drops user bucket and details",
+        "edges": [
+          "route under /api/v1/admin with authMiddleware.Auth+AdminOnly (rest.go:319-321); admin flag set on JWT by ClaimsUpd (server.go:1420)"
+        ],
+        "note": "_defaulted said 'row_key (no parameter found)': user_id column-name standing in as arg. Real arg is userid (DELETE /api/v1/admin/user/{userid}); bound to user_id so the row resolves."
+      },
+      "entity": "UserDetail",
+      "_binds": {
+        "userid": "User.id",
+        "site": "Comment.site_id"
+      },
+      "_output_schema": {
+        "user_id": "",
+        "site_id": ""
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "admin",
+                      "op": "eq",
+                      "value": true
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "userid",
+          "site"
+        ],
+        "messages": {
+          "auth": "You must sign in first.",
+          "precondition": "Only an admin can permanently delete a user."
+        }
+      },
+      "_defaulted": [
+        "row_key (no parameter found; the column name is standing in as one)"
+      ],
+      "description": "Permanently delete a user and all their comments and details. Admin only."
+    },
+    {
+      "tool": "user_get_admin",
+      "op": "read",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Comment",
+        "search_fields": [
+          "user_id",
+          "site_id"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "user_id",
+            "site_id"
+          ]
+        },
+        "pagination": {
+          "default_limit": 20
+        }
+      },
+      "input_schema": {
+        "userid": {
+          "type": "int",
+          "required": true,
+          "description": "User id to block, delete, verify or read."
+        },
+        "site": {
+          "type": "text",
+          "required": true,
+          "description": "The Remark42 site id (which comments section/tenant this refers to)."
+        }
+      },
+      "_evidence": {
+        "locator": "backend/app/rest/api/admin.go:76",
+        "id_local": "User.get_admin",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v1/admin/user/{userid}",
+          "locator": "backend/app/rest/api/rest.go:330"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "ucomments, err := a.dataService.User(siteID, userID, 1, 0, rest.GetUserOrEmpty(r))\nR.RenderJSON(w, ucomments[0].User)"
+      },
+      "entity": "Comment",
+      "_binds": {
+        "userid": "User.id",
+        "site": "Comment.site_id"
+      },
+      "_output_schema": {
+        "user": "the user profile"
+      },
+      "guards": {
+        "required": [
+          "userid",
+          "site"
+        ],
+        "messages": {}
+      },
+      "description": "Admin view of a user: lists that user's comments on a site (the profile is derived from their comments). Admin only."
+    },
+    {
+      "tool": "user_confirm_delete",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "UserDetail",
+        "lookup_by": {
+          "user_id": {
+            "$session": "account_id"
+          }
+        }
+      },
+      "input_schema": {
+        "token": {
+          "type": "text",
+          "required": true,
+          "description": "The one-time confirmation/authorization token for the current step."
+        }
+      },
+      "_evidence": {
+        "locator": "backend/app/rest/api/admin.go:91",
+        "id_local": "User.confirm_delete",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v1/admin/deleteme",
+          "locator": "backend/app/rest/api/rest.go:331"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "claims, err := a.authenticator.TokenService().Parse(token)\nif !claims.User.BoolAttr(\"delete_me\") { 403 }\na.dataService.DeleteUserDetail(audience, claims.User.ID, engine.AllUserDetails)\na.dataService.DeleteUser(audience, claims.User.ID, store.HardDelete)\nif claims.User.Picture != \"\" && a.authenticator.AvatarProxy() != nil { a.authenticator.AvatarProxy().Store.Remove(avatarID) }",
+        "edges": [
+          "route under /api/v1/admin with authMiddleware.Auth+AdminOnly (rest.go:319-321); admin flag set on JWT by ClaimsUpd (server.go:1420)"
+        ]
+      },
+      "entity": "UserDetail",
+      "_output_schema": {
+        "user_id": "",
+        "site_id": ""
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "admin",
+                      "op": "eq",
+                      "value": true
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "token"
+        ],
+        "messages": {
+          "auth": "You must sign in first.",
+          "precondition": "Only an admin can confirm this account-deletion request."
+        }
+      },
+      "description": "Confirm a pending account-deletion request for the token owner, permanently deleting their details and comments. Admin only."
+    },
+    {
+      "tool": "user_verify",
+      "op": "update",
+      "family": "crud.upsert",
+      "exec_spec": {
+        "entity": "UserVerified",
+        "key": {
+          "user_id": {
+            "$arg": "userid"
+          }
+        },
+        "insert_fields": {
+          "user_id": {
+            "$arg": "userid"
+          }
+        },
+        "set_on_exists": {
+          "user_id": {
+            "$arg": "userid"
+          }
+        }
+      },
+      "input_schema": {
+        "userid": {
+          "type": "int",
+          "required": true,
+          "description": "User id to block, delete, verify or read."
+        },
+        "site": {
+          "type": "text",
+          "required": true,
+          "description": "The Remark42 site id (which comments section/tenant this refers to)."
+        },
+        "verified": {
+          "type": "bool",
+          "required": true,
+          "description": "True to mark the user verified, false to clear."
+        }
+      },
+      "_evidence": {
+        "locator": "backend/app/rest/api/admin.go:238",
+        "id_local": "User.verify",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /api/v1/admin/verify/{userid}",
+          "locator": "backend/app/rest/api/rest.go:332"
+        },
+        "entity_why": "primary effect row_upsert lands on this table",
+        "ref_code": "s.dataService.SetVerified(siteID, userID, verifyStatus) // sets/clears the verified flag keyed by user id",
+        "edges": [
+          "route under /api/v1/admin with authMiddleware.Auth+AdminOnly (rest.go:319-321); admin flag set on JWT by ClaimsUpd (server.go:1420)"
+        ]
+      },
+      "entity": "UserVerified",
+      "_binds": {
+        "userid": "UserVerified.user_id",
+        "site": "Comment.site_id"
+      },
+      "_output_schema": {
+        "user": "userid",
+        "verified": "bool"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "admin",
+                      "op": "eq",
+                      "value": true
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "userid",
+          "site",
+          "verified"
+        ],
+        "messages": {
+          "auth": "You must sign in first.",
+          "precondition": "Only an admin can set or clear the verified flag."
+        }
+      },
+      "_defaulted": [
+        "dropped unwritable columns ['user_id']",
+        "row_key (the locator column is also writable — the bound arg may be a new value, not an address)"
+      ],
+      "description": "Set or clear the verified flag on a user. Admin only."
+    },
+    {
+      "tool": "comment_pin",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Comment",
+        "row_key": {
+          "id": {
+            "$arg": "id"
+          }
+        },
+        "fields": [
+          "pin"
+        ],
+        "set": {
+          "pin": {
+            "$arg": "pin"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the comment to act on."
+        },
+        "site": {
+          "type": "text",
+          "required": true,
+          "description": "The Remark42 site id (which comments section/tenant this refers to)."
+        },
+        "url": {
+          "type": "text",
+          "required": true,
+          "description": "The page URL the comment belongs to."
+        },
+        "pin": {
+          "type": "bool",
+          "required": true,
+          "description": "True to pin the comment, false to unpin."
+        }
+      },
+      "_evidence": {
+        "locator": "backend/app/rest/api/admin.go:253",
+        "id_local": "Comment.pin",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /api/v1/admin/pin/{id}",
+          "locator": "backend/app/rest/api/rest.go:333"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "a.dataService.SetPin(locator, commentID, pinStatus) // sets comment.Pin and Engine.Update",
+        "edges": [
+          "route under /api/v1/admin with authMiddleware.Auth+AdminOnly (rest.go:319-321); admin flag set on JWT by ClaimsUpd (server.go:1420)"
+        ]
+      },
+      "entity": "Comment",
+      "_binds": {
+        "id": "Comment.id",
+        "site": "Comment.site_id",
+        "url": "Comment.url"
+      },
+      "_output_schema": {
+        "id": "comment id",
+        "locator": "object",
+        "pin": "bool"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "admin",
+                      "op": "eq",
+                      "value": true
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "id",
+          "site",
+          "url",
+          "pin"
+        ],
+        "messages": {
+          "auth": "You must sign in first.",
+          "precondition": "Only an admin can pin or unpin a comment."
+        }
+      },
+      "_defaulted": [
+        "fields",
+        "fields (mapped to the real parameter names via binds)"
+      ],
+      "description": "Pin or unpin a comment within a post. Admin only."
+    },
+    {
+      "tool": "user_blocked_list",
+      "op": "read",
+      "family": "search",
+      "exec_spec": {
+        "entity": "BlockedUser",
+        "rank": {
+          "method": "exact"
+        }
+      },
+      "input_schema": {
+        "site": {
+          "type": "text",
+          "required": true,
+          "description": "The Remark42 site id (which comments section/tenant this refers to)."
+        }
+      },
+      "_evidence": {
+        "locator": "backend/app/rest/api/admin.go:184",
+        "id_local": "User.blocked_list",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v1/admin/blocked",
+          "locator": "backend/app/rest/api/rest.go:334"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "users, err := a.dataService.BlockedUsers(siteID)",
+        "edges": [
+          "route under /api/v1/admin with authMiddleware.Auth+AdminOnly (rest.go:319-321); admin flag set on JWT by ClaimsUpd (server.go:1420)"
+        ]
+      },
+      "entity": "BlockedUser",
+      "_binds": {
+        "site": "Comment.site_id"
+      },
+      "_output_schema": {
+        "blocked": "list of BlockedUser {id,name,until}"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "admin",
+                      "op": "eq",
+                      "value": true
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "site"
+        ],
+        "messages": {
+          "auth": "You must sign in first.",
+          "precondition": "Only an admin can see the blocked-users list."
+        }
+      },
+      "description": "List the users currently blocked on a site. Admin only."
+    },
+    {
+      "tool": "postinfo_set_readonly",
+      "op": "update",
+      "family": "crud.upsert",
+      "exec_spec": {
+        "entity": "PostReadonly",
+        "key": {
+          "url": {
+            "$arg": "url"
+          }
+        },
+        "insert_fields": {
+          "url": {
+            "$arg": "url"
+          }
+        },
+        "set_on_exists": {
+          "url": {
+            "$arg": "url"
+          }
+        }
+      },
+      "input_schema": {
+        "site": {
+          "type": "text",
+          "required": true,
+          "description": "The Remark42 site id (which comments section/tenant this refers to)."
+        },
+        "url": {
+          "type": "text",
+          "required": true,
+          "description": "The page URL the comment belongs to."
+        },
+        "ro": {
+          "type": "bool",
+          "required": true,
+          "description": "True to make the post read-only, false to lift."
+        }
+      },
+      "_evidence": {
+        "locator": "backend/app/rest/api/admin.go:195",
+        "id_local": "PostInfo.set_readonly",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /api/v1/admin/readonly",
+          "locator": "backend/app/rest/api/rest.go:335"
+        },
+        "entity_why": "primary effect row_upsert lands on this table",
+        "ref_code": "if !roStatus { if info, e := a.dataService.Info(locator, a.readOnlyAge); e == nil && isRoByAge(info) { 403 read-only due the age } }\na.dataService.SetReadOnly(locator, roStatus)",
+        "edges": [
+          "route under /api/v1/admin with authMiddleware.Auth+AdminOnly (rest.go:319-321); admin flag set on JWT by ClaimsUpd (server.go:1420)"
+        ]
+      },
+      "entity": "PostReadonly",
+      "_binds": {
+        "site": "Comment.site_id",
+        "url": "PostReadonly.url"
+      },
+      "_output_schema": {
+        "locator": "object",
+        "read-only": "bool"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "admin",
+                      "op": "eq",
+                      "value": true
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "site",
+          "url",
+          "ro"
+        ],
+        "messages": {
+          "auth": "You must sign in first.",
+          "precondition": "Only an admin can mark a post read-only."
+        }
+      },
+      "_defaulted": [
+        "dropped unwritable columns ['url']"
+      ],
+      "description": "Mark a post read-only (or clear it) so no new comments can be posted. Admin only."
+    },
+    {
+      "tool": "comment_set_title",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Comment",
+        "row_key": {
+          "id": {
+            "$arg": "id"
+          }
+        },
+        "fields": [
+          "post_title"
+        ],
+        "set": {
+          "post_title": {
+            "$arg": "title"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the comment to act on."
+        },
+        "site": {
+          "type": "text",
+          "required": true,
+          "description": "The Remark42 site id (which comments section/tenant this refers to)."
+        },
+        "url": {
+          "type": "text",
+          "required": true,
+          "description": "The page URL the comment belongs to."
+        },
+        "title": {
+          "type": "text",
+          "required": true,
+          "description": "Optional post title stored on the comment."
+        }
+      },
+      "_evidence": {
+        "locator": "backend/app/rest/api/admin.go:222",
+        "id_local": "Comment.set_title",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /api/v1/admin/title/{id}",
+          "locator": "backend/app/rest/api/rest.go:336"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "c, err := a.dataService.SetTitle(locator, id) // sets PostTitle from fetched page title, Engine.Update",
+        "edges": [
+          "route under /api/v1/admin with authMiddleware.Auth+AdminOnly (rest.go:319-321); admin flag set on JWT by ClaimsUpd (server.go:1420)"
+        ]
+      },
+      "entity": "Comment",
+      "_binds": {
+        "id": "Comment.id",
+        "site": "Comment.site_id",
+        "url": "Comment.url",
+        "title": "Comment.post_title"
+      },
+      "_output_schema": {
+        "id": "comment id",
+        "locator": "object"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "admin",
+                      "op": "eq",
+                      "value": true
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "id",
+          "site",
+          "url"
+        ],
+        "messages": {
+          "auth": "You must sign in first.",
+          "precondition": "Only an admin can refresh a comment's post title."
+        }
+      },
+      "_defaulted": [
+        "fields",
+        "fields (mapped to the real parameter names via binds)"
+      ],
+      "description": "Refresh a comment's post_title (fetched from the page). Admin only."
+    },
+    {
+      "tool": "export_run",
+      "op": "action",
+      "family": "action.emit",
+      "exec_spec": {
+        "channel": "event",
+        "record": {
+          "table": "CommentLog"
+        }
+      },
+      "input_schema": {
+        "site": {
+          "type": "text",
+          "required": true,
+          "description": "The Remark42 site id (which comments section/tenant this refers to)."
+        },
+        "mode": {
+          "type": "text",
+          "required": false,
+          "description": "Export mode."
+        }
+      },
+      "_evidence": {
+        "locator": "backend/app/rest/api/migrator.go:163",
+        "id_local": "Export.run",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v1/admin/export",
+          "locator": "backend/app/rest/api/rest.go:343"
+        },
+        "entity_why": "neither effects nor id_local said; inferred Comment from params.binds",
+        "ref_code": "m.NativeExporter.Export(gzWriter, siteID) // Native.Export streams version+comments json lines",
+        "edges": [
+          "route under /api/v1/admin with authMiddleware.Auth+AdminOnly (rest.go:319-321); admin flag set on JWT by ClaimsUpd (server.go:1420)"
+        ]
+      },
+      "entity": "Comment",
+      "_binds": {
+        "site": "Comment.site_id"
+      },
+      "_output_schema": {
+        "gzip": "full-site JSON backup (comments + meta)"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "admin",
+                      "op": "eq",
+                      "value": true
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "site"
+        ],
+        "messages": {
+          "auth": "You must sign in first.",
+          "precondition": "Only an admin can export a site backup."
+        }
+      },
+      "_defaulted": [
+        "entity (not taken from the primary effect: neither effects nor id_local said; inferred Comment from params.binds)"
+      ],
+      "description": "Stream a full-site JSON backup (comments + meta) as gzip. Admin only.",
+      "_record_undeclared": false
+    },
+    {
+      "tool": "import_run",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Comment",
+        "fields": {
+          "user_id": {
+            "$arg": "user_id"
+          },
+          "user_name": {
+            "$arg": "user_name"
+          },
+          "site_id": {
+            "$arg": "site"
+          },
+          "url": {
+            "$arg": "url"
+          },
+          "text": {
+            "$arg": "text"
+          }
+        },
+        "set_on_create": {
+          "imported": true
+        }
+      },
+      "input_schema": {
+        "site": {
+          "type": "text",
+          "required": true,
+          "description": "The site id to import into."
+        },
+        "provider": {
+          "type": "text",
+          "required": true,
+          "description": "Import provider name (e.g. wordpress/disqus)."
+        },
+        "secret": {
+          "type": "text",
+          "required": true,
+          "description": "Provider auth secret for the import."
+        },
+        "user_id": {
+          "type": "int",
+          "required": false,
+          "description": "Owner for the imported comment (defaults to the acting account)."
+        },
+        "user_name": {
+          "type": "text",
+          "required": false,
+          "description": "Display name for the imported comment."
+        },
+        "url": {
+          "type": "text",
+          "required": true,
+          "description": "Page URL the imported comment belongs to."
+        },
+        "text": {
+          "type": "text",
+          "required": true,
+          "description": "The imported comment body."
+        }
+      },
+      "_evidence": {
+        "locator": "backend/app/rest/api/migrator.go:48",
+        "id_local": "Import.run",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/v1/admin/import",
+          "locator": "backend/app/rest/api/rest.go:344"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "go m.runImport(siteID, provider, tmpfile) // async; Native.Import calls DeleteAll(siteID) then Create per comment then SetMetas",
+        "edges": [
+          "admin route or CLI calling admin endpoints"
+        ]
+      },
+      "entity": "Comment",
+      "_binds": {
+        "site": "Comment.site_id"
+      },
+      "_output_schema": {
+        "status": "import request accepted"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "admin",
+                      "op": "eq",
+                      "value": true
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "site",
+          "provider",
+          "secret",
+          "url",
+          "text"
+        ],
+        "messages": {
+          "auth": "You must sign in first.",
+          "precondition": "Only an admin can import a site."
+        }
+      },
+      "_defaulted": [
+        "fields",
+        "fields (mapped to the real parameter names via binds)"
+      ],
+      "description": "Accept an import request for a site from a provider; it runs asynchronously, replacing the site's comments. Records the imported comment. Admin only.",
+      "_record_undeclared": false
+    },
+    {
+      "tool": "migrate_wait",
+      "op": "action",
+      "family": "action.emit",
+      "exec_spec": {
+        "channel": "event",
+        "record": {
+          "table": "CommentLog"
+        }
+      },
+      "input_schema": {
+        "site": {
+          "type": "text",
+          "required": true,
+          "description": "The Remark42 site id (which comments section/tenant this refers to)."
+        }
+      },
+      "_evidence": {
+        "locator": "backend/app/rest/api/migrator.go:138",
+        "id_local": "Migrate.wait",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v1/admin/wait",
+          "locator": "backend/app/rest/api/rest.go:347"
+        },
+        "entity_why": "neither effects nor id_local said; inferred Comment from params.binds",
+        "ref_code": "for m.isBusy(siteID) { select { case <-ctx.Done(): 504 timeout; case <-time.After(100ms): } }\nR.RenderJSON(w, R.JSON{\"status\":\"completed\", \"site_id\": siteID})",
+        "edges": [
+          "route under /api/v1/admin with authMiddleware.Auth+AdminOnly (rest.go:319-321); admin flag set on JWT by ClaimsUpd (server.go:1420)"
+        ]
+      },
+      "entity": "Comment",
+      "_binds": {
+        "site": "Comment.site_id"
+      },
+      "_output_schema": {
+        "status": "completed or timeout expired"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "admin",
+                      "op": "eq",
+                      "value": true
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "site"
+        ],
+        "messages": {
+          "auth": "You must sign in first.",
+          "precondition": "Only an admin can watch the migration job."
+        }
+      },
+      "_defaulted": [
+        "entity (not taken from the primary effect: neither effects nor id_local said; inferred Comment from params.binds)"
+      ],
+      "description": "Block until the current import/remap job for a site finishes, returning 'completed'. Admin only.",
+      "_record_undeclared": false
+    },
+    {
+      "tool": "migrate_remap",
+      "op": "update",
+      "family": "action.emit",
+      "exec_spec": {
+        "channel": "event",
+        "record": {
+          "table": "CommentLog",
+          "set": {
+            "event": "remap"
+          }
+        }
+      },
+      "input_schema": {
+        "site": {
+          "type": "text",
+          "required": true,
+          "description": "The site id to remap."
+        },
+        "rules": {
+          "type": "json",
+          "required": true,
+          "description": "JSON URL-mapping rules for the remap job."
+        }
+      },
+      "_evidence": {
+        "locator": "backend/app/rest/api/migrator.go:211",
+        "id_local": "Migrate.remap",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/v1/admin/remap",
+          "locator": "backend/app/rest/api/rest.go:346"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "go func() { // async; export -> WithMapper -> NativeImporter.Import (DeleteAll + re-create with mapped URLs) }()\nmappedReader := migrator.WithMapper(fh, mapper)\nsize, e := m.NativeImporter.Import(mappedReader, siteID)",
+        "edges": [
+          "admin route or CLI calling admin endpoints"
+        ],
+        "note": "Real remap is delete-all + re-import with mapped URLs (migrator.go:211); modeled as an accepted event since the bulk rewrite is not row-addressed."
+      },
+      "entity": "Comment",
+      "_binds": {
+        "site": "Comment.site_id"
+      },
+      "_output_schema": {
+        "status": "convert request accepted"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "site",
+          "rules"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "admin",
+                      "op": "eq",
+                      "value": true
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must sign in first.",
+          "precondition": "Only an admin can remap a site."
+        }
+      },
+      "_defaulted": [
+        "fields",
+        "fields (mapped to the real parameter names via binds)"
+      ],
+      "description": "Accept a URL-remap job for a site; it runs asynchronously and re-imports the site's comments with mapped URLs. Records the accepted remap event. Admin only.",
+      "_record_undeclared": false
+    },
+    {
+      "tool": "sign_in",
+      "family": "guard.auth",
+      "entity": "User",
+      "description": "Sign in to a site by email address (passwordless): a confirmation link is emailed. Sign-in is represented here by your verified account's presence — the session it opens is what $actor resolves to, and all comment, vote, subscription and moderation tools require it.",
+      "input_schema": {
+        "site": {
+          "type": "text",
+          "required": false,
+          "description": "The Remark42 site id (which comments section/tenant this refers to)."
+        },
+        "name": {
+          "type": "text",
+          "required": false,
+          "description": "The display name to use for the signing-in account."
+        },
+        "email": {
+          "type": "text",
+          "required": true,
+          "description": "The account email to sign in with (a login link is emailed)."
+        },
+        "password": {
+          "type": "text",
+          "required": true,
+          "description": "The account password (mirrors the magic-link flow; real verification is out-of-band)."
+        }
+      },
+      "exec_spec": {
+        "verify": {
+          "entity": "User",
+          "username_col": "email",
+          "password_col": "password"
+        }
+      },
+      "guards": {
+        "required": [
+          "email",
+          "password"
+        ],
+        "messages": {
+          "required": "Provide site, name and email to sign in."
+        }
+      },
+      "_evidence": {
+        "locator": "backend/app/cmd/server.go:1186",
+        "id_local": "Auth.email_login",
+        "entry": {
+          "kind": "http",
+          "route": "/auth/email/login",
+          "locator": "backend/app/cmd/server.go:1186"
+        },
+        "note": "Remark42 has no password: users sign in via an emailed magic-link. The deterministic runtime can only open a session by comparing a password column, so this mirrors the flow as email+password, seeded to match. Real verification is out-of-band."
+      }
+    },
+    {
+      "tool": "sign_out",
+      "family": "guard.logout",
+      "entity": "User",
+      "description": "End the current signed-in session.",
+      "input_schema": {},
+      "exec_spec": {},
+      "_evidence": {
+        "locator": "backend/app/cmd/server.go:1186",
+        "id_local": "Auth.logout",
+        "note": "Ends the browser session."
+      }
+    }
+  ],
+  "seed_state": {
+    "User": [
+      {
+        "id": 1,
+        "name": "Ada",
+        "email": "ops@remark42.example",
+        "password": "pw-operations",
+        "site_id": "demo",
+        "admin": true,
+        "verified": true,
+        "email_subscription": false,
+        "paid_sub": false
+      },
+      {
+        "id": 2,
+        "name": "Grace",
+        "email": "member@remark42.example",
+        "password": "pw-member",
+        "site_id": "demo",
+        "admin": false,
+        "verified": true,
+        "email_subscription": false,
+        "paid_sub": false
+      }
+    ],
+    "UserDetail": [
+      {
+        "user_id": 1,
+        "email": "ada@example.com",
+        "telegram": null,
+        "id": 1
+      },
+      {
+        "user_id": 2,
+        "email": null,
+        "telegram": "tg-grace",
+        "id": 2
+      }
+    ]
+  },
+  "summary": "Remark42 is a self-hosted Go comment engine: users post markdown comments on site/url posts; each comment stores votes/pins/deletion state; admins moderate (delete comments/users, block, verify, pin, set read-only, set titles) and can import/export/remap the site; everything persists into a BoltDB (embedded key-value file) with per-post/comment/user buckets; images and avatars are additional storage blobs.",
+  "_auth_candidates": [
+    {
+      "entity": "User",
+      "username_col": "email",
+      "password_col": "password",
+      "why": "_auth_missing fired (no local password); email magic-link auth mirrored via a bridge password column per the external-auth precedent."
+    }
+  ],
+  "_fk_gravity": {
+    "entity": "User",
+    "fk_count": 4
+  },
+  "_read_denied": "forbidden",
+  "_no_edges": [
+    {
+      "id_local": "Comment.preview",
+      "why": "renders markdown only; no auth wall beyond the open route, calls nothing mutating (rest_private.go:74)"
+    },
+    {
+      "id_local": "User.delete_me_req",
+      "why": "only mints a signed JWT; now modeled as an action.emit into UserLog (rest_private.go:696)"
+    }
+  ],
+  "auth": {
+    "account_entity": "User",
+    "username_col": "email",
+    "password_col": "password",
+    "session_account_ref": "account_id",
+    "session_fields": {
+      "account_id": "id",
+      "admin": "admin",
+      "verified": "verified"
+    }
+  }
+}

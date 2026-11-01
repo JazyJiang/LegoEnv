@@ -1,0 +1,111 @@
+{
+  "app": "bagisto",
+  "role": "Commerce catalog and administrative order/review operations",
+  "domains": [
+    "ecommerce",
+    "retail",
+    "operations"
+  ],
+  "kinds": {
+    "create_record": [
+      "product_create"
+    ],
+    "update_record": [
+      "productinventory_save"
+    ],
+    "attach_note_or_task": [
+      "order_comment"
+    ],
+    "record_status_change": [
+      "order_cancel",
+      "productreview_updatestatus"
+    ],
+    "delete_or_archive_row": [
+      "product_delete",
+      "productreview_delete"
+    ]
+  },
+  "check_kinds": [
+    "record_exists",
+    "record_not_exists",
+    "record_field_equals",
+    "record_field_contains",
+    "record_field_unchanged",
+    "note_or_task_exists",
+    "note_or_task_not_exists",
+    "action_done",
+    "action_not_done"
+  ],
+  "carriers": {
+    "notes_field": {
+      "entity": "Order",
+      "field": "shipping_description"
+    }
+  },
+  "login": {
+    "tool": "admin_login",
+    "user_field": "email",
+    "persona_entity": "Admin",
+    "customer_tool": "customer_login",
+    "customer_persona_entity": "Customer"
+  },
+  "content_entities": [
+    "Product",
+    "ProductAttributeValue",
+    "ProductInventory",
+    "ProductReview",
+    "Order",
+    "OrderComment",
+    "Cart",
+    "CartItem",
+    "Invoice",
+    "Shipment",
+    "Refund",
+    "CustomerAddress",
+    "Wishlist"
+  ],
+  "seed_helpers": [
+    "products",
+    "orders",
+    "reviews",
+    "inventory",
+    "carts"
+  ],
+  "tool_families_to_keep": [
+    "admin_login",
+    "admin_logout",
+    "customer_login",
+    "customer_logout",
+    "product_",
+    "productinventory_",
+    "productreview_",
+    "order_",
+    "refund_getorderitemsrefundsummary"
+  ],
+  "obs_reads": [
+    "product_search",
+    "productreview_list",
+    "refund_getorderitemsrefundsummary"
+  ],
+  "known_patches": [
+    "env_id bagisto",
+    "Two id arguments use integer schemas",
+    "Shared credential for id-1 Admin and Customer personas; demo tokens/accounts removed; auth realms unchanged",
+    "Existing product search supports omitted query and substring filters; review list adds optional q while preserving required product_id"
+  ],
+  "smoke": {
+    "passed": true,
+    "date": "2026-10-24",
+    "report": "ok"
+  },
+  "limitations": [
+    "No order list, inventory list, cart/cart-item list, address list, or order-comment read tool exists. Tasks must supply ids for the existing single-order reader.",
+    "product_update uses product-only upsert identity and conflates multiple attributes; it is not a verified capability.",
+    "productinventory_save is verified for existing seeded inventory rows; it lacks an inventory_source_id argument for reliable new stock-row creation.",
+    "Order/invoice/refund/shipment creation lacks nested line and financial effects; checkout_storeorder only alters Cart and does not create Order.",
+    "Order cancellation changes scalar status only; it does not restore inventory, cancel lines or enforce all upstream transition rules.",
+    "No category CRUD or general product-name/price-flat update interface exists in this tool panel; no tools invented."
+  ],
+  "register_file": "pack/newspecs3/bagisto/register.py",
+  "base_spec": "pack/base_specs/bagisto.spec.json"
+}

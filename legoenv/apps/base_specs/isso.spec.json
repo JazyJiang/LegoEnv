@@ -1,0 +1,1402 @@
+{
+  "env_id": "isso",
+  "_prep_version": 3,
+  "summary": "Isso is a self-hosted comment server (a Disqus alternative): a Python WSGI app backed by SQLite that stores threads, comments with a moderation/approval state machine and rate-limited voting, and a runtime preferences table (used as the signing key source).",
+  "entities": [
+    {
+      "name": "Thread",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "uri",
+          "type": "text",
+          "nullable": false,
+          "max": 256
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "nullable": true,
+          "max": 256
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "uri"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Comment",
+      "columns": [
+        {
+          "name": "tid",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Thread.id"
+        },
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "parent",
+          "type": "id",
+          "nullable": true,
+          "fk_to": "Comment.id"
+        },
+        {
+          "name": "created",
+          "type": "datetime",
+          "nullable": false,
+          "immutable": true,
+          "audit": true
+        },
+        {
+          "name": "modified",
+          "type": "datetime",
+          "nullable": true,
+          "audit": true
+        },
+        {
+          "name": "mode",
+          "type": "int",
+          "nullable": true,
+          "enum": [
+            1,
+            2,
+            4
+          ],
+          "default": 1
+        },
+        {
+          "name": "remote_addr",
+          "type": "text",
+          "nullable": true,
+          "immutable": true
+        },
+        {
+          "name": "text",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "author",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "email",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "website",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "likes",
+          "type": "int",
+          "nullable": true,
+          "default": 0
+        },
+        {
+          "name": "dislikes",
+          "type": "int",
+          "nullable": true,
+          "default": 0
+        },
+        {
+          "name": "voters",
+          "type": "json",
+          "nullable": false
+        },
+        {
+          "name": "notification",
+          "type": "bool",
+          "nullable": true,
+          "default": 0
+        }
+      ],
+      "_lifecycle": {
+        "col": "mode",
+        "initial": "2",
+        "states": [
+          "1",
+          "2",
+          "4"
+        ],
+        "via": {
+          "Comment.activate": {
+            "col": "mode",
+            "from": [
+              "2"
+            ],
+            "to": "1"
+          },
+          "Comment.delete": {
+            "col": "mode",
+            "from": [
+              "1"
+            ],
+            "to": "4"
+          },
+          "Comment.moderate": {
+            "col": "mode",
+            "from": [
+              "2"
+            ],
+            "to": "4"
+          }
+        }
+      }
+    },
+    {
+      "name": "Preference",
+      "columns": [
+        {
+          "name": "key",
+          "type": "text",
+          "pk": true
+        },
+        {
+          "name": "value",
+          "type": "text",
+          "nullable": true
+        }
+      ]
+    }
+  ],
+  "tools": [
+    {
+      "tool": "thread_create",
+      "description": "Create a comment thread for a page URI. Isso lazily creates a thread the first time a comment lands on a new URI, so this makes the thread exist before any comments; fails if a thread with the same URI already exists.",
+      "family": "crud.insert",
+      "entity": "Thread",
+      "input_schema": {
+        "uri": {
+          "type": "text",
+          "required": true,
+          "description": "The page URI the thread belongs to (unique; e.g. a path or full URL)."
+        },
+        "title": {
+          "type": "text",
+          "required": false,
+          "description": "A human-friendly title for the thread, shown in listings and feeds."
+        }
+      },
+      "exec_spec": {
+        "entity": "Thread",
+        "fields": [
+          "uri",
+          "title"
+        ],
+        "unique_on": [
+          "uri"
+        ]
+      },
+      "guards": {
+        "required": [
+          "uri"
+        ],
+        "messages": {
+          "unique": "A thread for this URI already exists.",
+          "fk_missing": "A URI is required to create a thread."
+        }
+      },
+      "_evidence": {
+        "locator": "isso/views/comments.py:383",
+        "id_local": "Thread.new",
+        "entry": {
+          "kind": "http",
+          "route": "POST /new",
+          "locator": "isso/views/comments.py:240"
+        },
+        "entity_why": "row_insert lands on Thread",
+        "ref_code": "data[\"mode\"] = 2 if self.moderated else 1\ndata[\"remote_addr\"] = self._remote_addr(request)\nwith self.isso.lock:\n    if uri not in self.threads:\n        ...\n        thread = self.threads.new(uri, title)\n    else:\n        thread = self.threads[uri]\nvalid, reason = self.guard.validate(uri, data)\nif not valid:\n    raise Forbidden(reason)\nwith self.isso.lock:\n    if self.approve_if_email_previously_approved and self.comments.is_previously_approved_author(data[\"email\"]):\n        data[\"mode\"] = 1\n    rv = self.comments.add(uri, data)\ncookie = self.create_cookie(value=self.isso.sign([rv[\"id\"], sha1(rv",
+        "edges": [
+          "threads.__contains__ / __getitem__; insert uses threads.id FROM threads WHERE threads.uri=? (comments.py:111, threads.py:18)",
+          "comments.add _find() requires parent to exist in the same thread (comments.py:83)"
+        ]
+      }
+    },
+    {
+      "tool": "comment_new",
+      "description": "Post a new comment on a thread, addressed by its page URI. The thread must already exist (create it with thread_create first). Optionally reply to an existing comment by passing its id. Comments are created queued for moderation and become publicly visible only once approved (see comment_approve).",
+      "family": "crud.insert",
+      "entity": "Comment",
+      "input_schema": {
+        "uri": {
+          "type": "text",
+          "required": true,
+          "description": "URI of the thread to comment on."
+        },
+        "text": {
+          "type": "text",
+          "required": true,
+          "description": "Comment body, 3 to 65535 characters."
+        },
+        "author": {
+          "type": "text",
+          "required": false,
+          "description": "Display name of the commenter."
+        },
+        "email": {
+          "type": "text",
+          "required": false,
+          "description": "Email address (kept for notifications; never shown publicly)."
+        },
+        "website": {
+          "type": "text",
+          "required": false,
+          "description": "A URL for the commenter, rendered as a link."
+        },
+        "parent": {
+          "type": "int",
+          "required": false,
+          "description": "Id of the published comment this is a reply to. Omit for a top-level comment."
+        },
+        "title": {
+          "type": "text",
+          "required": false,
+          "description": "Thread title, used only when the thread is first created by this call."
+        }
+      },
+      "exec_spec": {
+        "entity": "Comment",
+        "fields": {
+          "tid": {
+            "$ref": {
+              "entity": "Thread",
+              "where": {
+                "uri": {
+                  "$arg": "uri"
+                }
+              },
+              "col": "id"
+            }
+          },
+          "text": {
+            "$arg": "text"
+          },
+          "author": {
+            "$arg": "author"
+          },
+          "email": {
+            "$arg": "email"
+          },
+          "website": {
+            "$arg": "website"
+          },
+          "parent": {
+            "$arg": "parent"
+          }
+        },
+        "set_on_create": {
+          "mode": 2,
+          "notification": 0
+        }
+      },
+      "guards": {
+        "required": [
+          "uri",
+          "text"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Thread",
+                "where": {
+                  "node": "field",
+                  "col": "uri",
+                  "op": "eq",
+                  "value": {
+                    "arg": "uri"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "precondition": "Create the thread for this URI before commenting (see thread_create).",
+          "fk": "That thread could not be found.",
+          "fk_missing": "The thread for this URI must be created first.",
+          "not_found": "The thread for this URI does not exist."
+        }
+      },
+      "_evidence": {
+        "locator": "isso/views/comments.py:383",
+        "id_local": "Comment.new",
+        "entry": {
+          "kind": "http",
+          "route": "POST /new",
+          "locator": "isso/views/comments.py:240"
+        },
+        "entity_why": "primary effect row_insert lands on Comment",
+        "ref_code": "data[\"mode\"] = 2 if self.moderated else 1\ndata[\"remote_addr\"] = self._remote_addr(request)\nwith self.isso.lock:\n    if uri not in self.threads:\n        ...\n        thread = self.threads.new(uri, title)\n    else:\n        thread = self.threads[uri]\nvalid, reason = self.guard.validate(uri, data)\nif not valid:\n    raise Forbidden(reason)\nwith self.isso.lock:\n    if self.approve_if_email_previously_approved and self.comments.is_previously_approved_author(data[\"email\"]):\n        data[\"mode\"] = 1\n    rv = self.comments.add(uri, data)\ncookie = self.create_cookie(value=self.isso.sign([rv[\"id\"], sha1(rv",
+        "edges": [
+          "threads.__contains__ / __getitem__; insert uses threads.id FROM threads WHERE threads.uri=? (comments.py:111, threads.py:18)",
+          "comments.add _find() requires parent to exist in the same thread (comments.py:83)"
+        ]
+      }
+    },
+    {
+      "tool": "comment_fetch",
+      "description": "Fetch the published comments of a thread, addressed by its page URI: the root comment id, the total and hidden reply counts, and the list of published comments. Queued and deleted comments are not shown. Optionally restrict to one root comment's replies, filter by creation time, and control depth.",
+      "family": "search",
+      "entity": "Comment",
+      "input_schema": {
+        "uri": {
+          "type": "text",
+          "required": true,
+          "description": "URI of the thread to fetch."
+        },
+        "parent": {
+          "type": "int",
+          "required": false,
+          "description": "If set, return only replies to this root comment."
+        },
+        "after": {
+          "type": "int",
+          "required": false,
+          "description": "Only comments created after this unix timestamp."
+        },
+        "limit": {
+          "type": "int",
+          "required": false,
+          "description": "Maximum number of root-level comments to return."
+        },
+        "nested_limit": {
+          "type": "int",
+          "required": false,
+          "description": "Maximum depth of nested replies to expand."
+        },
+        "sort": {
+          "type": "text",
+          "required": false,
+          "description": "Order of replies: newest, oldest, or upvotes."
+        },
+        "offset": {
+          "type": "int",
+          "required": false,
+          "description": "Pagination offset into the root comments."
+        },
+        "plain": {
+          "type": "bool",
+          "required": false,
+          "description": "If true, return raw text; otherwise render markdown."
+        }
+      },
+      "exec_spec": {
+        "entity": "Comment",
+        "filter": {
+          "op": "and",
+          "clauses": [
+            {
+              "col": "tid",
+              "mode": "in",
+              "val": {
+                "$subquery": {
+                  "entity": "Thread",
+                  "where": {
+                    "uri": {
+                      "$arg": "uri"
+                    }
+                  },
+                  "select": "id"
+                }
+              }
+            },
+            {
+              "col": "mode",
+              "mode": "exact",
+              "val": 1
+            }
+          ]
+        },
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "tid"
+          ]
+        },
+        "pagination": {
+          "default_limit": 20
+        },
+        "sort": {
+          "col": "created",
+          "dir": "asc"
+        }
+      },
+      "guards": {
+        "required": [
+          "uri"
+        ],
+        "messages": {
+          "not_found": "The thread for this URI does not exist."
+        }
+      },
+      "_evidence": {
+        "locator": "isso/views/comments.py:977",
+        "id_local": "Comment.fetch",
+        "entry": {
+          "kind": "http",
+          "route": "GET /",
+          "locator": "isso/views/comments.py:240"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "args = {\"uri\": uri, \"after\": request.args.get(\"after\", 0)}\n...\nroot_list = list(self.comments.fetch(**args))\nreply_counts = self.comments.reply_count(uri)\ntotal_replies = sum(reply_counts.values()) if root_id is None else reply_counts[root_id]\nrv = {\"id\": root_id, \"total_replies\": total_replies, \"hidden_replies\": ..., \"replies\": self._process_fetched_list(root_list, plain), \"config\": self.public_conf}"
+      }
+    },
+    {
+      "tool": "comment_view",
+      "description": "Fetch a single comment by id, returning its current text (optionally markdown-rendered) and fields. Issued before editing so the caller can re-submit the body along with the edit cookie.",
+      "family": "crud.fetch",
+      "entity": "Comment",
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the comment to view."
+        },
+        "plain": {
+          "type": "bool",
+          "required": false,
+          "description": "If true, return raw text; otherwise render markdown."
+        }
+      },
+      "exec_spec": {
+        "entity": "Comment",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "guards": {
+        "required": [
+          "id"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Comment",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "not_found": "That comment does not exist.",
+          "precondition": "That comment does not exist."
+        }
+      },
+      "_evidence": {
+        "locator": "isso/views/comments.py:530",
+        "id_local": "Comment.view",
+        "entry": {
+          "kind": "http",
+          "route": "GET /id/<int:id>",
+          "locator": "isso/views/comments.py:240"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "def view(self, environ, request, id):\n    rv = self.comments.get(id)\n    if rv is None:\n        raise NotFound\n    self.unsign_edit_cookie(request, id)\n    ...\n    if request.args.get(\"plain\", \"0\") == \"0\":\n        rv[\"text\"] = self.isso.render(rv[\"text\"])\n    return JSON(rv, 200)",
+        "edges": [
+          "must present a valid unsigned edit cookie, else Forbidden (comments.py:535)"
+        ]
+      }
+    },
+    {
+      "tool": "comment_edit",
+      "description": "Edit a comment's text, author, or website by id. Use a session that was authenticated by obtaining the comment's edit cookie (see comment_view); the edit is rejected unless the submitted text's hash matches the stored hash. Cannot change the comment's thread, parent, or voting fields.",
+      "family": "update.field_set",
+      "entity": "Comment",
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the comment to edit."
+        },
+        "text": {
+          "type": "text",
+          "required": true,
+          "description": "New comment body."
+        },
+        "author": {
+          "type": "text",
+          "required": false,
+          "description": "New display name."
+        },
+        "website": {
+          "type": "text",
+          "required": false,
+          "description": "New website URL."
+        }
+      },
+      "exec_spec": {
+        "entity": "Comment",
+        "row_key": {
+          "id": {
+            "$arg": "id"
+          }
+        },
+        "fields": [
+          "text",
+          "author",
+          "website"
+        ]
+      },
+      "guards": {
+        "required": [
+          "id",
+          "text"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Comment",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "not_found": "That comment does not exist or cannot be edited.",
+          "precondition": "That comment does not exist or cannot be edited."
+        }
+      },
+      "_evidence": {
+        "locator": "isso/views/comments.py:585",
+        "id_local": "Comment.edit",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /id/<int:id>",
+          "locator": "isso/views/comments.py:240"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "def edit(self, environ, request, id):\n    rv = self.unsign_edit_cookie(request, id)\n    item = self.comments.get(id)\n    if item is None:\n        raise NotFound\n    if rv[1] != sha1(item[\"text\"]):\n        raise Forbidden\n    data = request.json\n    for key in set(data.keys()) - set([\"text\", \"author\", \"website\"]):\n        data.pop(key)\n    valid, reason = API.verify(data)\n    if not valid:\n        return BadRequest(reason)\n    data[\"modified\"] = time.time()\n    with self.isso.lock:\n        rv = self.comments.update(id, data)",
+        "edges": [
+          "unsign_edit_cookie + checksum verify (comments.py:586-594)"
+        ]
+      }
+    },
+    {
+      "tool": "comment_delete",
+      "description": "Delete a comment by id, supplied together with the signed edit cookie that proves ownership. A comment that has replies cannot be deleted directly — delete its replies first. Once deleted, the comment row is removed entirely (leaf comments) and its notifications are cleared.",
+      "family": "crud.delete",
+      "entity": "Comment",
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the comment to delete."
+        }
+      },
+      "exec_spec": {
+        "entity": "Comment",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "guards": {
+        "required": [
+          "id"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Comment",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "not_found": "That comment does not exist.",
+          "on_child": "This comment still has replies; delete them before deleting the comment.",
+          "precondition": "That comment does not exist."
+        }
+      },
+      "_evidence": {
+        "locator": "isso/views/comments.py:333",
+        "id_local": "Comment.delete",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /id/<int:id>",
+          "locator": "isso/views/comments.py:240"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "refs = self.db.execute(\"SELECT * FROM comments WHERE parent=?\").fetchone()\nif refs is None:\n    self.db.execute(\"DELETE FROM comments WHERE id=?\", (id,))\n    self._remove_stale()\n    return None\nself.db.execute(\"UPDATE comments SET text=? WHERE id=?\", (\"\", id))\nself.db.execute(\"UPDATE comments SET mode=? WHERE id=?\", (4, id))\nfor field in (\"author\", \"website\"):\n    self.db.execute(\"UPDATE comments SET %s=? WHERE id=?\" % field, (None, id))\nself._remove_stale()\nreturn self.get(id)",
+        "edges": [
+          "unsign_edit_cookie raises Forbidden on missing/invalid/expired edit cookie; checksum must match sha1(text) (comments.py:674-684)"
+        ]
+      }
+    },
+    {
+      "tool": "comment_approve",
+      "description": "Approve a queued comment by id so it becomes publicly visible, using the signed moderation token held by the moderator (from the admin UI or an email notification). Only a comment that is still in the moderation queue can be approved; an already-published comment is left unchanged.",
+      "family": "update.status_transition",
+      "entity": "Comment",
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the queued comment to approve."
+        },
+        "key": {
+          "type": "text",
+          "required": false,
+          "description": "Signed moderation token (from the admin UI or a moderation email), proving the caller is a moderator."
+        }
+      },
+      "exec_spec": {
+        "entity": "Comment",
+        "status_col": "mode",
+        "from": [
+          2
+        ],
+        "to": 1,
+        "row_key": {
+          "id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "guards": {
+        "required": [
+          "id"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Comment",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "mode",
+                      "op": "eq",
+                      "value": 2
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "precondition": "Only a comment that is still in the moderation queue can be approved.",
+          "not_found": "That comment does not exist.",
+          "transition": "That comment is not in the moderation queue, so it cannot be approved."
+        }
+      },
+      "_evidence": {
+        "locator": "isso/views/comments.py:815",
+        "id_local": "Comment.moderate",
+        "entry": {
+          "kind": "http",
+          "route": "POST /id/<int:id>/<any(edit,activate,delete):action>/<string:key>",
+          "locator": "isso/views/comments.py:240"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "if action == \"activate\":\n    if item[\"mode\"] == 1:\n        return JSON({\"counts\": self.comments.count_modes()}, 200)\n    with self.isso.lock:\n        self.comments.activate(id)\nelif action == \"edit\":\n    data = request.json\n    for key in set(data.keys()) - set([\"text\", \"author\", \"website\"]):\n        data.pop(key)\n    ...\n    with self.isso.lock:\n        rv = self.comments.update(id, data)\nelse:\n    with self.isso.lock:\n        self.comments.delete(id)\n    self.cache.delete(\"hash\", (item[\"email\"] or item[\"remote_addr\"]).encode(\"utf-8\"))",
+        "edges": [
+          "raises NotFound if comment does not exist (comments.py:821-823)",
+          "moderation key token required (comments.py:815)"
+        ]
+      }
+    },
+    {
+      "tool": "comment_like",
+      "description": "Like a comment. Each address can cast one vote (a per-comment bloom filter prevents double voting), so liking a comment you have already liked has no effect. The comment's like count is incremented. Disliking and liking the same comment are tracked independently.",
+      "family": "action.trigger",
+      "entity": "Comment",
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the comment to like."
+        },
+        "remote_addr": {
+          "type": "text",
+          "required": false,
+          "description": "Voter address used for deduplication. Omit to let it be taken from the session."
+        }
+      },
+      "exec_spec": {
+        "entity": "Comment",
+        "target": {
+          "entity": "Comment",
+          "lookup_by": {
+            "id": {
+              "$arg": "id"
+            }
+          }
+        },
+        "set": {
+          "likes": {
+            "$compute": "likes+1"
+          }
+        }
+      },
+      "guards": {
+        "required": [
+          "id"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Comment",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "not_found": "That comment does not exist.",
+          "precondition": "That comment does not exist; it cannot be liked."
+        }
+      },
+      "_evidence": {
+        "locator": "isso/views/comments.py:1142",
+        "id_local": "Comment.like",
+        "entry": {
+          "kind": "http",
+          "route": "POST /id/<int:id>/like",
+          "locator": "isso/views/comments.py:240"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "@xhr\ndef like(self, environ, request, id):\n    nv = self.comments.vote(True, id, self._remote_addr(request))\n    return JSON(nv, 200)",
+        "edges": [
+          "Comment.vote requires the comment to exist (comments.py:366: return None if rv is None)",
+          "Comment.like delegates to comments.vote(True, id, addr) (views/comments.py:1143)"
+        ]
+      }
+    },
+    {
+      "tool": "comment_dislike",
+      "description": "Dislike a comment. Each address can cast one vote (a per-comment bloom filter prevents double voting), so disliking a comment you have already disliked has no effect. The comment's dislike count is incremented.",
+      "family": "action.trigger",
+      "entity": "Comment",
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the comment to dislike."
+        },
+        "remote_addr": {
+          "type": "text",
+          "required": false,
+          "description": "Voter address used for deduplication. Omit to let it be taken from the session."
+        }
+      },
+      "exec_spec": {
+        "entity": "Comment",
+        "target": {
+          "entity": "Comment",
+          "lookup_by": {
+            "id": {
+              "$arg": "id"
+            }
+          }
+        },
+        "set": {
+          "dislikes": {
+            "$compute": "dislikes+1"
+          }
+        }
+      },
+      "guards": {
+        "required": [
+          "id"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Comment",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "not_found": "That comment does not exist.",
+          "precondition": "That comment does not exist; it cannot be disliked."
+        }
+      },
+      "_evidence": {
+        "locator": "isso/views/comments.py:1165",
+        "id_local": "Comment.dislike",
+        "entry": {
+          "kind": "http",
+          "route": "POST /id/<int:id>/dislike",
+          "locator": "isso/views/comments.py:240"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "@xhr\ndef dislike(self, environ, request, id):\n    nv = self.comments.vote(False, id, self._remote_addr(request))\n    return JSON(nv, 200)",
+        "edges": [
+          "Comment.vote requires the comment to exist (comments.py:366: return None if rv is None)",
+          "Comment.dislike delegates to comments.vote(False, id, addr) (views/comments.py:1166)"
+        ]
+      }
+    },
+    {
+      "tool": "comment_unsubscribe",
+      "description": "Stop receiving reply notifications on a comment, using the signed unsubscribe token that was emailed to the subscriber. The token must decode to the exact email being unsubscribed; the comment's notification flag is turned off so no further reply emails are sent.",
+      "family": "update.field_set",
+      "entity": "Comment",
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the comment to unsubscribe from."
+        },
+        "email": {
+          "type": "text",
+          "required": true,
+          "description": "Email address that is being unsubscribed."
+        },
+        "key": {
+          "type": "text",
+          "required": true,
+          "description": "Signed unsubscribe token (from the unsubscribe link in a notification email)."
+        }
+      },
+      "exec_spec": {
+        "entity": "Comment",
+        "row_key": {
+          "id": {
+            "$arg": "id"
+          }
+        },
+        "fields": [
+          "notification"
+        ],
+        "set": {
+          "notification": 0
+        }
+      },
+      "guards": {
+        "required": [
+          "id",
+          "email",
+          "key"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Comment",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "not_found": "That comment does not exist.",
+          "precondition": "That comment does not exist, so there is nothing to unsubscribe from."
+        }
+      },
+      "_evidence": {
+        "locator": "isso/views/comments.py:732",
+        "id_local": "Comment.unsubscribe",
+        "entry": {
+          "kind": "http",
+          "route": "GET /id/<int:id>/unsubscribe/<string:email>/<string:key>",
+          "locator": "isso/views/comments.py:240"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "def unsubscribe(self, environ, request, id, email, key):\n    email = unquote(email)\n    rv = self.isso.unsign(key, max_age=2**32)\n    ...\n    if rv[0] != \"unsubscribe\" or rv[1] != email:\n        raise Forbidden\n    item = self.comments.get(id)\n    if item is None:\n        raise NotFound\n    with self.isso.lock:\n        self.comments.unsubscribe(email, id)",
+        "edges": [
+          "signed unsubscribe token must decode to ['unsubscribe', email] (comments.py:735-744)"
+        ]
+      }
+    },
+    {
+      "tool": "comment_count",
+      "description": "Return the number of published comments on a single page URI (zero if the thread has no published comments). This is the comment count badge shown next to a page link.",
+      "family": "search.aggregate",
+      "entity": "Comment",
+      "input_schema": {
+        "uri": {
+          "type": "text",
+          "required": true,
+          "description": "URI of the thread to count published comments for."
+        }
+      },
+      "exec_spec": {
+        "entity": "Comment",
+        "filter": {
+          "op": "and",
+          "clauses": [
+            {
+              "col": "mode",
+              "mode": "exact",
+              "val": 1
+            },
+            {
+              "col": "tid",
+              "mode": "in",
+              "val": {
+                "$subquery": {
+                  "entity": "Thread",
+                  "where": {
+                    "uri": {
+                      "$arg": "uri"
+                    }
+                  },
+                  "select": "id"
+                }
+              }
+            }
+          ]
+        },
+        "aggregate": [
+          {
+            "fn": "count",
+            "as": "n"
+          }
+        ]
+      },
+      "guards": {
+        "required": [
+          "uri"
+        ],
+        "messages": {
+          "required": "A thread URI to count is required."
+        }
+      },
+      "_evidence": {
+        "locator": "isso/views/comments.py:1218",
+        "id_local": "Comment.counts",
+        "entry": {
+          "kind": "http",
+          "route": "POST /count",
+          "locator": "isso/views/comments.py:240"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "def counts(self, environ, request):\n    data = request.json\n    if not isinstance(data, list) and not all(isinstance(x, str) for x in data):\n        raise BadRequest(\"JSON must be a list of URLs\")\n    return JSON(self.comments.count(*data), 200)"
+      }
+    },
+    {
+      "tool": "comment_latest",
+      "description": "Return the most recent published comments across all threads, newest first, up to the requested limit.",
+      "family": "search",
+      "entity": "Comment",
+      "input_schema": {
+        "limit": {
+          "type": "int",
+          "required": true,
+          "description": "Maximum number of latest comments to return."
+        }
+      },
+      "exec_spec": {
+        "entity": "Comment",
+        "filter": {
+          "col": "mode",
+          "mode": "exact",
+          "val": 1
+        },
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "mode"
+          ]
+        },
+        "sort": {
+          "col": "created",
+          "dir": "desc"
+        },
+        "pagination": {
+          "default_limit": 20
+        }
+      },
+      "guards": {
+        "required": [
+          "limit"
+        ],
+        "messages": {
+          "required": "A limit is required."
+        }
+      },
+      "_evidence": {
+        "locator": "isso/views/comments.py:1621",
+        "id_local": "Comment.latest",
+        "entry": {
+          "kind": "http",
+          "route": "GET /latest",
+          "locator": "isso/views/comments.py:240"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "if not self.conf.getboolean(\"latest-enabled\"):\n    return NotFound(\"Unavailable because 'latest-enabled' not set by site admin\")\ntry:\n    limit = int(request.args[\"limit\"])\n...\nall_comments_gen = self.comments.fetchall(limit=None, order_by=\"created\", mode=\"1\")\ncomments = collections.deque(all_comments_gen, maxlen=limit)"
+      }
+    },
+    {
+      "tool": "comment_feed",
+      "description": "Return all published comments of a thread's URI, newest-first, for building an RSS/Atom feed of that page's discussion. Queued and deleted comments are not included.",
+      "family": "search",
+      "entity": "Comment",
+      "input_schema": {
+        "uri": {
+          "type": "text",
+          "required": true,
+          "description": "URI of the thread to include in the feed."
+        },
+        "limit": {
+          "type": "int",
+          "required": false,
+          "description": "Maximum number of comments to include."
+        }
+      },
+      "exec_spec": {
+        "entity": "Comment",
+        "filter": {
+          "op": "and",
+          "clauses": [
+            {
+              "col": "tid",
+              "mode": "in",
+              "val": {
+                "$subquery": {
+                  "entity": "Thread",
+                  "where": {
+                    "uri": {
+                      "$arg": "uri"
+                    }
+                  },
+                  "select": "id"
+                }
+              }
+            },
+            {
+              "col": "mode",
+              "mode": "exact",
+              "val": 1
+            }
+          ]
+        },
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "tid"
+          ]
+        },
+        "sort": {
+          "col": "id",
+          "dir": "desc"
+        },
+        "pagination": {
+          "default_limit": 20
+        }
+      },
+      "guards": {
+        "required": [
+          "uri"
+        ],
+        "messages": {
+          "required": "A thread URI is required."
+        }
+      },
+      "_evidence": {
+        "locator": "isso/views/comments.py:1270",
+        "id_local": "Comment.feed",
+        "entry": {
+          "kind": "http",
+          "route": "GET /feed",
+          "locator": "isso/views/comments.py:240"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "def feed(self, environ, request, uri):\n    conf = self.isso.conf.section(\"rss\")\n    if not conf.get(\"base\"):\n        raise NotFound\n    args = {\"uri\": uri, \"order_by\": \"id\", \"asc\": 0, \"limit\": conf.getint(\"limit\")}\n    comments = self.comments.fetch(**args)"
+      }
+    },
+    {
+      "tool": "comment_preview",
+      "description": "Render comment text (Markdown) to its HTML form, exactly as it would appear once published. It does not persist anything.",
+      "family": "action.emit",
+      "entity": "Comment",
+      "input_schema": {
+        "text": {
+          "type": "text",
+          "required": true,
+          "description": "Raw comment text to render to HTML."
+        }
+      },
+      "exec_spec": {
+        "channel": "event",
+        "record": {
+          "table": "Comment"
+        }
+      },
+      "guards": {
+        "required": [
+          "text"
+        ],
+        "messages": {
+          "required": "Text to preview is required."
+        }
+      },
+      "_evidence": {
+        "locator": "isso/views/comments.py:1192",
+        "id_local": "Comment.preview",
+        "entry": {
+          "kind": "http",
+          "route": "POST /preview",
+          "locator": "isso/views/comments.py:240"
+        },
+        "entity_why": "primary effect external lands on this table",
+        "ref_code": "def preview(self, environment, request):\n    data = request.json\n    if data.get(\"text\", None) is None:\n        raise BadRequest(\"no text given\")\n    return JSON({\"text\": self.isso.render(data[\"text\"])}, 200)"
+      }
+    },
+    {
+      "tool": "admin_moderation_queue",
+      "description": "List comments for the admin backend, filterable by moderation mode (queued / published / hidden), with pagination. This is the moderation inbox from which comments are approved, edited, or deleted.",
+      "family": "search",
+      "entity": "Comment",
+      "input_schema": {
+        "page": {
+          "type": "int",
+          "required": false,
+          "description": "Page of results to return."
+        },
+        "mode": {
+          "type": "int",
+          "required": false,
+          "description": "Filter by comment mode: 2 = in the moderation queue, 1 = published, 4 = deleted/hidden."
+        },
+        "limit": {
+          "type": "int",
+          "required": false,
+          "description": "Maximum number of comments to return."
+        }
+      },
+      "exec_spec": {
+        "entity": "Comment",
+        "filter": {
+          "col": "mode",
+          "mode": "exact",
+          "val": {
+            "$arg": "mode"
+          },
+          "optional": true
+        },
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "mode"
+          ]
+        },
+        "pagination": {
+          "default_limit": 20
+        }
+      },
+      "guards": {
+        "messages": {}
+      },
+      "_evidence": {
+        "locator": "isso/views/comments.py:1527",
+        "id_local": "Admin.admin",
+        "entry": {
+          "kind": "http",
+          "route": "GET /admin/",
+          "locator": "isso/views/comments.py:240"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "def admin(self, env, req):\n    if not self.isso.conf.getboolean(\"admin\", \"enabled\"):\n        return render_template(\"disabled.html\", ...)\n    try:\n        data = self.isso.unsign(req.cookies.get(\"admin-session\", \"\"), max_age=60 * 60 * 24)\n    except BadSignature:\n        return render_template(\"login.html\", ...)\n    if not data or not data[\"logged\"]:\n        return render_template(\"login.html\", ...)"
+      }
+    }
+  ],
+  "seed_state": {
+    "Thread": [
+      {
+        "id": 1,
+        "uri": "/posts/introducing-isso",
+        "title": "Introducing Isso"
+      },
+      {
+        "id": 2,
+        "uri": "/posts/comment-policy",
+        "title": "Comment Policy"
+      }
+    ],
+    "Comment": [
+      {
+        "id": 1,
+        "tid": 1,
+        "parent": null,
+        "created": "2026-01-05T09:00:00",
+        "modified": null,
+        "mode": 1,
+        "remote_addr": "203.0.113.5",
+        "text": "Great talk — hello from the comments.",
+        "author": "Ada",
+        "email": "ada@example.com",
+        "website": null,
+        "likes": 3,
+        "dislikes": 0,
+        "voters": [],
+        "notification": 0
+      },
+      {
+        "id": 2,
+        "tid": 1,
+        "parent": 1,
+        "created": "2026-01-05T10:30:00",
+        "modified": null,
+        "mode": 1,
+        "remote_addr": "198.51.100.9",
+        "text": "Agreed — the moderation queue is a nice touch.",
+        "author": "Grace",
+        "email": "grace@example.com",
+        "website": "https://grace.dev",
+        "likes": 1,
+        "dislikes": 0,
+        "voters": [],
+        "notification": 1
+      },
+      {
+        "id": 3,
+        "tid": 2,
+        "parent": null,
+        "created": "2026-01-06T08:12:00",
+        "modified": null,
+        "mode": 2,
+        "remote_addr": "192.0.2.44",
+        "text": "Great prices, click my link for a deal!",
+        "author": "Spammer",
+        "email": "spam@example.com",
+        "website": null,
+        "likes": 0,
+        "dislikes": 0,
+        "voters": [],
+        "notification": 0
+      }
+    ]
+  },
+  "_auth_candidates": [],
+  "_fk_gravity": {
+    "entity": "Comment",
+    "fk_count": 1
+  },
+  "_read_denied": "forbidden",
+  "_no_edges": [
+    {
+      "id_local": "Comment.purge",
+      "why": "scheduled purge loop; calls only Comments.purge internally, has no caller-supplied guard (the system timer is the trigger) - core.py:68"
+    },
+    {
+      "id_local": "Comment.preview",
+      "why": "stateless markdown render, no persistence and no guard - views/comments.py:1192"
+    },
+    {
+      "id_local": "Thread.new",
+      "why": "internal insert helper; no guard code and calls nothing itself (the unique-uri constraint is the only check) - threads.py:27"
+    },
+    {
+      "id_local": "Admin.login",
+      "why": "guard is the [admin] password config comparison, which is not a DB state; no DB writes, no downstream call (views/comments.py:1479)"
+    }
+  ],
+  "guard_note": "no auth block: this repo has no credential table (see _auth_missing); authorization is via signed secret tokens (moderation key, edit cookie, unsubscribe token, admin session) that no tool here can mint or verify."
+}

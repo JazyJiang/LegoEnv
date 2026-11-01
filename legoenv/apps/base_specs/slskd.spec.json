@@ -1,0 +1,1927 @@
+{
+  "env_id": "slskd",
+  "entities": [
+    {
+      "name": "Transfer",
+      "columns": [
+        {
+          "name": "Id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "BatchId",
+          "type": "id",
+          "nullable": true,
+          "fk_to": "Batch.Id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "Username",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "Direction",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "Upload",
+            "Download"
+          ]
+        },
+        {
+          "name": "Filename",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "Size",
+          "type": "int",
+          "nullable": false
+        },
+        {
+          "name": "State",
+          "type": "int",
+          "nullable": false,
+          "enum": [
+            0,
+            4,
+            8,
+            48,
+            80,
+            144,
+            272,
+            528,
+            1040,
+            2050,
+            4098
+          ],
+          "default": 0
+        },
+        {
+          "name": "StateDescription",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "RequestedAt",
+          "type": "datetime",
+          "nullable": false
+        },
+        {
+          "name": "EnqueuedAt",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "StartedAt",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "EndedAt",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "BytesTransferred",
+          "type": "int",
+          "nullable": false,
+          "default": 0
+        },
+        {
+          "name": "AverageSpeed",
+          "type": "float",
+          "nullable": false,
+          "default": 0.0
+        },
+        {
+          "name": "PlaceInQueue",
+          "type": "int",
+          "nullable": true
+        },
+        {
+          "name": "Exception",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "Attempts",
+          "type": "int",
+          "nullable": false,
+          "default": 0
+        },
+        {
+          "name": "NextAttemptAt",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "Removed",
+          "type": "bool",
+          "nullable": false,
+          "default": false
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "Username",
+            "Filename"
+          ]
+        }
+      ],
+      "_lifecycle": {
+        "col": "State",
+        "initial": 2050,
+        "states": [
+          0,
+          4,
+          8,
+          48,
+          80,
+          144,
+          272,
+          528,
+          1040,
+          2050,
+          4098
+        ],
+        "via": {
+          "Download.retry": {
+            "col": "State",
+            "from": [
+              2050,
+              8
+            ],
+            "to": 144
+          },
+          "Download.cancel": {
+            "col": "State",
+            "from": [
+              2050,
+              8
+            ],
+            "to": 80
+          },
+          "Upload.upload": {
+            "col": "State",
+            "from": [
+              8
+            ],
+            "to": 1040
+          }
+        }
+      }
+    },
+    {
+      "name": "Batch",
+      "columns": [
+        {
+          "name": "Id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "SearchId",
+          "type": "id",
+          "nullable": true,
+          "fk_to": "Search.Id"
+        },
+        {
+          "name": "Username",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "Direction",
+          "type": "int",
+          "nullable": false,
+          "default": 1
+        },
+        {
+          "name": "CreatedAt",
+          "type": "datetime",
+          "nullable": false,
+          "audit": true
+        },
+        {
+          "name": "Options",
+          "type": "json",
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "name": "PrivateMessage",
+      "columns": [
+        {
+          "name": "Username",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "fk_to": "Conversation.Username"
+        },
+        {
+          "name": "Id",
+          "type": "int",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "Timestamp",
+          "type": "datetime",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "Direction",
+          "type": "text",
+          "nullable": true,
+          "enum": [
+            "Out",
+            "In"
+          ]
+        },
+        {
+          "name": "Message",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "IsAcknowledged",
+          "type": "bool",
+          "nullable": false,
+          "default": false
+        },
+        {
+          "name": "WasReplayed",
+          "type": "bool",
+          "nullable": false,
+          "default": false
+        }
+      ]
+    },
+    {
+      "name": "Conversation",
+      "columns": [
+        {
+          "name": "Username",
+          "type": "text",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "IsActive",
+          "type": "bool",
+          "nullable": false,
+          "default": true
+        }
+      ]
+    },
+    {
+      "name": "Search",
+      "columns": [
+        {
+          "name": "Id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "SearchText",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "Token",
+          "type": "int",
+          "nullable": true
+        },
+        {
+          "name": "StartedAt",
+          "type": "datetime",
+          "nullable": false
+        },
+        {
+          "name": "EndedAt",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "State",
+          "type": "int",
+          "nullable": true,
+          "enum": [
+            "Requested",
+            "Completed",
+            "Completed, Errored",
+            "Completed, Cancelled",
+            "TimedOut"
+          ]
+        },
+        {
+          "name": "FileCount",
+          "type": "int",
+          "nullable": false
+        },
+        {
+          "name": "ResponseCount",
+          "type": "int",
+          "nullable": false
+        },
+        {
+          "name": "LockedFileCount",
+          "type": "int",
+          "nullable": false
+        },
+        {
+          "name": "ResponsesJson",
+          "type": "text",
+          "nullable": true
+        }
+      ],
+      "_lifecycle": {
+        "col": "State",
+        "initial": "Requested",
+        "states": [
+          "Requested",
+          "Completed",
+          "Completed, Errored",
+          "Completed, Cancelled",
+          "TimedOut"
+        ],
+        "via": {
+          "Search.finalize": {
+            "col": "State",
+            "from": [
+              "Requested"
+            ],
+            "to": null
+          },
+          "Search.cancel": {
+            "col": "State",
+            "from": [
+              "Requested"
+            ],
+            "to": "Completed, Cancelled"
+          }
+        }
+      }
+    },
+    {
+      "name": "EventRecord",
+      "columns": [
+        {
+          "name": "Id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "Timestamp",
+          "type": "datetime",
+          "nullable": false
+        },
+        {
+          "name": "Type",
+          "type": "text",
+          "nullable": true,
+          "enum": [
+            "None",
+            "Any",
+            "DownloadFileComplete",
+            "DownloadDirectoryComplete",
+            "UploadFileComplete",
+            "PrivateMessageReceived",
+            "RoomMessageReceived",
+            "SoulseekClientConnected",
+            "SoulseekClientDisconnected",
+            "Noop"
+          ]
+        },
+        {
+          "name": "Data",
+          "type": "json",
+          "nullable": true
+        }
+      ]
+    }
+  ],
+  "tools": [
+    {
+      "tool": "transfer_download_enqueue",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Transfer",
+        "fields": {
+          "BatchId": {
+            "$arg": "batchId"
+          },
+          "Username": {
+            "$arg": "username"
+          },
+          "Filename": {
+            "$arg": "filename"
+          },
+          "Size": {
+            "$arg": "size"
+          }
+        },
+        "set_on_create": {
+          "Direction": "Download",
+          "State": 2050,
+          "RequestedAt": "2026-01-01T00:00:00Z",
+          "BytesTransferred": 0,
+          "AverageSpeed": 0.0,
+          "Attempts": 0,
+          "Removed": false
+        }
+      },
+      "input_schema": {
+        "username": {
+          "type": "text",
+          "required": true,
+          "description": "The Soulseek username of the peer you are downloading from."
+        },
+        "filename": {
+          "type": "text",
+          "required": true,
+          "description": "The remote filename (path on the peer's machine) to download."
+        },
+        "size": {
+          "type": "int",
+          "required": false,
+          "description": "Declared file size in bytes."
+        },
+        "batchId": {
+          "type": "int",
+          "required": false,
+          "description": "Id of the download batch this enqueue belongs to, if any."
+        }
+      },
+      "_evidence": {
+        "locator": "src/slskd/Transfers/Downloads/DownloadService.cs:299",
+        "id_local": "Download.enqueue",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/v0/transfers/downloads/{username}",
+          "locator": "src/slskd/Transfers/API/Controllers/TransfersController.cs:230"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "var transfer = new Transfer() { Id = transferId, BatchId = batchId, Username = username, Direction = TransferDirection.Download, Filename = file.Filename, Size = file.Size, RequestedAt = DateTime.UtcNow, State = TransferStates.Queued | TransferStates.Locally };\ncontext.Add(transfer);\nforeach (var record in existingRecordsNotYetRemoved.Where(t => t.Filename == file.Filename && !t.Removed)) { record.Removed = true; context.Update(record); }\ncontext.SaveChanges();"
+      },
+      "entity": "Transfer",
+      "_binds": {
+        "username": "Transfer.Username",
+        "filename": "Transfer.Filename",
+        "size": "Transfer.Size",
+        "batchId": "Transfer.BatchId"
+      },
+      "_output_schema": {
+        "Enqueued": "int",
+        "Failed": "int"
+      },
+      "guards": {
+        "required": [
+          "username",
+          "filename"
+        ],
+        "messages": {
+          "not_found": "The download transfer row could not be addressed.",
+          "unique": "A transfer for that file from that user already exists.",
+          "constraint": "A transfer for that file from that user already exists.",
+          "fk": "That batch does not exist."
+        }
+      },
+      "_defaulted": [],
+      "description": "Enqueue a download of <filename> from <username>, creating a Transfer row in the Queued state so the Soulseek client fetches the file. Fails if a download of the same file from that user is already present (Username+Filename are unique).",
+      "_binding_overrides": "Transfer rows address their batch via a batchId parameter (the FK is BatchId, not a generated id)."
+    },
+    {
+      "tool": "download_enqueue_batch",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Batch",
+        "fields": {
+          "SearchId": {
+            "$arg": "searchId"
+          },
+          "Username": {
+            "$arg": "username"
+          }
+        },
+        "set_on_create": {
+          "Id": {
+            "$arg": "batchId"
+          },
+          "Direction": 1,
+          "CreatedAt": "2026-01-01T00:00:00Z"
+        }
+      },
+      "input_schema": {
+        "batchId": {
+          "type": "int",
+          "required": true,
+          "description": "Id to assign to the new batch."
+        },
+        "username": {
+          "type": "text",
+          "required": true,
+          "description": "The Soulseek user the batch downloads from."
+        },
+        "searchId": {
+          "type": "int",
+          "required": false,
+          "description": "Id of the search whose results produced this batch."
+        },
+        "destination": {
+          "type": "text",
+          "required": false,
+          "description": "Local save directory for the batch (stored in Options)."
+        }
+      },
+      "_evidence": {
+        "locator": "src/slskd/Transfers/API/Controllers/TransfersController.cs:314",
+        "id_local": "EnqueueBatch.enqueue",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/v0/transfers/downloads/batches",
+          "locator": "src/slskd/Transfers/API/Controllers/TransfersController.cs:304"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "await Transfers.Downloads.Batches.CreateAsync(new(){ Id = batchId.Value, SearchId = searchId, Username = request.Username, Options = new(){ Destination = request.Options.Destination } });\nvar (enqueued, failed) = await Transfers.Downloads.EnqueueAsync(username: request.Username, files: request.Files.Select(r => (r.Filename, r.Size.Value)), batchId: batchId);",
+        "behavior_notes": "Creates the Batch row, then enqueues each file (Transfer rows) with the same batchId."
+      },
+      "entity": "Batch",
+      "_binds": {
+        "Id": "Batch.Id",
+        "SearchId": "Search.Id",
+        "Username": "Transfer.Username",
+        "filename": "Transfer.Filename",
+        "size": "Transfer.Size",
+        "batchId": "Transfer.BatchId"
+      },
+      "_output_schema": {
+        "Batch": "the created Batch",
+        "Failures": "({Filename,Message})[]"
+      },
+      "guards": {
+        "required": [
+          "batchId",
+          "username"
+        ],
+        "messages": {
+          "not_found": "The batch could not be addressed.",
+          "unique": "A download batch with that Id already exists.",
+          "fk": "That search does not exist."
+        }
+      },
+      "_defaulted": [],
+      "description": "Create a download Batch (a grouped unit of files downloaded from one user) addressed by <batchId>. Then enqueue individual files of the batch by calling transfer_download_enqueue with the same batchId. Fails if a batch with that Id already exists."
+    },
+    {
+      "tool": "transfer_download_cancel",
+      "op": "update",
+      "family": "update.status_transition",
+      "exec_spec": {
+        "entity": "Transfer",
+        "row_key": {
+          "Id": {
+            "$arg": "id"
+          }
+        },
+        "status_col": "State",
+        "from": [
+          2050,
+          8
+        ],
+        "to": 80,
+        "timestamp_col": "EndedAt"
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the download Transfer to cancel."
+        },
+        "remove": {
+          "type": "bool",
+          "required": false,
+          "description": "When true, also soft-remove the row after canceling."
+        }
+      },
+      "_evidence": {
+        "locator": "src/slskd/Transfers/API/Controllers/TransfersController.cs:95",
+        "id_local": "Download.cancel",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/v0/transfers/downloads/{username}/{id}",
+          "locator": "src/slskd/Transfers/API/Controllers/TransfersController.cs:91"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "Transfers.Downloads.TryCancel(guid);\nif (remove) { Transfers.Downloads.Remove(guid); }\nreturn NoContent(); // TryCancel fallback: t.State = Completed|Cancelled; t.EndedAt = UtcNow; t.Exception = new OperationCanceledException().Message; Update(t)"
+      },
+      "entity": "Transfer",
+      "_binds": {
+        "username": "Transfer.Username",
+        "id": "Transfer.Id"
+      },
+      "_output_schema": {
+        "status": "204|404|400"
+      },
+      "guards": {
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "not_found": "That download transfer does not exist.",
+          "transition": "Only a queued or in-progress download can be canceled."
+        }
+      },
+      "description": "Cancel a queued or in-progress download, moving its Transfer to the Completed/Cancelled state. Pass remove=true to also soft-remove the transfer row so it leaves the active list.",
+      "_defaulted": []
+    },
+    {
+      "tool": "transfer_upload_cancel",
+      "op": "action",
+      "family": "update.status_transition",
+      "exec_spec": {
+        "entity": "Transfer",
+        "row_key": {
+          "Id": {
+            "$arg": "id"
+          }
+        },
+        "status_col": "State",
+        "from": [
+          2050,
+          8
+        ],
+        "to": 80,
+        "timestamp_col": "EndedAt"
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the upload Transfer to cancel."
+        },
+        "remove": {
+          "type": "bool",
+          "required": false,
+          "description": "When true, also soft-remove the row after canceling."
+        }
+      },
+      "_evidence": {
+        "locator": "src/slskd/Transfers/API/Controllers/TransfersController.cs:164",
+        "id_local": "Upload.cancel",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/v0/transfers/uploads/{username}/{id}",
+          "locator": "src/slskd/Transfers/API/Controllers/TransfersController.cs:160"
+        },
+        "entity_why": "neither effects nor id_local said; inferred Transfer from params.binds",
+        "ref_code": "Transfers.Uploads.TryCancel(guid); // only cancels in-memory CTS; row finalized by upload task failure path\nif (remove) { Transfers.Uploads.Remove(guid); }\nreturn NoContent();"
+      },
+      "entity": "Transfer",
+      "_binds": {
+        "username": "Transfer.Username",
+        "id": "Transfer.Id"
+      },
+      "_output_schema": {
+        "status": "204|404|400"
+      },
+      "guards": {
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "not_found": "That upload transfer does not exist.",
+          "transition": "Only a queued or in-progress upload can be canceled."
+        }
+      },
+      "_defaulted": [],
+      "description": "Cancel a queued or in-progress upload, moving its Transfer to the Completed/Cancelled state. Pass remove=true to also soft-remove the transfer row so it leaves the active list."
+    },
+    {
+      "tool": "transfer_download_remove",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Transfer",
+        "row_key": {
+          "Id": {
+            "$arg": "id"
+          }
+        },
+        "set": {
+          "Removed": true
+        },
+        "fields": [
+          "BatchId",
+          "Username",
+          "Direction",
+          "Filename",
+          "Size",
+          "State",
+          "StateDescription",
+          "RequestedAt",
+          "EnqueuedAt",
+          "StartedAt",
+          "EndedAt",
+          "BytesTransferred",
+          "AverageSpeed",
+          "PlaceInQueue",
+          "Exception",
+          "Attempts",
+          "NextAttemptAt",
+          "Removed"
+        ]
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the completed download Transfer to soft-remove."
+        },
+        "Username": {
+          "type": "text",
+          "required": false,
+          "description": "Peer username of the transfer (informational)."
+        },
+        "Direction": {
+          "type": "text",
+          "required": false,
+          "description": "Transfer direction (informational)."
+        },
+        "Filename": {
+          "type": "text",
+          "required": false,
+          "description": "File path of the transfer (informational)."
+        },
+        "Size": {
+          "type": "int",
+          "required": false,
+          "description": "File size in bytes (informational)."
+        },
+        "State": {
+          "type": "int",
+          "required": false,
+          "description": "Transfer state (informational)."
+        },
+        "StateDescription": {
+          "type": "text",
+          "required": false,
+          "description": "Human transfer state (informational)."
+        },
+        "BytesTransferred": {
+          "type": "int",
+          "required": false,
+          "description": "Bytes transferred so far (informational)."
+        },
+        "AverageSpeed": {
+          "type": "float",
+          "required": false,
+          "description": "Average transfer speed (informational)."
+        },
+        "PlaceInQueue": {
+          "type": "int",
+          "required": false,
+          "description": "Peer queue position (informational)."
+        },
+        "Exception": {
+          "type": "text",
+          "required": false,
+          "description": "Error message if failed (informational)."
+        },
+        "Attempts": {
+          "type": "int",
+          "required": false,
+          "description": "Retry count (informational)."
+        },
+        "EndedAt": {
+          "type": "datetime",
+          "required": false,
+          "description": "When the transfer ended (informational)."
+        }
+      },
+      "_evidence": {
+        "locator": "src/slskd/Transfers/Downloads/DownloadService.cs:983",
+        "id_local": "Download.remove",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/v0/transfers/downloads/{username}/{id}?remove=true",
+          "locator": "src/slskd/Transfers/Downloads/DownloadService.cs:977"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "var count = context.Transfers\n  .Where(t => t.Direction == TransferDirection.Download)\n  .Where(t => TransferStateCategories.Completed.Contains(t.State))\n  .Where(expression)\n  .ExecuteUpdate(r => r.SetProperty(c => c.Removed, true));",
+        "behavior_notes": "Bulk ExecuteUpdate setting Removed=true (DownloadService.cs:983 / UploadService.cs:915). Real mutation is Removed; the extra panel columns are the runtime need that a provable write registers a world change."
+      },
+      "entity": "Transfer",
+      "_binds": {
+        "id": "Transfer.Id"
+      },
+      "_output_schema": {
+        "Count": "int"
+      },
+      "guards": {
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "not_found": "That transfer does not exist."
+        }
+      },
+      "_defaulted": [],
+      "description": "Soft-remove a completed download Transfer by setting Removed=true, hiding it from the active transfer list."
+    },
+    {
+      "tool": "transfer_upload_remove",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Transfer",
+        "row_key": {
+          "Id": {
+            "$arg": "id"
+          }
+        },
+        "set": {
+          "Removed": true
+        },
+        "fields": [
+          "BatchId",
+          "Username",
+          "Direction",
+          "Filename",
+          "Size",
+          "State",
+          "StateDescription",
+          "RequestedAt",
+          "EnqueuedAt",
+          "StartedAt",
+          "EndedAt",
+          "BytesTransferred",
+          "AverageSpeed",
+          "PlaceInQueue",
+          "Exception",
+          "Attempts",
+          "NextAttemptAt",
+          "Removed"
+        ]
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the completed upload Transfer to soft-remove."
+        },
+        "Username": {
+          "type": "text",
+          "required": false,
+          "description": "Peer username of the transfer (informational)."
+        },
+        "Direction": {
+          "type": "text",
+          "required": false,
+          "description": "Transfer direction (informational)."
+        },
+        "Filename": {
+          "type": "text",
+          "required": false,
+          "description": "File path of the transfer (informational)."
+        },
+        "Size": {
+          "type": "int",
+          "required": false,
+          "description": "File size in bytes (informational)."
+        },
+        "State": {
+          "type": "int",
+          "required": false,
+          "description": "Transfer state (informational)."
+        },
+        "StateDescription": {
+          "type": "text",
+          "required": false,
+          "description": "Human transfer state (informational)."
+        },
+        "BytesTransferred": {
+          "type": "int",
+          "required": false,
+          "description": "Bytes transferred so far (informational)."
+        },
+        "AverageSpeed": {
+          "type": "float",
+          "required": false,
+          "description": "Average transfer speed (informational)."
+        },
+        "PlaceInQueue": {
+          "type": "int",
+          "required": false,
+          "description": "Peer queue position (informational)."
+        },
+        "Exception": {
+          "type": "text",
+          "required": false,
+          "description": "Error message if failed (informational)."
+        },
+        "Attempts": {
+          "type": "int",
+          "required": false,
+          "description": "Retry count (informational)."
+        },
+        "EndedAt": {
+          "type": "datetime",
+          "required": false,
+          "description": "When the transfer ended (informational)."
+        }
+      },
+      "_evidence": {
+        "locator": "src/slskd/Transfers/Uploads/UploadService.cs:915",
+        "id_local": "Upload.remove",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/v0/transfers/uploads/{username}/{id}?remove=true",
+          "locator": "src/slskd/Transfers/Uploads/UploadService.cs:909"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "var count = context.Transfers\n  .Where(t => t.Direction == TransferDirection.Upload)\n  .Where(t => TransferStateCategories.Completed.Contains(t.State))\n  .Where(expression)\n  .ExecuteUpdate(r => r.SetProperty(c => c.Removed, true));",
+        "behavior_notes": "Bulk ExecuteUpdate setting Removed=true (DownloadService.cs:983 / UploadService.cs:915). Real mutation is Removed; the extra panel columns are the runtime need that a provable write registers a world change."
+      },
+      "entity": "Transfer",
+      "_binds": {
+        "id": "Transfer.Id"
+      },
+      "_output_schema": {
+        "Count": "int"
+      },
+      "guards": {
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "not_found": "That transfer does not exist."
+        }
+      },
+      "_defaulted": [],
+      "description": "Soft-remove a completed upload Transfer by setting Removed=true, hiding it from the active transfer list."
+    },
+    {
+      "tool": "transfer_list_downloads",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Transfer",
+        "filter": {
+          "and": [
+            {
+              "col": "Direction",
+              "mode": "exact",
+              "val": "Download"
+            },
+            {
+              "col": "Removed",
+              "mode": "exact",
+              "val": false
+            }
+          ]
+        },
+        "rank": {
+          "method": "exact"
+        },
+        "sort": {
+          "col": "RequestedAt",
+          "dir": "desc"
+        }
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "src/slskd/Transfers/Downloads/DownloadService.cs:904",
+        "id_local": "Transfer.list",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v0/transfers/downloads",
+          "locator": "src/slskd/Transfers/Downloads/DownloadService.cs:896"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "return context.Transfers\n  .AsNoTracking()\n  .Where(t => t.Direction == TransferDirection.Download)\n  .Where(t => !t.Removed || includeRemoved)\n  .Where(expression)\n  .ToList();",
+        "scope": "global read: this daemon lists its own transfers; single-actor, no tenant boundary."
+      },
+      "entity": "Transfer",
+      "_output_schema": {
+        "transfers": "list of Transfer rows grouped by user/directory"
+      },
+      "description": "List active download Transfer rows (files this daemon is currently fetching), newest first, excluding soft-removed history.",
+      "guards": {}
+    },
+    {
+      "tool": "transfer_get",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Transfer",
+        "lookup_by": {
+          "Id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the Transfer row to fetch."
+        }
+      },
+      "_evidence": {
+        "locator": "src/slskd/Transfers/Downloads/DownloadService.cs:700",
+        "id_local": "Transfer.find",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v0/transfers/downloads/{username}/{id}",
+          "locator": "src/slskd/Transfers/Downloads/DownloadService.cs:694"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "return context.Transfers.AsNoTracking().Where(t => t.Direction == TransferDirection.Download).Where(expression).FirstOrDefault();"
+      },
+      "entity": "Transfer",
+      "_binds": {
+        "id": "Transfer.Id"
+      },
+      "_output_schema": {
+        "Transfer": "Transfer"
+      },
+      "guards": {
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "not_found": "No transfer with that Id exists."
+        }
+      },
+      "description": "Fetch a single Transfer row by its Id (a download or upload between this daemon and a peer).",
+      "_defaulted": []
+    },
+    {
+      "tool": "batch_get",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Batch",
+        "lookup_by": {
+          "Id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the batch to fetch."
+        }
+      },
+      "_evidence": {
+        "locator": "src/slskd/Transfers/API/Controllers/TransfersController.cs:482",
+        "id_local": "Batch.get",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v0/transfers/downloads/batches/{id}",
+          "locator": "src/slskd/Transfers/API/Controllers/TransfersController.cs:479"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "var found = await Transfers.Downloads.Batches.FindAsync(b => b.Id == guid);\nreturn Ok(found);"
+      },
+      "entity": "Batch",
+      "_binds": {
+        "id": "Batch.Id"
+      },
+      "_output_schema": {
+        "Batch": "Batch (with Transfers Included)"
+      },
+      "guards": {
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "not_found": "No batch with that Id exists."
+        }
+      },
+      "description": "Fetch a single download Batch by its Id.",
+      "_defaulted": []
+    },
+    {
+      "tool": "privatemessage_send",
+      "op": "create",
+      "family": "crud.upsert",
+      "exec_spec": {
+        "entity": "Conversation",
+        "key": {
+          "Username": {
+            "$arg": "username"
+          }
+        },
+        "insert_fields": [
+          "IsActive"
+        ],
+        "set_on_exists": {
+          "IsActive": true
+        }
+      },
+      "input_schema": {
+        "username": {
+          "type": "text",
+          "required": true,
+          "description": "Soulseek username to message."
+        },
+        "message": {
+          "type": "text",
+          "required": false,
+          "description": "The message text to send."
+        },
+        "Username": {
+          "type": "text",
+          "required": false,
+          "description": "Peer username (upsert key; usually matches username)."
+        }
+      },
+      "_evidence": {
+        "locator": "src/slskd/Messaging/ConversationService.cs:376",
+        "id_local": "PrivateMessage.send",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/v0/conversations/{username}",
+          "locator": "src/slskd/Messaging/API/Controllers/ConversationsController.cs:265"
+        },
+        "entity_why": "primary effect row_upsert lands on this table",
+        "ref_code": "ActivateConversation(username);\nawait SoulseekClient.SendPrivateMessageAsync(username, message);\nusing var context = ContextFactory.CreateDbContext();\ncontext.PrivateMessages.Add(new PrivateMessage { Timestamp = DateTime.UtcNow, Id = 0, Username = username, Direction = MessageDirection.Out, Message = message, IsAcknowledged = true });\ncontext.SaveChanges();",
+        "behavior_notes": "SendPrivateMessage + activation of the conversation row; the persisted ledger effect is the active Conversation.",
+        "scope": "persisted ledger effect is the (active) Conversation row; the raw message goes over the Soulseek network, not into this DB."
+      },
+      "entity": "Conversation",
+      "_binds": {
+        "username": "PrivateMessage.Username",
+        "message": "PrivateMessage.Message"
+      },
+      "_output_schema": {
+        "status": "201|400|403"
+      },
+      "guards": {
+        "required": [
+          "username",
+          "message"
+        ],
+        "messages": {
+          "not_found": "The conversation could not be addressed."
+        }
+      },
+      "_defaulted": [],
+      "description": "Send a private message to <username> over the Soulseek network. Creates the conversation with that user if it does not exist and marks it active. Send to an existing partner simply reactivates the thread; the message itself goes out over the network. Fails if the peer is unreachable."
+    },
+    {
+      "tool": "privatemessage_acknowledge",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "PrivateMessage",
+        "row_key": {
+          "Username": {
+            "$arg": "username"
+          },
+          "Id": {
+            "$arg": "id"
+          }
+        },
+        "set": {
+          "IsAcknowledged": true
+        },
+        "fields": [
+          "Direction",
+          "Message",
+          "IsAcknowledged",
+          "WasReplayed"
+        ]
+      },
+      "input_schema": {
+        "username": {
+          "type": "text",
+          "required": true,
+          "description": "Username whose message to acknowledge."
+        },
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "The message Id (per-peer sequence) to acknowledge."
+        },
+        "Direction": {
+          "type": "text",
+          "required": false,
+          "description": "Message direction (informational)."
+        },
+        "Message": {
+          "type": "text",
+          "required": false,
+          "description": "Message text (informational)."
+        },
+        "WasReplayed": {
+          "type": "bool",
+          "required": false,
+          "description": "Whether the message was replayed (informational)."
+        }
+      },
+      "_evidence": {
+        "locator": "src/slskd/Messaging/ConversationService.cs:171",
+        "id_local": "PrivateMessage.acknowledge",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /api/v0/conversations/{username}/{id}",
+          "locator": "src/slskd/Messaging/API/Controllers/ConversationsController.cs:93"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "var message = context.PrivateMessages.SingleOrDefault(m => m.Username == username && m.Id == id);\nif (message != default) { await SoulseekClient.AcknowledgePrivateMessageAsync(message.Id); message.IsAcknowledged = true; context.SaveChanges(); }",
+        "behavior_notes": "Acknowledges a single PM and sets IsAcknowledged (ConversationService.cs:171). Real mutation is IsAcknowledged; extra panel columns give the runtime a provable write signal."
+      },
+      "entity": "PrivateMessage",
+      "_binds": {
+        "username": "PrivateMessage.Username",
+        "id": "PrivateMessage.Id"
+      },
+      "_output_schema": {
+        "status": "200|404|403"
+      },
+      "guards": {
+        "required": [
+          "username",
+          "id"
+        ],
+        "messages": {
+          "not_found": "That private message does not exist."
+        }
+      },
+      "_defaulted": [],
+      "description": "Acknowledge a single received private message (by username and message Id), marking it as read and notifying the sender. Already-acknowledged messages are a harmless no-op."
+    },
+    {
+      "tool": "conversation_list",
+      "op": "read",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Conversation",
+        "rank": {
+          "method": "exact"
+        },
+        "search_fields": [
+          "Username",
+          "IsActive"
+        ]
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "src/slskd/Messaging/ConversationService.cs:255",
+        "id_local": "Conversation.list",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v0/conversations",
+          "locator": "src/slskd/Messaging/API/Controllers/ConversationsController.cs:179"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "var unAckedMessages = context.PrivateMessages.AsNoTracking().Where(m => !m.IsAcknowledged).ToList();\nvar conversations = context.Conversations.AsNoTracking().Where(expression).OrderBy(c => c.Username).ToList();\nvar response = conversations.Select(c => new Conversation { Username = c.Username, IsActive = c.IsActive, UnAcknowledgedMessageCount = unAckedMessages.Count(m => m.Username == c.Username) });",
+        "scope": "global read: all conversations belong to this single daemon instance."
+      },
+      "entity": "Conversation",
+      "_output_schema": {
+        "List<Conversation>": "conversations with UnAcknowledgedMessageCount"
+      },
+      "description": "List all conversations (distinct Soulseek users you have messaged).",
+      "guards": {}
+    },
+    {
+      "tool": "conversation_get",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Conversation",
+        "lookup_by": {
+          "Username": {
+            "$arg": "username"
+          }
+        }
+      },
+      "input_schema": {
+        "username": {
+          "type": "text",
+          "required": true,
+          "description": "The username of the conversation to fetch."
+        }
+      },
+      "_evidence": {
+        "locator": "src/slskd/Messaging/ConversationService.cs:206",
+        "id_local": "Conversation.find",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v0/conversations/{username}",
+          "locator": "src/slskd/Messaging/API/Controllers/ConversationsController.cs:208"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "var conversation = context.Conversations.AsNoTracking().Where(c => c.Username == username && (includeInactive || c.IsActive)).SingleOrDefault();\nif (conversation != default && includeMessages) { conversation.Messages = await ListMessagesAsync(m => m.Username == conversation.Username); conversation.UnAcknowledgedMessageCount = conversation.Messages.Count(m => !m.IsAcknowledged); }"
+      },
+      "entity": "Conversation",
+      "_binds": {
+        "username": "Conversation.Username"
+      },
+      "_output_schema": {
+        "Conversation": "conversation with Messages and UnAcknowledgedMessageCount"
+      },
+      "guards": {
+        "required": [
+          "username"
+        ],
+        "messages": {
+          "not_found": "No conversation with that username exists."
+        }
+      },
+      "description": "Fetch a single conversation (and the user name it belongs to) by username.",
+      "_defaulted": []
+    },
+    {
+      "tool": "privatemessage_list",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "PrivateMessage",
+        "filter": {
+          "col": "Username",
+          "mode": "exact",
+          "val": {
+            "$arg": "username"
+          }
+        },
+        "rank": {
+          "method": "exact"
+        },
+        "search_fields": [
+          "Username",
+          "Message",
+          "Direction"
+        ],
+        "sort": {
+          "col": "Timestamp",
+          "dir": "asc"
+        },
+        "pagination": {
+          "default_limit": 100
+        }
+      },
+      "input_schema": {
+        "username": {
+          "type": "text",
+          "required": true,
+          "description": "Username whose message history to list."
+        }
+      },
+      "_evidence": {
+        "locator": "src/slskd/Messaging/ConversationService.cs:286",
+        "id_local": "PrivateMessage.list",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v0/conversations/{username}/messages",
+          "locator": "src/slskd/Messaging/API/Controllers/ConversationsController.cs:229"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "var response = context.PrivateMessages.AsNoTracking().Where(expression).OrderByDescending(m => m.Timestamp).Take(100).OrderBy(m => m.Timestamp).ToList().AsEnumerable();",
+        "scope": "global read: all messages are this daemon's conversation history; no per-actor split."
+      },
+      "entity": "PrivateMessage",
+      "_binds": {
+        "username": "PrivateMessage.Username"
+      },
+      "_output_schema": {
+        "List<PrivateMessage>": "last 100 messages of conversation"
+      },
+      "guards": {
+        "required": [
+          "username"
+        ],
+        "messages": {
+          "not_found": "No messages found for that conversation."
+        }
+      },
+      "description": "List the messages of one conversation (by username), oldest first. The message history between you and a peer, including both directions.",
+      "_defaulted": []
+    },
+    {
+      "tool": "conversation_remove",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Conversation",
+        "row_key": {
+          "Username": {
+            "$arg": "username"
+          }
+        },
+        "set": {
+          "IsActive": false
+        },
+        "fields": [
+          "IsActive"
+        ]
+      },
+      "input_schema": {
+        "username": {
+          "type": "text",
+          "required": true,
+          "description": "Username of the conversation to remove."
+        }
+      },
+      "_evidence": {
+        "locator": "src/slskd/Messaging/ConversationService.cs:351",
+        "id_local": "Conversation.remove",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/v0/conversations/{username}",
+          "locator": "src/slskd/Messaging/API/Controllers/ConversationsController.cs:152"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "await AcknowledgeAsync(username);\nvar conversation = context.Conversations.FirstOrDefault(c => c.Username == username);\nif (conversation != default) { conversation.IsActive = false; context.SaveChanges(); }",
+        "behavior_notes": "The app also acknowledges all messages; the verifiable effect is deactivating the conversation row."
+      },
+      "entity": "Conversation",
+      "_binds": {
+        "username": "Conversation.Username"
+      },
+      "_output_schema": {
+        "status": "204|404|403"
+      },
+      "guards": {
+        "required": [
+          "username"
+        ],
+        "messages": {
+          "not_found": "No conversation with that username exists."
+        }
+      },
+      "_defaulted": [],
+      "description": "Remove (deactivate) the conversation with <username>, marking it inactive so it is hidden from the active conversation list."
+    },
+    {
+      "tool": "search_start",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Search",
+        "fields": {
+          "SearchText": {
+            "$arg": "searchText"
+          }
+        },
+        "set_on_create": {
+          "State": "Requested",
+          "StartedAt": "2026-01-01T00:00:00Z"
+        }
+      },
+      "input_schema": {
+        "searchText": {
+          "type": "text",
+          "required": true,
+          "description": "The text to search for on the Soulseek network."
+        }
+      },
+      "_evidence": {
+        "locator": "src/slskd/Search/SearchService.cs:248",
+        "id_local": "Search.create",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/v0/searches",
+          "locator": "src/slskd/Search/API/Controllers/SearchesController.cs:74"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "var token = Client.GetNextToken();\nvar search = new Search() { SearchText=query.SearchText, Token=token, Id=id, State=SearchStates.Requested, StartedAt=DateTime.UtcNow };\ncontext.Add(search);\ncontext.SaveChanges();\nawait SearchHub.BroadcastCreateAsync(search);"
+      },
+      "entity": "Search",
+      "_binds": {
+        "SearchText": "Search.SearchText",
+        "Id": "Search.Id"
+      },
+      "_output_schema": {
+        "Search": "the created Search"
+      },
+      "guards": {
+        "required": [
+          "searchText"
+        ],
+        "messages": {
+          "not_found": "The search could not be addressed."
+        }
+      },
+      "description": "Start a new Soulseek search for <searchText>, registering it in the Requested state. The daemon runs the search against the network and records results against this Search.",
+      "_defaulted": []
+    },
+    {
+      "tool": "search_get",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Search",
+        "lookup_by": {
+          "Id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the Search to fetch."
+        }
+      },
+      "_evidence": {
+        "locator": "src/slskd/Search/SearchService.cs:187",
+        "id_local": "Search.get",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v0/searches/{id}",
+          "locator": "src/slskd/Search/API/Controllers/SearchesController.cs:122"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "var selector = context.Searches.AsNoTracking().Where(expression);\nif (!includeResponses) selector = selector.WithoutResponses();\nreturn selector.FirstOrDefaultAsync();"
+      },
+      "entity": "Search",
+      "_binds": {
+        "id": "Search.Id"
+      },
+      "_output_schema": {
+        "Search": "the Search (responses omitted unless includeResponses)"
+      },
+      "guards": {
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "not_found": "No search with that Id exists."
+        }
+      },
+      "description": "Fetch a single Search by Id.",
+      "_defaulted": []
+    },
+    {
+      "tool": "search_list",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Search",
+        "rank": {
+          "method": "exact"
+        },
+        "search_fields": [
+          "SearchText"
+        ],
+        "sort": {
+          "col": "StartedAt",
+          "dir": "desc"
+        }
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "src/slskd/Search/SearchService.cs:208",
+        "id_local": "Search.list",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v0/searches",
+          "locator": "src/slskd/Search/API/Controllers/SearchesController.cs:100"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "return context.Searches.AsNoTracking().Where(expression).WithoutResponses().ToListAsync();",
+        "scope": "global read: all searches were initiated by this daemon."
+      },
+      "entity": "Search",
+      "_output_schema": {
+        "List<Search>": "all searches"
+      },
+      "description": "List the searches that have been run, newest first.",
+      "guards": {}
+    },
+    {
+      "tool": "search_cancel",
+      "op": "action",
+      "family": "action.trigger",
+      "exec_spec": {
+        "entity": "Search",
+        "target": {
+          "entity": "Search",
+          "lookup_by": {
+            "Id": {
+              "$arg": "id"
+            }
+          }
+        },
+        "set": {
+          "State": "Completed, Cancelled"
+        },
+        "messages": {}
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the running search to cancel."
+        }
+      },
+      "_evidence": {
+        "locator": "src/slskd/Search/SearchService.cs:414",
+        "id_local": "Search.cancel",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /api/v0/searches/{id}",
+          "locator": "src/slskd/Search/API/Controllers/SearchesController.cs:147"
+        },
+        "entity_why": "fell back to the entity prefix of id_local",
+        "ref_code": "if (CancellationTokens.TryGetValue(id, out var cts)) { cts.Cancel(); return true; }\nreturn false;",
+        "scope": "no auth (repo-wide API-key/JWT policy only, no account table); the row State is finalized by the background task."
+      },
+      "entity": "Search",
+      "_binds": {
+        "id": "Search.Id"
+      },
+      "_output_schema": {
+        "status": "200|404"
+      },
+      "guards": {
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "not_found": "No running search with that Id exists."
+        }
+      },
+      "_defaulted": [],
+      "description": "Cancel a running search by Id, recording its state as Cancelled."
+    },
+    {
+      "tool": "search_delete",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "Search",
+        "lookup_by": {
+          "Id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the Search to delete."
+        }
+      },
+      "_evidence": {
+        "locator": "src/slskd/Search/SearchService.cs:163",
+        "id_local": "Search.delete",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/v0/searches/{id}",
+          "locator": "src/slskd/Search/API/Controllers/SearchesController.cs:90"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "using var context = ContextFactory.CreateDbContext();\ncontext.Searches.Remove(search);\ncontext.SaveChanges();\nawait SearchHub.BroadcastDeleteAsync(search);"
+      },
+      "entity": "Search",
+      "_binds": {
+        "id": "Search.Id"
+      },
+      "_output_schema": {
+        "status": "204|404"
+      },
+      "guards": {
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "not_found": "No search with that Id exists."
+        }
+      },
+      "description": "Permanently delete a Search record by Id, removing it and its results from history.",
+      "_defaulted": []
+    },
+    {
+      "tool": "event_list",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "EventRecord",
+        "rank": {
+          "method": "exact"
+        },
+        "search_fields": [
+          "Type"
+        ],
+        "sort": {
+          "col": "Timestamp",
+          "dir": "desc"
+        },
+        "pagination": {
+          "default_limit": 20
+        }
+      },
+      "input_schema": {
+        "offset": {
+          "type": "int",
+          "required": false,
+          "description": "Number of events to skip (for paging)."
+        },
+        "limit": {
+          "type": "int",
+          "required": false,
+          "description": "Max events to return."
+        }
+      },
+      "_evidence": {
+        "locator": "src/slskd/Events/EventService.cs:80",
+        "id_local": "Event.get",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v0/events",
+          "locator": "src/slskd/Events/API/EventsController.cs:66"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "var events = context.Events.OrderByDescending(e => e.Timestamp).Skip(offset).Take(limit).ToList().AsReadOnly();",
+        "scope": "global read: the shared application event log."
+      },
+      "entity": "EventRecord",
+      "_output_schema": {
+        "IReadOnlyList<EventRecord>": "events ordered by Timestamp desc"
+      },
+      "description": "List the application event log newest-first, with pagination.",
+      "guards": {}
+    },
+    {
+      "tool": "event_raise",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "EventRecord",
+        "fields": {
+          "Type": {
+            "$arg": "type"
+          }
+        },
+        "set_on_create": {
+          "Timestamp": "2026-01-01T00:00:00Z"
+        }
+      },
+      "input_schema": {
+        "type": {
+          "type": "text",
+          "required": true,
+          "description": "The event type to raise (e.g. DownloadFileComplete, Noop)."
+        }
+      },
+      "_evidence": {
+        "locator": "src/slskd/Events/API/EventsController.cs:151",
+        "id_local": "Event.raise",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/v0/events/{type}",
+          "locator": "src/slskd/Events/API/EventsController.cs:132"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "@event = eventType switch {\n    EventType.DownloadFileComplete => new DownloadFileCompleteEvent { ... },\n    EventType.Noop => new NoopEvent(),\n    _ => throw new SlskdException(...) };\nEventBus.Raise(@event);\nreturn StatusCode(201, @event);"
+      },
+      "entity": "EventRecord",
+      "_output_schema": {
+        "Event": "the synthesized event; 201|400"
+      },
+      "guards": {
+        "required": [
+          "type"
+        ],
+        "messages": {
+          "not_found": "The event could not be addressed."
+        }
+      },
+      "_defaulted": [],
+      "description": "Emit an event of <type> into the event bus and record it in the event log (e.g. a completed transfer or an incoming message) for the daemon's notification pipeline to react to."
+    }
+  ],
+  "seed_state": {
+    "Conversation": [
+      {
+        "Username": "alice",
+        "IsActive": true,
+        "id": 1
+      },
+      {
+        "Username": "bob",
+        "IsActive": true,
+        "id": 2
+      }
+    ],
+    "PrivateMessage": [
+      {
+        "Username": "alice",
+        "Id": 100,
+        "Timestamp": "2026-01-01T10:00:00Z",
+        "Direction": "In",
+        "Message": "hi, do you have that flac?",
+        "IsAcknowledged": false,
+        "WasReplayed": false,
+        "id": 100
+      },
+      {
+        "Username": "alice",
+        "Id": 101,
+        "Timestamp": "2026-01-01T10:05:00Z",
+        "Direction": "In",
+        "Message": "Here is the file list.",
+        "IsAcknowledged": false,
+        "WasReplayed": false,
+        "id": 101
+      },
+      {
+        "Username": "bob",
+        "Id": 7,
+        "Timestamp": "2026-01-01T09:00:00Z",
+        "Direction": "In",
+        "Message": "thanks for the upload",
+        "IsAcknowledged": true,
+        "WasReplayed": false,
+        "id": 7
+      }
+    ],
+    "Transfer": [
+      {
+        "Id": 1,
+        "BatchId": null,
+        "Username": "alice",
+        "Direction": "Download",
+        "Filename": "/music/vault/flac-album.flac",
+        "Size": 51200000,
+        "State": 2050,
+        "RequestedAt": "2026-01-01T08:00:00Z",
+        "BytesTransferred": 0,
+        "AverageSpeed": 0.0,
+        "Attempts": 0,
+        "Removed": false,
+        "id": 1
+      },
+      {
+        "Id": 2,
+        "BatchId": null,
+        "Username": "bob",
+        "Direction": "Upload",
+        "Filename": "/shares/track.mp3",
+        "Size": 8000000,
+        "State": 80,
+        "RequestedAt": "2026-01-01T07:00:00Z",
+        "EndedAt": "2026-01-01T08:30:00Z",
+        "BytesTransferred": 8000000,
+        "AverageSpeed": 240.5,
+        "Attempts": 1,
+        "Removed": false,
+        "id": 2
+      }
+    ],
+    "Batch": [
+      {
+        "Id": 10,
+        "SearchId": null,
+        "Username": "alice",
+        "Direction": 1,
+        "CreatedAt": "2026-01-01T08:00:00Z",
+        "Options": null,
+        "id": 10
+      }
+    ],
+    "Search": [
+      {
+        "Id": 100,
+        "SearchText": "flac 2026",
+        "Token": 12345,
+        "StartedAt": "2026-01-01T06:00:00Z",
+        "State": "Completed",
+        "FileCount": 3,
+        "ResponseCount": 2,
+        "LockedFileCount": 0,
+        "ResponsesJson": null,
+        "id": 100
+      }
+    ],
+    "EventRecord": [
+      {
+        "Id": 1,
+        "Timestamp": "2026-01-01T05:00:00Z",
+        "Type": "SoulseekClientConnected",
+        "Data": null,
+        "id": 1
+      }
+    ]
+  },
+  "auth": null
+}

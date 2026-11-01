@@ -1,0 +1,69 @@
+{
+  "app": "seaweedfs",
+  "role": "existing IAM administrator",
+  "domains": [
+    "operations"
+  ],
+  "kinds": {
+    "create_record": [
+      "group_create"
+    ],
+    "update_record": [
+      "group_update"
+    ],
+    "delete_or_archive_row": [
+      "group_delete"
+    ]
+  },
+  "check_kinds": [
+    "record_exists",
+    "record_not_exists",
+    "record_field_equals",
+    "record_field_contains",
+    "record_field_unchanged"
+  ],
+  "carriers": {
+    "notes_field": {
+      "entity": "ServiceAccount",
+      "field": "content"
+    }
+  },
+  "login": {
+    "tool": "sign_in",
+    "user_field": "username",
+    "persona_entity": "User"
+  },
+  "content_entities": [
+    "Group",
+    "ServiceAccount"
+  ],
+  "seed_helpers": [
+    "records"
+  ],
+  "tool_families_to_keep": [
+    ""
+  ],
+  "obs_reads": [
+    "serviceaccount_get",
+    "group_list"
+  ],
+  "known_patches": [
+    "Neutral prefix",
+    "Integer identity schemas and synthetic source persona",
+    "Original source semantics bounded by actual probes"
+  ],
+  "missing_tools": [],
+  "limitations": [
+    "Only Group name/disabled/create/delete metadata certified. No IAM/S3 policy evaluation, ACL enforcement, storage/object bytes, multipart upload, service credential/key generation or network effects invoked.",
+    "Carrier is original ServiceAccount.content JSON with its preexisting free-text description key, returned by original serviceaccount_get. This exact existing source shape is used; no body schema invented.",
+    "Original s3:Admin action and source member/policy-empty deletion guards retained; lower privilege, duplicate and nonempty-group rejection actually probed. Username business key maps session.account_name, and user/group member references renamed consistently.",
+    "Opaque ServiceAccount id normalized to integer for source lookup; serviceaccount_create metadata mapping remains unclaimed, no genuine service-account provisioning claim."
+  ],
+  "smoke": {
+    "passed": true,
+    "date": "2026-10-24",
+    "report": "ok"
+  },
+  "register_file": "pack/newspecs3/seaweedfs/register.py",
+  "base_spec": "pack/base_specs/seaweedfs.spec.json"
+}

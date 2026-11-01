@@ -1,0 +1,6455 @@
+{
+  "env_id": "wallos",
+  "_prep_version": 3,
+  "auth": {
+    "account_entity": "User",
+    "username_col": "username",
+    "password_col": "password",
+    "session_account_ref": "account_id",
+    "account_link_entity": "User",
+    "account_link_col": "id"
+  },
+  "entities": [
+    {
+      "name": "User",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "username",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "email",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "password",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "main_currency",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Currency.id"
+        },
+        {
+          "name": "avatar",
+          "type": "text"
+        },
+        {
+          "name": "language",
+          "type": "text",
+          "nullable": false,
+          "default": "en"
+        },
+        {
+          "name": "budget",
+          "type": "int",
+          "default": 0
+        },
+        {
+          "name": "totp_enabled",
+          "type": "bool",
+          "default": 0
+        },
+        {
+          "name": "api_key",
+          "type": "text"
+        },
+        {
+          "name": "firstname",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        },
+        {
+          "name": "lastname",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        },
+        {
+          "name": "oidc_sub",
+          "type": "text"
+        },
+        {
+          "name": "budget_period_type",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "monthly",
+            "weekly",
+            "yearly"
+          ],
+          "default": "monthly"
+        },
+        {
+          "name": "budget_period_anchor_date",
+          "type": "text"
+        },
+        {
+          "name": "period_budget",
+          "type": "float",
+          "default": 0
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "username"
+          ]
+        },
+        {
+          "kind": "unique",
+          "cols": [
+            "email"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "LoginToken",
+      "columns": [
+        {
+          "name": "user_id",
+          "type": "id",
+          "pk": true,
+          "nullable": false,
+          "fk_to": "User.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "token",
+          "type": "text",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "timestamp",
+          "type": "datetime",
+          "audit": true,
+          "default": "CURRENT_TIMESTAMP"
+        }
+      ]
+    },
+    {
+      "name": "Totp",
+      "columns": [
+        {
+          "name": "user_id",
+          "type": "id",
+          "pk": true,
+          "nullable": false,
+          "fk_to": "User.id"
+        },
+        {
+          "name": "totp_secret",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "backup_codes",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "last_totp_used",
+          "type": "int",
+          "default": 0
+        },
+        {
+          "name": "failed_attempts",
+          "type": "int",
+          "default": 0
+        },
+        {
+          "name": "lockout_until",
+          "type": "int",
+          "default": 0
+        }
+      ]
+    },
+    {
+      "name": "PasswordReset",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "user_id",
+          "type": "id",
+          "fk_to": "User.id"
+        },
+        {
+          "name": "email",
+          "type": "text"
+        },
+        {
+          "name": "token",
+          "type": "text"
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        {
+          "name": "email_sent",
+          "type": "bool",
+          "default": 0
+        }
+      ]
+    },
+    {
+      "name": "EmailVerification",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "user_id",
+          "type": "id",
+          "fk_to": "User.id"
+        },
+        {
+          "name": "email",
+          "type": "text"
+        },
+        {
+          "name": "token",
+          "type": "text"
+        },
+        {
+          "name": "email_sent",
+          "type": "bool",
+          "default": 0
+        }
+      ]
+    },
+    {
+      "name": "Admin",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "registrations_open",
+          "type": "bool",
+          "default": 0
+        },
+        {
+          "name": "max_users",
+          "type": "int",
+          "default": 0
+        },
+        {
+          "name": "require_email_verification",
+          "type": "bool",
+          "default": 0
+        },
+        {
+          "name": "server_url",
+          "type": "text"
+        },
+        {
+          "name": "smtp_address",
+          "type": "text"
+        },
+        {
+          "name": "smtp_port",
+          "type": "int",
+          "default": 587
+        },
+        {
+          "name": "smtp_username",
+          "type": "text"
+        },
+        {
+          "name": "smtp_password",
+          "type": "text"
+        },
+        {
+          "name": "from_email",
+          "type": "text"
+        },
+        {
+          "name": "encryption",
+          "type": "text",
+          "default": "tls"
+        },
+        {
+          "name": "login_disabled",
+          "type": "bool",
+          "default": 0
+        },
+        {
+          "name": "latest_version",
+          "type": "text",
+          "default": "v2.21.1"
+        },
+        {
+          "name": "update_notification",
+          "type": "bool",
+          "default": 0
+        },
+        {
+          "name": "oidc_oauth_enabled",
+          "type": "int",
+          "default": 0
+        },
+        {
+          "name": "local_webhook_notifications_allowlist",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "allow_standard_users_local_webhooks",
+          "type": "int",
+          "default": 0
+        }
+      ]
+    },
+    {
+      "name": "OauthSettings",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "client_id",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "client_secret",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "authorization_url",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "token_url",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "user_info_url",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "redirect_url",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "logout_url",
+          "type": "text"
+        },
+        {
+          "name": "user_identifier_field",
+          "type": "text",
+          "nullable": false,
+          "default": "sub"
+        },
+        {
+          "name": "scopes",
+          "type": "text",
+          "nullable": false,
+          "default": "openid email profile"
+        },
+        {
+          "name": "auth_style",
+          "type": "text",
+          "default": "auto"
+        },
+        {
+          "name": "auto_create_user",
+          "type": "int",
+          "default": 0
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "audit": true,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        {
+          "name": "password_login_disabled",
+          "type": "int",
+          "default": 0
+        },
+        {
+          "name": "require_email_verified",
+          "type": "int",
+          "default": 1
+        }
+      ]
+    },
+    {
+      "name": "UploadedAvatar",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "user_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "User.id"
+        },
+        {
+          "name": "path",
+          "type": "text",
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "name": "Subscription",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "logo",
+          "type": "text"
+        },
+        {
+          "name": "price",
+          "type": "float",
+          "nullable": false
+        },
+        {
+          "name": "currency_id",
+          "type": "id",
+          "fk_to": "Currency.id"
+        },
+        {
+          "name": "next_payment",
+          "type": "datetime"
+        },
+        {
+          "name": "cycle",
+          "type": "id",
+          "fk_to": "Cycle.id"
+        },
+        {
+          "name": "frequency",
+          "type": "id",
+          "fk_to": "Frequency.id"
+        },
+        {
+          "name": "notes",
+          "type": "text"
+        },
+        {
+          "name": "payment_method_id",
+          "type": "id",
+          "fk_to": "PaymentMethod.id",
+          "nullable": true
+        },
+        {
+          "name": "payer_user_id",
+          "type": "id",
+          "fk_to": "Household.id",
+          "nullable": true
+        },
+        {
+          "name": "category_id",
+          "type": "id",
+          "fk_to": "Category.id",
+          "nullable": true
+        },
+        {
+          "name": "notify",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "inactive",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "url",
+          "type": "text"
+        },
+        {
+          "name": "notify_days_before",
+          "type": "int",
+          "default": -1
+        },
+        {
+          "name": "cancellation_date",
+          "type": "datetime"
+        },
+        {
+          "name": "replacement_subscription_id",
+          "type": "id",
+          "fk_to": "Subscription.id",
+          "on_delete": "set_null",
+          "nullable": true
+        },
+        {
+          "name": "logo_text_color",
+          "type": "text",
+          "enum": [
+            "dark",
+            "light"
+          ]
+        },
+        {
+          "name": "logo_variant",
+          "type": "text"
+        },
+        {
+          "name": "auto_renew",
+          "type": "int",
+          "default": 1
+        },
+        {
+          "name": "start_date",
+          "type": "int"
+        },
+        {
+          "name": "user_id",
+          "type": "id",
+          "fk_to": "User.id",
+          "default": 1
+        }
+      ]
+    },
+    {
+      "name": "Category",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "order",
+          "type": "int",
+          "default": 0
+        },
+        {
+          "name": "user_id",
+          "type": "id",
+          "fk_to": "User.id",
+          "default": 1
+        }
+      ]
+    },
+    {
+      "name": "Currency",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "symbol",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "code",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "rate",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "user_id",
+          "type": "id",
+          "fk_to": "User.id",
+          "default": 1
+        }
+      ]
+    },
+    {
+      "name": "Cycle",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "days",
+          "type": "int",
+          "nullable": false
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "Daily",
+            "Weekly",
+            "Monthly",
+            "Yearly",
+            "One-time"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Frequency",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "name",
+          "type": "int",
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "name": "PaymentMethod",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "icon",
+          "type": "text"
+        },
+        {
+          "name": "enabled",
+          "type": "bool",
+          "default": 1
+        },
+        {
+          "name": "order",
+          "type": "int",
+          "default": 0
+        },
+        {
+          "name": "user_id",
+          "type": "id",
+          "fk_to": "User.id",
+          "default": 1
+        }
+      ]
+    },
+    {
+      "name": "Household",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "email",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        },
+        {
+          "name": "user_id",
+          "type": "id",
+          "fk_to": "User.id",
+          "default": 1
+        }
+      ]
+    },
+    {
+      "name": "Setting",
+      "columns": [
+        {
+          "name": "dark_theme",
+          "type": "int",
+          "default": 0
+        },
+        {
+          "name": "monthly_price",
+          "type": "bool",
+          "default": 0
+        },
+        {
+          "name": "convert_currency",
+          "type": "bool",
+          "default": 0
+        },
+        {
+          "name": "remove_background",
+          "type": "bool",
+          "default": 0
+        },
+        {
+          "name": "color_theme",
+          "type": "text",
+          "enum": [
+            "blue",
+            "red",
+            "green",
+            "yellow",
+            "purple",
+            "custom"
+          ],
+          "default": "blue"
+        },
+        {
+          "name": "hide_disabled",
+          "type": "bool",
+          "default": 0
+        },
+        {
+          "name": "disabled_to_bottom",
+          "type": "bool",
+          "default": 0
+        },
+        {
+          "name": "show_original_price",
+          "type": "bool",
+          "default": 0
+        },
+        {
+          "name": "mobile_nav",
+          "type": "bool",
+          "default": 0
+        },
+        {
+          "name": "show_subscription_progress",
+          "type": "bool",
+          "default": 0
+        },
+        {
+          "name": "week_starts_sunday",
+          "type": "bool",
+          "default": 0
+        },
+        {
+          "name": "user_id",
+          "type": "id",
+          "pk": true,
+          "nullable": false,
+          "fk_to": "User.id",
+          "default": 1
+        }
+      ]
+    },
+    {
+      "name": "CustomColors",
+      "columns": [
+        {
+          "name": "main_color",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "accent_color",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "hover_color",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "user_id",
+          "type": "id",
+          "pk": true,
+          "nullable": false,
+          "fk_to": "User.id",
+          "default": 1
+        }
+      ]
+    },
+    {
+      "name": "CustomCssStyle",
+      "columns": [
+        {
+          "name": "css",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        },
+        {
+          "name": "user_id",
+          "type": "id",
+          "pk": true,
+          "nullable": false,
+          "fk_to": "User.id"
+        }
+      ]
+    },
+    {
+      "name": "NotificationSettings",
+      "columns": [
+        {
+          "name": "days",
+          "type": "int",
+          "default": 0
+        },
+        {
+          "name": "period_summary_at_period_start",
+          "type": "int",
+          "default": 0
+        },
+        {
+          "name": "user_id",
+          "type": "id",
+          "pk": true,
+          "nullable": false,
+          "fk_to": "User.id",
+          "default": 1
+        }
+      ]
+    },
+    {
+      "name": "EmailNotification",
+      "columns": [
+        {
+          "name": "enabled",
+          "type": "bool",
+          "default": 0
+        },
+        {
+          "name": "smtp_address",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "smtp_port",
+          "type": "int",
+          "default": 587
+        },
+        {
+          "name": "smtp_username",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "smtp_password",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "from_email",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "encryption",
+          "type": "text",
+          "default": "tls"
+        },
+        {
+          "name": "other_emails",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "user_id",
+          "type": "id",
+          "pk": true,
+          "nullable": false,
+          "fk_to": "User.id",
+          "default": 1
+        }
+      ]
+    },
+    {
+      "name": "TelegramNotification",
+      "columns": [
+        {
+          "name": "enabled",
+          "type": "bool",
+          "default": 0
+        },
+        {
+          "name": "bot_token",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "chat_id",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "user_id",
+          "type": "id",
+          "pk": true,
+          "nullable": false,
+          "fk_to": "User.id",
+          "default": 1
+        }
+      ]
+    },
+    {
+      "name": "WebhookNotification",
+      "columns": [
+        {
+          "name": "enabled",
+          "type": "bool",
+          "default": 0
+        },
+        {
+          "name": "headers",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "url",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "request_method",
+          "type": "text",
+          "default": "POST"
+        },
+        {
+          "name": "payload",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "cancelation_payload",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "ignore_ssl",
+          "type": "int",
+          "default": 0
+        },
+        {
+          "name": "user_id",
+          "type": "id",
+          "pk": true,
+          "nullable": false,
+          "fk_to": "User.id",
+          "default": 1
+        }
+      ]
+    },
+    {
+      "name": "GotifyNotification",
+      "columns": [
+        {
+          "name": "enabled",
+          "type": "bool",
+          "default": 0
+        },
+        {
+          "name": "url",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "token",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "ignore_ssl",
+          "type": "int",
+          "default": 0
+        },
+        {
+          "name": "user_id",
+          "type": "id",
+          "pk": true,
+          "nullable": false,
+          "fk_to": "User.id",
+          "default": 1
+        }
+      ]
+    },
+    {
+      "name": "PushoverNotification",
+      "columns": [
+        {
+          "name": "enabled",
+          "type": "bool",
+          "default": 0
+        },
+        {
+          "name": "user_key",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "token",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "user_id",
+          "type": "id",
+          "pk": true,
+          "nullable": false,
+          "fk_to": "User.id",
+          "default": 1
+        }
+      ]
+    },
+    {
+      "name": "DiscordNotification",
+      "columns": [
+        {
+          "name": "enabled",
+          "type": "bool",
+          "default": 0
+        },
+        {
+          "name": "webhook_url",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "bot_username",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "bot_avatar_url",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "user_id",
+          "type": "id",
+          "pk": true,
+          "nullable": false,
+          "fk_to": "User.id",
+          "default": 1
+        }
+      ]
+    },
+    {
+      "name": "NtfyNotification",
+      "columns": [
+        {
+          "name": "enabled",
+          "type": "bool",
+          "default": 0
+        },
+        {
+          "name": "host",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "topic",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "headers",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "ignore_ssl",
+          "type": "int",
+          "default": 0
+        },
+        {
+          "name": "user_id",
+          "type": "id",
+          "pk": true,
+          "nullable": false,
+          "fk_to": "User.id"
+        }
+      ]
+    },
+    {
+      "name": "PushplusNotification",
+      "columns": [
+        {
+          "name": "enabled",
+          "type": "int",
+          "nullable": false,
+          "default": 0
+        },
+        {
+          "name": "token",
+          "type": "text"
+        },
+        {
+          "name": "user_id",
+          "type": "id",
+          "pk": true,
+          "nullable": false,
+          "fk_to": "User.id"
+        }
+      ]
+    },
+    {
+      "name": "MattermostNotification",
+      "columns": [
+        {
+          "name": "enabled",
+          "type": "int",
+          "nullable": false,
+          "default": 0
+        },
+        {
+          "name": "webhook_url",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "bot_username",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "bot_icon_emoji",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "user_id",
+          "type": "id",
+          "pk": true,
+          "nullable": false,
+          "fk_to": "User.id"
+        }
+      ]
+    },
+    {
+      "name": "ServerchanNotification",
+      "columns": [
+        {
+          "name": "enabled",
+          "type": "bool",
+          "default": 0
+        },
+        {
+          "name": "sendkey",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "user_id",
+          "type": "id",
+          "pk": true,
+          "nullable": false,
+          "fk_to": "User.id"
+        }
+      ]
+    },
+    {
+      "name": "Fixer",
+      "columns": [
+        {
+          "name": "api_key",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "provider",
+          "type": "int",
+          "enum": [
+            0,
+            1
+          ],
+          "default": 0
+        },
+        {
+          "name": "usage_used",
+          "type": "int"
+        },
+        {
+          "name": "usage_limit",
+          "type": "int"
+        },
+        {
+          "name": "usage_updated_at",
+          "type": "text"
+        },
+        {
+          "name": "user_id",
+          "type": "id",
+          "pk": true,
+          "nullable": false,
+          "fk_to": "User.id",
+          "default": 1
+        }
+      ]
+    },
+    {
+      "name": "GoogleSearch",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "user_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "User.id"
+        },
+        {
+          "name": "api_key",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        }
+      ]
+    },
+    {
+      "name": "LastExchangeUpdate",
+      "columns": [
+        {
+          "name": "date",
+          "type": "datetime",
+          "nullable": false
+        },
+        {
+          "name": "user_id",
+          "type": "id",
+          "pk": true,
+          "nullable": false,
+          "fk_to": "User.id",
+          "default": 1
+        }
+      ]
+    },
+    {
+      "name": "LastUpdateNextPaymentDate",
+      "columns": [
+        {
+          "name": "date",
+          "type": "datetime",
+          "pk": true,
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "name": "TotalYearlyCost",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "user_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "User.id"
+        },
+        {
+          "name": "date",
+          "type": "datetime",
+          "nullable": false,
+          "immutable": true
+        },
+        {
+          "name": "cost",
+          "type": "float",
+          "nullable": false,
+          "immutable": true
+        },
+        {
+          "name": "currency",
+          "type": "text",
+          "nullable": false,
+          "immutable": true
+        }
+      ]
+    },
+    {
+      "name": "AiSettings",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "user_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "User.id"
+        },
+        {
+          "name": "type",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "chatgpt",
+            "gemini",
+            "openrouter",
+            "ollama",
+            "openai-compatible"
+          ]
+        },
+        {
+          "name": "enabled",
+          "type": "bool",
+          "nullable": false,
+          "default": 0
+        },
+        {
+          "name": "api_key",
+          "type": "text"
+        },
+        {
+          "name": "model",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "url",
+          "type": "text"
+        },
+        {
+          "name": "run_schedule",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "manual",
+            "weekly",
+            "monthly"
+          ],
+          "default": "manual"
+        },
+        {
+          "name": "last_successful_run",
+          "type": "datetime"
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "audit": true,
+          "default": "CURRENT_TIMESTAMP"
+        }
+      ]
+    },
+    {
+      "name": "AiRecommendation",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "user_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "User.id"
+        },
+        {
+          "name": "type",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "subscription"
+          ]
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "savings",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "default": "CURRENT_TIMESTAMP"
+        }
+      ]
+    },
+    {
+      "name": "Migrations",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "migration",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "migrated_at",
+          "type": "datetime",
+          "audit": true,
+          "default": "CURRENT_TIMESTAMP"
+        }
+      ]
+    }
+  ],
+  "tools": [
+    {
+      "tool": "user_login",
+      "family": "guard.auth",
+      "entity": "User",
+      "description": "Sign in with your username and password, opening the session that $actor resolves to. Everything on your own data requires this first.",
+      "input_schema": {
+        "username": {
+          "type": "text",
+          "required": true,
+          "description": "Your Wallos username."
+        },
+        "password": {
+          "type": "text",
+          "required": true,
+          "description": "Your account password."
+        },
+        "remember": {
+          "type": "bool",
+          "description": "Issue a persistent login token so the session survives across browser restarts."
+        }
+      },
+      "exec_spec": {
+        "verify": {
+          "entity": "User"
+        }
+      },
+      "guards": {
+        "required": [
+          "username",
+          "password"
+        ],
+        "messages": {
+          "fail": "That username or password is wrong."
+        }
+      },
+      "_evidence": {
+        "locator": "login.php:167",
+        "id_local": "User.login",
+        "entry": {
+          "kind": "http",
+          "route": "POST /login.php",
+          "locator": "login.php:167"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "$query = \"SELECT id, password, main_currency, language FROM user WHERE username = :username\";\nif (password_verify($password, $hashedPasswordFromDb)) { session_regenerate_id(true); $_SESSION['loggedin']=true; if ($remember) { INSERT INTO login_tokens (user_id, token) VALUES (:userId,:token) } setcookie('wallos_login', $username.'|'.$token.'|'.$main_currency) } else { login_failed }"
+      }
+    },
+    {
+      "tool": "user_logout",
+      "family": "guard.logout",
+      "entity": "User",
+      "description": "End the current session and revoke its remember-me token.",
+      "input_schema": {},
+      "exec_spec": {
+        "entity": "LoginToken"
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You can only sign out while signed in."
+        }
+      },
+      "_evidence": {
+        "locator": "logout.php:14",
+        "id_local": "User.logout",
+        "entry": {
+          "kind": "http",
+          "route": "GET /logout.php",
+          "locator": "logout.php:14"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "if (isset($_SESSION['token'])) { DELETE FROM login_tokens WHERE token = :token; check result } $_SESSION=array(); session_destroy(); clear wallos_login cookie"
+      }
+    },
+    {
+      "tool": "user_register",
+      "family": "auth.register",
+      "entity": "User",
+      "description": "Create a new account (only allowed while registrations are open, or for the very first admin). Fails if the username or email is already taken.",
+      "input_schema": {
+        "username": {
+          "type": "text",
+          "required": true,
+          "description": "Desired unique username."
+        },
+        "email": {
+          "type": "text",
+          "required": true,
+          "description": "Account email, must be unique."
+        },
+        "password": {
+          "type": "text",
+          "required": true,
+          "description": "Account password."
+        },
+        "firstname": {
+          "type": "text",
+          "description": "Given name."
+        },
+        "lastname": {
+          "type": "text",
+          "description": "Family name."
+        },
+        "language": {
+          "type": "text",
+          "description": "UI locale code (default en)."
+        },
+        "main_currency": {
+          "type": "int",
+          "description": "Id of the user's primary currency."
+        }
+      },
+      "exec_spec": {
+        "entity": "User",
+        "fields": [
+          "username",
+          "firstname",
+          "lastname",
+          "email",
+          "main_currency",
+          "language",
+          "password"
+        ],
+        "prechecks": [
+          {
+            "entity": "User",
+            "where": {
+              "username": {
+                "$arg": "username"
+              }
+            },
+            "negate": true,
+            "message": "That username is already registered."
+          },
+          {
+            "entity": "User",
+            "where": {
+              "email": {
+                "$arg": "email"
+              }
+            },
+            "negate": true,
+            "message": "That email is already registered."
+          }
+        ]
+      },
+      "guards": {
+        "required": [
+          "username",
+          "email",
+          "password"
+        ],
+        "messages": {
+          "unique": "That value is already taken."
+        }
+      },
+      "_evidence": {
+        "locator": "registration.php:214",
+        "id_local": "User.register",
+        "entry": {
+          "kind": "http",
+          "route": "POST /registration.php",
+          "locator": "registration.php:214"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "INSERT INTO user (username,email,password,main_currency,avatar,language,budget,api_key) VALUES (...) [password_hash]; userId=lastInsertRowID; INSERT household (name,user_id); seed categories/payment_methods/currencies/settings when userId>1; INSERT email_verification if require_email_verification"
+      }
+    },
+    {
+      "tool": "user_setbudget",
+      "family": "update.field_set",
+      "entity": "User",
+      "description": "Set your monthly budget and (optionally) a fixed-period budget with its cadence.",
+      "input_schema": {
+        "budget": {
+          "type": "int",
+          "description": "Recurring monthly budget amount."
+        },
+        "period_budget": {
+          "type": "float",
+          "description": "Budget for the whole budget period."
+        },
+        "budget_period_type": {
+          "type": "text",
+          "description": "period cadence: monthly, weekly or yearly."
+        },
+        "budget_period_anchor_date": {
+          "type": "text",
+          "description": "Anchor date for the budget period."
+        }
+      },
+      "exec_spec": {
+        "entity": "User",
+        "row_key": {
+          "id": {
+            "$session": "account_id"
+          }
+        },
+        "fields": [
+          "budget",
+          "period_budget",
+          "budget_period_type",
+          "budget_period_anchor_date"
+        ],
+        "set": {
+          "id": {
+            "$session": "account_id"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "Sign in before setting a budget."
+        }
+      },
+      "_evidence": {
+        "locator": "endpoints/user/budget.php:45",
+        "id_local": "User.setBudget",
+        "entry": {
+          "kind": "http",
+          "route": "POST /endpoints/user/budget.php",
+          "locator": "endpoints/user/budget.php:45"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "UPDATE user SET budget=:monthlyBudget[, period_budget=:periodBudget, budget_period_type=:t, budget_period_anchor_date=:d] WHERE id=:userId",
+        "edges": [
+          "includes/validate_endpoint.php:19 ($_SESSION['loggedin'] !== true -> session_expired); connect_endpoint.php resolves $actor.id via session/remember-me"
+        ]
+      }
+    },
+    {
+      "tool": "user_save",
+      "family": "update.field_set",
+      "entity": "User",
+      "description": "Update your own profile: name, email, avatar, password, main currency and language. Fails if the new email is already used by someone else.",
+      "input_schema": {
+        "firstname": {
+          "type": "text",
+          "description": "New given name."
+        },
+        "lastname": {
+          "type": "text",
+          "description": "New family name."
+        },
+        "email": {
+          "type": "text",
+          "description": "New email; must not already belong to another account."
+        },
+        "avatar": {
+          "type": "text",
+          "description": "Avatar image path."
+        },
+        "main_currency": {
+          "type": "int",
+          "description": "Id of the primary currency."
+        },
+        "language": {
+          "type": "text",
+          "description": "UI locale code."
+        },
+        "password": {
+          "type": "text",
+          "description": "New password (blank keeps current)."
+        }
+      },
+      "exec_spec": {
+        "entity": "User",
+        "row_key": {
+          "id": {
+            "$session": "account_id"
+          }
+        },
+        "fields": [
+          "firstname",
+          "lastname",
+          "email",
+          "avatar",
+          "main_currency",
+          "language",
+          "password"
+        ],
+        "set": {
+          "id": {
+            "$session": "account_id"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "not_found": "That record does not exist in your account.",
+          "fk": "The parent record you referenced does not exist.",
+          "fk_missing": "A required reference was not supplied.",
+          "unique": "That value is already taken.",
+          "on_child": "Can't delete: another record still references it. Reassign or remove those first.",
+          "auth": "You must sign in before editing your profile."
+        }
+      },
+      "_evidence": {
+        "locator": "endpoints/user/save_user.php:214",
+        "id_local": "User.save",
+        "entry": {
+          "kind": "http",
+          "route": "POST /endpoints/user/save_user.php",
+          "locator": "endpoints/user/save_user.php:214"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "if email changed: SELECT email FROM user WHERE email=:email AND id!=:userId (unique); UPDATE user SET avatar,firstname,lastname,email,password,main_currency,language WHERE id=:userId; if profile_pic uploaded INSERT uploaded_avatars (user_id,path)",
+        "edges": [
+          "includes/validate_endpoint.php:19 ($_SESSION['loggedin'] !== true -> session_expired); connect_endpoint.php resolves $actor.id via session/remember-me"
+        ]
+      }
+    },
+    {
+      "tool": "user_regenerateapikey",
+      "family": "update.field_set",
+      "entity": "User",
+      "description": "Generate a fresh random API key for your account. The old key stops working immediately.",
+      "input_schema": {},
+      "exec_spec": {
+        "entity": "User",
+        "row_key": {
+          "id": {
+            "$session": "account_id"
+          }
+        },
+        "fields": [
+          "api_key"
+        ],
+        "set": {
+          "id": {
+            "$session": "account_id"
+          },
+          "api_key": {
+            "$auto": "1000000000"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "Sign in to regenerate your API key."
+        }
+      },
+      "_evidence": {
+        "locator": "endpoints/user/regenerateapikey.php:8",
+        "id_local": "User.regenerateApiKey",
+        "entry": {
+          "kind": "http",
+          "route": "POST /endpoints/user/regenerateapikey.php",
+          "locator": "endpoints/user/regenerateapikey.php:8"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "$apiKey = bin2hex(random_bytes(32)); UPDATE user SET api_key=:apiKey WHERE id=:userId; return $apiKey",
+        "edges": [
+          "includes/validate_endpoint.php:19 ($_SESSION['loggedin'] !== true -> session_expired); connect_endpoint.php resolves $actor.id via session/remember-me"
+        ]
+      }
+    },
+    {
+      "tool": "user_deleteaccount",
+      "family": "crud.delete",
+      "entity": "User",
+      "description": "Permanently delete your own account and all of its subscriptions, categories, currencies and settings. The first (admin) account cannot be deleted this way.",
+      "input_schema": {
+        "userId": {
+          "type": "int",
+          "required": true,
+          "description": "Your own user id to delete."
+        }
+      },
+      "exec_spec": {
+        "entity": "User",
+        "lookup_by": {
+          "id": {
+            "$arg": "userId"
+          }
+        },
+        "on_child": "cascade"
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "not_found": "That record does not exist in your account.",
+          "fk": "The parent record you referenced does not exist.",
+          "fk_missing": "A required reference was not supplied.",
+          "unique": "That value is already taken.",
+          "on_child": "Can't delete: another record still references it. Reassign or remove those first.",
+          "auth": "You must sign in before deleting your account.",
+          "precondition": "You can only delete your own account, and the first (admin) account cannot be deleted."
+        },
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "userId"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            },
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "userId"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "ne",
+                      "value": 1
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ]
+      },
+      "_evidence": {
+        "locator": "endpoints/settings/deleteaccount.php:11",
+        "id_local": "User.deleteAccount",
+        "entry": {
+          "kind": "http",
+          "route": "POST /endpoints/settings/deleteaccount.php",
+          "locator": "endpoints/settings/deleteaccount.php:11"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "if ($userIdToDelete == 1 || $userIdToDelete != $userId) die; DELETE FROM user WHERE id=:id; DELETE FROM subscriptions WHERE user_id=:id; DELETE FROM settings; fixer; custom_colors; currencies; categories; household; payment_methods; email_notifications; telegram; webhook; gotify; pushover; notification_settings; last_exchange_update; email_verification; totp; total_yearly_cost",
+        "edges": [
+          "endpoints/settings/deleteaccount.php:11 (refuse id 1 / must equal session userId)"
+        ]
+      }
+    },
+    {
+      "tool": "user_admincreate",
+      "family": "crud.insert",
+      "entity": "User",
+      "description": "[admin] Create a new user account, seeding a household, default categories, payment methods and currencies for them.",
+      "input_schema": {
+        "username": {
+          "type": "text",
+          "required": true,
+          "description": "Unique username for the new user."
+        },
+        "email": {
+          "type": "text",
+          "required": true,
+          "description": "Unique email for the new user."
+        },
+        "password": {
+          "type": "text",
+          "required": true,
+          "description": "Initial password for the new user."
+        },
+        "language": {
+          "type": "text",
+          "description": "UI locale (default en)."
+        }
+      },
+      "exec_spec": {
+        "entity": "User",
+        "fields": [
+          "username",
+          "email",
+          "password"
+        ],
+        "set_on_create": {
+          "language": "en",
+          "main_currency": 1
+        },
+        "unique_on": [
+          "username",
+          "email"
+        ]
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": 1
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "not_found": "That record does not exist in your account.",
+          "fk": "The parent record you referenced does not exist.",
+          "fk_missing": "A required reference was not supplied.",
+          "unique": "That value is already taken.",
+          "on_child": "Can't delete: another record still references it. Reassign or remove those first.",
+          "auth": "You must be signed in as the administrator to create users.",
+          "precondition": "Only the instance administrator (the first account) can create users."
+        },
+        "required": [
+          "username",
+          "email",
+          "password"
+        ]
+      },
+      "_evidence": {
+        "locator": "endpoints/admin/adduser.php:149",
+        "id_local": "User.adminCreate",
+        "entry": {
+          "kind": "http",
+          "route": "POST /endpoints/admin/adduser.php",
+          "locator": "endpoints/admin/adduser.php:149"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "INSERT INTO user (...) [password_hash]; newUserId=lastInsertRowID; INSERT household; if newUserId>1 seed categories/payment_methods/currencies/settings",
+        "edges": [
+          "includes/validate_endpoint_admin.php:4 (if $userId !== 1 die); admin principal is user.id==1"
+        ]
+      }
+    },
+    {
+      "tool": "user_admindelete",
+      "family": "crud.delete",
+      "entity": "User",
+      "description": "[admin] Delete any user (except the first admin) and everything they own.",
+      "input_schema": {
+        "userId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the user to delete."
+        }
+      },
+      "exec_spec": {
+        "entity": "User",
+        "lookup_by": {
+          "id": {
+            "$arg": "userId"
+          }
+        },
+        "on_child": "cascade"
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": 1
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            },
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "userId"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "ne",
+                      "value": 1
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "userId"
+        ],
+        "messages": {
+          "auth": "You must be signed in.",
+          "precondition": "Only the instance administrator can delete users, and the first admin account cannot be deleted.",
+          "not_found": "That user does not exist."
+        }
+      },
+      "_evidence": {
+        "locator": "endpoints/admin/deleteuser.php:11",
+        "id_local": "User.adminDelete",
+        "entry": {
+          "kind": "http",
+          "route": "POST /endpoints/admin/deleteuser.php",
+          "locator": "endpoints/admin/deleteuser.php:11"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "if ($userId == 1) die error; DELETE FROM user WHERE id=:id; DELETE FROM subscriptions WHERE user_id=:id; DELETE FROM settings...; DELETE FROM email_verification...; DELETE FROM totp...; (per-user cascade)",
+        "edges": [
+          "includes/validate_endpoint_admin.php:4 (if $userId !== 1 die); admin principal is user.id==1"
+        ]
+      }
+    },
+    {
+      "tool": "totp_enable",
+      "family": "crud.upsert",
+      "entity": "Totp",
+      "description": "Enable two-factor authentication on your account by storing the TOTP secret and its backup codes.",
+      "input_schema": {
+        "totp_secret": {
+          "type": "text",
+          "required": true,
+          "description": "The TOTP base32 secret that was shown at setup."
+        },
+        "backup_codes": {
+          "type": "text",
+          "description": "One-time backup codes for the secret."
+        }
+      },
+      "exec_spec": {
+        "entity": "Totp",
+        "key": {
+          "user_id": {
+            "$session": "account_id"
+          }
+        },
+        "insert_fields": [
+          "totp_secret",
+          "backup_codes"
+        ],
+        "set_on_exists": {
+          "totp_secret": {
+            "$arg": "totp_secret"
+          },
+          "backup_codes": {
+            "$arg": "backup_codes"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "not_found": "That record does not exist in your account.",
+          "fk": "The parent record you referenced does not exist.",
+          "fk_missing": "A required reference was not supplied.",
+          "unique": "That value is already taken.",
+          "on_child": "Can't delete: another record still references it. Reassign or remove those first.",
+          "auth": "You must sign in before enabling two-factor authentication."
+        }
+      },
+      "_evidence": {
+        "locator": "endpoints/user/enable_totp.php:98",
+        "id_local": "Totp.enable",
+        "entry": {
+          "kind": "http",
+          "route": "POST /endpoints/user/enable_totp.php",
+          "locator": "endpoints/user/enable_totp.php:98"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "action=generate returns secret+QR; action=verify: validate code against secret; if ok: DELETE FROM totp WHERE user_id; INSERT INTO totp (user_id,totp_secret,backup_codes,last_totp_used); UPDATE user SET totp_enabled=1 WHERE id",
+        "edges": [
+          "includes/validate_endpoint.php:19 ($_SESSION['loggedin'] !== true -> session_expired); connect_endpoint.php resolves $actor.id via session/remember-me"
+        ]
+      }
+    },
+    {
+      "tool": "totp_disable",
+      "family": "crud.delete",
+      "entity": "Totp",
+      "description": "Disable two-factor authentication for your account, given a valid code.",
+      "input_schema": {
+        "totpCode": {
+          "type": "text",
+          "required": true,
+          "description": "Current TOTP code to confirm."
+        }
+      },
+      "exec_spec": {
+        "entity": "Totp",
+        "lookup_by": {
+          "user_id": {
+            "$session": "account_id"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "not_found": "That record does not exist in your account.",
+          "fk": "The parent record you referenced does not exist.",
+          "fk_missing": "A required reference was not supplied.",
+          "unique": "That value is already taken.",
+          "on_child": "Can't delete: another record still references it. Reassign or remove those first.",
+          "auth": "You must sign in before disabling two-factor authentication."
+        }
+      },
+      "_evidence": {
+        "locator": "endpoints/user/disable_totp.php:48",
+        "id_local": "Totp.disable",
+        "entry": {
+          "kind": "http",
+          "route": "POST /endpoints/user/disable_totp.php",
+          "locator": "endpoints/user/disable_totp.php:48"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "verify totpCode against totp_secret (leeway 15) or backup_codes; if ok: UPDATE user SET totp_enabled=0 WHERE id; DELETE FROM totp WHERE user_id=:id",
+        "edges": [
+          "includes/validate_endpoint.php:19 ($_SESSION['loggedin'] !== true -> session_expired); connect_endpoint.php resolves $actor.id via session/remember-me"
+        ]
+      }
+    },
+    {
+      "tool": "uploadedavatar_delete",
+      "family": "crud.delete",
+      "entity": "UploadedAvatar",
+      "description": "Remove one of your uploaded avatar images from disk and from your account.",
+      "input_schema": {
+        "path": {
+          "type": "text",
+          "required": true,
+          "description": "The avatar image path to delete."
+        }
+      },
+      "exec_spec": {
+        "entity": "UploadedAvatar",
+        "lookup_by": {
+          "user_id": {
+            "$session": "account_id"
+          },
+          "path": {
+            "$arg": "path"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "not_found": "That record does not exist in your account.",
+          "fk": "The parent record you referenced does not exist.",
+          "fk_missing": "A required reference was not supplied.",
+          "unique": "That value is already taken.",
+          "on_child": "Can't delete: another record still references it. Reassign or remove those first.",
+          "auth": "You must sign in before deleting an avatar."
+        }
+      },
+      "_evidence": {
+        "locator": "endpoints/user/delete_avatar.php:12",
+        "id_local": "UploadedAvatar.delete",
+        "entry": {
+          "kind": "http",
+          "route": "POST /endpoints/user/delete_avatar.php",
+          "locator": "endpoints/user/delete_avatar.php:12"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "SELECT id FROM uploaded_avatars WHERE user_id=:userId AND path=:path; sanitize path; if not current avatar: unlink file; DELETE FROM uploaded_avatars WHERE id=:id",
+        "edges": [
+          "includes/validate_endpoint.php:19 ($_SESSION['loggedin'] !== true -> session_expired); connect_endpoint.php resolves $actor.id via session/remember-me"
+        ]
+      }
+    },
+    {
+      "tool": "passwordreset_request",
+      "family": "crud.insert",
+      "entity": "PasswordReset",
+      "description": "Request a password reset for an email address. Always returns the same message so it cannot be used to enumerate accounts; requires SMTP and server_url to be configured.",
+      "input_schema": {
+        "email": {
+          "type": "text",
+          "required": true,
+          "description": "Email address of the account to reset."
+        }
+      },
+      "exec_spec": {
+        "entity": "PasswordReset",
+        "fields": [
+          "email"
+        ],
+        "set_on_create": {
+          "user_id": {
+            "$ref": {
+              "entity": "User",
+              "where": {
+                "email": {
+                  "$arg": "email"
+                }
+              },
+              "col": "id"
+            }
+          },
+          "token": {
+            "$const": "reset-token"
+          }
+        }
+      },
+      "guards": {
+        "required": [
+          "email"
+        ],
+        "messages": {
+          "precondition": "Password reset is unavailable: no SMTP / server URL is configured.",
+          "fk": "No account uses that email address."
+        }
+      },
+      "_evidence": {
+        "locator": "passwordreset.php:63",
+        "id_local": "PasswordReset.request",
+        "entry": {
+          "kind": "http",
+          "route": "POST /passwordreset.php",
+          "locator": "passwordreset.php:63"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "DELETE FROM password_resets WHERE email=:email; $token=bin2hex(random_bytes(32)); INSERT INTO password_resets (user_id,email,token) VALUES (:user_id,:email,:token); always same message (no enumeration)"
+      }
+    },
+    {
+      "tool": "emailverification_verify",
+      "family": "crud.delete",
+      "entity": "EmailVerification",
+      "description": "Confirm an email address with the token that was emailed to it, removing the pending verification.",
+      "input_schema": {
+        "email": {
+          "type": "text",
+          "required": true,
+          "description": "The email address that was sent the link."
+        },
+        "token": {
+          "type": "text",
+          "required": true,
+          "description": "The verification token from the email link."
+        }
+      },
+      "exec_spec": {
+        "entity": "EmailVerification",
+        "lookup_by": {
+          "email": {
+            "$arg": "email"
+          },
+          "token": {
+            "$arg": "token"
+          }
+        }
+      },
+      "guards": {
+        "required": [
+          "email",
+          "token"
+        ],
+        "messages": {
+          "not_found": "That verification link is invalid or already used."
+        }
+      },
+      "_evidence": {
+        "locator": "verifyemail.php:48",
+        "id_local": "EmailVerification.verify",
+        "entry": {
+          "kind": "http",
+          "route": "GET /verifyemail.php",
+          "locator": "verifyemail.php:48"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "SELECT * FROM email_verification WHERE email=:email AND token=:token; on match DELETE FROM email_verification WHERE email=:email AND token=:token; redirect login.php?validated=true"
+      }
+    },
+    {
+      "tool": "admin_saveopenregistrations",
+      "family": "update.field_set",
+      "entity": "Admin",
+      "description": "[admin] Configure registration: whether new signups are open, the user cap, whether email verification is required, the server URL, and whether login is disabled. Refuses to disable login while registrations are open.",
+      "input_schema": {
+        "open_registrations": {
+          "type": "bool",
+          "description": "Allow new users to self-register."
+        },
+        "max_users": {
+          "type": "int",
+          "description": "Maximum number of user accounts."
+        },
+        "require_email_validation": {
+          "type": "bool",
+          "description": "Require new users to verify their email."
+        },
+        "server_url": {
+          "type": "text",
+          "description": "Public base URL of the instance (needed for emailed links)."
+        },
+        "disable_login": {
+          "type": "bool",
+          "description": "Disable password login entirely."
+        }
+      },
+      "exec_spec": {
+        "entity": "Admin",
+        "row_key": {
+          "id": 1
+        },
+        "fields": {
+          "registrations_open": {
+            "$arg": "open_registrations"
+          },
+          "max_users": {
+            "$arg": "max_users"
+          },
+          "require_email_verification": {
+            "$arg": "require_email_validation"
+          },
+          "server_url": {
+            "$arg": "server_url"
+          },
+          "login_disabled": {
+            "$arg": "disable_login"
+          }
+        },
+        "set": {
+          "id": 1
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": 1
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "not_found": "That record does not exist in your account.",
+          "fk": "The parent record you referenced does not exist.",
+          "fk_missing": "A required reference was not supplied.",
+          "unique": "That value is already taken.",
+          "on_child": "Can't delete: another record still references it. Reassign or remove those first.",
+          "auth": "You must be signed in as the administrator to change registration settings.",
+          "precondition": "Only the instance administrator (the first account) can change registration settings. Login cannot be disabled while registrations are open."
+        }
+      },
+      "_evidence": {
+        "locator": "endpoints/admin/saveopenregistrations.php:47",
+        "id_local": "Admin.saveOpenRegistrations",
+        "entry": {
+          "kind": "http",
+          "route": "POST /endpoints/admin/saveopenregistrations.php",
+          "locator": "endpoints/admin/saveopenregistrations.php:47"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "UPDATE admin SET registrations_open=:r, max_users=:m, require_email_verification=:v, server_url=:s, login_disabled=:d WHERE id=1; validations: cannot disable login while registrations open or >1 user; require_email_verification needs server_url",
+        "edges": [
+          "includes/validate_endpoint_admin.php:4 (if $userId !== 1 die); admin principal is user.id==1"
+        ]
+      }
+    },
+    {
+      "tool": "admin_savesecurity",
+      "family": "update.field_set",
+      "entity": "Admin",
+      "description": "[admin] Configure local webhook security: which domains may receive local webhooks and whether standard (non-admin) users may set them up.",
+      "input_schema": {
+        "local_webhook_notifications_allowlist": {
+          "type": "text",
+          "description": "Comma-separated list of allowed local webhook destinations."
+        },
+        "allow_standard_users_local_webhooks": {
+          "type": "bool",
+          "description": "Let non-admin users configure local webhooks."
+        }
+      },
+      "exec_spec": {
+        "entity": "Admin",
+        "row_key": {
+          "id": 1
+        },
+        "fields": [
+          "local_webhook_notifications_allowlist",
+          "allow_standard_users_local_webhooks"
+        ],
+        "set": {
+          "id": 1
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": 1
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must be signed in to manage this instance.",
+          "precondition": "Only the instance administrator (the first account) can do this."
+        }
+      },
+      "_evidence": {
+        "locator": "endpoints/admin/savesecuritysettings.php:31",
+        "id_local": "Admin.saveSecurity",
+        "entry": {
+          "kind": "http",
+          "route": "POST /endpoints/admin/savesecuritysettings.php",
+          "locator": "endpoints/admin/savesecuritysettings.php:31"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "UPDATE admin SET local_webhook_notifications_allowlist=:allowlist, allow_standard_users_local_webhooks=:allow WHERE id=1",
+        "edges": [
+          "includes/validate_endpoint_admin.php:4 (if $userId !== 1 die); admin principal is user.id==1"
+        ]
+      }
+    },
+    {
+      "tool": "admin_savesmtp",
+      "family": "update.field_set",
+      "entity": "Admin",
+      "description": "[admin] Configure the SMTP server used to send notification and verification emails.",
+      "input_schema": {
+        "smtpaddress": {
+          "type": "text",
+          "description": "SMTP host address."
+        },
+        "smtpport": {
+          "type": "int",
+          "description": "SMTP port."
+        },
+        "encryption": {
+          "type": "text",
+          "description": "Connection encryption (tls/ssl/none)."
+        },
+        "smtpusername": {
+          "type": "text",
+          "description": "SMTP username."
+        },
+        "smtppassword": {
+          "type": "text",
+          "description": "SMTP password."
+        },
+        "fromemail": {
+          "type": "text",
+          "description": "From address for outgoing email."
+        }
+      },
+      "exec_spec": {
+        "entity": "Admin",
+        "row_key": {
+          "id": 1
+        },
+        "fields": {
+          "smtp_address": {
+            "$arg": "smtpaddress"
+          },
+          "smtp_port": {
+            "$arg": "smtpport"
+          },
+          "encryption": {
+            "$arg": "encryption"
+          },
+          "smtp_username": {
+            "$arg": "smtpusername"
+          },
+          "smtp_password": {
+            "$arg": "smtppassword"
+          },
+          "from_email": {
+            "$arg": "fromemail"
+          }
+        },
+        "set": {
+          "id": 1
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": 1
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must be signed in to manage this instance.",
+          "precondition": "Only the instance administrator (the first account) can do this."
+        }
+      },
+      "_evidence": {
+        "locator": "endpoints/admin/savesmtpsettings.php:40",
+        "id_local": "Admin.saveSmtp",
+        "entry": {
+          "kind": "http",
+          "route": "POST /endpoints/admin/savesmtpsettings.php",
+          "locator": "endpoints/admin/savesmtpsettings.php:40"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "UPDATE admin SET smtp_address=:a, smtp_port=:p, encryption=:e, smtp_username=:u, smtp_password=:pw, from_email=:f WHERE id=1; host SSRF + port validated",
+        "edges": [
+          "includes/validate_endpoint_admin.php:4 (if $userId !== 1 die); admin principal is user.id==1"
+        ]
+      }
+    },
+    {
+      "tool": "admin_updatenotification",
+      "family": "update.field_set",
+      "entity": "Admin",
+      "description": "[admin] Turn update-available notifications on or off.",
+      "input_schema": {
+        "notificationEnabled": {
+          "type": "bool",
+          "required": true,
+          "description": "Whether to show/notify about available updates."
+        }
+      },
+      "exec_spec": {
+        "entity": "Admin",
+        "row_key": {
+          "id": 1
+        },
+        "fields": {
+          "update_notification": {
+            "$arg": "notificationEnabled"
+          }
+        },
+        "set": {
+          "id": 1
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": 1
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must be signed in to manage this instance.",
+          "precondition": "Only the instance administrator (the first account) can do this."
+        }
+      },
+      "_evidence": {
+        "locator": "endpoints/admin/updatenotification.php:12",
+        "id_local": "Admin.updateNotification",
+        "entry": {
+          "kind": "http",
+          "route": "POST /endpoints/admin/updatenotification.php",
+          "locator": "endpoints/admin/updatenotification.php:12"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "UPDATE admin SET update_notification=:v WHERE id=1",
+        "edges": [
+          "includes/validate_endpoint_admin.php:4 (if $userId !== 1 die); admin principal is user.id==1"
+        ]
+      }
+    },
+    {
+      "tool": "oauthsettings_save",
+      "family": "update.field_set",
+      "entity": "OauthSettings",
+      "description": "[admin] Configure the OIDC/OAuth provider used for single sign-on.",
+      "input_schema": {
+        "oidcName": {
+          "type": "text",
+          "required": true,
+          "description": "Provider display name."
+        },
+        "oidcClientId": {
+          "type": "text",
+          "required": true,
+          "description": "OIDC client id."
+        },
+        "oidcClientSecret": {
+          "type": "text",
+          "required": true,
+          "description": "OIDC client secret."
+        },
+        "oidcAuthUrl": {
+          "type": "text",
+          "required": true,
+          "description": "Authorize endpoint URL."
+        },
+        "oidcTokenUrl": {
+          "type": "text",
+          "required": true,
+          "description": "Token endpoint URL."
+        },
+        "oidcUserInfoUrl": {
+          "type": "text",
+          "required": true,
+          "description": "Userinfo endpoint URL."
+        },
+        "oidcRedirectUrl": {
+          "type": "text",
+          "required": true,
+          "description": "Redirect callback URL."
+        },
+        "oidcLogoutUrl": {
+          "type": "text",
+          "description": "Logout endpoint URL."
+        },
+        "oidcUserIdentifierField": {
+          "type": "text",
+          "description": "Claim used as the user identifier."
+        },
+        "oidcScopes": {
+          "type": "text",
+          "description": "Space-separated OAuth scopes to request."
+        },
+        "oidcAuthStyle": {
+          "type": "text",
+          "description": "Authentication style for token requests."
+        },
+        "oidcAutoCreateUser": {
+          "type": "bool",
+          "description": "Automatically create a local user on first SSO login."
+        },
+        "oidcPasswordLoginDisabled": {
+          "type": "bool",
+          "description": "Disable username/password login."
+        },
+        "oidcRequireEmailVerified": {
+          "type": "bool",
+          "description": "Reject SSO users whose email is not verified."
+        }
+      },
+      "exec_spec": {
+        "entity": "OauthSettings",
+        "row_key": {
+          "id": 1
+        },
+        "fields": {
+          "name": {
+            "$arg": "oidcName"
+          },
+          "client_id": {
+            "$arg": "oidcClientId"
+          },
+          "client_secret": {
+            "$arg": "oidcClientSecret"
+          },
+          "authorization_url": {
+            "$arg": "oidcAuthUrl"
+          },
+          "token_url": {
+            "$arg": "oidcTokenUrl"
+          },
+          "user_info_url": {
+            "$arg": "oidcUserInfoUrl"
+          },
+          "redirect_url": {
+            "$arg": "oidcRedirectUrl"
+          },
+          "logout_url": {
+            "$arg": "oidcLogoutUrl"
+          },
+          "user_identifier_field": {
+            "$arg": "oidcUserIdentifierField"
+          },
+          "scopes": {
+            "$arg": "oidcScopes"
+          },
+          "auth_style": {
+            "$arg": "oidcAuthStyle"
+          },
+          "auto_create_user": {
+            "$arg": "oidcAutoCreateUser"
+          },
+          "password_login_disabled": {
+            "$arg": "oidcPasswordLoginDisabled"
+          },
+          "require_email_verified": {
+            "$arg": "oidcRequireEmailVerified"
+          }
+        },
+        "set": {
+          "id": 1
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": 1
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must be signed in to manage this instance.",
+          "precondition": "Only the instance administrator (the first account) can do this."
+        },
+        "required": [
+          "oidcName",
+          "oidcClientId",
+          "oidcClientSecret",
+          "oidcAuthUrl",
+          "oidcTokenUrl",
+          "oidcUserInfoUrl",
+          "oidcRedirectUrl"
+        ]
+      },
+      "_evidence": {
+        "locator": "endpoints/admin/saveoidcsettings.php:73",
+        "id_local": "OauthSettings.save",
+        "entry": {
+          "kind": "http",
+          "route": "POST /endpoints/admin/saveoidcsettings.php",
+          "locator": "endpoints/admin/saveoidcsettings.php:73"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "UPDATE oauth_settings SET name=:n, client_id=..., token_url=..., user_identifier_field=..., scopes=..., auto_create_user=... WHERE id=1 (upsert; token_url/user_info_url SSRF-validated)",
+        "edges": [
+          "includes/validate_endpoint_admin.php:4 (if $userId !== 1 die); admin principal is user.id==1"
+        ]
+      }
+    },
+    {
+      "tool": "oauthsettings_setenabled",
+      "family": "update.field_set",
+      "entity": "Admin",
+      "description": "[admin] Enable or disable the OIDC/OAuth single sign-on provider.",
+      "input_schema": {
+        "oidcEnabled": {
+          "type": "bool",
+          "required": true,
+          "description": "Whether OIDC login is enabled."
+        }
+      },
+      "exec_spec": {
+        "entity": "Admin",
+        "row_key": {
+          "id": 1
+        },
+        "fields": {
+          "oidc_oauth_enabled": {
+            "$arg": "oidcEnabled"
+          }
+        },
+        "set": {
+          "id": 1
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": 1
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must be signed in to manage this instance.",
+          "precondition": "Only the instance administrator (the first account) can do this."
+        }
+      },
+      "_evidence": {
+        "locator": "endpoints/admin/enableoidc.php:19",
+        "id_local": "OauthSettings.setEnabled",
+        "entry": {
+          "kind": "http",
+          "route": "POST /endpoints/admin/enableoidc.php",
+          "locator": "endpoints/admin/enableoidc.php:19"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "UPDATE admin SET oidc_oauth_enabled=:v WHERE id=1",
+        "edges": [
+          "includes/validate_endpoint_admin.php:4 (if $userId !== 1 die); admin principal is user.id==1"
+        ]
+      }
+    },
+    {
+      "tool": "admin_readsettings",
+      "family": "crud.fetch",
+      "entity": "Admin",
+      "description": "[admin] Read the current instance configuration as the administrator.",
+      "input_schema": {},
+      "exec_spec": {
+        "entity": "Admin",
+        "lookup_by": {
+          "id": 1
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": 1
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must be signed in to manage this instance.",
+          "precondition": "Only the instance administrator (the first account) can do this."
+        }
+      },
+      "_evidence": {
+        "locator": "api/admin/get_admin_settings.php:59",
+        "id_local": "Admin.apiGetSettings",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/admin/get_admin_settings.php",
+          "locator": "api/admin/get_admin_settings.php:59"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "SELECT * FROM user WHERE api_key=:apiKey; if ($userId !== 1) die 'Invalid user'; SELECT * FROM 'admin'; smtp_password='********'",
+        "edges": [
+          "api/<file>: SELECT * FROM user WHERE api_key=:apiKey; !$user -> Invalid API key (e.g. api/users/get_user.php:53)",
+          "api/admin/get_admin_settings.php:59 (api_key then $userId!==1 -> Invalid user)"
+        ]
+      }
+    },
+    {
+      "tool": "oauthsettings_read",
+      "family": "crud.fetch",
+      "entity": "OauthSettings",
+      "description": "[admin] Read the current OIDC/OAuth single sign-on configuration.",
+      "input_schema": {},
+      "exec_spec": {
+        "entity": "OauthSettings",
+        "lookup_by": {
+          "id": 1
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": 1
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must be signed in to manage this instance.",
+          "precondition": "Only the instance administrator (the first account) can do this."
+        }
+      },
+      "_evidence": {
+        "locator": "api/admin/get_oidc_settings.php:59",
+        "id_local": "OauthSettings.apiGet",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/admin/get_oidc_settings.php",
+          "locator": "api/admin/get_oidc_settings.php:59"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "SELECT * FROM user WHERE api_key=:apiKey; if ($userId !== 1) die Invalid user; effective OIDC config",
+        "edges": [
+          "api/<file>: SELECT * FROM user WHERE api_key=:apiKey; !$user -> Invalid API key (e.g. api/users/get_user.php:53)",
+          "api/admin/get_oidc_settings.php:59"
+        ]
+      }
+    },
+    {
+      "tool": "subscription_add",
+      "family": "crud.insert",
+      "entity": "Subscription",
+      "description": "Add a new subscription to track (name, price, currency, billing cycle and frequency). Fails if the replacement-subscription reference belongs to someone else.",
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "Name of the subscription."
+        },
+        "price": {
+          "type": "float",
+          "required": true,
+          "description": "Amount charged per billing period."
+        },
+        "currency_id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the currency the price is in."
+        },
+        "cycle": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the billing cycle (daily/weekly/monthly/yearly/one-time)."
+        },
+        "frequency": {
+          "type": "int",
+          "required": true,
+          "description": "Frequency multiplier for the cycle."
+        },
+        "next_payment": {
+          "type": "datetime",
+          "description": "Next expected payment date."
+        },
+        "auto_renew": {
+          "type": "bool",
+          "description": "Automatically roll this subscription forward."
+        },
+        "start_date": {
+          "type": "datetime",
+          "description": "When the subscription started."
+        },
+        "payment_method_id": {
+          "type": "int",
+          "description": "Id of the payment method used."
+        },
+        "payer_user_id": {
+          "type": "int",
+          "description": "Id of the household member who pays."
+        },
+        "category_id": {
+          "type": "int",
+          "description": "Id of the category it belongs to."
+        },
+        "notes": {
+          "type": "text",
+          "description": "Free-form notes."
+        },
+        "url": {
+          "type": "text",
+          "description": "Management or billing URL."
+        },
+        "notify": {
+          "type": "bool",
+          "description": "Send renewal reminders for this subscription."
+        },
+        "notify_days_before": {
+          "type": "int",
+          "description": "Days before renewal to remind."
+        },
+        "inactive": {
+          "type": "bool",
+          "description": "Mark as cancelled/inactive."
+        },
+        "cancellation_date": {
+          "type": "datetime",
+          "description": "Date the subscription is/was cancelled."
+        },
+        "replacement_subscription_id": {
+          "type": "int",
+          "description": "Id of another subscription that replaces this one."
+        }
+      },
+      "exec_spec": {
+        "entity": "Subscription",
+        "fields": {
+          "name": {
+            "$arg": "name"
+          },
+          "price": {
+            "$arg": "price"
+          },
+          "currency_id": {
+            "$arg": "currency_id"
+          },
+          "cycle": {
+            "$arg": "cycle"
+          },
+          "frequency": {
+            "$arg": "frequency"
+          },
+          "next_payment": {
+            "$arg": "next_payment"
+          },
+          "payment_method_id": {
+            "$arg": "payment_method_id"
+          },
+          "payer_user_id": {
+            "$arg": "payer_user_id"
+          },
+          "category_id": {
+            "$arg": "category_id"
+          },
+          "notes": {
+            "$arg": "notes"
+          },
+          "url": {
+            "$arg": "url"
+          },
+          "notify": {
+            "$arg": "notify"
+          },
+          "inactive": {
+            "$arg": "inactive"
+          },
+          "notify_days_before": {
+            "$arg": "notify_days_before"
+          },
+          "cancellation_date": {
+            "$arg": "cancellation_date"
+          },
+          "replacement_subscription_id": {
+            "$arg": "replacement_subscription_id"
+          },
+          "auto_renew": {
+            "$arg": "auto_renew"
+          },
+          "start_date": {
+            "$arg": "start_date"
+          }
+        },
+        "set_on_create": {
+          "user_id": {
+            "$session": "account_id"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "not_found": "That record does not exist in your account.",
+          "fk": "The parent record you referenced does not exist.",
+          "fk_missing": "A required reference was not supplied.",
+          "unique": "That value is already taken.",
+          "on_child": "Can't delete: another record still references it. Reassign or remove those first.",
+          "auth": "You must sign in before adding a subscription.",
+          "precondition": "The replacement subscription (if any) must be one of your own subscriptions."
+        },
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ]
+      },
+      "_evidence": {
+        "locator": "endpoints/subscription/add.php:234",
+        "id_local": "Subscription.add",
+        "entry": {
+          "kind": "http",
+          "route": "POST /endpoints/subscription/add.php",
+          "locator": "endpoints/subscription/add.php:234"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "if id set: UPDATE subscriptions SET name,price,currency_id,next_payment,auto_renew,start_date,cycle,frequency,notes,payment_method_id,payer_user_id,category_id,notify,inactive,url,notify_days_before,cancellation_date,replacement_subscription_id[,logo...] WHERE id=:id AND user_id=:userId; else INSERT INTO subscriptions (...) VALUES(...); replacement_subscription_id owner-checked (SELECT id FROM subscriptions WHERE id AND user_id)",
+        "edges": [
+          "includes/validate_endpoint.php:19 ($_SESSION['loggedin'] !== true -> session_expired); connect_endpoint.php resolves $actor.id via session/remember-me",
+          "endpoints/subscription/add.php:262 (replacement_subscription_id must be owned by actor)"
+        ]
+      }
+    },
+    {
+      "tool": "subscription_read",
+      "family": "crud.fetch",
+      "entity": "Subscription",
+      "description": "Read the full details of one of your subscriptions.",
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the subscription to read."
+        }
+      },
+      "exec_spec": {
+        "entity": "Subscription",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        },
+        "scope": {
+          "owner_col": "user_id"
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "not_found": "That record does not exist in your account.",
+          "fk": "The parent record you referenced does not exist.",
+          "fk_missing": "A required reference was not supplied.",
+          "unique": "That value is already taken.",
+          "on_child": "Can't delete: another record still references it. Reassign or remove those first.",
+          "auth": "You must sign in before reading a subscription."
+        }
+      },
+      "_evidence": {
+        "locator": "endpoints/subscription/get.php:5",
+        "id_local": "Subscription.read",
+        "entry": {
+          "kind": "http",
+          "route": "GET /endpoints/subscription/get.php",
+          "locator": "endpoints/subscription/get.php:5"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "SELECT * FROM subscriptions WHERE id=:id AND user_id=:userId; 401 if not logged in",
+        "edges": [
+          "includes/validate_endpoint.php:19 ($_SESSION['loggedin'] !== true -> session_expired); connect_endpoint.php resolves $actor.id via session/remember-me"
+        ]
+      }
+    },
+    {
+      "tool": "subscription_delete",
+      "family": "crud.delete",
+      "entity": "Subscription",
+      "description": "Delete one of your subscriptions. Any subscription that referenced it as its replacement is cleared.",
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the subscription to delete."
+        }
+      },
+      "exec_spec": {
+        "entity": "Subscription",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "not_found": "That record does not exist in your account.",
+          "fk": "The parent record you referenced does not exist.",
+          "fk_missing": "A required reference was not supplied.",
+          "unique": "That value is already taken.",
+          "on_child": "Can't delete: another record still references it. Reassign or remove those first.",
+          "auth": "You must sign in before deleting a subscription."
+        }
+      },
+      "_evidence": {
+        "locator": "endpoints/subscription/delete.php:9",
+        "id_local": "Subscription.delete",
+        "entry": {
+          "kind": "http",
+          "route": "POST /endpoints/subscription/delete.php",
+          "locator": "endpoints/subscription/delete.php:9"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "DELETE FROM subscriptions WHERE id=:id AND user_id=:userId; UPDATE subscriptions SET replacement_subscription_id=NULL WHERE replacement_subscription_id=:id AND user_id=:userId",
+        "edges": [
+          "includes/validate_endpoint.php:19 ($_SESSION['loggedin'] !== true -> session_expired); connect_endpoint.php resolves $actor.id via session/remember-me"
+        ]
+      }
+    },
+    {
+      "tool": "subscription_renew",
+      "family": "update.field_set",
+      "entity": "Subscription",
+      "description": "Advance one of your non-auto-renewing subscriptions to its next payment date based on its billing cycle. Only works on subscriptions with auto-renew off that are not one-time.",
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the subscription to renew."
+        },
+        "next_payment": {
+          "type": "datetime",
+          "description": "The new next-payment date."
+        }
+      },
+      "exec_spec": {
+        "entity": "Subscription",
+        "row_key": {
+          "id": {
+            "$arg": "id"
+          }
+        },
+        "fields": [
+          "next_payment"
+        ],
+        "scope": {
+          "owner_col": "user_id"
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Subscription",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "auto_renew",
+                      "op": "eq",
+                      "value": 0
+                    },
+                    {
+                      "node": "field",
+                      "col": "cycle",
+                      "op": "ne",
+                      "value": 5
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "Sign in to renew a subscription.",
+          "precondition": "This subscription cannot be renewed: it is missing, not yours, auto-renews, or is a one-time subscription.",
+          "not_found": "That subscription does not exist."
+        }
+      },
+      "_evidence": {
+        "locator": "endpoints/subscription/renew.php:20",
+        "id_local": "Subscription.renew",
+        "entry": {
+          "kind": "http",
+          "route": "POST /endpoints/subscription/renew.php",
+          "locator": "endpoints/subscription/renew.php:20"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "SELECT * FROM subscriptions WHERE id=:id AND user_id=:user_id AND auto_renew=0 AND cycle!=5; read cycles; compute DateInterval(P{freq}{D|W|M|Y}); while next_payment<today add interval; UPDATE subscriptions SET next_payment=:np WHERE id=:subscriptionId",
+        "edges": [
+          "includes/validate_endpoint.php:19 ($_SESSION['loggedin'] !== true -> session_expired); connect_endpoint.php resolves $actor.id via session/remember-me",
+          "endpoints/subscription/renew.php:20 (SELECT ... WHERE auto_renew=0 AND cycle!=5)"
+        ]
+      }
+    },
+    {
+      "tool": "subscription_clone",
+      "family": "crud.insert",
+      "entity": "Subscription",
+      "description": "Create a copy of an existing subscription, carrying over its billing details, and optionally override the name and price.",
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the subscription to clone."
+        },
+        "name": {
+          "type": "text",
+          "description": "Override the copied name."
+        },
+        "price": {
+          "type": "float",
+          "description": "Override the copied price."
+        }
+      },
+      "exec_spec": {
+        "entity": "Subscription",
+        "fields": [
+          "name",
+          "price"
+        ],
+        "set_on_create": {
+          "user_id": {
+            "$session": "account_id"
+          },
+          "logo": {
+            "$ref": {
+              "entity": "Subscription",
+              "where": {
+                "id": {
+                  "$arg": "id"
+                }
+              },
+              "col": "logo"
+            }
+          },
+          "currency_id": {
+            "$ref": {
+              "entity": "Subscription",
+              "where": {
+                "id": {
+                  "$arg": "id"
+                }
+              },
+              "col": "currency_id"
+            }
+          },
+          "next_payment": {
+            "$ref": {
+              "entity": "Subscription",
+              "where": {
+                "id": {
+                  "$arg": "id"
+                }
+              },
+              "col": "next_payment"
+            }
+          },
+          "auto_renew": {
+            "$ref": {
+              "entity": "Subscription",
+              "where": {
+                "id": {
+                  "$arg": "id"
+                }
+              },
+              "col": "auto_renew"
+            }
+          },
+          "frequency": {
+            "$ref": {
+              "entity": "Subscription",
+              "where": {
+                "id": {
+                  "$arg": "id"
+                }
+              },
+              "col": "frequency"
+            }
+          },
+          "cycle": {
+            "$ref": {
+              "entity": "Subscription",
+              "where": {
+                "id": {
+                  "$arg": "id"
+                }
+              },
+              "col": "cycle"
+            }
+          },
+          "payment_method_id": {
+            "$ref": {
+              "entity": "Subscription",
+              "where": {
+                "id": {
+                  "$arg": "id"
+                }
+              },
+              "col": "payment_method_id"
+            }
+          },
+          "category_id": {
+            "$ref": {
+              "entity": "Subscription",
+              "where": {
+                "id": {
+                  "$arg": "id"
+                }
+              },
+              "col": "category_id"
+            }
+          },
+          "notes": {
+            "$ref": {
+              "entity": "Subscription",
+              "where": {
+                "id": {
+                  "$arg": "id"
+                }
+              },
+              "col": "notes"
+            }
+          },
+          "notify": {
+            "$ref": {
+              "entity": "Subscription",
+              "where": {
+                "id": {
+                  "$arg": "id"
+                }
+              },
+              "col": "notify"
+            }
+          },
+          "url": {
+            "$ref": {
+              "entity": "Subscription",
+              "where": {
+                "id": {
+                  "$arg": "id"
+                }
+              },
+              "col": "url"
+            }
+          },
+          "inactive": {
+            "$ref": {
+              "entity": "Subscription",
+              "where": {
+                "id": {
+                  "$arg": "id"
+                }
+              },
+              "col": "inactive"
+            }
+          },
+          "notify_days_before": {
+            "$ref": {
+              "entity": "Subscription",
+              "where": {
+                "id": {
+                  "$arg": "id"
+                }
+              },
+              "col": "notify_days_before"
+            }
+          },
+          "cancellation_date": {
+            "$ref": {
+              "entity": "Subscription",
+              "where": {
+                "id": {
+                  "$arg": "id"
+                }
+              },
+              "col": "cancellation_date"
+            }
+          },
+          "replacement_subscription_id": {
+            "$ref": {
+              "entity": "Subscription",
+              "where": {
+                "id": {
+                  "$arg": "id"
+                }
+              },
+              "col": "replacement_subscription_id"
+            }
+          },
+          "start_date": {
+            "$ref": {
+              "entity": "Subscription",
+              "where": {
+                "id": {
+                  "$arg": "id"
+                }
+              },
+              "col": "start_date"
+            }
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Subscription",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "Sign in to clone a subscription.",
+          "precondition": "The subscription to clone does not exist or is not yours.",
+          "not_found": "That subscription does not exist.",
+          "fk": "A referenced record does not exist."
+        }
+      },
+      "_evidence": {
+        "locator": "endpoints/subscription/clone.php:9",
+        "id_local": "Subscription.clone",
+        "entry": {
+          "kind": "http",
+          "route": "POST /endpoints/subscription/clone.php",
+          "locator": "endpoints/subscription/clone.php:9"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "SELECT * FROM subscriptions WHERE id=:id AND user_id=:user_id; INSERT INTO subscriptions (...) SELECT values copied from source row (new user_id)",
+        "edges": [
+          "includes/validate_endpoint.php:19 ($_SESSION['loggedin'] !== true -> session_expired); connect_endpoint.php resolves $actor.id via session/remember-me"
+        ]
+      }
+    },
+    {
+      "tool": "subscription_search",
+      "family": "search",
+      "entity": "Subscription",
+      "description": "List your subscriptions, optionally filtered by category, payment method, household member, and activity state, sorted as you choose.",
+      "input_schema": {
+        "categories": {
+          "type": "text",
+          "description": "Comma-separated category ids to include."
+        },
+        "payments": {
+          "type": "text",
+          "description": "Comma-separated payment method ids to include."
+        },
+        "members": {
+          "type": "text",
+          "description": "Comma-separated payer member ids to include."
+        },
+        "state": {
+          "type": "text",
+          "description": "activity filter (active/inactive)."
+        },
+        "renewalType": {
+          "type": "text",
+          "description": "renewal type filter."
+        },
+        "notifications": {
+          "type": "text",
+          "description": "notification setting filter."
+        },
+        "sortOrder": {
+          "type": "text",
+          "description": "sort direction."
+        },
+        "sort": {
+          "type": "text",
+          "description": "column to sort by."
+        }
+      },
+      "exec_spec": {
+        "entity": "Subscription",
+        "scope": {
+          "owner_col": "user_id"
+        },
+        "search_fields": [
+          "name",
+          "category_id",
+          "payment_method_id",
+          "payer_user_id",
+          "inactive",
+          "auto_renew",
+          "cycle",
+          "notify"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "category_id",
+            "payment_method_id",
+            "payer_user_id",
+            "inactive",
+            "auto_renew",
+            "cycle",
+            "notify"
+          ]
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "Sign in to list your subscriptions."
+        }
+      },
+      "_evidence": {
+        "locator": "endpoints/subscriptions/get.php:39",
+        "id_local": "Subscription.search",
+        "entry": {
+          "kind": "http",
+          "route": "GET /endpoints/subscriptions/get.php",
+          "locator": "endpoints/subscriptions/get.php:39"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "SELECT * FROM subscriptions WHERE user_id=:userId [AND category_id IN..] [AND payment_method_id IN..] [AND payer_user_id IN..] [AND inactive=..] [AND auto_renew/cycle/notify filters] ORDER BY <allowlisted>",
+        "edges": [
+          "includes/validate_endpoint.php:19 ($_SESSION['loggedin'] !== true -> session_expired); connect_endpoint.php resolves $actor.id via session/remember-me"
+        ]
+      }
+    },
+    {
+      "tool": "dashboard_read",
+      "family": "search",
+      "entity": "Subscription",
+      "description": "Read your dashboard: upcoming subscription payments, overdue items, and any AI recommendations.",
+      "input_schema": {},
+      "exec_spec": {
+        "entity": "Subscription",
+        "scope": {
+          "owner_col": "user_id"
+        },
+        "search_fields": [
+          "next_payment",
+          "inactive",
+          "cycle",
+          "auto_renew"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "next_payment",
+            "inactive",
+            "cycle",
+            "auto_renew"
+          ]
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "Sign in to view your dashboard."
+        }
+      },
+      "_evidence": {
+        "locator": "index.php:76",
+        "id_local": "Dashboard.read",
+        "entry": {
+          "kind": "http",
+          "route": "GET /index.php",
+          "locator": "index.php:76"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "SELECT ... FROM subscriptions WHERE user_id=:userId AND next_payment>=date('now') AND inactive=0 AND cycle!=5 ORDER BY next_payment LIMIT 3; overdue query; SELECT * FROM ai_recommendations WHERE user_id=:userId"
+      }
+    },
+    {
+      "tool": "stats_read",
+      "family": "search",
+      "entity": "Subscription",
+      "description": "Compute spending statistics across your subscriptions: monthly/yearly cost, amount due this month, and breakdowns by category/member/payment method.",
+      "input_schema": {
+        "member": {
+          "type": "text",
+          "description": "Filter to one household member."
+        },
+        "category": {
+          "type": "text",
+          "description": "Filter to one category."
+        },
+        "payment": {
+          "type": "text",
+          "description": "Filter to one payment method."
+        }
+      },
+      "exec_spec": {
+        "entity": "Subscription",
+        "scope": {
+          "owner_col": "user_id"
+        },
+        "search_fields": [
+          "name",
+          "price",
+          "category_id",
+          "payer_user_id",
+          "payment_method_id",
+          "auto_renew",
+          "inactive"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "name",
+            "price",
+            "category_id",
+            "payer_user_id",
+            "payment_method_id",
+            "auto_renew",
+            "inactive"
+          ]
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "Sign in to view stats."
+        }
+      },
+      "_evidence": {
+        "locator": "includes/stats_calculations.php:108",
+        "id_local": "Stats.read",
+        "entry": {
+          "kind": "http",
+          "route": "GET /stats.php",
+          "locator": "includes/stats_calculations.php:108"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "SELECT name,price,...,auto_renew FROM subscriptions WHERE user_id=:userId [filters]; compute totalCostPerMonth/Year, amountDueThisMonth, breakdowns; read total_yearly_cost"
+      }
+    },
+    {
+      "tool": "calendar_read",
+      "family": "search",
+      "entity": "Subscription",
+      "description": "Read the calendar of payment dates for a given month, plus your budget.",
+      "input_schema": {
+        "month": {
+          "type": "int",
+          "description": "Month number (1-12)."
+        },
+        "year": {
+          "type": "int",
+          "description": "Four-digit year."
+        }
+      },
+      "exec_spec": {
+        "entity": "Subscription",
+        "scope": {
+          "owner_col": "user_id"
+        },
+        "search_fields": [
+          "inactive",
+          "cycle",
+          "frequency",
+          "next_payment",
+          "price"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "inactive",
+            "cycle",
+            "frequency",
+            "next_payment",
+            "price"
+          ]
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "Sign in to view the calendar."
+        }
+      },
+      "_evidence": {
+        "locator": "calendar.php:52",
+        "id_local": "Calendar.read",
+        "entry": {
+          "kind": "http",
+          "route": "GET /calendar.php",
+          "locator": "calendar.php:52"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "SELECT * FROM subscriptions WHERE user_id=:userId AND inactive=0; project payments into month; SELECT budget FROM user WHERE id=:userId"
+      }
+    },
+    {
+      "tool": "subscription_exportics",
+      "family": "crud.fetch",
+      "entity": "Subscription",
+      "description": "Export one of your subscriptions as an iCalendar (.ics) entry so you can subscribe to its payment reminders in a calendar app.",
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the subscription to export."
+        }
+      },
+      "exec_spec": {
+        "entity": "Subscription",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        },
+        "scope": {
+          "owner_col": "user_id"
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "not_found": "That record does not exist in your account.",
+          "fk": "The parent record you referenced does not exist.",
+          "fk_missing": "A required reference was not supplied.",
+          "unique": "That value is already taken.",
+          "on_child": "Can't delete: another record still references it. Reassign or remove those first.",
+          "auth": "You must sign in before exporting a subscription."
+        }
+      },
+      "_evidence": {
+        "locator": "endpoints/subscription/exportcalendar.php:12",
+        "id_local": "Subscription.exportIcs",
+        "entry": {
+          "kind": "http",
+          "route": "POST /endpoints/subscription/exportcalendar.php",
+          "locator": "endpoints/subscription/exportcalendar.php:12"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "SELECT * FROM subscriptions WHERE id=:id AND user_id=:userId; build ICS VEVENT+VALARM; print .ics",
+        "edges": [
+          "includes/validate_endpoint.php:19 ($_SESSION['loggedin'] !== true -> session_expired); connect_endpoint.php resolves $actor.id via session/remember-me"
+        ]
+      }
+    },
+    {
+      "tool": "category_upsert",
+      "family": "crud.upsert",
+      "entity": "Category",
+      "description": "Add or rename one of your subscription categories.",
+      "input_schema": {
+        "categoryId": {
+          "type": "int",
+          "description": "Id to target when renaming an existing category."
+        },
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "Category name."
+        }
+      },
+      "exec_spec": {
+        "entity": "Category",
+        "key": {
+          "id": {
+            "$arg": "categoryId"
+          }
+        },
+        "insert_fields": {
+          "name": {
+            "$arg": "name"
+          },
+          "user_id": {
+            "$session": "account_id"
+          }
+        },
+        "set_on_exists": {
+          "name": {
+            "$arg": "name"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "not_found": "That record does not exist in your account.",
+          "fk": "The parent record you referenced does not exist.",
+          "fk_missing": "A required reference was not supplied.",
+          "unique": "That value is already taken.",
+          "on_child": "Can't delete: another record still references it. Reassign or remove those first.",
+          "auth": "You must sign in before managing categories."
+        }
+      },
+      "_evidence": {
+        "locator": "endpoints/categories/category.php:28",
+        "id_local": "Category.set",
+        "entry": {
+          "kind": "http",
+          "route": "POST /endpoints/categories/category.php",
+          "locator": "endpoints/categories/category.php:28"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "switch action: add -> INSERT categories (name,order,user_id) with order=max+1; edit -> UPDATE name WHERE id AND user_id (ownership check); delete -> refuse id=1, refuse if in use, DELETE WHERE id AND user_id; sort -> UPDATE order per id",
+        "edges": [
+          "includes/validate_endpoint.php:19 ($_SESSION['loggedin'] !== true -> session_expired); connect_endpoint.php resolves $actor.id via session/remember-me",
+          "endpoints/categories/category.php:102 (SELECT COUNT(*) FROM subscriptions WHERE category_id=:id; if >0 -> in use, block delete)"
+        ]
+      }
+    },
+    {
+      "tool": "category_search",
+      "family": "search",
+      "entity": "Category",
+      "description": "List your subscription categories.",
+      "input_schema": {},
+      "exec_spec": {
+        "entity": "Category",
+        "scope": {
+          "owner_col": "user_id"
+        },
+        "search_fields": [
+          "user_id"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "user_id"
+          ]
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "Sign in to view your categories."
+        }
+      },
+      "_evidence": {
+        "locator": "api/categories/get_categories.php:79",
+        "id_local": "Category.apiGet",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/categories/get_categories.php",
+          "locator": "api/categories/get_categories.php:79"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "auth by api_key; SELECT * FROM categories WHERE user_id; per-row COUNT(subscriptions) for in_use",
+        "edges": [
+          "api/<file>: SELECT * FROM user WHERE api_key=:apiKey; !$user -> Invalid API key (e.g. api/users/get_user.php:53)"
+        ]
+      }
+    },
+    {
+      "tool": "currency_upsert",
+      "family": "crud.upsert",
+      "entity": "Currency",
+      "description": "Add or edit one of your currencies (name, symbol, ISO code, exchange rate).",
+      "input_schema": {
+        "currencyId": {
+          "type": "int",
+          "description": "Id to target when editing an existing currency."
+        },
+        "name": {
+          "type": "text",
+          "description": "Currency name."
+        },
+        "symbol": {
+          "type": "text",
+          "description": "Currency symbol."
+        },
+        "code": {
+          "type": "text",
+          "description": "ISO 4217 code."
+        },
+        "rate": {
+          "type": "float",
+          "description": "Exchange rate vs the base currency."
+        }
+      },
+      "exec_spec": {
+        "entity": "Currency",
+        "key": {
+          "id": {
+            "$arg": "currencyId"
+          }
+        },
+        "insert_fields": {
+          "name": {
+            "$arg": "name"
+          },
+          "symbol": {
+            "$arg": "symbol"
+          },
+          "code": {
+            "$arg": "code"
+          },
+          "rate": {
+            "$arg": "rate"
+          },
+          "user_id": {
+            "$session": "account_id"
+          }
+        },
+        "set_on_exists": {
+          "name": {
+            "$arg": "name"
+          },
+          "symbol": {
+            "$arg": "symbol"
+          },
+          "code": {
+            "$arg": "code"
+          },
+          "rate": {
+            "$arg": "rate"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "not_found": "That record does not exist in your account.",
+          "fk": "The parent record you referenced does not exist.",
+          "fk_missing": "A required reference was not supplied.",
+          "unique": "That value is already taken.",
+          "on_child": "Can't delete: another record still references it. Reassign or remove those first.",
+          "auth": "You must sign in before managing currencies."
+        }
+      },
+      "_evidence": {
+        "locator": "endpoints/currency/currency.php:26",
+        "id_local": "Currency.set",
+        "entry": {
+          "kind": "http",
+          "route": "POST /endpoints/currency/currency.php",
+          "locator": "endpoints/currency/currency.php:26"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "switch action: add -> INSERT (name,symbol,code,rate,user_id); edit -> UPDATE name,symbol,code WHERE id AND user_id; delete -> refuse if main_currency or in use, DELETE WHERE id AND user_id",
+        "edges": [
+          "includes/validate_endpoint.php:19 ($_SESSION['loggedin'] !== true -> session_expired); connect_endpoint.php resolves $actor.id via session/remember-me",
+          "endpoints/currency/currency.php:88 (block delete of in-use or main_currency)"
+        ]
+      }
+    },
+    {
+      "tool": "currency_search",
+      "family": "search",
+      "entity": "Currency",
+      "description": "List your currencies and their exchange rates.",
+      "input_schema": {},
+      "exec_spec": {
+        "entity": "Currency",
+        "scope": {
+          "owner_col": "user_id"
+        },
+        "search_fields": [
+          "user_id"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "user_id"
+          ]
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "Sign in to view your currencies."
+        }
+      },
+      "_evidence": {
+        "locator": "api/currencies/get_currencies.php:87",
+        "id_local": "Currency.apiGet",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/currencies/get_currencies.php",
+          "locator": "api/currencies/get_currencies.php:87"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "auth by api_key; SELECT * FROM currencies WHERE user_id; per-row in_use check",
+        "edges": [
+          "api/<file>: SELECT * FROM user WHERE api_key=:apiKey; !$user -> Invalid API key (e.g. api/users/get_user.php:53)"
+        ]
+      }
+    },
+    {
+      "tool": "paymentmethod_add",
+      "family": "crud.insert",
+      "entity": "PaymentMethod",
+      "description": "Add a new payment method (credit card, PayPal, etc.) to your wallet.",
+      "input_schema": {
+        "paymentname": {
+          "type": "text",
+          "required": true,
+          "description": "Name of the payment method."
+        },
+        "icon": {
+          "type": "text",
+          "description": "Icon URL or filename."
+        }
+      },
+      "exec_spec": {
+        "entity": "PaymentMethod",
+        "fields": {
+          "name": {
+            "$arg": "paymentname"
+          },
+          "icon": {
+            "$arg": "icon"
+          }
+        },
+        "set_on_create": {
+          "enabled": 1,
+          "user_id": {
+            "$session": "account_id"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "not_found": "That record does not exist in your account.",
+          "fk": "The parent record you referenced does not exist.",
+          "fk_missing": "A required reference was not supplied.",
+          "unique": "That value is already taken.",
+          "on_child": "Can't delete: another record still references it. Reassign or remove those first.",
+          "auth": "You must sign in before adding a payment method."
+        }
+      },
+      "_evidence": {
+        "locator": "endpoints/payments/add.php:204",
+        "id_local": "PaymentMethod.add",
+        "entry": {
+          "kind": "http",
+          "route": "POST /endpoints/payments/add.php",
+          "locator": "endpoints/payments/add.php:204"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "$newID=max($maxID+1,32); INSERT INTO payment_methods (id,name,icon,enabled,user_id) VALUES (...)  [id force >=32]",
+        "edges": [
+          "includes/validate_endpoint.php:19 ($_SESSION['loggedin'] !== true -> session_expired); connect_endpoint.php resolves $actor.id via session/remember-me"
+        ]
+      }
+    },
+    {
+      "tool": "paymentmethod_rename",
+      "family": "update.field_set",
+      "entity": "PaymentMethod",
+      "description": "Rename one of your payment methods.",
+      "input_schema": {
+        "paymentId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the payment method to rename."
+        },
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "New name."
+        }
+      },
+      "exec_spec": {
+        "entity": "PaymentMethod",
+        "row_key": {
+          "id": {
+            "$arg": "paymentId"
+          }
+        },
+        "fields": [
+          "name"
+        ],
+        "set": {
+          "user_id": {
+            "$session": "account_id"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "not_found": "That record does not exist in your account.",
+          "fk": "The parent record you referenced does not exist.",
+          "fk_missing": "A required reference was not supplied.",
+          "unique": "That value is already taken.",
+          "on_child": "Can't delete: another record still references it. Reassign or remove those first.",
+          "auth": "You must sign in before renaming a payment method."
+        }
+      },
+      "_evidence": {
+        "locator": "endpoints/payments/rename.php:32",
+        "id_local": "PaymentMethod.rename",
+        "entry": {
+          "kind": "http",
+          "route": "POST /endpoints/payments/rename.php",
+          "locator": "endpoints/payments/rename.php:32"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "UPDATE payment_methods SET name=:name WHERE id=:paymentId AND user_id=:userId",
+        "edges": [
+          "includes/validate_endpoint.php:19 ($_SESSION['loggedin'] !== true -> session_expired); connect_endpoint.php resolves $actor.id via session/remember-me"
+        ]
+      }
+    },
+    {
+      "tool": "paymentmethod_toggle",
+      "family": "update.field_set",
+      "entity": "PaymentMethod",
+      "description": "Enable or disable one of your payment methods. A method still in use by subscriptions cannot be disabled.",
+      "input_schema": {
+        "paymentId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the payment method to toggle."
+        },
+        "enabled": {
+          "type": "bool",
+          "required": true,
+          "description": "New enabled state."
+        }
+      },
+      "exec_spec": {
+        "entity": "PaymentMethod",
+        "row_key": {
+          "id": {
+            "$arg": "paymentId"
+          }
+        },
+        "fields": [
+          "enabled"
+        ],
+        "set": {
+          "user_id": {
+            "$session": "account_id"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "not_found": "That record does not exist in your account.",
+          "fk": "The parent record you referenced does not exist.",
+          "fk_missing": "A required reference was not supplied.",
+          "unique": "That value is already taken.",
+          "on_child": "Can't delete: another record still references it. Reassign or remove those first.",
+          "auth": "You must sign in before changing a payment method.",
+          "precondition": "A payment method still assigned to a subscription cannot be disabled or deleted. Move those subscriptions to another method first."
+        },
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Subscription",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "payment_method_id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "paymentId"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "eq",
+              "n": 0
+            }
+          ]
+        ]
+      },
+      "_evidence": {
+        "locator": "endpoints/payments/toggle.php:14",
+        "id_local": "PaymentMethod.toggle",
+        "entry": {
+          "kind": "http",
+          "route": "POST /endpoints/payments/toggle.php",
+          "locator": "endpoints/payments/toggle.php:14"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "if disabling and in use by subscriptions -> payment_in_use error; UPDATE payment_methods SET enabled=:enabled WHERE id=:paymentId AND user_id=:userId",
+        "edges": [
+          "includes/validate_endpoint.php:19 ($_SESSION['loggedin'] !== true -> session_expired); connect_endpoint.php resolves $actor.id via session/remember-me",
+          "endpoints/payments/toggle.php:14 (block disabling an in-use method)"
+        ]
+      }
+    },
+    {
+      "tool": "paymentmethod_delete",
+      "family": "crud.delete",
+      "entity": "PaymentMethod",
+      "description": "Delete one of your payment methods. A method still in use by subscriptions cannot be deleted.",
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the payment method to delete."
+        }
+      },
+      "exec_spec": {
+        "entity": "PaymentMethod",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "not_found": "That record does not exist in your account.",
+          "fk": "The parent record you referenced does not exist.",
+          "fk_missing": "A required reference was not supplied.",
+          "unique": "That value is already taken.",
+          "on_child": "Can't delete: another record still references it. Reassign or remove those first.",
+          "auth": "You must sign in before deleting a payment method.",
+          "precondition": "A payment method still assigned to a subscription cannot be deleted. Move those subscriptions to another method first."
+        },
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Subscription",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "payment_method_id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "eq",
+              "n": 0
+            }
+          ]
+        ]
+      },
+      "_evidence": {
+        "locator": "endpoints/payments/delete.php:11",
+        "id_local": "PaymentMethod.delete",
+        "entry": {
+          "kind": "http",
+          "route": "POST /endpoints/payments/delete.php",
+          "locator": "endpoints/payments/delete.php:11"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "if in use by subscriptions -> error; DELETE FROM payment_methods WHERE id AND user_id",
+        "edges": [
+          "includes/validate_endpoint.php:19 ($_SESSION['loggedin'] !== true -> session_expired); connect_endpoint.php resolves $actor.id via session/remember-me",
+          "endpoints/payments/delete.php:11 (if in use -> block delete)"
+        ]
+      }
+    },
+    {
+      "tool": "paymentmethod_search",
+      "family": "search",
+      "entity": "PaymentMethod",
+      "description": "List your payment methods.",
+      "input_schema": {},
+      "exec_spec": {
+        "entity": "PaymentMethod",
+        "scope": {
+          "owner_col": "user_id"
+        },
+        "search_fields": [
+          "user_id"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "user_id"
+          ]
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "Sign in to view your payment methods."
+        }
+      },
+      "_evidence": {
+        "locator": "api/payment_methods/get_payment_methods.php:109",
+        "id_local": "PaymentMethod.apiGet",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/payment_methods/get_payment_methods.php",
+          "locator": "api/payment_methods/get_payment_methods.php:109"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "auth by api_key; SELECT * FROM payment_methods WHERE user_id; per-row in_use check",
+        "edges": [
+          "api/<file>: SELECT * FROM user WHERE api_key=:apiKey; !$user -> Invalid API key (e.g. api/users/get_user.php:53)"
+        ]
+      }
+    },
+    {
+      "tool": "household_member_add",
+      "family": "crud.insert",
+      "entity": "Household",
+      "description": "Add a household member who can be named as the payer on subscriptions.",
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "Member's name."
+        },
+        "email": {
+          "type": "text",
+          "description": "Member's email."
+        }
+      },
+      "exec_spec": {
+        "entity": "Household",
+        "fields": [
+          "name",
+          "email"
+        ],
+        "set_on_create": {
+          "user_id": {
+            "$session": "account_id"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "not_found": "That record does not exist in your account.",
+          "fk": "The parent record you referenced does not exist.",
+          "fk_missing": "A required reference was not supplied.",
+          "unique": "That value is already taken.",
+          "on_child": "Can't delete: another record still references it. Reassign or remove those first.",
+          "auth": "You must sign in before adding a household member."
+        }
+      },
+      "_evidence": {
+        "locator": "endpoints/household/household.php:25",
+        "id_local": "Household.set",
+        "entry": {
+          "kind": "http",
+          "route": "POST /endpoints/household/household.php",
+          "locator": "endpoints/household/household.php:25"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "switch action: add -> INSERT household (name,email,user_id); edit -> UPDATE name,email WHERE id AND user_id; delete -> refuse id=1, refuse if in use by subscriptions, DELETE WHERE id AND user_id",
+        "edges": [
+          "includes/validate_endpoint.php:19 ($_SESSION['loggedin'] !== true -> session_expired); connect_endpoint.php resolves $actor.id via session/remember-me",
+          "endpoints/household/household.php:89 (if count>0 -> household_in_use, block delete)"
+        ]
+      }
+    },
+    {
+      "tool": "household_search",
+      "family": "search",
+      "entity": "Household",
+      "description": "List the members of your household.",
+      "input_schema": {},
+      "exec_spec": {
+        "entity": "Household",
+        "scope": {
+          "owner_col": "user_id"
+        },
+        "search_fields": [
+          "user_id"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "user_id"
+          ]
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "Sign in to view your household."
+        }
+      },
+      "_evidence": {
+        "locator": "api/household/get_household.php:73",
+        "id_local": "Household.apiGet",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/household/get_household.php",
+          "locator": "api/household/get_household.php:73"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "auth by api_key; SELECT * FROM household WHERE user_id; per-row payer_user_id check",
+        "edges": [
+          "api/<file>: SELECT * FROM user WHERE api_key=:apiKey; !$user -> Invalid API key (e.g. api/users/get_user.php:53)"
+        ]
+      }
+    },
+    {
+      "tool": "setting_update",
+      "family": "update.field_set",
+      "entity": "Setting",
+      "description": "Update one or more display settings: currency conversion, price visibility, theming, and UI preferences.",
+      "input_schema": {
+        "dark_theme": {
+          "type": "bool",
+          "description": "Use the dark theme."
+        },
+        "monthly_price": {
+          "type": "bool",
+          "description": "Show monthly-equivalent prices."
+        },
+        "convert_currency": {
+          "type": "bool",
+          "description": "Convert foreign prices to your main currency."
+        },
+        "remove_background": {
+          "type": "bool",
+          "description": "Remove logo background images."
+        },
+        "color_theme": {
+          "type": "text",
+          "description": "Accent color name (blue/red/green/yellow/purple/custom)."
+        },
+        "hide_disabled": {
+          "type": "bool",
+          "description": "Hide disabled subscriptions."
+        },
+        "disabled_to_bottom": {
+          "type": "bool",
+          "description": "Sort disabled subscriptions to the bottom."
+        },
+        "show_original_price": {
+          "type": "bool",
+          "description": "Show the original price alongside converted."
+        },
+        "mobile_nav": {
+          "type": "bool",
+          "description": "Use the mobile navigation layout."
+        },
+        "show_subscription_progress": {
+          "type": "bool",
+          "description": "Show remaining-period progress for subscriptions."
+        },
+        "week_starts_sunday": {
+          "type": "bool",
+          "description": "Start calendar weeks on Sunday."
+        }
+      },
+      "exec_spec": {
+        "entity": "Setting",
+        "row_key": {
+          "user_id": {
+            "$session": "account_id"
+          }
+        },
+        "fields": [
+          "dark_theme",
+          "monthly_price",
+          "convert_currency",
+          "remove_background",
+          "color_theme",
+          "hide_disabled",
+          "disabled_to_bottom",
+          "show_original_price",
+          "mobile_nav",
+          "show_subscription_progress",
+          "week_starts_sunday"
+        ],
+        "set": {
+          "user_id": {
+            "$session": "account_id"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "not_found": "That record does not exist in your account.",
+          "fk": "The parent record you referenced does not exist.",
+          "fk_missing": "A required reference was not supplied.",
+          "unique": "That value is already taken.",
+          "on_child": "Can't delete: another record still references it. Reassign or remove those first.",
+          "auth": "You must sign in before changing your settings."
+        }
+      },
+      "_evidence": {
+        "locator": "endpoints/settings/monthly_price.php:16",
+        "id_local": "Setting.setmonthly_price",
+        "entry": {
+          "kind": "http",
+          "route": "POST /endpoints/settings/monthly_price.php",
+          "locator": "endpoints/settings/monthly_price.php:16"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "$value must be bool; UPDATE settings SET monthly_price=:value WHERE user_id=:userId",
+        "edges": [
+          "includes/validate_endpoint.php:19 (logged-in session); connect_endpoint.php $actor.id"
+        ]
+      }
+    },
+    {
+      "tool": "setting_setcustomcss",
+      "family": "crud.upsert",
+      "entity": "CustomCssStyle",
+      "description": "Set your custom CSS override (empty string clears it).",
+      "input_schema": {
+        "css": {
+          "type": "text",
+          "description": "Custom CSS stylesheet text."
+        }
+      },
+      "exec_spec": {
+        "entity": "CustomCssStyle",
+        "key": {
+          "user_id": {
+            "$session": "account_id"
+          }
+        },
+        "insert_fields": {
+          "css": {
+            "$arg": "css"
+          }
+        },
+        "set_on_exists": {
+          "css": {
+            "$arg": "css"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "not_found": "That record does not exist in your account.",
+          "fk": "The parent record you referenced does not exist.",
+          "fk_missing": "A required reference was not supplied.",
+          "unique": "That value is already taken.",
+          "on_child": "Can't delete: another record still references it. Reassign or remove those first.",
+          "auth": "You must sign in before setting custom CSS."
+        }
+      },
+      "_evidence": {
+        "locator": "endpoints/settings/customcss.php:11",
+        "id_local": "Setting.setCustomCss",
+        "entry": {
+          "kind": "http",
+          "route": "POST /endpoints/settings/customcss.php",
+          "locator": "endpoints/settings/customcss.php:11"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "DELETE FROM custom_css_style WHERE user_id; INSERT INTO custom_css_style (css,user_id) VALUES (:css,:userId)",
+        "edges": [
+          "includes/validate_endpoint.php:19 ($_SESSION['loggedin'] !== true -> session_expired); connect_endpoint.php resolves $actor.id via session/remember-me"
+        ]
+      }
+    },
+    {
+      "tool": "setting_setcustomtheme",
+      "family": "crud.upsert",
+      "entity": "CustomColors",
+      "description": "Set your custom theme colors. Main and accent must differ.",
+      "input_schema": {
+        "main_color": {
+          "type": "text",
+          "description": "Main color as #RRGGBB."
+        },
+        "accent_color": {
+          "type": "text",
+          "description": "Accent color as #RRGGBB (must differ from main)."
+        },
+        "hover_color": {
+          "type": "text",
+          "description": "Hover color as #RRGGBB."
+        }
+      },
+      "exec_spec": {
+        "entity": "CustomColors",
+        "key": {
+          "user_id": {
+            "$session": "account_id"
+          }
+        },
+        "insert_fields": {
+          "main_color": {
+            "$arg": "main_color"
+          },
+          "accent_color": {
+            "$arg": "accent_color"
+          },
+          "hover_color": {
+            "$arg": "hover_color"
+          }
+        },
+        "set_on_exists": {
+          "main_color": {
+            "$arg": "main_color"
+          },
+          "accent_color": {
+            "$arg": "accent_color"
+          },
+          "hover_color": {
+            "$arg": "hover_color"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "not_found": "That record does not exist in your account.",
+          "fk": "The parent record you referenced does not exist.",
+          "fk_missing": "A required reference was not supplied.",
+          "unique": "That value is already taken.",
+          "on_child": "Can't delete: another record still references it. Reassign or remove those first.",
+          "auth": "You must sign in before setting a custom theme."
+        }
+      },
+      "_evidence": {
+        "locator": "endpoints/settings/customtheme.php:28",
+        "id_local": "Setting.setCustomTheme",
+        "entry": {
+          "kind": "http",
+          "route": "POST /endpoints/settings/customtheme.php",
+          "locator": "endpoints/settings/customtheme.php:28"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "validate #RRGGBB and main!=accent; DELETE custom_colors WHERE user_id; INSERT custom_colors (main_color,accent_color,hover_color,user_id)",
+        "edges": [
+          "includes/validate_endpoint.php:19 ($_SESSION['loggedin'] !== true -> session_expired); connect_endpoint.php resolves $actor.id via session/remember-me"
+        ]
+      }
+    },
+    {
+      "tool": "setting_resettheme",
+      "family": "crud.delete",
+      "entity": "CustomColors",
+      "description": "Reset your custom theme back to the default colors.",
+      "input_schema": {},
+      "exec_spec": {
+        "entity": "CustomColors",
+        "lookup_by": {
+          "user_id": {
+            "$session": "account_id"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "not_found": "That record does not exist in your account.",
+          "fk": "The parent record you referenced does not exist.",
+          "fk_missing": "A required reference was not supplied.",
+          "unique": "That value is already taken.",
+          "on_child": "Can't delete: another record still references it. Reassign or remove those first.",
+          "auth": "You must sign in before resetting your theme."
+        }
+      },
+      "_evidence": {
+        "locator": "endpoints/settings/resettheme.php:6",
+        "id_local": "Setting.resetTheme",
+        "entry": {
+          "kind": "http",
+          "route": "POST /endpoints/settings/resettheme.php",
+          "locator": "endpoints/settings/resettheme.php:6"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "$stmt = $db->prepare('DELETE FROM custom_colors WHERE user_id = :userId');\n$stmt->bindParam(':userId', $userId, SQLITE3_INTEGER);\nif ($stmt->execute()) { die(json_encode(['success'=>true])) } else { die(json_encode(['success'=>false])) }",
+        "edges": [
+          "includes/validate_endpoint.php:19 ($_SESSION['loggedin'] !== true -> session_expired); connect_endpoint.php resolves $actor.id via session/remember-me"
+        ]
+      }
+    },
+    {
+      "tool": "setting_read",
+      "family": "search",
+      "entity": "Setting",
+      "description": "Read your current display settings, custom theme and custom CSS.",
+      "input_schema": {},
+      "exec_spec": {
+        "entity": "Setting",
+        "scope": {
+          "owner_col": "user_id"
+        },
+        "search_fields": [
+          "user_id"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "user_id"
+          ]
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "Sign in to read your settings."
+        }
+      },
+      "_evidence": {
+        "locator": "api/settings/get_settings.php:30",
+        "id_local": "Setting.apiGet",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/settings/get_settings.php",
+          "locator": "api/settings/get_settings.php:30"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "auth by api_key; select settings, custom_colors, custom_css_style for user; drop user_id",
+        "edges": [
+          "api/<file>: SELECT * FROM user WHERE api_key=:apiKey; !$user -> Invalid API key (e.g. api/users/get_user.php:53)"
+        ]
+      }
+    },
+    {
+      "tool": "emailnotification_save",
+      "family": "crud.upsert",
+      "entity": "EmailNotification",
+      "description": "Configure the email notification channel (SMTP) used to send renewal reminders.",
+      "input_schema": {
+        "enabled": {
+          "type": "bool",
+          "description": "Enable email notifications."
+        },
+        "smtp_address": {
+          "type": "text",
+          "description": "SMTP host."
+        },
+        "smtp_port": {
+          "type": "int",
+          "description": "SMTP port."
+        },
+        "smtp_username": {
+          "type": "text",
+          "description": "SMTP username."
+        },
+        "smtp_password": {
+          "type": "text",
+          "description": "SMTP password."
+        },
+        "from_email": {
+          "type": "text",
+          "description": "From address."
+        },
+        "encryption": {
+          "type": "text",
+          "description": "tls/ssl/none."
+        },
+        "other_emails": {
+          "type": "text",
+          "description": "Extra recipient addresses."
+        }
+      },
+      "exec_spec": {
+        "entity": "EmailNotification",
+        "key": {
+          "user_id": {
+            "$session": "account_id"
+          }
+        },
+        "insert_fields": [
+          "enabled",
+          "smtp_address",
+          "smtp_port",
+          "smtp_username",
+          "smtp_password",
+          "from_email",
+          "encryption",
+          "other_emails"
+        ],
+        "set_on_exists": [
+          "enabled",
+          "smtp_address",
+          "smtp_port",
+          "smtp_username",
+          "smtp_password",
+          "from_email",
+          "encryption",
+          "other_emails"
+        ]
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "not_found": "That record does not exist in your account.",
+          "fk": "The parent record you referenced does not exist.",
+          "fk_missing": "A required reference was not supplied.",
+          "unique": "That value is already taken.",
+          "on_child": "Can't delete: another record still references it. Reassign or remove those first.",
+          "auth": "You must sign in before configuring email notifications."
+        }
+      },
+      "_evidence": {
+        "locator": "endpoints/notifications/saveemailnotifications.php:23",
+        "id_local": "EmailNotification.save",
+        "entry": {
+          "kind": "http",
+          "route": "POST /endpoints/notifications/saveemailnotifications.php",
+          "locator": "endpoints/notifications/saveemailnotifications.php:23"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "SELECT COUNT(*) WHERE user_id; if 0 INSERT else UPDATE EmailNotification SET enabled + fields WHERE user_id; mandatory ['smtp_address', 'smtp_username', 'smtp_password', 'from_email'] validated; webhook/url channels SSRF-validated at save",
+        "edges": [
+          "includes/validate_endpoint.php:19; connect_endpoint.php $actor.id"
+        ]
+      }
+    },
+    {
+      "tool": "telegramnotification_save",
+      "family": "crud.upsert",
+      "entity": "TelegramNotification",
+      "description": "Configure the Telegram bot notification channel for renewal reminders.",
+      "input_schema": {
+        "enabled": {
+          "type": "bool",
+          "description": "Enable Telegram notifications."
+        },
+        "bot_token": {
+          "type": "text",
+          "description": "Telegram bot token."
+        },
+        "chat_id": {
+          "type": "text",
+          "description": "Chat id to message."
+        }
+      },
+      "exec_spec": {
+        "entity": "TelegramNotification",
+        "key": {
+          "user_id": {
+            "$session": "account_id"
+          }
+        },
+        "insert_fields": [
+          "enabled",
+          "bot_token",
+          "chat_id"
+        ],
+        "set_on_exists": [
+          "enabled",
+          "bot_token",
+          "chat_id"
+        ]
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "not_found": "That record does not exist in your account.",
+          "fk": "The parent record you referenced does not exist.",
+          "fk_missing": "A required reference was not supplied.",
+          "unique": "That value is already taken.",
+          "on_child": "Can't delete: another record still references it. Reassign or remove those first.",
+          "auth": "You must sign in before configuring Telegram notifications."
+        }
+      },
+      "_evidence": {
+        "locator": "endpoints/notifications/savetelegramnotifications.php:23",
+        "id_local": "TelegramNotification.save",
+        "entry": {
+          "kind": "http",
+          "route": "POST /endpoints/notifications/savetelegramnotifications.php",
+          "locator": "endpoints/notifications/savetelegramnotifications.php:23"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "SELECT COUNT(*) WHERE user_id; if 0 INSERT else UPDATE TelegramNotification SET enabled + fields WHERE user_id; mandatory ['bot_token', 'chat_id'] validated; webhook/url channels SSRF-validated at save",
+        "edges": [
+          "includes/validate_endpoint.php:19; connect_endpoint.php $actor.id"
+        ]
+      }
+    },
+    {
+      "tool": "webhooknotification_save",
+      "family": "crud.upsert",
+      "entity": "WebhookNotification",
+      "description": "Configure a generic webhook notification channel.",
+      "input_schema": {
+        "enabled": {
+          "type": "bool",
+          "description": "Enable webhook notifications."
+        },
+        "headers": {
+          "type": "text",
+          "description": "Custom request headers."
+        },
+        "url": {
+          "type": "text",
+          "description": "Webhook URL."
+        },
+        "request_method": {
+          "type": "text",
+          "description": "HTTP method (POST)."
+        },
+        "payload": {
+          "type": "text",
+          "description": "Request body template."
+        },
+        "cancelation_payload": {
+          "type": "text",
+          "description": "Body template for cancellations."
+        },
+        "ignore_ssl": {
+          "type": "bool",
+          "description": "Skip TLS verification."
+        }
+      },
+      "exec_spec": {
+        "entity": "WebhookNotification",
+        "key": {
+          "user_id": {
+            "$session": "account_id"
+          }
+        },
+        "insert_fields": [
+          "enabled",
+          "headers",
+          "url",
+          "request_method",
+          "payload",
+          "cancelation_payload",
+          "ignore_ssl"
+        ],
+        "set_on_exists": [
+          "enabled",
+          "headers",
+          "url",
+          "request_method",
+          "payload",
+          "cancelation_payload",
+          "ignore_ssl"
+        ]
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "not_found": "That record does not exist in your account.",
+          "fk": "The parent record you referenced does not exist.",
+          "fk_missing": "A required reference was not supplied.",
+          "unique": "That value is already taken.",
+          "on_child": "Can't delete: another record still references it. Reassign or remove those first.",
+          "auth": "You must sign in before configuring webhook notifications."
+        }
+      },
+      "_evidence": {
+        "locator": "endpoints/notifications/savewebhooknotifications.php:23",
+        "id_local": "WebhookNotification.save",
+        "entry": {
+          "kind": "http",
+          "route": "POST /endpoints/notifications/savewebhooknotifications.php",
+          "locator": "endpoints/notifications/savewebhooknotifications.php:23"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "SELECT COUNT(*) WHERE user_id; if 0 INSERT else UPDATE WebhookNotification SET enabled + fields WHERE user_id; mandatory ['url'] validated; webhook/url channels SSRF-validated at save",
+        "edges": [
+          "includes/validate_endpoint.php:19; connect_endpoint.php $actor.id"
+        ]
+      }
+    },
+    {
+      "tool": "gotifynotification_save",
+      "family": "crud.upsert",
+      "entity": "GotifyNotification",
+      "description": "Configure the Gotify push notification channel.",
+      "input_schema": {
+        "enabled": {
+          "type": "bool",
+          "description": "Enable Gotify notifications."
+        },
+        "url": {
+          "type": "text",
+          "description": "Gotify server URL."
+        },
+        "token": {
+          "type": "text",
+          "description": "Gotify app token."
+        },
+        "ignore_ssl": {
+          "type": "bool",
+          "description": "Skip TLS verification."
+        }
+      },
+      "exec_spec": {
+        "entity": "GotifyNotification",
+        "key": {
+          "user_id": {
+            "$session": "account_id"
+          }
+        },
+        "insert_fields": [
+          "enabled",
+          "url",
+          "token",
+          "ignore_ssl"
+        ],
+        "set_on_exists": [
+          "enabled",
+          "url",
+          "token",
+          "ignore_ssl"
+        ]
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "not_found": "That record does not exist in your account.",
+          "fk": "The parent record you referenced does not exist.",
+          "fk_missing": "A required reference was not supplied.",
+          "unique": "That value is already taken.",
+          "on_child": "Can't delete: another record still references it. Reassign or remove those first.",
+          "auth": "You must sign in before configuring Gotify notifications."
+        }
+      },
+      "_evidence": {
+        "locator": "endpoints/notifications/savegotifynotifications.php:23",
+        "id_local": "GotifyNotification.save",
+        "entry": {
+          "kind": "http",
+          "route": "POST /endpoints/notifications/savegotifynotifications.php",
+          "locator": "endpoints/notifications/savegotifynotifications.php:23"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "SELECT COUNT(*) WHERE user_id; if 0 INSERT else UPDATE GotifyNotification SET enabled + fields WHERE user_id; mandatory ['url', 'token'] validated; webhook/url channels SSRF-validated at save",
+        "edges": [
+          "includes/validate_endpoint.php:19; connect_endpoint.php $actor.id"
+        ]
+      }
+    },
+    {
+      "tool": "discordnotification_save",
+      "family": "crud.upsert",
+      "entity": "DiscordNotification",
+      "description": "Configure the Discord webhook notification channel.",
+      "input_schema": {
+        "enabled": {
+          "type": "bool",
+          "description": "Enable Discord notifications."
+        },
+        "webhook_url": {
+          "type": "text",
+          "description": "Discord webhook URL."
+        },
+        "bot_username": {
+          "type": "text",
+          "description": "Bot display name."
+        },
+        "bot_avatar_url": {
+          "type": "text",
+          "description": "Bot avatar URL."
+        }
+      },
+      "exec_spec": {
+        "entity": "DiscordNotification",
+        "key": {
+          "user_id": {
+            "$session": "account_id"
+          }
+        },
+        "insert_fields": [
+          "enabled",
+          "webhook_url",
+          "bot_username",
+          "bot_avatar_url"
+        ],
+        "set_on_exists": [
+          "enabled",
+          "webhook_url",
+          "bot_username",
+          "bot_avatar_url"
+        ]
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "not_found": "That record does not exist in your account.",
+          "fk": "The parent record you referenced does not exist.",
+          "fk_missing": "A required reference was not supplied.",
+          "unique": "That value is already taken.",
+          "on_child": "Can't delete: another record still references it. Reassign or remove those first.",
+          "auth": "You must sign in before configuring Discord notifications."
+        }
+      },
+      "_evidence": {
+        "locator": "endpoints/notifications/savediscordnotifications.php:23",
+        "id_local": "DiscordNotification.save",
+        "entry": {
+          "kind": "http",
+          "route": "POST /endpoints/notifications/savediscordnotifications.php",
+          "locator": "endpoints/notifications/savediscordnotifications.php:23"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "SELECT COUNT(*) WHERE user_id; if 0 INSERT else UPDATE DiscordNotification SET enabled + fields WHERE user_id; mandatory ['webhook_url'] validated; webhook/url channels SSRF-validated at save",
+        "edges": [
+          "includes/validate_endpoint.php:19; connect_endpoint.php $actor.id"
+        ]
+      }
+    },
+    {
+      "tool": "pushovernotification_save",
+      "family": "crud.upsert",
+      "entity": "PushoverNotification",
+      "description": "Configure the Pushover push notification channel.",
+      "input_schema": {
+        "enabled": {
+          "type": "bool",
+          "description": "Enable Pushover notifications."
+        },
+        "user_key": {
+          "type": "text",
+          "description": "Pushover user key."
+        },
+        "token": {
+          "type": "text",
+          "description": "Pushover application token."
+        }
+      },
+      "exec_spec": {
+        "entity": "PushoverNotification",
+        "key": {
+          "user_id": {
+            "$session": "account_id"
+          }
+        },
+        "insert_fields": [
+          "enabled",
+          "user_key",
+          "token"
+        ],
+        "set_on_exists": [
+          "enabled",
+          "user_key",
+          "token"
+        ]
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "not_found": "That record does not exist in your account.",
+          "fk": "The parent record you referenced does not exist.",
+          "fk_missing": "A required reference was not supplied.",
+          "unique": "That value is already taken.",
+          "on_child": "Can't delete: another record still references it. Reassign or remove those first.",
+          "auth": "You must sign in before configuring Pushover notifications."
+        }
+      },
+      "_evidence": {
+        "locator": "endpoints/notifications/savepushovernotifications.php:23",
+        "id_local": "PushoverNotification.save",
+        "entry": {
+          "kind": "http",
+          "route": "POST /endpoints/notifications/savepushovernotifications.php",
+          "locator": "endpoints/notifications/savepushovernotifications.php:23"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "SELECT COUNT(*) WHERE user_id; if 0 INSERT else UPDATE PushoverNotification SET enabled + fields WHERE user_id; mandatory ['user_key', 'token'] validated; webhook/url channels SSRF-validated at save",
+        "edges": [
+          "includes/validate_endpoint.php:19; connect_endpoint.php $actor.id"
+        ]
+      }
+    },
+    {
+      "tool": "ntfynotification_save",
+      "family": "crud.upsert",
+      "entity": "NtfyNotification",
+      "description": "Configure the ntfy.sh push notification channel.",
+      "input_schema": {
+        "enabled": {
+          "type": "bool",
+          "description": "Enable ntfy notifications."
+        },
+        "host": {
+          "type": "text",
+          "description": "ntfy host."
+        },
+        "topic": {
+          "type": "text",
+          "description": "ntfy topic."
+        },
+        "headers": {
+          "type": "text",
+          "description": "Extra headers."
+        },
+        "ignore_ssl": {
+          "type": "bool",
+          "description": "Skip TLS verification."
+        }
+      },
+      "exec_spec": {
+        "entity": "NtfyNotification",
+        "key": {
+          "user_id": {
+            "$session": "account_id"
+          }
+        },
+        "insert_fields": [
+          "enabled",
+          "host",
+          "topic",
+          "headers",
+          "ignore_ssl"
+        ],
+        "set_on_exists": [
+          "enabled",
+          "host",
+          "topic",
+          "headers",
+          "ignore_ssl"
+        ]
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "not_found": "That record does not exist in your account.",
+          "fk": "The parent record you referenced does not exist.",
+          "fk_missing": "A required reference was not supplied.",
+          "unique": "That value is already taken.",
+          "on_child": "Can't delete: another record still references it. Reassign or remove those first.",
+          "auth": "You must sign in before configuring ntfy notifications."
+        }
+      },
+      "_evidence": {
+        "locator": "endpoints/notifications/saventfynotifications.php:23",
+        "id_local": "NtfyNotification.save",
+        "entry": {
+          "kind": "http",
+          "route": "POST /endpoints/notifications/saventfynotifications.php",
+          "locator": "endpoints/notifications/saventfynotifications.php:23"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "SELECT COUNT(*) WHERE user_id; if 0 INSERT else UPDATE NtfyNotification SET enabled + fields WHERE user_id; mandatory ['host', 'topic'] validated; webhook/url channels SSRF-validated at save",
+        "edges": [
+          "includes/validate_endpoint.php:19; connect_endpoint.php $actor.id"
+        ]
+      }
+    },
+    {
+      "tool": "pushplusnotification_save",
+      "family": "crud.upsert",
+      "entity": "PushplusNotification",
+      "description": "Configure the PushPlus push notification channel.",
+      "input_schema": {
+        "enabled": {
+          "type": "bool",
+          "description": "Enable PushPlus notifications."
+        },
+        "token": {
+          "type": "text",
+          "description": "PushPlus token."
+        }
+      },
+      "exec_spec": {
+        "entity": "PushplusNotification",
+        "key": {
+          "user_id": {
+            "$session": "account_id"
+          }
+        },
+        "insert_fields": [
+          "enabled",
+          "token"
+        ],
+        "set_on_exists": [
+          "enabled",
+          "token"
+        ]
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "not_found": "That record does not exist in your account.",
+          "fk": "The parent record you referenced does not exist.",
+          "fk_missing": "A required reference was not supplied.",
+          "unique": "That value is already taken.",
+          "on_child": "Can't delete: another record still references it. Reassign or remove those first.",
+          "auth": "You must sign in before configuring PushPlus notifications."
+        }
+      },
+      "_evidence": {
+        "locator": "endpoints/notifications/savepushplusnotifications.php:23",
+        "id_local": "PushplusNotification.save",
+        "entry": {
+          "kind": "http",
+          "route": "POST /endpoints/notifications/savepushplusnotifications.php",
+          "locator": "endpoints/notifications/savepushplusnotifications.php:23"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "SELECT COUNT(*) WHERE user_id; if 0 INSERT else UPDATE PushplusNotification SET enabled + fields WHERE user_id; mandatory ['token'] validated; webhook/url channels SSRF-validated at save",
+        "edges": [
+          "includes/validate_endpoint.php:19; connect_endpoint.php $actor.id"
+        ]
+      }
+    },
+    {
+      "tool": "mattermostnotification_save",
+      "family": "crud.upsert",
+      "entity": "MattermostNotification",
+      "description": "Configure the Mattermost webhook notification channel.",
+      "input_schema": {
+        "enabled": {
+          "type": "bool",
+          "description": "Enable Mattermost notifications."
+        },
+        "webhook_url": {
+          "type": "text",
+          "description": "Mattermost incoming webhook URL."
+        },
+        "bot_username": {
+          "type": "text",
+          "description": "Bot display name."
+        },
+        "bot_icon_emoji": {
+          "type": "text",
+          "description": "Bot icon emoji."
+        }
+      },
+      "exec_spec": {
+        "entity": "MattermostNotification",
+        "key": {
+          "user_id": {
+            "$session": "account_id"
+          }
+        },
+        "insert_fields": [
+          "enabled",
+          "webhook_url",
+          "bot_username",
+          "bot_icon_emoji"
+        ],
+        "set_on_exists": [
+          "enabled",
+          "webhook_url",
+          "bot_username",
+          "bot_icon_emoji"
+        ]
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "not_found": "That record does not exist in your account.",
+          "fk": "The parent record you referenced does not exist.",
+          "fk_missing": "A required reference was not supplied.",
+          "unique": "That value is already taken.",
+          "on_child": "Can't delete: another record still references it. Reassign or remove those first.",
+          "auth": "You must sign in before configuring Mattermost notifications."
+        }
+      },
+      "_evidence": {
+        "locator": "endpoints/notifications/savemattermostnotifications.php:23",
+        "id_local": "MattermostNotification.save",
+        "entry": {
+          "kind": "http",
+          "route": "POST /endpoints/notifications/savemattermostnotifications.php",
+          "locator": "endpoints/notifications/savemattermostnotifications.php:23"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "SELECT COUNT(*) WHERE user_id; if 0 INSERT else UPDATE MattermostNotification SET enabled + fields WHERE user_id; mandatory ['webhook_url'] validated; webhook/url channels SSRF-validated at save",
+        "edges": [
+          "includes/validate_endpoint.php:19; connect_endpoint.php $actor.id"
+        ]
+      }
+    },
+    {
+      "tool": "serverchannotification_save",
+      "family": "crud.upsert",
+      "entity": "ServerchanNotification",
+      "description": "Configure the ServerChan push notification channel.",
+      "input_schema": {
+        "enabled": {
+          "type": "bool",
+          "description": "Enable ServerChan notifications."
+        },
+        "sendkey": {
+          "type": "text",
+          "description": "ServerChan send key."
+        }
+      },
+      "exec_spec": {
+        "entity": "ServerchanNotification",
+        "key": {
+          "user_id": {
+            "$session": "account_id"
+          }
+        },
+        "insert_fields": [
+          "enabled",
+          "sendkey"
+        ],
+        "set_on_exists": [
+          "enabled",
+          "sendkey"
+        ]
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "not_found": "That record does not exist in your account.",
+          "fk": "The parent record you referenced does not exist.",
+          "fk_missing": "A required reference was not supplied.",
+          "unique": "That value is already taken.",
+          "on_child": "Can't delete: another record still references it. Reassign or remove those first.",
+          "auth": "You must sign in before configuring ServerChan notifications."
+        }
+      },
+      "_evidence": {
+        "locator": "endpoints/notifications/saveserverchannotifications.php:23",
+        "id_local": "ServerchanNotification.save",
+        "entry": {
+          "kind": "http",
+          "route": "POST /endpoints/notifications/saveserverchannotifications.php",
+          "locator": "endpoints/notifications/saveserverchannotifications.php:23"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "SELECT COUNT(*) WHERE user_id; if 0 INSERT else UPDATE ServerchanNotification SET enabled + fields WHERE user_id; mandatory ['sendkey'] validated; webhook/url channels SSRF-validated at save",
+        "edges": [
+          "includes/validate_endpoint.php:19; connect_endpoint.php $actor.id"
+        ]
+      }
+    },
+    {
+      "tool": "notificationsettings_save",
+      "family": "crud.upsert",
+      "entity": "NotificationSettings",
+      "description": "Configure global notification timing: how many days before a renewal to remind, and whether to send a period summary.",
+      "input_schema": {
+        "days": {
+          "type": "int",
+          "description": "Days before renewal to send reminders."
+        },
+        "period_summary_at_period_start": {
+          "type": "bool",
+          "description": "Send a period summary when a period starts."
+        }
+      },
+      "exec_spec": {
+        "entity": "NotificationSettings",
+        "key": {
+          "user_id": {
+            "$session": "account_id"
+          }
+        },
+        "insert_fields": [
+          "days",
+          "period_summary_at_period_start"
+        ],
+        "set_on_exists": [
+          "days",
+          "period_summary_at_period_start"
+        ]
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "not_found": "That record does not exist in your account.",
+          "fk": "The parent record you referenced does not exist.",
+          "fk_missing": "A required reference was not supplied.",
+          "unique": "That value is already taken.",
+          "on_child": "Can't delete: another record still references it. Reassign or remove those first.",
+          "auth": "You must sign in before changing notification settings."
+        }
+      },
+      "_evidence": {
+        "locator": "endpoints/notifications/savenotificationsettings.php:25",
+        "id_local": "NotificationSettings.save",
+        "entry": {
+          "kind": "http",
+          "route": "POST /endpoints/notifications/savenotificationsettings.php",
+          "locator": "endpoints/notifications/savenotificationsettings.php:25"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "INSERT-or-UPDATE notification_settings (days, period_summary_at_period_start) per user",
+        "edges": [
+          "includes/validate_endpoint.php:19 ($_SESSION['loggedin'] !== true -> session_expired); connect_endpoint.php resolves $actor.id via session/remember-me"
+        ]
+      }
+    },
+    {
+      "tool": "fixer_save",
+      "family": "crud.upsert",
+      "entity": "Fixer",
+      "description": "Set the exchange-rate provider API key used for currency conversion.",
+      "input_schema": {
+        "api_key": {
+          "type": "text",
+          "required": true,
+          "description": "Exchange-rate provider API key."
+        },
+        "provider": {
+          "type": "int",
+          "description": "Provider id (0 or 1)."
+        }
+      },
+      "exec_spec": {
+        "entity": "Fixer",
+        "key": {
+          "user_id": {
+            "$session": "account_id"
+          }
+        },
+        "insert_fields": [
+          "api_key",
+          "provider"
+        ],
+        "set_on_exists": [
+          "api_key",
+          "provider"
+        ]
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "not_found": "That record does not exist in your account.",
+          "fk": "The parent record you referenced does not exist.",
+          "fk_missing": "A required reference was not supplied.",
+          "unique": "That value is already taken.",
+          "on_child": "Can't delete: another record still references it. Reassign or remove those first.",
+          "auth": "You must sign in before setting the exchange-rate provider key."
+        }
+      },
+      "_evidence": {
+        "locator": "endpoints/currency/fixer_api_key.php:8",
+        "id_local": "Fixer.set",
+        "entry": {
+          "kind": "http",
+          "route": "POST /endpoints/currency/fixer_api_key.php",
+          "locator": "endpoints/currency/fixer_api_key.php:8"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "DELETE fixer WHERE user_id; test key against provider; if success INSERT (api_key,provider,user_id); apilayer captures usage headers -> UPDATE usage_used/limit/updated_at",
+        "edges": [
+          "includes/validate_endpoint.php:19 ($_SESSION['loggedin'] !== true -> session_expired); connect_endpoint.php resolves $actor.id via session/remember-me"
+        ]
+      }
+    },
+    {
+      "tool": "googlesearch_save",
+      "family": "crud.upsert",
+      "entity": "GoogleSearch",
+      "description": "Set your Google logo-search API key used to automatically find subscription logos (empty clears it).",
+      "input_schema": {
+        "api_key": {
+          "type": "text",
+          "description": "Google Custom Search API key."
+        }
+      },
+      "exec_spec": {
+        "entity": "GoogleSearch",
+        "key": {
+          "user_id": {
+            "$session": "account_id"
+          }
+        },
+        "insert_fields": {
+          "api_key": {
+            "$arg": "api_key"
+          }
+        },
+        "set_on_exists": {
+          "api_key": {
+            "$arg": "api_key"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "not_found": "That record does not exist in your account.",
+          "fk": "The parent record you referenced does not exist.",
+          "fk_missing": "A required reference was not supplied.",
+          "unique": "That value is already taken.",
+          "on_child": "Can't delete: another record still references it. Reassign or remove those first.",
+          "auth": "You must sign in before setting the logo-search key."
+        }
+      },
+      "_evidence": {
+        "locator": "endpoints/settings/google_search.php:7",
+        "id_local": "GoogleSearch.set",
+        "entry": {
+          "kind": "http",
+          "route": "POST /endpoints/settings/google_search.php",
+          "locator": "endpoints/settings/google_search.php:7"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "DELETE google_search WHERE user_id; if key non-empty: validate against serpapi.com/account; if ok INSERT (user_id,api_key)",
+        "edges": [
+          "includes/validate_endpoint.php:19 ($_SESSION['loggedin'] !== true -> session_expired); connect_endpoint.php resolves $actor.id via session/remember-me"
+        ]
+      }
+    },
+    {
+      "tool": "aisettings_save",
+      "family": "crud.upsert",
+      "entity": "AiSettings",
+      "description": "Configure the AI integration used to generate subscription recommendations (provider, model, API key, schedule).",
+      "input_schema": {
+        "type": {
+          "type": "text",
+          "required": true,
+          "description": "Provider: chatgpt/gemini/openrouter/ollama/openai-compatible."
+        },
+        "enabled": {
+          "type": "bool",
+          "description": "Enable AI recommendations."
+        },
+        "api_key": {
+          "type": "text",
+          "description": "Provider API key."
+        },
+        "model": {
+          "type": "text",
+          "required": true,
+          "description": "Model name."
+        },
+        "url": {
+          "type": "text",
+          "description": "Custom API URL for self-hosted providers."
+        },
+        "run_schedule": {
+          "type": "text",
+          "description": "manual/weekly/monthly."
+        }
+      },
+      "exec_spec": {
+        "entity": "AiSettings",
+        "key": {
+          "user_id": {
+            "$session": "account_id"
+          }
+        },
+        "insert_fields": [
+          "type",
+          "enabled",
+          "api_key",
+          "model",
+          "url",
+          "run_schedule"
+        ],
+        "set_on_exists": [
+          "type",
+          "enabled",
+          "api_key",
+          "model",
+          "url",
+          "run_schedule"
+        ]
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "not_found": "That record does not exist in your account.",
+          "fk": "The parent record you referenced does not exist.",
+          "fk_missing": "A required reference was not supplied.",
+          "unique": "That value is already taken.",
+          "on_child": "Can't delete: another record still references it. Reassign or remove those first.",
+          "auth": "You must sign in before configuring AI."
+        }
+      },
+      "_evidence": {
+        "locator": "endpoints/ai/save_settings.php:64",
+        "id_local": "AiSettings.save",
+        "entry": {
+          "kind": "http",
+          "route": "POST /endpoints/ai/save_settings.php",
+          "locator": "endpoints/ai/save_settings.php:64"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "DELETE ai_settings WHERE user_id; INSERT (type,enabled,api_key,model,url,run_schedule); type whitelist; host SSRF-validated for host providers",
+        "edges": [
+          "includes/validate_endpoint.php:19 ($_SESSION['loggedin'] !== true -> session_expired); connect_endpoint.php resolves $actor.id via session/remember-me"
+        ]
+      }
+    },
+    {
+      "tool": "airecommendation_delete",
+      "family": "crud.delete",
+      "entity": "AiRecommendation",
+      "description": "Delete one of your AI-generated subscription recommendations.",
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the recommendation to delete."
+        }
+      },
+      "exec_spec": {
+        "entity": "AiRecommendation",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "not_found": "That record does not exist in your account.",
+          "fk": "The parent record you referenced does not exist.",
+          "fk_missing": "A required reference was not supplied.",
+          "unique": "That value is already taken.",
+          "on_child": "Can't delete: another record still references it. Reassign or remove those first.",
+          "auth": "You must sign in before deleting a recommendation."
+        }
+      },
+      "_evidence": {
+        "locator": "endpoints/ai/delete_recommendation.php:20",
+        "id_local": "AiRecommendation.delete",
+        "entry": {
+          "kind": "http",
+          "route": "POST /endpoints/ai/delete_recommendation.php",
+          "locator": "endpoints/ai/delete_recommendation.php:20"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "if id>0: DELETE FROM ai_recommendations WHERE id=:id AND user_id=:userId; success if changes()>0",
+        "edges": [
+          "includes/validate_endpoint.php:19 ($_SESSION['loggedin'] !== true -> session_expired); connect_endpoint.php resolves $actor.id via session/remember-me"
+        ]
+      }
+    }
+  ],
+  "seed_state": {
+    "User": [
+      {
+        "id": 1,
+        "username": "ops@wallos.example",
+        "email": "admin@example.com",
+        "password": "pw-operations",
+        "main_currency": 1,
+        "language": "en",
+        "budget": 1000,
+        "budget_period_type": "monthly",
+        "firstname": "Ada",
+        "lastname": "Owner",
+        "created_at": "2026-01-01"
+      },
+      {
+        "id": 2,
+        "username": "member@wallos.example",
+        "email": "dana@example.com",
+        "password": "pw-member",
+        "main_currency": 1,
+        "language": "en",
+        "budget": 500,
+        "budget_period_type": "monthly",
+        "firstname": "Dana",
+        "lastname": "User",
+        "created_at": "2026-01-01"
+      }
+    ],
+    "Currency": [
+      {
+        "id": 1,
+        "name": "US Dollar",
+        "symbol": "$",
+        "code": "USD",
+        "rate": "1",
+        "user_id": 1
+      },
+      {
+        "id": 2,
+        "name": "Euro",
+        "symbol": "€",
+        "code": "EUR",
+        "rate": "1.09",
+        "user_id": 1
+      },
+      {
+        "id": 3,
+        "name": "Japanese Yen",
+        "symbol": "¥",
+        "code": "JPY",
+        "rate": "0.0067",
+        "user_id": 2
+      }
+    ],
+    "Cycle": [
+      {
+        "id": 1,
+        "days": 1,
+        "name": "Daily"
+      },
+      {
+        "id": 2,
+        "days": 7,
+        "name": "Weekly"
+      },
+      {
+        "id": 3,
+        "days": 30,
+        "name": "Monthly"
+      },
+      {
+        "id": 4,
+        "days": 365,
+        "name": "Yearly"
+      },
+      {
+        "id": 5,
+        "days": 0,
+        "name": "One-time"
+      }
+    ],
+    "Frequency": [
+      {
+        "id": 1,
+        "name": 1
+      },
+      {
+        "id": 2,
+        "name": 2
+      },
+      {
+        "id": 3,
+        "name": 3
+      },
+      {
+        "id": 4,
+        "name": 4
+      },
+      {
+        "id": 12,
+        "name": 12
+      }
+    ],
+    "Category": [
+      {
+        "id": 1,
+        "name": "Streaming",
+        "order": 0,
+        "user_id": 1
+      },
+      {
+        "id": 2,
+        "name": "Software",
+        "order": 1,
+        "user_id": 1
+      },
+      {
+        "id": 3,
+        "name": "Music",
+        "order": 0,
+        "user_id": 2
+      }
+    ],
+    "PaymentMethod": [
+      {
+        "id": 32,
+        "name": "Credit Card",
+        "icon": "card",
+        "enabled": 1,
+        "order": 0,
+        "user_id": 1
+      },
+      {
+        "id": 33,
+        "name": "PayPal",
+        "icon": "paypal",
+        "enabled": 1,
+        "order": 1,
+        "user_id": 1
+      },
+      {
+        "id": 34,
+        "name": "Debit Card",
+        "icon": "card",
+        "enabled": 1,
+        "order": 0,
+        "user_id": 2
+      }
+    ],
+    "Household": [
+      {
+        "id": 1,
+        "name": "Ada",
+        "email": "admin@example.com",
+        "user_id": 1
+      },
+      {
+        "id": 2,
+        "name": "Sam",
+        "email": "",
+        "user_id": 1
+      },
+      {
+        "id": 3,
+        "name": "Dana",
+        "email": "dana@example.com",
+        "user_id": 2
+      }
+    ],
+    "Subscription": [
+      {
+        "id": 1,
+        "name": "Netflix",
+        "price": 15.49,
+        "currency_id": 1,
+        "next_payment": "2026-09-15",
+        "cycle": 3,
+        "frequency": 1,
+        "payment_method_id": 32,
+        "payer_user_id": 1,
+        "category_id": 1,
+        "notify": 1,
+        "inactive": 0,
+        "auto_renew": 1,
+        "user_id": 1
+      },
+      {
+        "id": 2,
+        "name": "Spotify",
+        "price": 9.99,
+        "currency_id": 1,
+        "next_payment": "2026-09-20",
+        "cycle": 3,
+        "frequency": 1,
+        "payment_method_id": 33,
+        "payer_user_id": 2,
+        "category_id": 3,
+        "notify": 1,
+        "inactive": 0,
+        "auto_renew": 1,
+        "user_id": 1
+      },
+      {
+        "id": 3,
+        "name": "Adobe CC",
+        "price": 52.99,
+        "currency_id": 1,
+        "next_payment": "2026-10-01",
+        "cycle": 3,
+        "frequency": 1,
+        "payment_method_id": 32,
+        "payer_user_id": 1,
+        "category_id": 2,
+        "notify": 0,
+        "inactive": 0,
+        "auto_renew": 1,
+        "user_id": 1
+      }
+    ],
+    "Setting": [
+      {
+        "dark_theme": 0,
+        "monthly_price": 0,
+        "convert_currency": 1,
+        "color_theme": "blue",
+        "hide_disabled": 0,
+        "user_id": 1,
+        "id": 1
+      },
+      {
+        "dark_theme": 1,
+        "monthly_price": 1,
+        "convert_currency": 0,
+        "color_theme": "green",
+        "hide_disabled": 0,
+        "user_id": 2,
+        "id": 2
+      }
+    ],
+    "Admin": [
+      {
+        "id": 1,
+        "registrations_open": 1,
+        "max_users": 10,
+        "require_email_verification": 0,
+        "server_url": "https://wallos.example.com",
+        "login_disabled": 0,
+        "smtp_address": "smtp.example.com",
+        "smtp_port": 587,
+        "latest_version": "v2.21.1",
+        "oidc_oauth_enabled": 0
+      }
+    ],
+    "LoginToken": [
+      {
+        "user_id": 1,
+        "token": "tok-admin-1",
+        "timestamp": "2026-09-05",
+        "id": 1
+      }
+    ],
+    "OauthSettings": [
+      {
+        "id": 1,
+        "name": "SSO",
+        "client_id": "c",
+        "client_secret": "s",
+        "authorization_url": "https://sso.example.com/auth",
+        "token_url": "https://sso.example.com/token",
+        "user_info_url": "https://sso.example.com/userinfo",
+        "redirect_url": "https://wallos.example.com/oidc",
+        "user_identifier_field": "sub",
+        "scopes": "openid email profile",
+        "auth_style": "auto",
+        "auto_create_user": 0,
+        "password_login_disabled": 0,
+        "created_at": "2026-01-01",
+        "updated_at": "2026-01-01"
+      }
+    ]
+  }
+}

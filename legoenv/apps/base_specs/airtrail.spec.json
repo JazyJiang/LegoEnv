@@ -1,0 +1,6437 @@
+{
+  "env_id": "airtrail",
+  "_prep_version": 3,
+  "auth": {
+    "account_entity": "User",
+    "username_col": "username",
+    "password_col": "password",
+    "session_fields": {
+      "oauth_id": "oauth_id"
+    }
+  },
+  "entities": [
+    {
+      "name": "User",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "username",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "display_name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "password",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "role",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "user",
+            "admin",
+            "owner"
+          ],
+          "default": "user"
+        },
+        {
+          "name": "oauth_id",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "distance_unit",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "km",
+            "mi",
+            "nm"
+          ],
+          "default": "km"
+        },
+        {
+          "name": "wind_speed_unit",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "kt",
+            "mph",
+            "kmh",
+            "ms"
+          ],
+          "default": "kt"
+        },
+        {
+          "name": "temperature_unit",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "c",
+            "f"
+          ],
+          "default": "c"
+        },
+        {
+          "name": "pressure_unit",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "hpa",
+            "inhg"
+          ],
+          "default": "hpa"
+        },
+        {
+          "name": "time_format",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "12h",
+            "24h",
+            "auto"
+          ],
+          "default": "auto"
+        },
+        {
+          "name": "date_format",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "iso",
+            "us",
+            "eu",
+            "auto"
+          ],
+          "default": "auto"
+        },
+        {
+          "name": "week_starts_on",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "mon",
+            "sun",
+            "auto"
+          ],
+          "default": "auto"
+        },
+        {
+          "name": "flight_time_display",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "airport",
+            "utc",
+            "system"
+          ],
+          "default": "airport"
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "username"
+          ]
+        },
+        {
+          "kind": "unique",
+          "cols": [
+            "oauth_id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Session",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "expires_at",
+          "type": "datetime",
+          "nullable": false
+        },
+        {
+          "name": "user_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "User.id",
+          "on_delete": "cascade"
+        }
+      ]
+    },
+    {
+      "name": "OAuthLinkToken",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "token",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "user_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "User.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "oauth_sub",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "expires_at",
+          "type": "datetime",
+          "nullable": false
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "token"
+          ]
+        },
+        {
+          "kind": "unique",
+          "cols": [
+            "user_id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ApiKey",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "user_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "User.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "key",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "last_used",
+          "type": "datetime",
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "name": "Airport",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "icao",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "iata",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "lat",
+          "type": "float",
+          "nullable": false
+        },
+        {
+          "name": "lon",
+          "type": "float",
+          "nullable": false
+        },
+        {
+          "name": "tz",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "municipality",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "type",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "large_airport",
+            "medium_airport",
+            "small_airport",
+            "heliport",
+            "seaplane_base",
+            "balloonport",
+            "closed"
+          ]
+        },
+        {
+          "name": "continent",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "EU",
+            "NA",
+            "SA",
+            "AS",
+            "AF",
+            "OC",
+            "AN"
+          ]
+        },
+        {
+          "name": "country",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "custom",
+          "type": "bool",
+          "nullable": false,
+          "default": false
+        }
+      ]
+    },
+    {
+      "name": "Aircraft",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "icao",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "source_id",
+          "type": "text",
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "name": "Airline",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "icao",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "iata",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "icon_path",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "source_id",
+          "type": "text",
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "name": "Flight",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "date",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "date_precision",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "day",
+            "month",
+            "year"
+          ],
+          "default": "day"
+        },
+        {
+          "name": "departure",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "arrival",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "departure_scheduled",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "arrival_scheduled",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "takeoff_scheduled",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "takeoff_actual",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "landing_scheduled",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "landing_actual",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "duration",
+          "type": "int",
+          "nullable": true
+        },
+        {
+          "name": "departure_terminal",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "departure_gate",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "arrival_terminal",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "arrival_gate",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "flight_number",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "aircraft_reg",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "note",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "from_id",
+          "type": "id",
+          "nullable": true,
+          "fk_to": "Airport.id",
+          "on_delete": "set_null"
+        },
+        {
+          "name": "to_id",
+          "type": "id",
+          "nullable": true,
+          "fk_to": "Airport.id",
+          "on_delete": "set_null"
+        },
+        {
+          "name": "aircraft_id",
+          "type": "id",
+          "nullable": true,
+          "fk_to": "Aircraft.id"
+        },
+        {
+          "name": "airline_id",
+          "type": "id",
+          "nullable": true,
+          "fk_to": "Airline.id"
+        }
+      ]
+    },
+    {
+      "name": "FlightPassenger",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "flight_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Flight.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "user_id",
+          "type": "id",
+          "nullable": true,
+          "fk_to": "User.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "guest_name",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "seat",
+          "type": "text",
+          "nullable": true,
+          "enum": [
+            "window",
+            "aisle",
+            "middle",
+            "pilot",
+            "copilot",
+            "jumpseat",
+            "other"
+          ]
+        },
+        {
+          "name": "seat_number",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "seat_class",
+          "type": "text",
+          "nullable": true,
+          "enum": [
+            "economy",
+            "economy+",
+            "business",
+            "first",
+            "private"
+          ]
+        },
+        {
+          "name": "flight_reason",
+          "type": "text",
+          "nullable": true,
+          "enum": [
+            "leisure",
+            "business",
+            "crew",
+            "other"
+          ]
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "flight_id",
+            "user_id"
+          ]
+        },
+        {
+          "kind": "unique",
+          "cols": [
+            "flight_id",
+            "guest_name"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "FlightTrack",
+      "columns": [
+        {
+          "name": "flight_id",
+          "type": "id",
+          "pk": true,
+          "fk_to": "Flight.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "track",
+          "type": "json",
+          "nullable": false
+        },
+        {
+          "name": "source_format",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "gpx",
+            "kml",
+            "csv",
+            "readsb"
+          ]
+        },
+        {
+          "name": "source_name",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "point_count",
+          "type": "int",
+          "nullable": false
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "audit": true
+        }
+      ]
+    },
+    {
+      "name": "VisitedCountry",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "code",
+          "type": "text",
+          "nullable": false,
+          "max": 2
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "lived",
+            "visited",
+            "layover",
+            "wishlist"
+          ]
+        },
+        {
+          "name": "note",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "user_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "User.id",
+          "on_delete": "cascade"
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "code",
+            "user_id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "PublicShare",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "user_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "User.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "slug",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "expires_at",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "show_map",
+          "type": "bool",
+          "nullable": false,
+          "default": true
+        },
+        {
+          "name": "show_stats",
+          "type": "bool",
+          "nullable": false,
+          "default": false
+        },
+        {
+          "name": "show_flight_list",
+          "type": "bool",
+          "nullable": false,
+          "default": false
+        },
+        {
+          "name": "date_from",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "date_to",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "show_flight_numbers",
+          "type": "bool",
+          "nullable": false,
+          "default": true
+        },
+        {
+          "name": "show_airlines",
+          "type": "bool",
+          "nullable": false,
+          "default": true
+        },
+        {
+          "name": "show_aircraft",
+          "type": "bool",
+          "nullable": false,
+          "default": false
+        },
+        {
+          "name": "show_times",
+          "type": "bool",
+          "nullable": false,
+          "default": false
+        },
+        {
+          "name": "show_tracks",
+          "type": "bool",
+          "nullable": false,
+          "default": false
+        },
+        {
+          "name": "show_dates",
+          "type": "bool",
+          "nullable": false,
+          "default": true
+        },
+        {
+          "name": "show_seat",
+          "type": "bool",
+          "nullable": false,
+          "default": false
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "slug"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "CustomFieldDefinition",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "entity_type",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "flight",
+            "flight_passenger"
+          ]
+        },
+        {
+          "name": "key",
+          "type": "text",
+          "nullable": false,
+          "max": 50
+        },
+        {
+          "name": "label",
+          "type": "text",
+          "nullable": false,
+          "max": 80
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "nullable": true,
+          "max": 200
+        },
+        {
+          "name": "field_type",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "text",
+            "textarea",
+            "number",
+            "boolean",
+            "date",
+            "select",
+            "multi-select",
+            "airport",
+            "airline",
+            "aircraft"
+          ]
+        },
+        {
+          "name": "required",
+          "type": "bool",
+          "nullable": false,
+          "default": false
+        },
+        {
+          "name": "active",
+          "type": "bool",
+          "nullable": false,
+          "default": true
+        },
+        {
+          "name": "order",
+          "type": "int",
+          "nullable": false,
+          "default": 0
+        },
+        {
+          "name": "default_value",
+          "type": "json",
+          "nullable": true
+        },
+        {
+          "name": "options",
+          "type": "json",
+          "nullable": true
+        },
+        {
+          "name": "validation_json",
+          "type": "json",
+          "nullable": true
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "audit": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "entity_type",
+            "key"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "CustomFieldValue",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "field_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "CustomFieldDefinition.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "entity_type",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "flight",
+            "flight_passenger"
+          ]
+        },
+        {
+          "name": "entity_id",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "value",
+          "type": "json",
+          "nullable": false
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "audit": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "field_id",
+            "entity_type",
+            "entity_id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "AppConfig",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "config",
+          "type": "json",
+          "nullable": false,
+          "default": "{}"
+        }
+      ]
+    }
+  ],
+  "tools": [
+    {
+      "tool": "user_login",
+      "description": "Sign in with an account username and password. Everything that touches flights, users or settings requires this first; the session it opens is what $actor resolves to.",
+      "family": "guard.auth",
+      "entity": "User",
+      "input_schema": {
+        "username": {
+          "type": "text",
+          "required": true,
+          "description": "The account username."
+        },
+        "password": {
+          "type": "text",
+          "required": true,
+          "description": "The account password."
+        }
+      },
+      "exec_spec": {
+        "verify": {
+          "entity": "User"
+        }
+      },
+      "guards": {
+        "required": [
+          "username",
+          "password"
+        ],
+        "messages": {
+          "required": "Both username and password are required to sign in."
+        }
+      },
+      "_evidence": {
+        "locator": "src/routes/api/users/login/+server.ts:20-62",
+        "id_local": "User.login",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/users/login",
+          "locator": "src/routes/api/users/login/+server.ts:63"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "POST /api/users/login: getUserWithPassword(username); if(!user||!user.password) invalid; validPassword=verifyArgon2(user.password,password); if oauthLinkToken linkOAuthAccountWithToken; await createSession(lucia,user.id,cookies); redirect /",
+        "edges": [
+          "getUserWithPassword where username (auth.ts:52) -> if !user invalid login",
+          "login checks !user || !user.password -> invalid (login/+server.ts:28)"
+        ]
+      }
+    },
+    {
+      "tool": "user_setup",
+      "description": "First-run setup: create the initial owner account. Refused once any owner already exists or the username is taken. The new owner is signed in automatically.",
+      "family": "auth.register",
+      "entity": "User",
+      "input_schema": {
+        "username": {
+          "type": "text",
+          "required": true,
+          "description": "Desired username for the owner account."
+        },
+        "password": {
+          "type": "text",
+          "required": true,
+          "description": "Desired password for the owner account."
+        },
+        "displayName": {
+          "type": "text",
+          "required": true,
+          "description": "Display name shown in the app."
+        }
+      },
+      "exec_spec": {
+        "entity": "User",
+        "fields": {
+          "display_name": {
+            "$arg": "displayName"
+          },
+          "password": {
+            "$arg": "password"
+          },
+          "username": {
+            "$arg": "username"
+          }
+        },
+        "set_on_create": {
+          "role": "owner"
+        },
+        "prechecks": [
+          {
+            "entity": "User",
+            "where": {
+              "username": {
+                "$arg": "username"
+              }
+            },
+            "negate": true,
+            "message": "That username is already taken."
+          }
+        ]
+      },
+      "guards": {
+        "messages": {
+          "precondition": "An owner account already exists; initial setup has already run.",
+          "register": "That username is already taken.",
+          "required": "username, password and display name are all required."
+        },
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "role",
+                  "op": "eq",
+                  "value": "owner"
+                }
+              },
+              "op": "eq",
+              "n": 0
+            }
+          ]
+        ],
+        "required": [
+          "username",
+          "password",
+          "displayName"
+        ]
+      },
+      "_evidence": {
+        "locator": "src/routes/api/users/setup/+server.ts:17-41",
+        "id_local": "User.setup",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/users/setup",
+          "locator": "src/routes/api/users/setup/+server.ts:43"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "setup POST: owners=select role=owner; if owners.length>0 error 'Owner already exists'; usernameExists check; generateId; hashedPassword=hashArgon2(password); createUser(userId,username,hashedPassword,displayName,'owner',preferences); createSession; redirect /",
+        "edges": [
+          "owners.length>0 -> 'Owner already exists' (setup/+server.ts:18-22)"
+        ]
+      }
+    },
+    {
+      "tool": "user_add",
+      "description": "Admin: create a new user account with a chosen role. Refused for non-admins, or if the username is already taken.",
+      "family": "crud.insert",
+      "entity": "User",
+      "input_schema": {
+        "username": {
+          "type": "text",
+          "required": true,
+          "description": "Username for the new account (must be unique)."
+        },
+        "password": {
+          "type": "text",
+          "required": true,
+          "description": "Desired password for the new account."
+        },
+        "displayName": {
+          "type": "text",
+          "required": true,
+          "description": "Display name for the new account."
+        },
+        "role": {
+          "type": "text",
+          "required": true,
+          "enum": [
+            "user",
+            "admin"
+          ],
+          "description": "Role to grant: user or admin."
+        }
+      },
+      "exec_spec": {
+        "entity": "User",
+        "unique_on": [
+          "username"
+        ],
+        "fields": {
+          "display_name": {
+            "$arg": "displayName"
+          },
+          "password": {
+            "$arg": "password"
+          },
+          "username": {
+            "$arg": "username"
+          },
+          "role": {
+            "$arg": "role"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in to add a user.",
+          "precondition": "Only an admin or the owner can add users.",
+          "unique": "That username is already taken."
+        },
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "admin",
+                          "owner"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            },
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "username",
+                  "op": "eq",
+                  "value": {
+                    "arg": "username"
+                  }
+                }
+              },
+              "op": "eq",
+              "n": 0
+            }
+          ]
+        ],
+        "required": [
+          "username",
+          "password",
+          "displayName",
+          "role"
+        ]
+      },
+      "_evidence": {
+        "locator": "src/routes/api/users/add/+server.ts:15-43",
+        "id_local": "User.add",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/users/add",
+          "locator": "src/routes/api/users/add/+server.ts:28"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "add POST: if(!user) 401; if(user.role==='user') 403; usernameExists; generateId; passwordHash=hashArgon2(password); createUser(userId,username,passwordHash,displayName,role)",
+        "edges": [
+          "if(!user)401; if(user.role==='user')403 (add/+server.ts:21-25)",
+          "usernameExists(username) -> error if exists (add/+server.ts:27-30)"
+        ]
+      }
+    },
+    {
+      "tool": "user_logout",
+      "description": "End the current session and sign the user out.",
+      "family": "guard.logout",
+      "entity": "Session",
+      "input_schema": {},
+      "exec_spec": {
+        "entity": "Session"
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You are not signed in."
+        }
+      },
+      "_evidence": {
+        "locator": "src/routes/(auth)/log-out/+server.ts:9-21",
+        "id_local": "User.logout",
+        "entry": {
+          "kind": "http",
+          "route": "POST /log-out",
+          "locator": "src/routes/(auth)/log-out/+server.ts:18"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "logout POST: if(!event.locals.session)401; await lucia.invalidateSession(event.locals.session.id); createBlankSessionCookie; redirect /login",
+        "edges": [
+          "if(!event.locals.session) 401 (log-out/+server.ts:10)"
+        ]
+      }
+    },
+    {
+      "tool": "user_me",
+      "description": "Fetch the current signed-in user's own account row, including role and unit preferences.",
+      "family": "crud.fetch",
+      "entity": "User",
+      "input_schema": {},
+      "exec_spec": {
+        "entity": "User",
+        "lookup_by": {
+          "id": {
+            "$session": "account_id"
+          }
+        },
+        "scope": {
+          "owner_col": "id"
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in to view your profile."
+        }
+      },
+      "_evidence": {
+        "locator": "src/lib/server/routes/user.ts:13",
+        "id_local": "User.me",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/trpc/user.me",
+          "locator": "src/lib/server/server.ts:10"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "me: authedProcedure.query(({ctx:{user}}) => user)"
+      }
+    },
+    {
+      "tool": "user_issetup",
+      "description": "Public check of whether the app has been set up yet (whether any user account exists).",
+      "family": "search",
+      "entity": "User",
+      "input_schema": {},
+      "exec_spec": {
+        "entity": "User",
+        "search_fields": [
+          "id"
+        ]
+      },
+      "_evidence": {
+        "locator": "src/lib/server/routes/user.ts:16-22",
+        "id_local": "User.isSetup",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/trpc/user.isSetup",
+          "locator": "src/lib/server/server.ts:10"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "isSetup: publicProcedure.query(async () => { const users = await db.selectFrom('user').select(sql`1`.as('exists')).limit(1).execute(); return users.length > 0; })"
+      }
+    },
+    {
+      "tool": "user_list",
+      "description": "List all user accounts (id, username, display name, role).",
+      "family": "search",
+      "entity": "User",
+      "input_schema": {},
+      "exec_spec": {
+        "entity": "User"
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in to list users."
+        }
+      },
+      "_evidence": {
+        "locator": "src/lib/server/routes/user.ts:80-82",
+        "id_local": "User.list",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/trpc/user.list",
+          "locator": "src/lib/server/server.ts:10"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "list: authedProcedure.query(async () => db.selectFrom('user').select(publicUserSelect).execute())"
+      }
+    },
+    {
+      "tool": "user_delete",
+      "description": "Delete a user account. Anyone may delete their own account; admins may also delete plain 'user' accounts. A user account with role 'owner' can never be deleted.",
+      "family": "crud.delete",
+      "entity": "User",
+      "input_schema": {
+        "userId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the user account to delete."
+        }
+      },
+      "exec_spec": {
+        "entity": "User",
+        "lookup_by": {
+          "id": {
+            "$arg": "userId"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in to delete a user.",
+          "precondition": "You may only delete your own account, or (as an admin) an ordinary user account. Owner accounts can never be deleted.",
+          "not_found": "No user with that id exists."
+        },
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "admin",
+                          "owner"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            },
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "userId"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "ne",
+                      "value": "owner"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "userId"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "ne",
+                      "value": "owner"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "userId"
+        ]
+      },
+      "_evidence": {
+        "locator": "src/lib/server/routes/user.ts:24-79",
+        "id_local": "User.delete",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/trpc/user.delete",
+          "locator": "src/lib/server/server.ts:10"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "delete: authedProcedure.input(z.string()).mutation(async ({ctx,input}) => { if (ctx.user.id !== input && ctx.user.role==='user') throw FORBIDDEN; const user=find; if(user.role==='owner'|| (ctx.user.role==='admin' && user.role!=='user' && ctx.user.id!==user.id)) return false; transaction: delete flightPassenger for user, delete user, then delete flights with no remaining passengers }",
+        "edges": [
+          "if(ctx.user.id!==input && ctx.user.role==='user') throw FORBIDDEN (user.ts:25-27)",
+          "if(user.role==='owner'|| (admin && user.role!=='user' && self!==target)) return false (user.ts:39-46)"
+        ]
+      }
+    },
+    {
+      "tool": "user_edit",
+      "description": "Update your own display name and/or username.",
+      "family": "update.field_set",
+      "entity": "User",
+      "input_schema": {
+        "username": {
+          "type": "text",
+          "required": false,
+          "description": "New username (must stay unique)."
+        },
+        "displayName": {
+          "type": "text",
+          "required": false,
+          "description": "New display name."
+        }
+      },
+      "exec_spec": {
+        "entity": "User",
+        "row_key": {
+          "id": {
+            "$session": "account_id"
+          }
+        },
+        "set": {
+          "username": {
+            "$arg": "username"
+          },
+          "display_name": {
+            "$arg": "displayName"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in to edit your profile."
+        }
+      },
+      "_evidence": {
+        "locator": "src/routes/api/users/edit/+server.ts:15-54",
+        "id_local": "User.edit",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/users/edit",
+          "locator": "src/routes/api/users/edit/+server.ts:28"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "edit POST: if(!user)401; updatedFields from username/displayName; if username changed, usernameExists(exclude own id); db.updateTable('user').set(updatedFields).where('id','=',user.id)",
+        "edges": [
+          "if(!user)401 (edit/+server.ts:21)"
+        ]
+      }
+    },
+    {
+      "tool": "user_editpassword",
+      "description": "Change the current user's password. Requires the current password and the new password.",
+      "family": "update.field_set",
+      "entity": "User",
+      "input_schema": {
+        "currentPassword": {
+          "type": "text",
+          "required": true,
+          "description": "The user's current password."
+        },
+        "newPassword": {
+          "type": "text",
+          "required": true,
+          "description": "The new password to set."
+        }
+      },
+      "exec_spec": {
+        "entity": "User",
+        "row_key": {
+          "id": {
+            "$session": "account_id"
+          }
+        },
+        "set": {
+          "password": {
+            "$arg": "newPassword"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in to change your password.",
+          "precondition": "You do not have a password set.",
+          "required": "Both current and new password are required."
+        },
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "password",
+                      "op": "is_not_null"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "currentPassword",
+          "newPassword"
+        ]
+      },
+      "_evidence": {
+        "locator": "src/routes/api/users/edit-password/+server.ts:18-62",
+        "id_local": "User.editPassword",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/users/edit-password",
+          "locator": "src/routes/api/users/edit-password/+server.ts:29"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "editPassword POST: if(!user)401; currentPasswordHash=getUserPasswordHash(user.id); if(!currentPasswordHash)401; valid=verifyArgon2(currentPasswordHash,currentPassword); passwordHash=hashArgon2(newPassword); update user set password where id=user.id",
+        "edges": [
+          "getUserPasswordHash(user.id); if !currentPasswordHash ->401 (edit-password/+server.ts:33-38)"
+        ]
+      }
+    },
+    {
+      "tool": "user_adminedit",
+      "description": "Admin: edit another user's username, display name, or role. Cannot change an owner account; an admin cannot edit another admin.",
+      "family": "update.field_set",
+      "entity": "User",
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the user to edit."
+        },
+        "username": {
+          "type": "text",
+          "required": false,
+          "description": "New username (must stay unique)."
+        },
+        "displayName": {
+          "type": "text",
+          "required": false,
+          "description": "New display name."
+        },
+        "role": {
+          "type": "text",
+          "required": false,
+          "description": "New role (user or admin)."
+        }
+      },
+      "exec_spec": {
+        "entity": "User",
+        "row_key": {
+          "id": {
+            "$arg": "id"
+          }
+        },
+        "set": {
+          "username": {
+            "$arg": "username"
+          },
+          "display_name": {
+            "$arg": "displayName"
+          },
+          "role": {
+            "$arg": "role"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in to manage users.",
+          "precondition": "Only an admin or owner can edit users, and owner accounts cannot be changed.",
+          "unique": "That username is already taken by another user."
+        },
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "admin",
+                          "owner"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            },
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "ne",
+                      "value": "owner"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "id"
+        ]
+      },
+      "_evidence": {
+        "locator": "src/routes/api/users/admin-edit/+server.ts:39-107",
+        "id_local": "User.adminEdit",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/users/admin-edit",
+          "locator": "src/routes/api/users/admin-edit/+server.ts:62"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "adminEdit POST: targetUser=find by id; if(!targetUser)404; checkAdminPermissions(user,targetUser): user=NULL->401, role user->403, target owner->403, target admin && user admin->403; getChangedFields; if username changed usernameExists(exclude targetId); update user set where id=userId",
+        "edges": [
+          "checkAdminPermissions: actor admin+; target not owner; admin cannot edit admin (admin-edit/+server.ts:24-37)",
+          "usernameExists(username, exclude targetId) (admin-edit/+server.ts:66-71)"
+        ]
+      }
+    },
+    {
+      "tool": "user_unlinkoauth",
+      "description": "Disconnect the current user's account from any linked OAuth identity.",
+      "family": "update.field_set",
+      "entity": "User",
+      "input_schema": {},
+      "exec_spec": {
+        "entity": "User",
+        "row_key": {
+          "id": {
+            "$session": "account_id"
+          }
+        },
+        "set": {
+          "oauth_id": null
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in to unlink OAuth."
+        }
+      },
+      "_evidence": {
+        "locator": "src/lib/server/routes/oauth.ts:36-43",
+        "id_local": "User.unlinkOAuth",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/trpc/oauth.unlink",
+          "locator": "src/lib/server/server.ts:10"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "unlink: authedProcedure.mutation(async ({ctx}) => db.updateTable('user').set({oauthId:null}).where('id','=',ctx.user.id).executeTakeFirst())",
+        "edges": [
+          "authedProcedure (oauth.ts:36)"
+        ]
+      }
+    },
+    {
+      "tool": "user_updatepreferences",
+      "description": "Update your own display-unit and format preferences (distance, wind, temperature, pressure, time, date, week start, flight-time display). Only the keys you pass are changed.",
+      "family": "update.field_set",
+      "entity": "User",
+      "input_schema": {
+        "distanceUnit": {
+          "type": "text",
+          "required": false,
+          "enum": [
+            "km",
+            "mi",
+            "nm"
+          ],
+          "description": "Distance unit."
+        },
+        "windSpeedUnit": {
+          "type": "text",
+          "required": false,
+          "enum": [
+            "kt",
+            "mph",
+            "kmh",
+            "ms"
+          ],
+          "description": "Wind speed unit."
+        },
+        "temperatureUnit": {
+          "type": "text",
+          "required": false,
+          "enum": [
+            "c",
+            "f"
+          ],
+          "description": "Temperature unit."
+        },
+        "pressureUnit": {
+          "type": "text",
+          "required": false,
+          "enum": [
+            "hpa",
+            "inhg"
+          ],
+          "description": "Pressure unit."
+        },
+        "timeFormat": {
+          "type": "text",
+          "required": false,
+          "enum": [
+            "12h",
+            "24h",
+            "auto"
+          ],
+          "description": "Time format."
+        },
+        "dateFormat": {
+          "type": "text",
+          "required": false,
+          "enum": [
+            "iso",
+            "us",
+            "eu",
+            "auto"
+          ],
+          "description": "Date format."
+        },
+        "weekStartsOn": {
+          "type": "text",
+          "required": false,
+          "enum": [
+            "mon",
+            "sun",
+            "auto"
+          ],
+          "description": "First day of the week."
+        },
+        "flightTimeDisplay": {
+          "type": "text",
+          "required": false,
+          "enum": [
+            "airport",
+            "utc",
+            "system"
+          ],
+          "description": "Flight time display mode."
+        }
+      },
+      "exec_spec": {
+        "entity": "User",
+        "row_key": {
+          "id": {
+            "$session": "account_id"
+          }
+        },
+        "set": {
+          "distance_unit": {
+            "$arg": "distanceUnit"
+          },
+          "wind_speed_unit": {
+            "$arg": "windSpeedUnit"
+          },
+          "temperature_unit": {
+            "$arg": "temperatureUnit"
+          },
+          "pressure_unit": {
+            "$arg": "pressureUnit"
+          },
+          "time_format": {
+            "$arg": "timeFormat"
+          },
+          "date_format": {
+            "$arg": "dateFormat"
+          },
+          "week_starts_on": {
+            "$arg": "weekStartsOn"
+          },
+          "flight_time_display": {
+            "$arg": "flightTimeDisplay"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in to update preferences."
+        }
+      },
+      "_evidence": {
+        "locator": "src/lib/server/routes/user.ts:105-115",
+        "id_local": "User.updatePreferences",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/trpc/user.updatePreferences",
+          "locator": "src/lib/server/server.ts:10"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "updatePreferences: authedProcedure.input(updatePreferencesSchema).mutation(async ({ctx,input}) => { if (Object.keys(input).length===0) return true; const result = await db.updateTable('user').set(input).where('id','=',ctx.user.id).executeTakeFirst(); })"
+      }
+    },
+    {
+      "tool": "user_listapikeys",
+      "description": "List the current user's API keys (name and creation info, not the secret).",
+      "family": "search",
+      "entity": "ApiKey",
+      "input_schema": {},
+      "exec_spec": {
+        "entity": "ApiKey",
+        "scope": {
+          "owner_col": "user_id"
+        },
+        "search_fields": [
+          "name",
+          "id"
+        ]
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in to list your API keys."
+        }
+      },
+      "_evidence": {
+        "locator": "src/lib/server/routes/user.ts:83-89",
+        "id_local": "User.listApiKeys",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/trpc/user.listApiKeys",
+          "locator": "src/lib/server/server.ts:10"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "listApiKeys: authedProcedure.query(async ({ctx}) => db.selectFrom('apiKey').select(['id','name','createdAt','lastUsed']).where('userId','=',ctx.user.id).execute())"
+      }
+    },
+    {
+      "tool": "user_createapikey",
+      "description": "Create a new API key for the current user. The plaintext key is returned once; store it because it is not shown again.",
+      "family": "crud.insert",
+      "entity": "ApiKey",
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "A name to identify this API key."
+        }
+      },
+      "exec_spec": {
+        "entity": "ApiKey",
+        "fields": [
+          "name"
+        ],
+        "set_on_create": {
+          "user_id": {
+            "$session": "account_id"
+          },
+          "key": "ak-"
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in to create an API key.",
+          "required": "A key name is required."
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "_evidence": {
+        "locator": "src/lib/server/utils/auth.ts:88-100",
+        "id_local": "User.createApiKey",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/trpc/user.createApiKey",
+          "locator": "src/lib/server/server.ts:10"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "createApiKey: authedProcedure.input(z.string()).mutation(async ({ctx,input}) => createApiKey(ctx.user.id,input)); createApiKey(userId,name): const key=generateString(); const hash=hashSha256(key); insert apiKey {name,key:hash,userId}; returns plaintext key"
+      }
+    },
+    {
+      "tool": "user_deleteapikey",
+      "description": "Delete one of the current user's API keys.",
+      "family": "crud.delete",
+      "entity": "ApiKey",
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the API key to delete."
+        }
+      },
+      "exec_spec": {
+        "entity": "ApiKey",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in to delete an API key.",
+          "not_found": "No API key with that id exists."
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "_evidence": {
+        "locator": "src/lib/server/routes/user.ts:95-104",
+        "id_local": "User.deleteApiKey",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/trpc/user.deleteApiKey",
+          "locator": "src/lib/server/server.ts:10"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "deleteApiKey: authedProcedure.input(z.number()).mutation(async ({ctx,input}) => db.deleteFrom('apiKey').where('id','=',input).where('userId','=',ctx.user.id).executeTakeFirst())"
+      }
+    },
+    {
+      "tool": "flight_list",
+      "description": "List flights. Pass scope='mine' for flights you were a passenger on; an admin or owner may pass scope='user' with a userId to see another user's flights, or scope='all' for all flights.",
+      "family": "search",
+      "entity": "Flight",
+      "input_schema": {
+        "scope": {
+          "type": "text",
+          "required": false,
+          "enum": [
+            "mine",
+            "user",
+            "all"
+          ],
+          "description": "Which flights to list: mine (default), a specific user's, or all."
+        },
+        "userId": {
+          "type": "int",
+          "required": false,
+          "description": "User whose flights to list when scope='user'."
+        }
+      },
+      "exec_spec": {
+        "entity": "Flight",
+        "search_fields": [
+          "id",
+          "flight_number",
+          "date"
+        ]
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in to list flights."
+        }
+      },
+      "_evidence": {
+        "locator": "src/lib/server/routes/flight.ts:76",
+        "id_local": "Flight.list",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/trpc/flight.list",
+          "locator": "src/lib/server/server.ts:10"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "list: authedProcedure.input(flightListInput).query(async ({ctx:{user},input}) => { const scope = input?.scope ?? 'mine'; if (scope==='mine') return await listFlights(user.id); if (user.role==='user') throw new TRPCError({code:'FORBIDDEN'}); if (scope==='user'){...} return await listAllFlights(); })"
+      }
+    },
+    {
+      "tool": "flight_get",
+      "description": "Fetch a single flight by id. Refused unless you were a passenger on it (admins may fetch any flight).",
+      "family": "crud.fetch",
+      "entity": "Flight",
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the flight to fetch."
+        }
+      },
+      "exec_spec": {
+        "entity": "Flight",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in to view or change a flight.",
+          "precondition": "You can only access flights you were a passenger on (admins may access any flight).",
+          "not_found": "No flight with that id exists."
+        },
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "admin",
+                          "owner"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "FlightPassenger",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "flight_id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ]
+      },
+      "_evidence": {
+        "locator": "src/routes/api/flight/get/[id]/+server.ts:29-47",
+        "id_local": "Flight.get",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/flight/get/{id}",
+          "locator": "src/routes/api/flight/get/[id]/+server.ts:13"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "const flight = await getFlight(id); if (!flight) return apiError('Flight not found',404); if (user.role==='user' && !flight.passengers.some(p=>p.userId===user.id)) return apiError('You are not a passenger on this flight',403); return json({success:true,flight});",
+        "edges": [
+          "validateApiKey (get/[id]/+server.ts:22)",
+          "if flight not found 404; if user role && !passenger 403 (get/[id]/+server.ts:40-47)"
+        ]
+      }
+    },
+    {
+      "tool": "flight_create",
+      "description": "Log a new flight. Resolve the departure/arrival airport, aircraft and airline ids first (via the search/autocomplete tools). The signed-in user is added as a passenger on the flight they create.",
+      "family": "crud.insert",
+      "entity": "Flight",
+      "input_schema": {
+        "from_id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the departure airport."
+        },
+        "to_id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the arrival airport."
+        },
+        "date": {
+          "type": "text",
+          "required": true,
+          "description": "Flight date as YYYY-MM-DD."
+        },
+        "date_precision": {
+          "type": "text",
+          "required": false,
+          "enum": [
+            "day",
+            "month",
+            "year"
+          ],
+          "description": "Precision of the date (defaults to day)."
+        },
+        "flight_number": {
+          "type": "text",
+          "required": false,
+          "description": "Flight number, e.g. EX100."
+        },
+        "aircraft_id": {
+          "type": "int",
+          "required": false,
+          "description": "Id of the aircraft flown."
+        },
+        "airline_id": {
+          "type": "int",
+          "required": false,
+          "description": "Id of the operating airline."
+        },
+        "aircraft_reg": {
+          "type": "text",
+          "required": false,
+          "description": "Aircraft tail / registration."
+        },
+        "departure": {
+          "type": "text",
+          "required": false,
+          "description": "Actual departure datetime (ISO)."
+        },
+        "arrival": {
+          "type": "text",
+          "required": false,
+          "description": "Actual arrival datetime (ISO)."
+        },
+        "departure_scheduled": {
+          "type": "text",
+          "required": false,
+          "description": "Scheduled departure datetime."
+        },
+        "arrival_scheduled": {
+          "type": "text",
+          "required": false,
+          "description": "Scheduled arrival datetime."
+        },
+        "departure_terminal": {
+          "type": "text",
+          "required": false,
+          "description": "Departure terminal."
+        },
+        "departure_gate": {
+          "type": "text",
+          "required": false,
+          "description": "Departure gate."
+        },
+        "arrival_terminal": {
+          "type": "text",
+          "required": false,
+          "description": "Arrival terminal."
+        },
+        "arrival_gate": {
+          "type": "text",
+          "required": false,
+          "description": "Arrival gate."
+        },
+        "note": {
+          "type": "text",
+          "required": false,
+          "description": "Free-text note about the flight."
+        }
+      },
+      "exec_spec": {
+        "entity": "Flight",
+        "fields": {
+          "date": {
+            "$arg": "date"
+          },
+          "date_precision": {
+            "$arg": "date_precision"
+          },
+          "flight_number": {
+            "$arg": "flight_number"
+          },
+          "aircraft_reg": {
+            "$arg": "aircraft_reg"
+          },
+          "departure": {
+            "$arg": "departure"
+          },
+          "arrival": {
+            "$arg": "arrival"
+          },
+          "departure_scheduled": {
+            "$arg": "departure_scheduled"
+          },
+          "arrival_scheduled": {
+            "$arg": "arrival_scheduled"
+          },
+          "departure_terminal": {
+            "$arg": "departure_terminal"
+          },
+          "departure_gate": {
+            "$arg": "departure_gate"
+          },
+          "arrival_terminal": {
+            "$arg": "arrival_terminal"
+          },
+          "arrival_gate": {
+            "$arg": "arrival_gate"
+          },
+          "from_id": {
+            "$arg": "from_id"
+          },
+          "to_id": {
+            "$arg": "to_id"
+          },
+          "aircraft_id": {
+            "$arg": "aircraft_id"
+          },
+          "airline_id": {
+            "$arg": "airline_id"
+          },
+          "note": {
+            "$arg": "note"
+          }
+        },
+        "side_inserts": [
+          {
+            "entity": "FlightPassenger",
+            "link_col": "flight_id",
+            "fields": {
+              "user_id": {
+                "$session": "account_id"
+              }
+            }
+          }
+        ]
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in to log a flight.",
+          "fk": "The airport/aircraft/airline id you passed does not exist. Resolve the code to an id first.",
+          "fk_missing": "A departure and arrival airport are required.",
+          "required": "from_id, to_id and date are required."
+        },
+        "required": [
+          "from_id",
+          "to_id",
+          "date"
+        ]
+      },
+      "_evidence": {
+        "locator": "src/routes/api/flight/save/+server.ts:76",
+        "id_local": "Flight.create",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/flight/save",
+          "locator": "src/routes/api/flight/save/+server.ts:76"
+        },
+        "entity_why": "primary effect spawn lands on this table",
+        "ref_code": "validateApiKey -> resolves from/to ICAO/IATA to Airport, aircraft/airline ICAO to Aircraft/Airline; validateAndSaveFlight(user,data,{bypassPassengerCheck: role!=='user'}) creates flight+passengers+optional track+custom fields",
+        "edges": [
+          "validateApiKey -> unauthorized if no key (api/api.ts:15-20)",
+          "getAirportByCode(from: icao then iata); if !from apiError('Invalid departure airport') (save/+server.ts:92-101)"
+        ]
+      }
+    },
+    {
+      "tool": "flight_update",
+      "description": "Edit an existing flight you were a passenger on (admins may edit any flight). Pass the columns you want to change; unchanged ones are left alone.",
+      "family": "update.field_set",
+      "entity": "Flight",
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the flight to edit."
+        },
+        "date": {
+          "type": "text",
+          "required": false,
+          "description": "Flight date (YYYY-MM-DD)."
+        },
+        "date_precision": {
+          "type": "text",
+          "required": false,
+          "description": "Date precision."
+        },
+        "flight_number": {
+          "type": "text",
+          "required": false,
+          "description": "Flight number."
+        },
+        "aircraft_reg": {
+          "type": "text",
+          "required": false,
+          "description": "Aircraft registration."
+        },
+        "from_id": {
+          "type": "int",
+          "required": false,
+          "description": "Departure airport id."
+        },
+        "to_id": {
+          "type": "int",
+          "required": false,
+          "description": "Arrival airport id."
+        },
+        "aircraft_id": {
+          "type": "int",
+          "required": false,
+          "description": "Aircraft id."
+        },
+        "airline_id": {
+          "type": "int",
+          "required": false,
+          "description": "Airline id."
+        },
+        "departure": {
+          "type": "text",
+          "required": false,
+          "description": "Actual departure datetime."
+        },
+        "arrival": {
+          "type": "text",
+          "required": false,
+          "description": "Actual arrival datetime."
+        },
+        "departure_terminal": {
+          "type": "text",
+          "required": false,
+          "description": "Departure terminal."
+        },
+        "departure_gate": {
+          "type": "text",
+          "required": false,
+          "description": "Departure gate."
+        },
+        "arrival_terminal": {
+          "type": "text",
+          "required": false,
+          "description": "Arrival terminal."
+        },
+        "arrival_gate": {
+          "type": "text",
+          "required": false,
+          "description": "Arrival gate."
+        },
+        "note": {
+          "type": "text",
+          "required": false,
+          "description": "Free-text note."
+        }
+      },
+      "exec_spec": {
+        "entity": "Flight",
+        "row_key": {
+          "id": {
+            "$arg": "id"
+          }
+        },
+        "fields": [],
+        "set": {
+          "date": {
+            "$arg": "date"
+          },
+          "date_precision": {
+            "$arg": "date_precision"
+          },
+          "flight_number": {
+            "$arg": "flight_number"
+          },
+          "aircraft_reg": {
+            "$arg": "aircraft_reg"
+          },
+          "from_id": {
+            "$arg": "from_id"
+          },
+          "to_id": {
+            "$arg": "to_id"
+          },
+          "aircraft_id": {
+            "$arg": "aircraft_id"
+          },
+          "airline_id": {
+            "$arg": "airline_id"
+          },
+          "departure": {
+            "$arg": "departure"
+          },
+          "arrival": {
+            "$arg": "arrival"
+          },
+          "departure_terminal": {
+            "$arg": "departure_terminal"
+          },
+          "departure_gate": {
+            "$arg": "departure_gate"
+          },
+          "arrival_terminal": {
+            "$arg": "arrival_terminal"
+          },
+          "arrival_gate": {
+            "$arg": "arrival_gate"
+          },
+          "note": {
+            "$arg": "note"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in to view or change a flight.",
+          "precondition": "You can only access flights you were a passenger on (admins may access any flight).",
+          "not_found": "No flight with that id exists."
+        },
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "admin",
+                          "owner"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "FlightPassenger",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "flight_id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ]
+      },
+      "_evidence": {
+        "locator": "src/lib/server/utils/flight.ts:136-186",
+        "id_local": "Flight.update",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/flight/save",
+          "locator": "src/routes/api/flight/save/+server.ts:76"
+        },
+        "entity_why": "primary effect row_upsert lands on this table",
+        "ref_code": "validateAndSaveFlight update path: getFlight(id); if !flight or (not bypassPassengerCheck and not a passenger) -> 404; updateFlightPrimitiveWithConnection updates flight, upserts/deletes track, resolves added/removed passengers; persistEntityCustomFields for flight and each passenger",
+        "edges": [
+          "validateApiKey (save/+server.ts:88)",
+          "getFlight(updateId); if !flight or not passenger (unless bypass) -> 404 (flight.ts:137-149)"
+        ]
+      }
+    },
+    {
+      "tool": "flight_delete",
+      "description": "Delete a flight you were a passenger on (admins may delete any flight). Passenger and track records for it are removed too.",
+      "family": "crud.delete",
+      "entity": "Flight",
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the flight to delete."
+        }
+      },
+      "exec_spec": {
+        "entity": "Flight",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in to view or change a flight.",
+          "precondition": "You can only access flights you were a passenger on (admins may access any flight).",
+          "not_found": "No flight with that id exists."
+        },
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "admin",
+                          "owner"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "FlightPassenger",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "flight_id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ]
+      },
+      "_evidence": {
+        "locator": "src/routes/api/flight/delete/+server.ts:34-57",
+        "id_local": "Flight.delete",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/flight/delete",
+          "locator": "src/routes/api/flight/delete/+server.ts:21"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "const user = await validateApiKey(request); if (!user) return unauthorized(); const flight = await getFlight(id); if (!flight) return apiError('Flight not found',400); if (user.role==='user' && !flight.passengers.some(p=>p.userId===user.id)) return apiError('You are not a passenger on this flight',403); await deleteFlight(id);",
+        "edges": [
+          "validateApiKey (delete/+server.ts:34)",
+          "if !flight 400; if user role and not passenger 403 (delete/+server.ts:38-51)"
+        ]
+      }
+    },
+    {
+      "tool": "flight_deletemany",
+      "description": "Delete several flights by id. Refused unless you were a passenger on every one of them (admins may delete any).",
+      "family": "crud.delete",
+      "entity": "Flight",
+      "input_schema": {
+        "ids": {
+          "type": "json",
+          "required": true,
+          "description": "Array of flight ids to delete."
+        }
+      },
+      "exec_spec": {
+        "entity": "Flight",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        },
+        "multi": {
+          "arg": "ids",
+          "bind": "id"
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in to delete flights.",
+          "precondition": "You can only delete flights you were a passenger on (admins may delete any).",
+          "not_found": "One of the flights does not exist.",
+          "multi": "One of the flights could not be deleted."
+        },
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "admin",
+                          "owner"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "FlightPassenger",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "flight_id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ]
+      },
+      "_evidence": {
+        "locator": "src/lib/server/routes/flight.ts:124-141",
+        "id_local": "Flight.deleteMany",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/trpc/flight.deleteMany",
+          "locator": "src/lib/server/server.ts:10"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "deleteMany: authedProcedure.input(z.array(z.number())).mutation(async ({ctx:{user},input}) => { ... if (user.role==='user' && flightIds.length !== input.length) throw new Error('You do not have a seat on all flights'); await db.deleteFrom('flight').where('id','in',input).execute(); })",
+        "edges": [
+          "authedProcedure (flight.ts:124)",
+          "if(user.role==='user' && flightIds.length!==input.length) throw 'You do not have a seat on all flights' (flight.ts:136-138)"
+        ]
+      }
+    },
+    {
+      "tool": "flighttrack_list",
+      "description": "List flight tracks (raw GPS/GPX/KML data) for flights the current user can view. Tracks only exist for flights that have uploaded telemetry.",
+      "family": "search",
+      "entity": "FlightTrack",
+      "input_schema": {
+        "scope": {
+          "type": "text",
+          "required": false,
+          "description": "mine"
+        }
+      },
+      "exec_spec": {
+        "entity": "FlightTrack",
+        "search_fields": [
+          "flight_id",
+          "source_format",
+          "source_name"
+        ]
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in to list tracks."
+        }
+      },
+      "_evidence": {
+        "locator": "src/lib/server/routes/flight-track.ts:41-88",
+        "id_local": "FlightTrack.list",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/trpc/flightTrack.list",
+          "locator": "src/lib/server/server.ts:10"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "list: authedProcedure.query -> if user.role==='user' && scope!=='mine' forbidden; query flightTrack join flight where exists flightPassenger for scopedUser; parseTrackRow(reduceForMap)"
+      }
+    },
+    {
+      "tool": "flighttrack_get",
+      "description": "Fetch the flight track (raw GPS data) for a flight you were a passenger on (admins may fetch any).",
+      "family": "crud.fetch",
+      "entity": "FlightTrack",
+      "input_schema": {
+        "flightId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the flight whose track to fetch."
+        }
+      },
+      "exec_spec": {
+        "entity": "FlightTrack",
+        "lookup_by": {
+          "flight_id": {
+            "$arg": "flightId"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in to view or change a flight.",
+          "precondition": "You can only access flights you were a passenger on (admins may access any flight).",
+          "not_found": "No flight with that id exists."
+        },
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "admin",
+                          "owner"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "FlightPassenger",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "flight_id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "flightId"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ]
+      },
+      "_evidence": {
+        "locator": "src/lib/server/routes/flight-track.ts:90-127",
+        "id_local": "FlightTrack.get",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/trpc/flightTrack.get",
+          "locator": "src/lib/server/server.ts:10"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "get: input(z.number()).query -> look up flight (passenger check for user role); if !flight NOT_FOUND; fetch flightTrack by flightId; return null if none",
+        "edges": [
+          "passenger check for user role (flight-track.ts:90-127)",
+          "if !flight NOT_FOUND (flight-track.ts:90-127)"
+        ]
+      }
+    },
+    {
+      "tool": "flight_exportjson",
+      "description": "Export your own flights as a JSON backup.",
+      "family": "search",
+      "entity": "Flight",
+      "input_schema": {},
+      "exec_spec": {
+        "entity": "Flight",
+        "search_fields": [
+          "id",
+          "flight_number",
+          "date"
+        ]
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in to export."
+        }
+      },
+      "_evidence": {
+        "locator": "src/lib/server/routes/flight.ts:225-228",
+        "id_local": "Flight.exportJson",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/trpc/flight.exportJson",
+          "locator": "src/lib/server/server.ts:10"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "exportJson: query -> generateBackup({scope:'mine',userId:user.id}); serializeBackup(backup,'json')"
+      }
+    },
+    {
+      "tool": "flight_exportcsv",
+      "description": "Export your own flights as CSV.",
+      "family": "search",
+      "entity": "Flight",
+      "input_schema": {},
+      "exec_spec": {
+        "entity": "Flight",
+        "search_fields": [
+          "id",
+          "flight_number",
+          "date"
+        ]
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in to export."
+        }
+      },
+      "_evidence": {
+        "locator": "src/lib/server/routes/flight.ts:229-250",
+        "id_local": "Flight.exportCsv",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/trpc/flight.exportCsv",
+          "locator": "src/lib/server/server.ts:10"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "exportCsv: query -> listFlights(user.id); generateCsv(flights)"
+      }
+    },
+    {
+      "tool": "airport_get",
+      "description": "Fetch one airport by id.",
+      "family": "crud.fetch",
+      "entity": "Airport",
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Airport id."
+        }
+      },
+      "exec_spec": {
+        "entity": "Airport",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in.",
+          "not_found": "No airport with that id exists."
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "_evidence": {
+        "locator": "src/lib/server/routes/airport.ts:9",
+        "id_local": "Airport.get",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/trpc/airport.get",
+          "locator": "src/lib/server/server.ts:10"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "get: authedProcedure.input(z.number()).query(async ({input}) => getAirport(input))"
+      }
+    },
+    {
+      "tool": "airport_getfromicao",
+      "description": "Fetch one airport by its ICAO code (case-insensitive).",
+      "family": "crud.fetch",
+      "entity": "Airport",
+      "input_schema": {
+        "icao": {
+          "type": "text",
+          "required": true,
+          "description": "ICAO code, e.g. KJFK."
+        }
+      },
+      "exec_spec": {
+        "entity": "Airport",
+        "lookup_by": {
+          "icao": {
+            "$arg": "icao"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in.",
+          "not_found": "No airport with that ICAO code exists."
+        },
+        "required": [
+          "icao"
+        ]
+      },
+      "_evidence": {
+        "locator": "src/lib/server/routes/airport.ts:12-16",
+        "id_local": "Airport.getFromIcao",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/trpc/airport.getFromIcao",
+          "locator": "src/lib/server/server.ts:10"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "getFromIcao: authedProcedure.input(z.string()).query(async ({input}) => db.selectFrom('airport').selectAll().where('icao','ilike',input).executeTakeFirst())"
+      }
+    },
+    {
+      "tool": "airport_list",
+      "description": "Search airports. Returns the count of built-in airports plus the list of custom ones.",
+      "family": "search",
+      "entity": "Airport",
+      "input_schema": {},
+      "exec_spec": {
+        "entity": "Airport",
+        "search_fields": [
+          "name",
+          "icao",
+          "iata",
+          "municipality"
+        ]
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in."
+        }
+      },
+      "_evidence": {
+        "locator": "src/lib/server/routes/airport.ts:30-47",
+        "id_local": "Airport.list",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/trpc/airport.getData",
+          "locator": "src/lib/server/server.ts:10"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "getData: authedProcedure.query(async () => { numAirports=count where custom=false; customAirports=selectAll where custom=true; return {numAirports,customAirports} })"
+      }
+    },
+    {
+      "tool": "airport_create",
+      "description": "Admin: add a custom airport. Refused if the ICAO code already belongs to a built-in airport.",
+      "family": "crud.insert",
+      "entity": "Airport",
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "Airport name."
+        },
+        "icao": {
+          "type": "text",
+          "required": true,
+          "description": "4-letter ICAO code."
+        },
+        "iata": {
+          "type": "text",
+          "required": false,
+          "description": "IATA code."
+        },
+        "lat": {
+          "type": "float",
+          "required": true,
+          "description": "Latitude."
+        },
+        "lon": {
+          "type": "float",
+          "required": true,
+          "description": "Longitude."
+        },
+        "tz": {
+          "type": "text",
+          "required": true,
+          "description": "Timezone, e.g. America/New_York."
+        },
+        "type": {
+          "type": "text",
+          "required": true,
+          "description": "Airport type."
+        },
+        "continent": {
+          "type": "text",
+          "required": true,
+          "description": "Continent code."
+        },
+        "country": {
+          "type": "text",
+          "required": true,
+          "description": "Country code."
+        },
+        "municipality": {
+          "type": "text",
+          "required": false,
+          "description": "City."
+        }
+      },
+      "exec_spec": {
+        "entity": "Airport",
+        "fields": {
+          "name": {
+            "$arg": "name"
+          },
+          "icao": {
+            "$arg": "icao"
+          },
+          "iata": {
+            "$arg": "iata"
+          },
+          "lat": {
+            "$arg": "lat"
+          },
+          "lon": {
+            "$arg": "lon"
+          },
+          "tz": {
+            "$arg": "tz"
+          },
+          "type": {
+            "$arg": "type"
+          },
+          "continent": {
+            "$arg": "continent"
+          },
+          "country": {
+            "$arg": "country"
+          },
+          "municipality": {
+            "$arg": "municipality"
+          }
+        },
+        "set_on_create": {
+          "custom": true
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in.",
+          "precondition": "Only an admin or the owner can add airports, and an ICAO code already used by a built-in airport cannot be reused.",
+          "required": "name, icao, lat, lon, tz, type, continent and country are required."
+        },
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "admin",
+                          "owner"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            },
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Airport",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "icao",
+                      "op": "eq",
+                      "value": {
+                        "arg": "icao"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "custom",
+                      "op": "eq",
+                      "value": false
+                    }
+                  ]
+                }
+              },
+              "op": "eq",
+              "n": 0
+            }
+          ]
+        ],
+        "required": [
+          "name",
+          "icao",
+          "lat",
+          "lon",
+          "tz",
+          "type",
+          "continent",
+          "country"
+        ]
+      },
+      "_evidence": {
+        "locator": "src/routes/api/airport/save/form/+server.ts:15-27",
+        "id_local": "Airport.create",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/airport/save/form",
+          "locator": "src/routes/api/airport/save/form/+server.ts:22"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "save/form POST: if(!user) error; if(user.role==='user') 'Unauthorized'; validateAndSaveAirport: sets custom=true; if existing by icao and !custom -> pathError 'Code already used'; else create or update",
+        "edges": [
+          "if(!user)error; if(user.role==='user')'Unauthorized' (airport/save/form/+server.ts:21-26)",
+          "if(existingAirport && !existingAirport.custom) return pathError('icao','Code already used') (airport.ts:110-112)",
+          "if(!user)error; if(user.role==='user')'Unauthorized' (save/form/+server.ts)",
+          "if(existingAirport && !custom) 'Code already used' (airport.ts:110-112)"
+        ]
+      }
+    },
+    {
+      "tool": "airport_update",
+      "description": "Admin: update a custom airport by its ICAO code.",
+      "family": "update.field_set",
+      "entity": "Airport",
+      "input_schema": {
+        "icao": {
+          "type": "text",
+          "required": true,
+          "description": "ICAO code of the custom airport to edit."
+        },
+        "name": {
+          "type": "text",
+          "required": false,
+          "description": "Airport name."
+        },
+        "iata": {
+          "type": "text",
+          "required": false,
+          "description": "IATA code."
+        },
+        "lat": {
+          "type": "float",
+          "required": false,
+          "description": "Latitude."
+        },
+        "lon": {
+          "type": "float",
+          "required": false,
+          "description": "Longitude."
+        },
+        "tz": {
+          "type": "text",
+          "required": false,
+          "description": "Timezone."
+        },
+        "type": {
+          "type": "text",
+          "required": false,
+          "description": "Airport type."
+        },
+        "continent": {
+          "type": "text",
+          "required": false,
+          "description": "Continent code."
+        },
+        "country": {
+          "type": "text",
+          "required": false,
+          "description": "Country code."
+        },
+        "municipality": {
+          "type": "text",
+          "required": false,
+          "description": "City."
+        }
+      },
+      "exec_spec": {
+        "entity": "Airport",
+        "row_key": {
+          "icao": {
+            "$arg": "icao"
+          }
+        },
+        "set": {
+          "custom": true,
+          "name": {
+            "$arg": "name"
+          },
+          "iata": {
+            "$arg": "iata"
+          },
+          "lat": {
+            "$arg": "lat"
+          },
+          "lon": {
+            "$arg": "lon"
+          },
+          "tz": {
+            "$arg": "tz"
+          },
+          "type": {
+            "$arg": "type"
+          },
+          "continent": {
+            "$arg": "continent"
+          },
+          "country": {
+            "$arg": "country"
+          },
+          "municipality": {
+            "$arg": "municipality"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in.",
+          "precondition": "Only an admin or the owner can update airports, and a built-in airport's ICAO code cannot be edited.",
+          "not_found": "No airport with that ICAO code exists."
+        },
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "admin",
+                          "owner"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            },
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Airport",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "icao",
+                      "op": "eq",
+                      "value": {
+                        "arg": "icao"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "custom",
+                      "op": "eq",
+                      "value": true
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "icao"
+        ]
+      },
+      "_evidence": {
+        "locator": "src/routes/api/airport/save/form/+server.ts:15-27",
+        "id_local": "Airport.update",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/airport/save/form",
+          "locator": "src/routes/api/airport/save/form/+server.ts:22"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "save/form POST: if(!user) error; if(user.role==='user') 'Unauthorized'; validateAndSaveAirport: sets custom=true; if existing by icao and !custom -> pathError 'Code already used'; else create or update",
+        "edges": [
+          "if(!user)error; if(user.role==='user')'Unauthorized' (airport/save/form/+server.ts:21-26)",
+          "if(existingAirport && !existingAirport.custom) return pathError('icao','Code already used') (airport.ts:110-112)",
+          "if(!user)error; if(user.role==='user')'Unauthorized' (save/form/+server.ts)",
+          "if(existingAirport && !custom) 'Code already used' (airport.ts:110-112)"
+        ]
+      }
+    },
+    {
+      "tool": "airport_delete",
+      "description": "Admin: delete airport by id.",
+      "family": "crud.delete",
+      "entity": "Airport",
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Airport id."
+        }
+      },
+      "exec_spec": {
+        "entity": "Airport",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in to manage reference data.",
+          "precondition": "Only an admin or the owner can manage reference data."
+        },
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "admin",
+                          "owner"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ]
+      },
+      "_evidence": {
+        "locator": "src/lib/server/routes/airport.ts:48-54",
+        "id_local": "Airport.delete",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/trpc/airport.delete",
+          "locator": "src/lib/server/server.ts:10"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "delete: adminProcedure.input(z.number()).mutation(async ({input}) => db.deleteFrom('airport').where('id','=',input).execute())",
+        "edges": [
+          "adminProcedure (airport.ts:48)"
+        ]
+      }
+    },
+    {
+      "tool": "aircraft_get",
+      "description": "Fetch one aircraft by id.",
+      "family": "crud.fetch",
+      "entity": "Aircraft",
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Aircraft id."
+        }
+      },
+      "exec_spec": {
+        "entity": "Aircraft",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in.",
+          "not_found": "No aircraft with that id exists."
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "_evidence": {
+        "locator": "src/lib/server/routes/aircraft.ts:13",
+        "id_local": "Aircraft.get",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/trpc/aircraft.get",
+          "locator": "src/lib/server/server.ts:10"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "get: authedProcedure.input(z.number()).query(async ({input}) => getAircraft(input))"
+      }
+    },
+    {
+      "tool": "aircraft_getbyicao",
+      "description": "Fetch one aircraft type by its ICAO type code.",
+      "family": "crud.fetch",
+      "entity": "Aircraft",
+      "input_schema": {
+        "icao": {
+          "type": "text",
+          "required": true,
+          "description": "Aircraft ICAO type code, e.g. B738."
+        }
+      },
+      "exec_spec": {
+        "entity": "Aircraft",
+        "lookup_by": {
+          "icao": {
+            "$arg": "icao"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in.",
+          "not_found": "No aircraft with that ICAO code exists."
+        },
+        "required": [
+          "icao"
+        ]
+      },
+      "_evidence": {
+        "locator": "src/lib/server/routes/aircraft.ts:16",
+        "id_local": "Aircraft.getByIcao",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/trpc/aircraft.getByIcao",
+          "locator": "src/lib/server/server.ts:10"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "getByIcao: authedProcedure.input(z.string()).query(async ({input}) => getAircraftByIcao(input))"
+      }
+    },
+    {
+      "tool": "aircraft_list",
+      "description": "List all known aircraft types, ordered by name.",
+      "family": "search",
+      "entity": "Aircraft",
+      "input_schema": {},
+      "exec_spec": {
+        "entity": "Aircraft",
+        "search_fields": [
+          "name",
+          "icao"
+        ]
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in."
+        }
+      },
+      "_evidence": {
+        "locator": "src/lib/server/routes/aircraft.ts:22-28",
+        "id_local": "Aircraft.list",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/trpc/aircraft.list",
+          "locator": "src/lib/server/server.ts:10"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "list: authedProcedure.query(async () => db.selectFrom('aircraft').selectAll().orderBy('name').execute())"
+      }
+    },
+    {
+      "tool": "aircraft_create",
+      "description": "Admin: add an aircraft type.",
+      "family": "crud.insert",
+      "entity": "Aircraft",
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "Aircraft name."
+        },
+        "icao": {
+          "type": "text",
+          "required": true,
+          "description": "ICAO type code."
+        }
+      },
+      "exec_spec": {
+        "entity": "Aircraft",
+        "fields": [
+          "name",
+          "icao"
+        ],
+        "set_on_create": {
+          "source_id": null
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in to manage reference data.",
+          "precondition": "Only an admin or the owner can manage reference data."
+        },
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "admin",
+                          "owner"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ]
+      },
+      "_evidence": {
+        "locator": "src/routes/api/aircraft/save/form/+server.ts:15-27",
+        "id_local": "Aircraft.create",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/aircraft/save/form",
+          "locator": "src/routes/api/aircraft/save/form/+server.ts:22"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "save/form POST: if(!user) error; if(user.role==='user') 'Unauthorized'; validateAndSaveAircraft(form.data): if id getAircraft->update else create {name,icao,sourceId:null}",
+        "edges": [
+          "if(!user)error; if(user.role==='user')'Unauthorized' (aircraft/save/form/+server.ts:21-26)",
+          "if(!user)error; if(user.role==='user')'Unauthorized' (save/form/+server.ts)"
+        ]
+      }
+    },
+    {
+      "tool": "aircraft_update",
+      "description": "Admin: update an aircraft type by id.",
+      "family": "update.field_set",
+      "entity": "Aircraft",
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Aircraft id."
+        },
+        "name": {
+          "type": "text",
+          "required": false,
+          "description": "Aircraft name."
+        },
+        "icao": {
+          "type": "text",
+          "required": false,
+          "description": "ICAO type code."
+        }
+      },
+      "exec_spec": {
+        "entity": "Aircraft",
+        "row_key": {
+          "id": {
+            "$arg": "id"
+          }
+        },
+        "set": {
+          "name": {
+            "$arg": "name"
+          },
+          "icao": {
+            "$arg": "icao"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in to manage reference data.",
+          "precondition": "Only an admin or the owner can manage reference data."
+        },
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "admin",
+                          "owner"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ]
+      },
+      "_evidence": {
+        "locator": "src/routes/api/aircraft/save/form/+server.ts:15-27",
+        "id_local": "Aircraft.update",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/aircraft/save/form",
+          "locator": "src/routes/api/aircraft/save/form/+server.ts:22"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "save/form POST: if(!user) error; if(user.role==='user') 'Unauthorized'; validateAndSaveAircraft(form.data): if id getAircraft->update else create {name,icao,sourceId:null}",
+        "edges": [
+          "if(!user)error; if(user.role==='user')'Unauthorized' (aircraft/save/form/+server.ts:21-26)",
+          "if(!user)error; if(user.role==='user')'Unauthorized' (save/form/+server.ts)"
+        ]
+      }
+    },
+    {
+      "tool": "aircraft_delete",
+      "description": "Admin: delete an aircraft type by id.",
+      "family": "crud.delete",
+      "entity": "Aircraft",
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Aircraft id."
+        }
+      },
+      "exec_spec": {
+        "entity": "Aircraft",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in to manage reference data.",
+          "precondition": "Only an admin or the owner can manage reference data."
+        },
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "admin",
+                          "owner"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ]
+      },
+      "_evidence": {
+        "locator": "src/lib/server/routes/aircraft.ts:29-35",
+        "id_local": "Aircraft.delete",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/trpc/aircraft.delete",
+          "locator": "src/lib/server/server.ts:10"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "delete: adminProcedure.input(z.number()).mutation(async ({input}) => db.deleteFrom('aircraft').where('id','=',input).execute())",
+        "edges": [
+          "adminProcedure (aircraft.ts:29)"
+        ]
+      }
+    },
+    {
+      "tool": "airline_get",
+      "description": "Fetch one airline by id.",
+      "family": "crud.fetch",
+      "entity": "Airline",
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Airline id."
+        }
+      },
+      "exec_spec": {
+        "entity": "Airline",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in.",
+          "not_found": "No airline with that id exists."
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "_evidence": {
+        "locator": "src/lib/server/routes/airline.ts:13",
+        "id_local": "Airline.get",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/trpc/airline.get",
+          "locator": "src/lib/server/server.ts:10"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "get: authedProcedure.input(z.number()).query(async ({input}) => getAirline(input))"
+      }
+    },
+    {
+      "tool": "airline_getbyicao",
+      "description": "Fetch one airline by its ICAO code.",
+      "family": "crud.fetch",
+      "entity": "Airline",
+      "input_schema": {
+        "icao": {
+          "type": "text",
+          "required": true,
+          "description": "Airline ICAO code."
+        }
+      },
+      "exec_spec": {
+        "entity": "Airline",
+        "lookup_by": {
+          "icao": {
+            "$arg": "icao"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in.",
+          "not_found": "No airline with that ICAO code exists."
+        },
+        "required": [
+          "icao"
+        ]
+      },
+      "_evidence": {
+        "locator": "src/lib/server/routes/airline.ts:16",
+        "id_local": "Airline.getByIcao",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/trpc/airline.getByIcao",
+          "locator": "src/lib/server/server.ts:10"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "getByIcao: authedProcedure.input(z.string()).query(async ({input}) => getAirlineByIcao(input))"
+      }
+    },
+    {
+      "tool": "airline_list",
+      "description": "List all known airlines, ordered by name.",
+      "family": "search",
+      "entity": "Airline",
+      "input_schema": {},
+      "exec_spec": {
+        "entity": "Airline",
+        "search_fields": [
+          "name",
+          "icao",
+          "iata"
+        ]
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in."
+        }
+      },
+      "_evidence": {
+        "locator": "src/lib/server/routes/airline.ts:29-31",
+        "id_local": "Airline.list",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/trpc/airline.list",
+          "locator": "src/lib/server/server.ts:10"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "list: authedProcedure.query(async () => db.selectFrom('airline').selectAll().orderBy('name').execute())"
+      }
+    },
+    {
+      "tool": "airline_create",
+      "description": "Admin: add an airline. Refused if the IATA code is already in use.",
+      "family": "crud.insert",
+      "entity": "Airline",
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "Airline name."
+        },
+        "icao": {
+          "type": "text",
+          "required": true,
+          "description": "ICAO code."
+        },
+        "iata": {
+          "type": "text",
+          "required": false,
+          "description": "IATA code."
+        },
+        "iconPath": {
+          "type": "text",
+          "required": false,
+          "description": "Icon path."
+        }
+      },
+      "exec_spec": {
+        "entity": "Airline",
+        "fields": {
+          "name": {
+            "$arg": "name"
+          },
+          "icao": {
+            "$arg": "icao"
+          },
+          "iata": {
+            "$arg": "iata"
+          },
+          "icon_path": {
+            "$arg": "iconPath"
+          }
+        },
+        "set_on_create": {
+          "source_id": null
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in.",
+          "precondition": "Only an admin or the owner can add airlines, and the IATA code must be unique.",
+          "unique": "That IATA code is already used by another airline.",
+          "required": "A name and ICAO code are required."
+        },
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "admin",
+                          "owner"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "name",
+          "icao"
+        ]
+      },
+      "_evidence": {
+        "locator": "src/routes/api/airline/save/form/+server.ts:15-27",
+        "id_local": "Airline.create",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/airline/save/form",
+          "locator": "src/routes/api/airline/save/form/+server.ts:22"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "save/form POST: if(!user) error; if(user.role==='user') 'Unauthorized'; validateAndSaveAirline: checks duplicate iata conflict, then create or update",
+        "edges": [
+          "if(!user)error; if(user.role==='user')'Unauthorized' (airline/save/form/+server.ts:21-26)",
+          "if airline.iata && !iata.endsWith('*') check iata conflict -> error (airline.ts:116-128)",
+          "if(!user)error; if(user.role==='user')'Unauthorized' (save/form/+server.ts)"
+        ]
+      }
+    },
+    {
+      "tool": "airline_update",
+      "description": "Admin: update an airline by id.",
+      "family": "update.field_set",
+      "entity": "Airline",
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Airline id."
+        },
+        "name": {
+          "type": "text",
+          "required": false,
+          "description": "Airline name."
+        },
+        "icao": {
+          "type": "text",
+          "required": false,
+          "description": "ICAO code."
+        },
+        "iata": {
+          "type": "text",
+          "required": false,
+          "description": "IATA code."
+        }
+      },
+      "exec_spec": {
+        "entity": "Airline",
+        "row_key": {
+          "id": {
+            "$arg": "id"
+          }
+        },
+        "set": {
+          "name": {
+            "$arg": "name"
+          },
+          "icao": {
+            "$arg": "icao"
+          },
+          "iata": {
+            "$arg": "iata"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in.",
+          "precondition": "Only an admin or the owner can update airlines.",
+          "unique": "That IATA code is already used by another airline.",
+          "not_found": "No airline with that id exists."
+        },
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "admin",
+                          "owner"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "id"
+        ]
+      },
+      "_evidence": {
+        "locator": "src/routes/api/airline/save/form/+server.ts:15-27",
+        "id_local": "Airline.update",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/airline/save/form",
+          "locator": "src/routes/api/airline/save/form/+server.ts:22"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "save/form POST: if(!user) error; if(user.role==='user') 'Unauthorized'; validateAndSaveAirline: checks duplicate iata conflict, then create or update",
+        "edges": [
+          "if(!user)error; if(user.role==='user')'Unauthorized' (airline/save/form/+server.ts:21-26)",
+          "if airline.iata && !iata.endsWith('*') check iata conflict -> error (airline.ts:116-128)",
+          "if(!user)error; if(user.role==='user')'Unauthorized' (save/form/+server.ts)"
+        ]
+      }
+    },
+    {
+      "tool": "airline_delete",
+      "description": "Admin: delete an airline by id.",
+      "family": "crud.delete",
+      "entity": "Airline",
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Airline id."
+        }
+      },
+      "exec_spec": {
+        "entity": "Airline",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in to manage reference data.",
+          "precondition": "Only an admin or the owner can manage reference data."
+        },
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "admin",
+                          "owner"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ]
+      },
+      "_evidence": {
+        "locator": "src/lib/server/routes/airline.ts:32-38",
+        "id_local": "Airline.delete",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/trpc/airline.delete",
+          "locator": "src/lib/server/server.ts:10"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "delete: adminProcedure.input(z.number()).mutation(async ({input}) => db.deleteFrom('airline').where('id','=',input).execute())",
+        "edges": [
+          "adminProcedure (airline.ts:32)"
+        ]
+      }
+    },
+    {
+      "tool": "airline_clearicon",
+      "description": "Admin: remove an airline's icon.",
+      "family": "update.field_set",
+      "entity": "Airline",
+      "input_schema": {
+        "airlineId": {
+          "type": "int",
+          "required": true,
+          "description": "Airline id."
+        }
+      },
+      "exec_spec": {
+        "entity": "Airline",
+        "row_key": {
+          "id": {
+            "$arg": "airlineId"
+          }
+        },
+        "set": {
+          "icon_path": null
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in to manage reference data.",
+          "precondition": "Only an admin or the owner can manage reference data."
+        },
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "admin",
+                          "owner"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ]
+      },
+      "_evidence": {
+        "locator": "src/routes/api/airline/icon/+server.ts:82-100",
+        "id_local": "Airline.clearIcon",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/airline/icon/delete",
+          "locator": "src/routes/api/airline/icon/+server.ts:84"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "DELETE /api/airline/icon: auth checks; if airline.iconPath deleteFile; update airline set iconPath=null",
+        "edges": [
+          "if(!user)401; if(user.role==='user')403 (icon/+server.ts:18-24)"
+        ]
+      }
+    },
+    {
+      "tool": "autocomplete_airport",
+      "description": "Search airports by name, ICAO or IATA code; returns ranked matches (max 10). Use this to resolve a code to an airport id.",
+      "family": "search",
+      "entity": "Airport",
+      "input_schema": {
+        "query": {
+          "type": "text",
+          "required": true,
+          "description": "Airport name or code fragment."
+        }
+      },
+      "exec_spec": {
+        "entity": "Airport",
+        "search_fields": [
+          "icao",
+          "iata",
+          "name"
+        ],
+        "rank": {
+          "method": "substring",
+          "fields": [
+            "icao",
+            "iata",
+            "name"
+          ]
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in.",
+          "required": "A query is required."
+        },
+        "required": [
+          "query"
+        ]
+      },
+      "_evidence": {
+        "locator": "src/lib/server/routes/autocomplete.ts:9-14",
+        "id_local": "Autocomplete.airport",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/trpc/autocomplete.airport",
+          "locator": "src/lib/server/server.ts:10"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "airport: authedProcedure.input(z.string()).query(async({input}) => findAirports(input)); findAirportsPrimitive matches name/icao/iata with ilike+unaccent, ranks and orders, limit 10"
+      }
+    },
+    {
+      "tool": "autocomplete_aircraft",
+      "description": "Search aircraft types by name or ICAO code.",
+      "family": "search",
+      "entity": "Aircraft",
+      "input_schema": {
+        "query": {
+          "type": "text",
+          "required": true,
+          "description": "Aircraft name or ICAO code fragment."
+        }
+      },
+      "exec_spec": {
+        "entity": "Aircraft",
+        "search_fields": [
+          "name",
+          "icao"
+        ],
+        "rank": {
+          "method": "substring",
+          "fields": [
+            "name",
+            "icao"
+          ]
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in.",
+          "required": "A query is required."
+        },
+        "required": [
+          "query"
+        ]
+      },
+      "_evidence": {
+        "locator": "src/lib/server/routes/autocomplete.ts:15-19",
+        "id_local": "Autocomplete.aircraft",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/trpc/autocomplete.aircraft",
+          "locator": "src/lib/server/server.ts:10"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "aircraft: authedProcedure.input(z.string()).query(async({input}) => findAircraft(input))"
+      }
+    },
+    {
+      "tool": "autocomplete_airline",
+      "description": "Search airlines by name, ICAO or IATA code.",
+      "family": "search",
+      "entity": "Airline",
+      "input_schema": {
+        "query": {
+          "type": "text",
+          "required": true,
+          "description": "Airline name or code fragment."
+        }
+      },
+      "exec_spec": {
+        "entity": "Airline",
+        "search_fields": [
+          "name",
+          "icao",
+          "iata"
+        ],
+        "rank": {
+          "method": "substring",
+          "fields": [
+            "name",
+            "icao",
+            "iata"
+          ]
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in.",
+          "required": "A query is required."
+        },
+        "required": [
+          "query"
+        ]
+      },
+      "_evidence": {
+        "locator": "src/lib/server/routes/autocomplete.ts:20-24",
+        "id_local": "Autocomplete.airline",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/trpc/autocomplete.airline",
+          "locator": "src/lib/server/server.ts:10"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "airline: authedProcedure.input(z.string()).query(async({input}) => findAirline(input))"
+      }
+    },
+    {
+      "tool": "visitedcountry_list",
+      "description": "List the current user's visited/lived countries.",
+      "family": "search",
+      "entity": "VisitedCountry",
+      "input_schema": {},
+      "exec_spec": {
+        "entity": "VisitedCountry",
+        "scope": {
+          "owner_col": "user_id"
+        },
+        "search_fields": [
+          "code",
+          "status",
+          "note"
+        ]
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in."
+        }
+      },
+      "_evidence": {
+        "locator": "src/lib/server/routes/visited-countries.ts:25-32",
+        "id_local": "VisitedCountry.list",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/trpc/visitedCountries.list",
+          "locator": "src/lib/server/server.ts:10"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "list: authedProcedure.query(async ({ctx}) => db.selectFrom('visitedCountry').select([...]).where('userId','=',ctx.user.id).execute())"
+      }
+    },
+    {
+      "tool": "visitedcountry_save",
+      "description": "Set the status of a country for the current user (lived/visited/layover/wishlist). Providing a status upserts the (user, country) row; leaving it empty deletes the row.",
+      "family": "crud.upsert",
+      "entity": "VisitedCountry",
+      "input_schema": {
+        "code": {
+          "type": "text",
+          "required": true,
+          "description": "ISO 2-letter country code."
+        },
+        "status": {
+          "type": "text",
+          "required": true,
+          "enum": [
+            "lived",
+            "visited",
+            "layover",
+            "wishlist"
+          ],
+          "description": "Status to record."
+        },
+        "note": {
+          "type": "text",
+          "required": false,
+          "description": "Optional note."
+        }
+      },
+      "exec_spec": {
+        "entity": "VisitedCountry",
+        "key": {
+          "user_id": {
+            "$session": "account_id"
+          },
+          "code": {
+            "$arg": "code"
+          }
+        },
+        "insert_fields": {
+          "status": {
+            "$arg": "status"
+          },
+          "note": {
+            "$arg": "note"
+          }
+        },
+        "set_on_exists": {
+          "status": {
+            "$arg": "status"
+          },
+          "note": {
+            "$arg": "note"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in.",
+          "required": "Country code and status are required."
+        },
+        "required": [
+          "code",
+          "status"
+        ]
+      },
+      "_evidence": {
+        "locator": "src/lib/server/routes/visited-countries.ts:34-62",
+        "id_local": "VisitedCountry.save",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/trpc/visitedCountries.save",
+          "locator": "src/lib/server/server.ts:10"
+        },
+        "entity_why": "primary effect row_upsert lands on this table",
+        "ref_code": "save: authedProcedure.input(VisitedCountrySchema).mutation(async ({ctx,input}) => { if(input.status){ insert visitedCountry onConflict([userId,code]) doUpdateSet({status,note}) } else { delete where userId,code } })",
+        "edges": [
+          "authedProcedure (visited-countries.ts:34)"
+        ]
+      }
+    },
+    {
+      "tool": "publicshare_list",
+      "description": "List the current user's public share links.",
+      "family": "search",
+      "entity": "PublicShare",
+      "input_schema": {},
+      "exec_spec": {
+        "entity": "PublicShare",
+        "scope": {
+          "owner_col": "user_id"
+        },
+        "search_fields": [
+          "slug"
+        ]
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in."
+        }
+      },
+      "_evidence": {
+        "locator": "src/lib/server/routes/share.ts:17-19",
+        "id_local": "PublicShare.list",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/trpc/share.list",
+          "locator": "src/lib/server/server.ts:10"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "list: authedProcedure.query(async ({ctx:{user}}) => listUserShares(user.id))"
+      }
+    },
+    {
+      "tool": "publicshare_create",
+      "description": "Create a public share link for your flights. A slug is generated if you don't pass one. The same share can only be linked to a flight list you own.",
+      "family": "crud.insert",
+      "entity": "PublicShare",
+      "input_schema": {
+        "slug": {
+          "type": "text",
+          "required": false,
+          "description": "Custom URL slug (unique; a random one is generated if omitted)."
+        },
+        "expiresAt": {
+          "type": "datetime",
+          "required": false,
+          "description": "Optional expiry time."
+        },
+        "showMap": {
+          "type": "bool",
+          "required": false,
+          "description": "Show the map."
+        },
+        "showStats": {
+          "type": "bool",
+          "required": false,
+          "description": "Show stats."
+        },
+        "showFlightList": {
+          "type": "bool",
+          "required": false,
+          "description": "Show the flight list."
+        },
+        "dateFrom": {
+          "type": "text",
+          "required": false,
+          "description": "Only flights from this date."
+        },
+        "dateTo": {
+          "type": "text",
+          "required": false,
+          "description": "Only flights up to this date."
+        },
+        "showFlightNumbers": {
+          "type": "bool",
+          "required": false,
+          "description": "Show flight numbers."
+        },
+        "showAirlines": {
+          "type": "bool",
+          "required": false,
+          "description": "Show airlines."
+        },
+        "showAircraft": {
+          "type": "bool",
+          "required": false,
+          "description": "Show aircraft."
+        },
+        "showTimes": {
+          "type": "bool",
+          "required": false,
+          "description": "Show times."
+        },
+        "showTracks": {
+          "type": "bool",
+          "required": false,
+          "description": "Show tracks (only effective when the map is shown)."
+        },
+        "showDates": {
+          "type": "bool",
+          "required": false,
+          "description": "Show dates."
+        },
+        "showSeat": {
+          "type": "bool",
+          "required": false,
+          "description": "Show seat."
+        }
+      },
+      "exec_spec": {
+        "entity": "PublicShare",
+        "fields": {
+          "slug": {
+            "$arg": "slug"
+          },
+          "expires_at": {
+            "$arg": "expiresAt"
+          },
+          "date_from": {
+            "$arg": "dateFrom"
+          },
+          "date_to": {
+            "$arg": "dateTo"
+          },
+          "show_map": {
+            "$arg": "showMap"
+          },
+          "show_stats": {
+            "$arg": "showStats"
+          },
+          "show_flight_list": {
+            "$arg": "showFlightList"
+          },
+          "show_flight_numbers": {
+            "$arg": "showFlightNumbers"
+          },
+          "show_airlines": {
+            "$arg": "showAirlines"
+          },
+          "show_aircraft": {
+            "$arg": "showAircraft"
+          },
+          "show_times": {
+            "$arg": "showTimes"
+          },
+          "show_tracks": {
+            "$arg": "showTracks"
+          },
+          "show_dates": {
+            "$arg": "showDates"
+          },
+          "show_seat": {
+            "$arg": "showSeat"
+          }
+        },
+        "set_on_create": {
+          "user_id": {
+            "$session": "account_id"
+          }
+        },
+        "unique_on": [
+          "slug"
+        ]
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in to create a share.",
+          "unique": "That slug is already taken by another share."
+        }
+      },
+      "_evidence": {
+        "locator": "src/lib/server/utils/share.ts:159-199",
+        "id_local": "PublicShare.create",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/trpc/share.create",
+          "locator": "src/lib/server/server.ts:10"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "create: authedProcedure.input(shareCreateSchema).mutation(async ({ctx:{user},input}) => createShare(user.id,input)); createShare: slug=input.slug||generateRandomString(12); showTracks=input.showMap&&input.showTracks; if existing slug CONFLICT; insert publicShare",
+        "edges": [
+          "authedProcedure (share.ts:22)",
+          "if existing slug -> CONFLICT (share.ts:172-178)"
+        ]
+      }
+    },
+    {
+      "tool": "publicshare_update",
+      "description": "Update one of your own public share links. Pass only the settings you want to change.",
+      "family": "update.field_set",
+      "entity": "PublicShare",
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the share to update."
+        },
+        "slug": {
+          "type": "text",
+          "required": false,
+          "description": "New slug."
+        },
+        "expiresAt": {
+          "type": "datetime",
+          "required": false,
+          "description": "Expiry time."
+        },
+        "showMap": {
+          "type": "bool",
+          "required": false,
+          "description": "Show the map."
+        },
+        "showStats": {
+          "type": "bool",
+          "required": false,
+          "description": "Show stats."
+        },
+        "showFlightList": {
+          "type": "bool",
+          "required": false,
+          "description": "Show the flight list."
+        },
+        "dateFrom": {
+          "type": "text",
+          "required": false,
+          "description": "Start date filter."
+        },
+        "dateTo": {
+          "type": "text",
+          "required": false,
+          "description": "End date filter."
+        },
+        "showFlightNumbers": {
+          "type": "bool",
+          "required": false,
+          "description": "Show flight numbers."
+        },
+        "showAirlines": {
+          "type": "bool",
+          "required": false,
+          "description": "Show airlines."
+        },
+        "showAircraft": {
+          "type": "bool",
+          "required": false,
+          "description": "Show aircraft."
+        },
+        "showTimes": {
+          "type": "bool",
+          "required": false,
+          "description": "Show times."
+        },
+        "showTracks": {
+          "type": "bool",
+          "required": false,
+          "description": "Show tracks."
+        },
+        "showDates": {
+          "type": "bool",
+          "required": false,
+          "description": "Show dates."
+        },
+        "showSeat": {
+          "type": "bool",
+          "required": false,
+          "description": "Show seat."
+        }
+      },
+      "exec_spec": {
+        "entity": "PublicShare",
+        "row_key": {
+          "id": {
+            "$arg": "id"
+          }
+        },
+        "set": {
+          "slug": {
+            "$arg": "slug"
+          },
+          "expires_at": {
+            "$arg": "expiresAt"
+          },
+          "date_from": {
+            "$arg": "dateFrom"
+          },
+          "date_to": {
+            "$arg": "dateTo"
+          },
+          "show_map": {
+            "$arg": "showMap"
+          },
+          "show_stats": {
+            "$arg": "showStats"
+          },
+          "show_flight_list": {
+            "$arg": "showFlightList"
+          },
+          "show_flight_numbers": {
+            "$arg": "showFlightNumbers"
+          },
+          "show_airlines": {
+            "$arg": "showAirlines"
+          },
+          "show_aircraft": {
+            "$arg": "showAircraft"
+          },
+          "show_times": {
+            "$arg": "showTimes"
+          },
+          "show_tracks": {
+            "$arg": "showTracks"
+          },
+          "show_dates": {
+            "$arg": "showDates"
+          },
+          "show_seat": {
+            "$arg": "showSeat"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in to update a share.",
+          "precondition": "You can only update your own share links.",
+          "not_found": "No share with that id exists.",
+          "unique": "That slug is already taken by another share."
+        },
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "PublicShare",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "id"
+        ]
+      },
+      "_evidence": {
+        "locator": "src/lib/server/utils/share.ts:202-250",
+        "id_local": "PublicShare.update",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/trpc/share.update",
+          "locator": "src/lib/server/server.ts:10"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "update: input(shareUpdateSchema).mutation(async ({ctx:{user},input}) => updateShare(user.id,input)); updateShare: currentShare by id+userId; effectiveShowMap; normalizedUpdates (showTracks forced off if !showMap); slug conflict check; update publicShare where id+userId",
+        "edges": [
+          "authedProcedure (share.ts:29)",
+          "updateShare where id and userId (share.ts:208-212)"
+        ]
+      }
+    },
+    {
+      "tool": "publicshare_delete",
+      "description": "Delete one of your own public share links.",
+      "family": "crud.delete",
+      "entity": "PublicShare",
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the share to delete."
+        }
+      },
+      "exec_spec": {
+        "entity": "PublicShare",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in to delete a share.",
+          "precondition": "You can only delete your own share links.",
+          "not_found": "No share with that id exists."
+        },
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "PublicShare",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "id"
+        ]
+      },
+      "_evidence": {
+        "locator": "src/lib/server/utils/share.ts:253-260",
+        "id_local": "PublicShare.delete",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/trpc/share.delete",
+          "locator": "src/lib/server/server.ts:10"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "delete: authedProcedure.input(z.string()).mutation(async ({ctx:{user},input}) => deleteShare(user.id,input)); deleteShare: deleteFrom publicShare where id=parseInt(shareId) and userId",
+        "edges": [
+          "authedProcedure (share.ts:36)",
+          "deleteShare where id and userId (share.ts:254-258)"
+        ]
+      }
+    },
+    {
+      "tool": "publicshare_viewpublic",
+      "description": "Public (no login required): fetch a public flight share page by its slug. Returns the share's settings plus the owner's flights filtered to what those settings allow. Refused if the slug does not exist.",
+      "family": "crud.fetch",
+      "entity": "PublicShare",
+      "input_schema": {
+        "slug": {
+          "type": "text",
+          "required": true,
+          "description": "Share slug."
+        }
+      },
+      "exec_spec": {
+        "entity": "PublicShare",
+        "lookup_by": {
+          "slug": {
+            "$arg": "slug"
+          }
+        }
+      },
+      "guards": {
+        "messages": {
+          "not_found": "No public share with that slug exists.",
+          "required": "A slug is required."
+        },
+        "required": [
+          "slug"
+        ]
+      },
+      "_evidence": {
+        "locator": "src/lib/server/utils/share.ts:262-340",
+        "id_local": "PublicShare.viewPublic",
+        "entry": {
+          "kind": "http",
+          "route": "GET /share/{slug}",
+          "locator": "src/routes/share/[slug]/+page.server.ts:20"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "public: publicProcedure.input(z.object({slug:z.string()})).query(async ({input}) => getPublicShareData(input.slug)); getPublicShareData: find share by slug not expired -> NOT_FOUND; getFilteredFlightsForShare(share) listFlightBaseQuery(db,share.userId) with dateFrom/dateTo; sanitizeFlightData per privacy settings"
+      }
+    },
+    {
+      "tool": "customfield_listdefinitions",
+      "description": "List custom-field definitions for an entity type (flight or flight_passenger).",
+      "family": "search",
+      "entity": "CustomFieldDefinition",
+      "input_schema": {
+        "entityType": {
+          "type": "text",
+          "required": true,
+          "enum": [
+            "flight",
+            "flight_passenger"
+          ],
+          "description": "Entity the custom fields apply to."
+        },
+        "includeInactive": {
+          "type": "bool",
+          "required": false,
+          "description": "Also include inactive definitions."
+        }
+      },
+      "exec_spec": {
+        "entity": "CustomFieldDefinition",
+        "search_fields": [
+          "key",
+          "label",
+          "entity_type"
+        ]
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in.",
+          "required": "entityType is required."
+        },
+        "required": [
+          "entityType"
+        ]
+      },
+      "_evidence": {
+        "locator": "src/lib/server/routes/custom-field.ts:134-154",
+        "id_local": "CustomField.listDefinitions",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/trpc/customField.listDefinitions",
+          "locator": "src/lib/server/server.ts:10"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "listDefinitions: authedProcedure.query(async ({input}) => { q=selectFrom('customFieldDefinition').selectAll().where('entityType').orderBy('order,label'); if(!includeInactive) where active=true })"
+      }
+    },
+    {
+      "tool": "customfield_createdefinition",
+      "description": "Admin: create a new custom-field definition for flights or passengers. The (entity_type, key) pair must be unique.",
+      "family": "crud.insert",
+      "entity": "CustomFieldDefinition",
+      "input_schema": {
+        "entityType": {
+          "type": "text",
+          "required": true,
+          "enum": [
+            "flight",
+            "flight_passenger"
+          ],
+          "description": "Entity the field applies to."
+        },
+        "key": {
+          "type": "text",
+          "required": true,
+          "description": "Stable field key (unique per entity type, max 50)."
+        },
+        "label": {
+          "type": "text",
+          "required": true,
+          "description": "Human-readable label."
+        },
+        "fieldType": {
+          "type": "text",
+          "required": true,
+          "description": "Data type: text, number, boolean, select, airport, etc."
+        },
+        "required": {
+          "type": "bool",
+          "required": false,
+          "description": "Whether the field is required on the entity."
+        },
+        "active": {
+          "type": "bool",
+          "required": false,
+          "description": "Whether the field is active."
+        },
+        "order": {
+          "type": "int",
+          "required": false,
+          "description": "Display order."
+        },
+        "description": {
+          "type": "text",
+          "required": false,
+          "description": "Field description."
+        },
+        "options": {
+          "type": "json",
+          "required": false,
+          "description": "Options for select/multi-select fields."
+        },
+        "defaultValue": {
+          "type": "json",
+          "required": false,
+          "description": "Default value."
+        },
+        "validationJson": {
+          "type": "json",
+          "required": false,
+          "description": "Validation rules."
+        }
+      },
+      "exec_spec": {
+        "entity": "CustomFieldDefinition",
+        "fields": {
+          "entity_type": {
+            "$arg": "entityType"
+          },
+          "key": {
+            "$arg": "key"
+          },
+          "label": {
+            "$arg": "label"
+          },
+          "field_type": {
+            "$arg": "fieldType"
+          },
+          "required": {
+            "$arg": "required"
+          },
+          "active": {
+            "$arg": "active"
+          },
+          "order": {
+            "$arg": "order"
+          },
+          "description": {
+            "$arg": "description"
+          },
+          "options": {
+            "$arg": "options"
+          },
+          "default_value": {
+            "$arg": "defaultValue"
+          },
+          "validation_json": {
+            "$arg": "validationJson"
+          }
+        },
+        "unique_on": [
+          "entity_type",
+          "key"
+        ]
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in.",
+          "precondition": "Only an admin or the owner can manage custom fields.",
+          "unique": "A definition with that key already exists for this entity type.",
+          "required": "entityType, key, label and fieldType are required."
+        },
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "admin",
+                          "owner"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "entityType",
+          "key",
+          "label",
+          "fieldType"
+        ]
+      },
+      "_evidence": {
+        "locator": "src/lib/server/routes/custom-field.ts:156-179",
+        "id_local": "CustomField.createDefinition",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/trpc/customField.createDefinition",
+          "locator": "src/lib/server/server.ts:10"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "createDefinition: adminProcedure.input(definitionInputSchema).mutation(async ({input}) => { ensureDefinitionIsValid(input); insert customFieldDefinition values(...) returned })",
+        "edges": [
+          "adminProcedure (custom-field.ts:156)",
+          "unique @@unique([entity_type,key]) (schema.prisma:289)"
+        ]
+      }
+    },
+    {
+      "tool": "customfield_updatedefinition",
+      "description": "Admin: update a custom-field definition by id. Pass only the fields to change.",
+      "family": "update.field_set",
+      "entity": "CustomFieldDefinition",
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Definition id."
+        },
+        "entityType": {
+          "type": "text",
+          "required": false,
+          "description": "Entity type."
+        },
+        "key": {
+          "type": "text",
+          "required": false,
+          "description": "Field key."
+        },
+        "label": {
+          "type": "text",
+          "required": false,
+          "description": "Label."
+        },
+        "fieldType": {
+          "type": "text",
+          "required": false,
+          "description": "Field type."
+        },
+        "required": {
+          "type": "bool",
+          "required": false,
+          "description": "Whether required."
+        },
+        "active": {
+          "type": "bool",
+          "required": false,
+          "description": "Whether active."
+        },
+        "order": {
+          "type": "int",
+          "required": false,
+          "description": "Display order."
+        },
+        "description": {
+          "type": "text",
+          "required": false,
+          "description": "Description."
+        },
+        "options": {
+          "type": "json",
+          "required": false,
+          "description": "Options."
+        },
+        "defaultValue": {
+          "type": "json",
+          "required": false,
+          "description": "Default value."
+        },
+        "validationJson": {
+          "type": "json",
+          "required": false,
+          "description": "Validation rules."
+        }
+      },
+      "exec_spec": {
+        "entity": "CustomFieldDefinition",
+        "row_key": {
+          "id": {
+            "$arg": "id"
+          }
+        },
+        "set": {
+          "entity_type": {
+            "$arg": "entityType"
+          },
+          "key": {
+            "$arg": "key"
+          },
+          "label": {
+            "$arg": "label"
+          },
+          "field_type": {
+            "$arg": "fieldType"
+          },
+          "required": {
+            "$arg": "required"
+          },
+          "active": {
+            "$arg": "active"
+          },
+          "order": {
+            "$arg": "order"
+          },
+          "description": {
+            "$arg": "description"
+          },
+          "options": {
+            "$arg": "options"
+          },
+          "default_value": {
+            "$arg": "defaultValue"
+          },
+          "validation_json": {
+            "$arg": "validationJson"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in to manage reference data.",
+          "precondition": "Only an admin or the owner can manage reference data."
+        },
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "admin",
+                          "owner"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ]
+      },
+      "_evidence": {
+        "locator": "src/lib/server/routes/custom-field.ts:181-206",
+        "id_local": "CustomField.updateDefinition",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/trpc/customField.updateDefinition",
+          "locator": "src/lib/server/server.ts:10"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "updateDefinition: adminProcedure.input(definitionInputSchema.extend({id})).mutation(async ({input}) => { ensureDefinitionIsValid(input); update customFieldDefinition set(...) where id and entityType })",
+        "edges": [
+          "adminProcedure (custom-field.ts:181,208,229)"
+        ]
+      }
+    },
+    {
+      "tool": "customfield_deletedefinition",
+      "description": "Admin: delete a custom-field definition by id.",
+      "family": "crud.delete",
+      "entity": "CustomFieldDefinition",
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Definition id."
+        }
+      },
+      "exec_spec": {
+        "entity": "CustomFieldDefinition",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in to manage reference data.",
+          "precondition": "Only an admin or the owner can manage reference data."
+        },
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "admin",
+                          "owner"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ]
+      },
+      "_evidence": {
+        "locator": "src/lib/server/routes/custom-field.ts:229-238",
+        "id_local": "CustomField.deleteDefinition",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/trpc/customField.deleteDefinition",
+          "locator": "src/lib/server/server.ts:10"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "deleteDefinition: adminProcedure.input(z.object({id,entityType})).mutation(async({input}) => db.deleteFrom('customFieldDefinition').where('id','=',input.id).where('entityType','=',input.entityType).execute())",
+        "edges": [
+          "adminProcedure (custom-field.ts:181,208,229)"
+        ]
+      }
+    },
+    {
+      "tool": "customfield_getentityvalues",
+      "description": "Fetch the custom-field values attached to one entity (a flight or a passenger).",
+      "family": "search",
+      "entity": "CustomFieldValue",
+      "input_schema": {
+        "entityType": {
+          "type": "text",
+          "required": true,
+          "enum": [
+            "flight",
+            "flight_passenger"
+          ],
+          "description": "Entity type."
+        },
+        "entityId": {
+          "type": "text",
+          "required": true,
+          "description": "Id of the flight or passenger."
+        }
+      },
+      "exec_spec": {
+        "entity": "CustomFieldValue",
+        "search_fields": [
+          "field_id",
+          "value"
+        ]
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in.",
+          "required": "entityType and entityId are required."
+        },
+        "required": [
+          "entityType",
+          "entityId"
+        ]
+      },
+      "_evidence": {
+        "locator": "src/lib/server/routes/custom-field.ts:240-266",
+        "id_local": "CustomField.getEntityValues",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/trpc/customField.getEntityValues",
+          "locator": "src/lib/server/server.ts:10"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "getEntityValues: await assertEntityAccess(entityType,entityId,user); join customFieldValue to definition where entityType,entityId,active orderBy"
+      }
+    },
+    {
+      "tool": "customfield_setentityvalues",
+      "description": "Set the custom-field values for one entity (a flight or passenger). Pass an array of {fieldId, value}; empty values are removed.",
+      "family": "crud.upsert",
+      "entity": "CustomFieldValue",
+      "input_schema": {
+        "entityType": {
+          "type": "text",
+          "required": true,
+          "enum": [
+            "flight",
+            "flight_passenger"
+          ],
+          "description": "Entity type."
+        },
+        "entityId": {
+          "type": "text",
+          "required": true,
+          "description": "Id of the flight or passenger."
+        },
+        "fieldId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the custom-field definition."
+        },
+        "value": {
+          "type": "json",
+          "required": true,
+          "description": "Value to store (any JSON)."
+        }
+      },
+      "exec_spec": {
+        "entity": "CustomFieldValue",
+        "key": {
+          "field_id": {
+            "$arg": "fieldId"
+          },
+          "entity_type": {
+            "$arg": "entityType"
+          },
+          "entity_id": {
+            "$arg": "entityId"
+          }
+        },
+        "insert_fields": {
+          "field_id": {
+            "$arg": "fieldId"
+          },
+          "entity_type": {
+            "$arg": "entityType"
+          },
+          "entity_id": {
+            "$arg": "entityId"
+          },
+          "value": {
+            "$arg": "value"
+          }
+        },
+        "set_on_exists": {
+          "value": {
+            "$arg": "value"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in.",
+          "fk": "No custom-field definition with that id exists.",
+          "required": "entityType, entityId, fieldId and value are required."
+        },
+        "required": [
+          "entityType",
+          "entityId",
+          "fieldId",
+          "value"
+        ]
+      },
+      "_evidence": {
+        "locator": "src/lib/server/routes/custom-field.ts:268-296",
+        "id_local": "CustomField.setEntityValues",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/trpc/customField.setEntityValues",
+          "locator": "src/lib/server/server.ts:10"
+        },
+        "entity_why": "primary effect row_upsert lands on this table",
+        "ref_code": "setEntityValues: await assertEntityAccess; transaction persistEntityCustomFields(trx,{entityType,entityId,values}); persistEntry deletes empty values or upserts by [fieldId,entityType,entityId]; validates required/defaults; throws CustomFieldValidationError->BAD_REQUEST",
+        "edges": [
+          "authedProcedure + assertEntityAccess (custom-field.ts:268-277)",
+          "assertEntityAccess (custom-field.ts:70-104)"
+        ]
+      }
+    }
+  ],
+  "seed_state": {
+    "User": [
+      {
+        "id": 1,
+        "username": "ops@airtrail.example",
+        "display_name": "Operations Example",
+        "password": "pw-operations",
+        "role": "owner",
+        "oauth_id": null,
+        "distance_unit": "km",
+        "wind_speed_unit": "kt",
+        "temperature_unit": "c",
+        "pressure_unit": "hpa",
+        "time_format": "24h",
+        "date_format": "iso",
+        "week_starts_on": "mon",
+        "flight_time_display": "airport"
+      },
+      {
+        "id": 2,
+        "username": "member@airtrail.example",
+        "display_name": "Member Example",
+        "password": "pw-member",
+        "role": "user",
+        "oauth_id": null,
+        "distance_unit": "mi",
+        "wind_speed_unit": "mph",
+        "temperature_unit": "f",
+        "pressure_unit": "inhg",
+        "time_format": "12h",
+        "date_format": "us",
+        "week_starts_on": "sun",
+        "flight_time_display": "system"
+      }
+    ],
+    "Session": [],
+    "OAuthLinkToken": [],
+    "ApiKey": [
+      {
+        "id": 1,
+        "name": "Home automation",
+        "user_id": 1,
+        "key": "ak-ada-1",
+        "created_at": "2026-05-01T00:00:00",
+        "last_used": null
+      }
+    ],
+    "Airport": [
+      {
+        "id": 1,
+        "icao": "KATL",
+        "iata": "ATL",
+        "lat": 33.6367,
+        "lon": -84.4281,
+        "tz": "America/New_York",
+        "name": "Hartsfield-Jackson Atlanta Intl",
+        "municipality": "Atlanta",
+        "type": "large_airport",
+        "continent": "NA",
+        "country": "US",
+        "custom": false
+      },
+      {
+        "id": 2,
+        "icao": "KJFK",
+        "iata": "JFK",
+        "lat": 40.6413,
+        "lon": -73.7781,
+        "tz": "America/New_York",
+        "name": "John F Kennedy Intl",
+        "municipality": "New York",
+        "type": "large_airport",
+        "continent": "NA",
+        "country": "US",
+        "custom": false
+      },
+      {
+        "id": 3,
+        "icao": "EGLL",
+        "iata": "LHR",
+        "lat": 51.47,
+        "lon": -0.4543,
+        "tz": "Europe/London",
+        "name": "London Heathrow",
+        "municipality": "London",
+        "type": "large_airport",
+        "continent": "EU",
+        "country": "GB",
+        "custom": false
+      },
+      {
+        "id": 4,
+        "icao": "KSFO",
+        "iata": "SFO",
+        "lat": 37.6213,
+        "lon": -122.379,
+        "tz": "America/Los_Angeles",
+        "name": "San Francisco Intl",
+        "municipality": "San Francisco",
+        "type": "large_airport",
+        "continent": "NA",
+        "country": "US",
+        "custom": false
+      }
+    ],
+    "Aircraft": [
+      {
+        "id": 1,
+        "name": "Boeing 737-800",
+        "icao": "B738",
+        "source_id": null
+      },
+      {
+        "id": 2,
+        "name": "Airbus A320",
+        "icao": "A320",
+        "source_id": null
+      }
+    ],
+    "Airline": [
+      {
+        "id": 1,
+        "name": "Example Airways",
+        "icao": null,
+        "iata": "EX",
+        "icon_path": null,
+        "source_id": null
+      }
+    ],
+    "Flight": [
+      {
+        "id": 1,
+        "date": "2026-06-10",
+        "date_precision": "day",
+        "departure": "2026-06-10T12:00:00",
+        "arrival": "2026-06-10T14:10:00",
+        "departure_scheduled": null,
+        "arrival_scheduled": null,
+        "takeoff_scheduled": null,
+        "takeoff_actual": null,
+        "landing_scheduled": null,
+        "landing_actual": null,
+        "duration": 130,
+        "departure_terminal": "A",
+        "departure_gate": "12",
+        "arrival_terminal": "B",
+        "arrival_gate": "5",
+        "flight_number": "EX100",
+        "aircraft_reg": "N123EX",
+        "note": "Business trip",
+        "from_id": 1,
+        "to_id": 2,
+        "aircraft_id": 1,
+        "airline_id": 1
+      },
+      {
+        "id": 2,
+        "date": "2026-06-20",
+        "date_precision": "day",
+        "departure": "2026-06-20T16:00:00",
+        "arrival": "2026-06-20T19:20:00",
+        "departure_scheduled": null,
+        "arrival_scheduled": null,
+        "takeoff_scheduled": null,
+        "takeoff_actual": null,
+        "landing_scheduled": null,
+        "landing_actual": null,
+        "duration": 200,
+        "flight_number": "EX210",
+        "aircraft_reg": "N321EX",
+        "note": "Cross-country",
+        "from_id": 2,
+        "to_id": 4,
+        "aircraft_id": 2,
+        "airline_id": 1
+      }
+    ],
+    "FlightPassenger": [
+      {
+        "id": 1,
+        "flight_id": 1,
+        "user_id": 1,
+        "guest_name": null,
+        "seat": "window",
+        "seat_number": "12A",
+        "seat_class": "business",
+        "flight_reason": "business"
+      },
+      {
+        "id": 2,
+        "flight_id": 2,
+        "user_id": 1,
+        "guest_name": null,
+        "seat": "aisle",
+        "seat_number": "3B",
+        "seat_class": "economy",
+        "flight_reason": "leisure"
+      },
+      {
+        "id": 3,
+        "flight_id": 2,
+        "user_id": 2,
+        "guest_name": null,
+        "seat": "window",
+        "seat_number": "3A",
+        "seat_class": "economy",
+        "flight_reason": "leisure"
+      }
+    ],
+    "FlightTrack": [
+      {
+        "flight_id": 1,
+        "track": [
+          [
+            33.6367,
+            -84.4281
+          ],
+          [
+            34.0,
+            -83.0
+          ]
+        ],
+        "source_format": "gpx",
+        "source_name": "leg1.gpx",
+        "point_count": 2,
+        "created_at": "2026-06-10T12:00:00",
+        "updated_at": "2026-06-10T12:00:00",
+        "id": 1
+      }
+    ],
+    "VisitedCountry": [
+      {
+        "id": 1,
+        "code": "US",
+        "status": "visited",
+        "note": "Home",
+        "user_id": 1
+      },
+      {
+        "id": 2,
+        "code": "GB",
+        "status": "visited",
+        "note": null,
+        "user_id": 1
+      }
+    ],
+    "PublicShare": [
+      {
+        "id": 1,
+        "user_id": 1,
+        "slug": "ada-flights",
+        "expires_at": null,
+        "created_at": "2026-06-01T00:00:00",
+        "show_map": true,
+        "show_stats": false,
+        "show_flight_list": true,
+        "date_from": null,
+        "date_to": null,
+        "show_flight_numbers": true,
+        "show_airlines": true,
+        "show_aircraft": false,
+        "show_times": false,
+        "show_tracks": false,
+        "show_dates": true,
+        "show_seat": false
+      }
+    ],
+    "CustomFieldDefinition": [
+      {
+        "id": 1,
+        "entity_type": "flight",
+        "key": "seat_preference",
+        "label": "Seat preference",
+        "description": "Preferred seat",
+        "field_type": "text",
+        "required": false,
+        "active": true,
+        "order": 0,
+        "default_value": null,
+        "options": null,
+        "validation_json": null,
+        "created_at": "2026-01-01T00:00:00",
+        "updated_at": "2026-01-01T00:00:00"
+      }
+    ],
+    "CustomFieldValue": [
+      {
+        "id": 1,
+        "field_id": 1,
+        "entity_type": "flight",
+        "entity_id": "1",
+        "value": "aisle",
+        "created_at": "2026-06-10T12:00:00",
+        "updated_at": "2026-06-10T12:00:00"
+      }
+    ],
+    "AppConfig": [
+      {
+        "id": 1,
+        "config": {}
+      }
+    ]
+  },
+  "summary": "AirTrail is a self-hosted flight-logging web app (SvelteKit + Prisma/Kysely over PostgreSQL). Users log flights (from/to airports, aircraft, airline, passengers with seat/reason, optional flight tracks) which are multi-user shared via flight_passenger rows; they also maintain visited countries, api_keys for a JSON REST API, public_share links (privacy-filtered public views), custom fields on flights/passengers, per-user preferences, and app config (oauth/integrations/map stored in app_config JSON).",
+  "_dropped_candidates": [
+    {
+      "tool": "aircraft_sync",
+      "id_local": "Aircraft.sync",
+      "reason": "admin bulk import from GitHub (external fetch); not runnable in sandbox"
+    },
+    {
+      "tool": "airline_sync",
+      "id_local": "Airline.sync",
+      "reason": "admin bulk import from GitHub (external fetch); not runnable in sandbox"
+    },
+    {
+      "tool": "airline_syncicons",
+      "id_local": "Airline.syncIcons",
+      "reason": "downloads icon files from network and writes them; side-effect not observable in sandbox"
+    },
+    {
+      "tool": "airline_seticon",
+      "id_local": "Airline.setIcon",
+      "reason": "file-upload endpoint (multipart icon); the visible write (icon_path) is already covered by airline_update/clear_icon"
+    },
+    {
+      "tool": "airport_updatefromsource",
+      "id_local": "Airport.updateFromSource",
+      "reason": "admin bulk import from external source; not runnable in sandbox"
+    },
+    {
+      "tool": "flight_createmany",
+      "id_local": "Flight.createMany",
+      "reason": "bulk import; dedupe/attach semantics not representable faithfully"
+    },
+    {
+      "tool": "flight_deleteall",
+      "id_local": "Flight.deleteAll",
+      "reason": "bulk deleteAll; guard is on existing flight_delete/deletemany"
+    },
+    {
+      "tool": "flight_lookup",
+      "id_local": "Flight.lookup",
+      "reason": "external flight-route API call; no persisted effect"
+    },
+    {
+      "tool": "flight_lookupaircraftbyreg",
+      "id_local": "Flight.lookupAircraftByReg",
+      "reason": "external lookup API call; no persisted effect"
+    },
+    {
+      "tool": "sql_execute",
+      "id_local": "Sql.execute",
+      "reason": "raw SQL REPL (owner-only); cannot be emulated"
+    },
+    {
+      "tool": "weather_getmetar",
+      "id_local": "Weather.getMetar",
+      "reason": "external METAR fetch; no persisted effect"
+    },
+    {
+      "tool": "oauth_authorize",
+      "id_local": "OAuth.authorize",
+      "reason": "external OAuth redirect flow; not runnable in sandbox"
+    },
+    {
+      "tool": "oauth_callback",
+      "id_local": "OAuth.callback",
+      "reason": "external OAuth callback; requires provider round-trip"
+    },
+    {
+      "tool": "appconfig_mapsave",
+      "id_local": "AppConfig.mapSave",
+      "reason": "JSON-merge app config; not verifiable"
+    },
+    {
+      "tool": "appconfig_integrationssave",
+      "id_local": "AppConfig.integrationsSave",
+      "reason": "JSON-merge app config; not verifiable"
+    },
+    {
+      "tool": "appconfig_oauthsave",
+      "id_local": "AppConfig.oauthSave",
+      "reason": "JSON-merge app config; not verifiable"
+    },
+    {
+      "tool": "appconfig_integrationsget",
+      "id_local": "AppConfig.integrationsGet",
+      "reason": "returns env-configured secrets; not a real read"
+    },
+    {
+      "tool": "customfield_reorderdefinitions",
+      "id_local": "CustomField.reorderDefinitions",
+      "reason": "multi-row reorder op; not representable with a single row_key"
+    },
+    {
+      "tool": "visitedcountry_importflights",
+      "id_local": "VisitedCountry.importFlights",
+      "reason": "derived bulk insert from user's own flights; folded into visitedcountry_save"
+    }
+  ]
+}

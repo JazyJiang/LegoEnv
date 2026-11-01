@@ -1,0 +1,1485 @@
+{
+  "env_id": "piga",
+  "_prep_version": 3,
+  "entities": [
+    {
+      "name": "User",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "loginName",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "passwordHash",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "isAdmin",
+          "type": "bool",
+          "nullable": false,
+          "default": false
+        },
+        {
+          "name": "lastUpdateTime",
+          "type": "json",
+          "audit": true
+        }
+      ]
+    },
+    {
+      "name": "DocumentEntity",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "lastUpdateTime",
+          "type": "json",
+          "audit": true
+        }
+      ]
+    },
+    {
+      "name": "DocumentPermissionAndPlacement",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "documentId",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "DocumentEntity.id"
+        },
+        {
+          "name": "userId",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "User.id"
+        },
+        {
+          "name": "orderToken",
+          "type": "json",
+          "nullable": false
+        },
+        {
+          "name": "lastUpdateTime",
+          "type": "json",
+          "audit": true
+        }
+      ]
+    },
+    {
+      "name": "TaskEntity",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "documentId",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "DocumentEntity.id"
+        },
+        {
+          "name": "contentHtml",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "orderToken",
+          "type": "json",
+          "nullable": false
+        },
+        {
+          "name": "indentation",
+          "type": "int",
+          "nullable": false
+        },
+        {
+          "name": "collapsed",
+          "type": "bool",
+          "nullable": false
+        },
+        {
+          "name": "checked",
+          "type": "bool",
+          "nullable": false
+        },
+        {
+          "name": "delayedUntil",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "tags",
+          "type": "json",
+          "nullable": false
+        },
+        {
+          "name": "lastContentModifierUserId",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "User.id"
+        },
+        {
+          "name": "lastUpdateTime",
+          "type": "json",
+          "audit": true
+        }
+      ]
+    },
+    {
+      "name": "EntityModificationEntity",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "userId",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "User.id"
+        },
+        {
+          "name": "entityId",
+          "type": "id",
+          "nullable": false
+        },
+        {
+          "name": "modification",
+          "type": "json",
+          "nullable": false,
+          "immutable": true
+        },
+        {
+          "name": "date",
+          "type": "datetime",
+          "nullable": false,
+          "immutable": true
+        },
+        {
+          "name": "instantNanos",
+          "type": "int",
+          "nullable": false,
+          "immutable": true
+        }
+      ]
+    }
+  ],
+  "tools": [
+    {
+      "tool": "sign_in",
+      "description": "Sign in with an account login name and password. Every interactive operation in Piga requires this first; the session it opens is what $actor resolves to.",
+      "family": "guard.auth",
+      "entity": "User",
+      "input_schema": {
+        "loginName": {
+          "type": "text",
+          "required": true,
+          "description": "The account login name (usually an email address)."
+        },
+        "password": {
+          "type": "text",
+          "required": true,
+          "description": "The plaintext account password, hashed and compared against the stored hash."
+        }
+      },
+      "exec_spec": {
+        "verify": {
+          "entity": "User",
+          "username_col": "loginName",
+          "password_col": "passwordHash"
+        }
+      },
+      "_evidence": {
+        "locator": "app/jvm/src/main/scala/hydro/controllers/Auth.scala:45",
+        "id_local": "Auth.authenticate",
+        "entry": {
+          "kind": "http",
+          "route": "POST /login/",
+          "locator": "app/jvm/src/main/resources/routes:47"
+        },
+        "entity_why": "primary effect external lands on this table",
+        "ref_code": "def authenticate(returnTo: String) = Action { implicit request =>\n  Forms.loginForm.bindFromRequest.fold(\n    formWithErrors => {\n      maybeSendLoginFailedEmail(...)\n      BadRequest(views.html.login(formWithErrors, returnTo))\n    },\n    user => Redirect(returnTo).withSession(\"username\" -> user._1),\n  )\n}\n// loginForm verifies: (loginName, password) => Users.authenticate(loginName, password)\n// Users.authenticate: findOne(loginName === loginName) && user.passwordHash == hash(password)",
+        "edges": [
+          "Users.authenticate: findOne(loginName === loginName) then passwordHash == hash(password) (Auth.scala:35, Users.scala:37)"
+        ]
+      }
+    },
+    {
+      "tool": "sign_out",
+      "description": "End the current session and clear the login cookie.",
+      "family": "guard.logout",
+      "entity": "User",
+      "input_schema": {},
+      "exec_spec": {
+        "entity": "User"
+      },
+      "_evidence": {
+        "locator": "app/jvm/src/main/scala/hydro/controllers/Auth.scala:54",
+        "id_local": "Auth.logout",
+        "entry": {
+          "kind": "http",
+          "route": "GET /logout/",
+          "locator": "app/jvm/src/main/resources/routes:48"
+        },
+        "entity_why": "primary effect external lands on this table",
+        "ref_code": "def logout = Action { implicit request =>\n  Redirect(hydro.controllers.routes.Auth.login(\"/\")).withNewSession.flashing(\n    \"message\" -> Messages(\"app.you-are-now-logged-out\"))\n}"
+      }
+    },
+    {
+      "tool": "get_current_user",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "User",
+        "lookup_by": {
+          "id": {
+            "$session": "account_id"
+          }
+        }
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "app/jvm/src/main/scala/hydro/controllers/Auth.scala:60",
+        "id_local": "Auth.amILoggedIn",
+        "entry": {
+          "kind": "http",
+          "route": "GET /loggedin/",
+          "locator": "app/jvm/src/main/resources/routes:49"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "def amILoggedIn = Action { implicit request =>\n  Ok(AuthenticatedAction.getAuthenticatedUser(request).isDefined.toString)\n}",
+        "note": "runtime login sets the session account_id to the User's id (account_entity==User, no link entity), so keying lookup_by on account_id resolves to the signed-in user; the original candidate read a $session.username that the runtime never sets."
+      },
+      "entity": "User",
+      "_output_schema": {
+        "result": "boolean string: whether current session maps to an authenticated User"
+      },
+      "description": "Return the account that is currently signed in and whether that login is valid.",
+      "guards": {}
+    },
+    {
+      "tool": "get_my_tasks",
+      "op": "read",
+      "family": "search",
+      "exec_spec": {
+        "entity": "TaskEntity",
+        "search_fields": [
+          "documentId"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "documentId"
+          ]
+        },
+        "filter": {
+          "col": "documentId",
+          "mode": "in",
+          "val": {
+            "$subquery": {
+              "entity": "DocumentPermissionAndPlacement",
+              "where": {
+                "userId": {
+                  "$session": "account_id"
+                }
+              }
+            }
+          }
+        }
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "app/jvm/src/main/scala/app/api/ScalaJsApiServerFactory.scala:39",
+        "id_local": "ScalaJsApi.getInitialData",
+        "entry": {
+          "kind": "http",
+          "route": "POST /scalajsapi/*path",
+          "locator": "app/jvm/src/main/resources/routes:33"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "override def getInitialData() =\n  GetInitialDataResponse(\n    user = user,\n    allAccessibleDocuments = Await.result(UserDocument.fetchAllForUser(), Duration.Inf),\n    i18nMessages = i18n.allI18nMessages,\n    nextUpdateToken = toUpdateToken(clock.nowInstant))"
+      },
+      "entity": "TaskEntity",
+      "_output_schema": {
+        "user": "the current User",
+        "allAccessibleDocuments": "Seq[UserDocument]",
+        "i18nMessages": "map",
+        "nextUpdateToken": "string"
+      },
+      "description": "List every task across all documents the signed-in user has access to. This is the task view that boots the Piga editor.",
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in to list your documents."
+        }
+      }
+    },
+    {
+      "tool": "list_documents",
+      "description": "List the names and ids of the documents you have access to. Document access is granted via sharing; documents you have not been granted are not listed.",
+      "family": "search",
+      "entity": "DocumentEntity",
+      "input_schema": {},
+      "exec_spec": {
+        "entity": "DocumentEntity",
+        "rank": {
+          "method": "exact",
+          "fields": []
+        },
+        "filter": {
+          "col": "id",
+          "mode": "in",
+          "val": {
+            "$subquery": {
+              "entity": "DocumentPermissionAndPlacement",
+              "where": {
+                "userId": {
+                  "$session": "account_id"
+                }
+              }
+            }
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in to list documents."
+        }
+      },
+      "_evidence": {
+        "locator": "app/jvm/src/main/scala/app/api/ScalaJsApiServerFactory.scala:48",
+        "id_local": "ScalaJsApi.getAllEntities",
+        "entry": {
+          "kind": "http",
+          "route": "POST /scalajsapi/*path",
+          "locator": "app/jvm/src/main/resources/routes:33"
+        },
+        "why": "generic getAllEntities read over requested entity types, permission filtered per row (isAllowedToRead); surfaced as the document registry read (ref_code at ScalaJsApiServerFactory.scala:48)",
+        "entity_why": "returns rows of the requested entity type; DocumentEntity is the coherent face of a document registry",
+        "ref_code": "override def getAllEntities(types) = { ... allEntities.filter(entityPermissions.isAllowedToRead) }"
+      }
+    },
+    {
+      "tool": "get_tasks_under_parent",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "TaskEntity",
+        "rank": {
+          "method": "exact",
+          "fields": []
+        },
+        "filter": {
+          "op": "and",
+          "clauses": [
+            {
+              "col": "documentId",
+              "mode": "exact",
+              "val": {
+                "$arg": "documentId"
+              }
+            },
+            {
+              "col": "tags",
+              "mode": "substring",
+              "val": {
+                "$arg": "parentTag"
+              }
+            }
+          ]
+        }
+      },
+      "input_schema": {
+        "documentId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the document whose tasks to search."
+        },
+        "parentTag": {
+          "type": "text",
+          "required": true,
+          "description": "Tag of the parent task; its subtree is returned. Must match a task in the document."
+        }
+      },
+      "_evidence": {
+        "locator": "app/jvm/src/main/scala/app/controllers/ExternalApi.scala:91",
+        "id_local": "ExternalApi.getTasksAsJson",
+        "entry": {
+          "kind": "http",
+          "route": "GET /externalapi/gettasksasjson/:docId/$parentTag<[^/]+>/:appSecret/",
+          "locator": "app/jvm/src/main/resources/routes:28"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "def getTasksAsJson(documentIdString, parentTagEncoded, applicationSecret) = Action { implicit request =>\n  validateApplicationSecret(applicationSecret)\n  ...findById(documentId)\n  val tasks = ...filter(TaskEntity.documentId === documentId).data().sorted\n  val parentAndBelow = tasks.dropWhile(t => !(t.tags contains parentTag))\n  require(parentAndBelow.nonEmpty, s\"Could not find $parentTag\")\n  val parent = parentAndBelow.head\n  val tasksToReturn = parentAndBelow.takeWhile(t => t == parent || t.indentation > parent.indentation)\n  Ok(toJson(tasksToReturn))\n}",
+        "edges": [
+          "require(parentAndBelow.nonEmpty, s\"Could not find $parentTag\") (ExternalApi.scala:106)"
+        ]
+      },
+      "entity": "TaskEntity",
+      "_binds": {
+        "documentId": "DocumentEntity.id"
+      },
+      "_output_schema": {
+        "tasks": "JSON array of tasks under parentTag (contentHtml, indentation, collapsed, checked, tags)"
+      },
+      "guards": {
+        "required": [
+          "documentId",
+          "parentTag"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "TaskEntity",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "documentId",
+                      "op": "eq",
+                      "value": {
+                        "arg": "documentId"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "tags",
+                      "op": "contains",
+                      "value": {
+                        "arg": "parentTag"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "required": "Provide the document id and parent tag.",
+          "precondition": "No task in this document carries the parent tag {parentTag}."
+        }
+      },
+      "description": "Return the tasks in a document that belong to the subtree under the task carrying the given tag, nearest ancestor first. An automation-style read; fails if no task in the document carries that tag."
+    },
+    {
+      "tool": "find_tasks_by_content",
+      "description": "Search the tasks of a document whose content mention the given text. Returns tasks matched by substring on content.",
+      "family": "search",
+      "entity": "TaskEntity",
+      "input_schema": {
+        "documentId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the document to search."
+        },
+        "query": {
+          "type": "text",
+          "required": true,
+          "description": "Free text matched against task content (substring)."
+        }
+      },
+      "exec_spec": {
+        "entity": "TaskEntity",
+        "rank": {
+          "method": "substring",
+          "fields": [
+            "contentHtml",
+            "tags"
+          ]
+        },
+        "filter": {
+          "op": "and",
+          "clauses": [
+            {
+              "col": "documentId",
+              "mode": "exact",
+              "val": {
+                "$arg": "documentId"
+              }
+            },
+            {
+              "col": "contentHtml",
+              "mode": "substring",
+              "val": {
+                "$arg": "query"
+              }
+            }
+          ]
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "documentId",
+          "query"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "DocumentPermissionAndPlacement",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "documentId",
+                      "op": "eq",
+                      "value": {
+                        "arg": "documentId"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "userId",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must be signed in to search tasks.",
+          "precondition": "You can only search tasks in a document shared with you."
+        }
+      },
+      "_evidence": {
+        "locator": "app/jvm/src/main/scala/app/api/ScalaJsApiServerFactory.scala:75",
+        "id_local": "ScalaJsApi.executeDataQuery",
+        "entry": {
+          "kind": "http",
+          "route": "POST /scalajsapi/*path",
+          "locator": "app/jvm/src/main/resources/routes:33"
+        },
+        "why": "generic parameterized query over client-nominated entity type, per-row permission filtered (isAllowedToRead); surfaced as a task-content search. Search method inferred 'substring' from free-text query semantics.",
+        "entity_why": "the agent-side face of this generic query is task lookup",
+        "ref_code": "override def executeDataQuery(dbQuery) = { ... allData.filter(entityPermissions.isAllowedToRead) }",
+        "edges": [
+          "routed through InternalApi.scalaJsApiPost, an AuthenticatedAction resolving current User from session (InternalApi.scala:52); result rows filtered by AppEntityPermissions.isAllowedToRead (ScalaJsApiServerFactory.scala:75)",
+          "AppEntityPermissions isAllowedToRead (AppEntityPermissions.scala:53): for a TaskEntity read, requires documentToOwners.containsEntry(e.documentId, user.id) - i.e. a DocumentPermissionAndPlacement linking this document to this user"
+        ]
+      }
+    },
+    {
+      "tool": "get_tasks_by_document",
+      "description": "List all tasks in a document. An automation-style read that does not require a login.",
+      "family": "search",
+      "entity": "TaskEntity",
+      "input_schema": {
+        "documentId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the document whose tasks to list."
+        }
+      },
+      "exec_spec": {
+        "entity": "TaskEntity",
+        "rank": {
+          "method": "exact",
+          "fields": []
+        },
+        "filter": {
+          "col": "documentId",
+          "mode": "exact",
+          "val": {
+            "$arg": "documentId"
+          }
+        }
+      },
+      "guards": {
+        "required": [
+          "documentId"
+        ],
+        "messages": {
+          "required": "Provide the document id to list its tasks."
+        }
+      },
+      "_evidence": {
+        "locator": "app/jvm/src/main/scala/app/controllers/ExternalApi.scala:91",
+        "id_local": "ExternalApi.getTasksAsJson",
+        "entry": {
+          "kind": "http",
+          "route": "GET /externalapi/gettasksasjson/:docId/$parentTag<[^/]+>/:appSecret/",
+          "locator": "app/jvm/src/main/resources/routes:28"
+        },
+        "why": "external API filters tasks by documentId (ExternalApi.scala:91); surfaced without the parent-tag walk so a document-wide task list is expressible. The external route is secret-gated and not user-scoped, so this read is deliberately global.",
+        "entity_why": "tasks of one document",
+        "ref_code": "val tasks = ...filter(TaskEntity.documentId === documentId).data().sorted"
+      }
+    },
+    {
+      "tool": "insert_task",
+      "description": "Insert a task under the task carrying parentTag in the given document, from a plain-text content string parsed as Markdown or HTML. Adds a #child of the parent (or keeps the parent tag if suggested). Fails if no parent task carries that tag.",
+      "family": "crud.insert",
+      "entity": "TaskEntity",
+      "input_schema": {
+        "documentId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the document to insert into."
+        },
+        "parentTag": {
+          "type": "text",
+          "required": true,
+          "description": "Tag of the parent task; a task carrying it must already exist in the document."
+        },
+        "content": {
+          "type": "text",
+          "required": true,
+          "description": "Task content, parsed as Markdown (interactive) or base64-encoded text."
+        }
+      },
+      "exec_spec": {
+        "entity": "TaskEntity",
+        "fields": [
+          "documentId",
+          "contentHtml"
+        ],
+        "set_on_create": {
+          "contentHtml": {
+            "$arg": "content"
+          },
+          "tags": [],
+          "orderToken": null,
+          "indentation": 0,
+          "collapsed": false,
+          "checked": false,
+          "delayedUntil": null,
+          "lastContentModifierUserId": {
+            "$session": "account_id"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "documentId",
+          "parentTag",
+          "content"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "DocumentPermissionAndPlacement",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "documentId",
+                      "op": "eq",
+                      "value": {
+                        "arg": "documentId"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "userId",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            },
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "TaskEntity",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "documentId",
+                      "op": "eq",
+                      "value": {
+                        "arg": "documentId"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "tags",
+                      "op": "contains",
+                      "value": {
+                        "arg": "parentTag"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must be signed in to insert a task.",
+          "precondition": "You can only insert tasks in a document shared with you, and no task in this document carries the parent tag {parentTag}.",
+          "fk_missing": "That document does not exist."
+        }
+      },
+      "_evidence": {
+        "locator": "app/jvm/src/main/scala/app/controllers/ExternalApi.scala:129",
+        "id_local": "ExternalApi.insertTask",
+        "entry": {
+          "kind": "http",
+          "route": "GET /externalapi/inserttask/:docId/$parentTag<[^/]+>/:appSecret/*content",
+          "locator": "app/jvm/src/main/resources/routes:27"
+        },
+        "entity_why": "primary effect row_insert lands on TaskEntity",
+        "ref_code": "def insertTask(...) = Action { implicit request =>\n  validateApplicationSecret(applicationSecret)\n  implicit val user = Users.getOrCreateRobotUser()\n  insertTaskInternal(documentIdString, parentTagEncoded, contentEncoded, isMarkdown, extraIndent)\n  Ok(\"OK\\n\")\n}\n// insertTaskInternal: finds parent task by tag (require parentAndBelow.nonEmpty), then for each parsed task:\n// entityAccess.persistEntityModifications(EntityModification.createAddWithRandomId(TaskEntity(documentId, contentHtml, orderToken,\n//   indentation = parent.indentation + 1 + relativeIndentation + extraIndent, collapsed = ..., ",
+        "merged_from": [
+          "ExternalApi.insertTask (scala:129)",
+          "ExternalApi.interactiveInsertTask (scala:148)"
+        ],
+        "edges": [
+          "require(parentAndBelow.nonEmpty, s\"Could not find $parentTag\") inside insertTaskInternal (ExternalApi.scala:221)",
+          "INSERT under the task carrying parentTag; a parent carrying that tag must already exist in the document (ExternalApi.scala:221)"
+        ]
+      }
+    },
+    {
+      "tool": "add_user",
+      "op": "update",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "User",
+        "fields": [
+          "loginName",
+          "passwordHash",
+          "name",
+          "isAdmin"
+        ],
+        "set_on_create": {
+          "passwordHash": {
+            "$arg": "plainTextPassword"
+          }
+        },
+        "prechecks": [
+          {
+            "entity": "User",
+            "where": {
+              "loginName": {
+                "$arg": "loginName"
+              }
+            },
+            "negate": true,
+            "message": "That login name is already registered."
+          }
+        ]
+      },
+      "input_schema": {
+        "loginName": {
+          "type": "text",
+          "required": true,
+          "description": "The new account's login name (usually an email address). Must be unique."
+        },
+        "plainTextPassword": {
+          "type": "text",
+          "required": true,
+          "description": "The new account's plaintext password, stored as a hash."
+        },
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "Display name of the new account."
+        },
+        "isAdmin": {
+          "type": "bool",
+          "required": false,
+          "description": "Whether the new account is an admin; defaults to false."
+        }
+      },
+      "_evidence": {
+        "locator": "app/jvm/src/main/scala/app/api/ScalaJsApiServerFactory.scala:108",
+        "id_local": "ScalaJsApi.upsertUser",
+        "entry": {
+          "kind": "http",
+          "route": "POST /scalajsapi/*path",
+          "locator": "app/jvm/src/main/resources/routes:33"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "userProto.id match {\n  case None => // Add user\n    requireNonEmpty(userProto.loginName); requireNonEmpty(userProto.plainTextPassword); requireNonEmpty(userProto.name)\n    require(user.isAdmin, \"Only an admin can add users\")\n    entityAccess.persistEntityModifications(EntityModification.createAddWithRandomId(\n      Users.createUser(userProto.loginName.get, userProto.plainTextPassword.get, userProto.name.get, userProto.isAdmin getOrElse false)))\n  case Some(id) => // Update user\n    require(user.isAdmin || id == user.id, \"Changing an other user's password\")\n    val existingUser = ...findById(id",
+        "edges": [
+          "require(user.isAdmin, \"Only an admin can add users\") (ScalaJsApiServerFactory.scala:111); update branch: require(user.isAdmin || id == user.id, ...) (ScalaJsApiServerFactory.scala:119)"
+        ],
+        "note": "passwordHash bound to plainTextPassword arg; runtime stores the value as-given (plaintext in seeds, hash in real SHA-512 world)."
+      },
+      "entity": "User",
+      "_binds": {
+        "id": "User.id",
+        "loginName": "User.loginName",
+        "name": "User.name",
+        "isAdmin": "User.isAdmin"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "loginName",
+          "plainTextPassword",
+          "name"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "isAdmin",
+                      "op": "eq",
+                      "value": true
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must be signed in to add a user.",
+          "precondition": "Only an admin can add users.",
+          "unique": "That login name is already registered.",
+          "required": "Provide loginName, password and name to add a user."
+        }
+      },
+      "description": "Create a new Piga account with the given login name and password. Only an admin can create users."
+    },
+    {
+      "tool": "update_user",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "User",
+        "row_key": {
+          "id": {
+            "$arg": "id"
+          }
+        },
+        "fields": [
+          "loginName",
+          "passwordHash",
+          "name",
+          "isAdmin"
+        ],
+        "set": {
+          "passwordHash": {
+            "$arg": "plainTextPassword"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the account to edit."
+        },
+        "loginName": {
+          "type": "text",
+          "required": false,
+          "description": "New login name (leave out to keep the current one)."
+        },
+        "name": {
+          "type": "text",
+          "required": false,
+          "description": "New display name."
+        },
+        "isAdmin": {
+          "type": "bool",
+          "required": false,
+          "description": "New admin flag."
+        },
+        "plainTextPassword": {
+          "type": "text",
+          "required": false,
+          "description": "New password to hash onto the account."
+        }
+      },
+      "_evidence": {
+        "locator": "app/jvm/src/main/scala/app/api/ScalaJsApiServerFactory.scala:108",
+        "id_local": "ScalaJsApi.upsertUser",
+        "entry": {
+          "kind": "http",
+          "route": "POST /scalajsapi/*path",
+          "locator": "app/jvm/src/main/resources/routes:33"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "userProto.id match {\n  case None => // Add user\n    requireNonEmpty(userProto.loginName); requireNonEmpty(userProto.plainTextPassword); requireNonEmpty(userProto.name)\n    require(user.isAdmin, \"Only an admin can add users\")\n    entityAccess.persistEntityModifications(EntityModification.createAddWithRandomId(\n      Users.createUser(userProto.loginName.get, userProto.plainTextPassword.get, userProto.name.get, userProto.isAdmin getOrElse false)))\n  case Some(id) => // Update user\n    require(user.isAdmin || id == user.id, \"Changing an other user's password\")\n    val existingUser = ...findById(id",
+        "edges": [
+          "require(user.isAdmin, \"Only an admin can add users\") (ScalaJsApiServerFactory.scala:111); update branch: require(user.isAdmin || id == user.id, ...) (ScalaJsApiServerFactory.scala:119)"
+        ],
+        "note": "passwordHash bound to plainTextPassword arg."
+      },
+      "entity": "User",
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "id"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "isAdmin",
+                      "op": "eq",
+                      "value": true
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must be signed in to edit a user.",
+          "precondition": "You can edit your own account; editing another account requires admin rights.",
+          "not_found": "No account with that id exists.",
+          "required": "Provide the id of the account to edit."
+        }
+      },
+      "description": "Update an existing account's name, login name, admin flag or password. You may edit your own account; editing any other account requires admin rights."
+    },
+    {
+      "tool": "add_task",
+      "op": "action",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "TaskEntity",
+        "fields": [
+          "documentId",
+          "contentHtml",
+          "tags"
+        ],
+        "set_on_create": {
+          "contentHtml": {
+            "$arg": "contentHtml"
+          },
+          "documentId": {
+            "$arg": "documentId"
+          },
+          "tags": {
+            "$arg": "tags"
+          },
+          "orderToken": null,
+          "indentation": 0,
+          "collapsed": false,
+          "checked": false,
+          "delayedUntil": null,
+          "lastContentModifierUserId": {
+            "$session": "account_id"
+          }
+        }
+      },
+      "input_schema": {
+        "documentId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the document the task belongs to."
+        },
+        "contentHtml": {
+          "type": "text",
+          "required": true,
+          "description": "Rendered HTML content of the task."
+        },
+        "tags": {
+          "type": "json",
+          "required": false,
+          "description": "List of tags on the task (e.g. [\"#plan\"])."
+        }
+      },
+      "_evidence": {
+        "locator": "app/jvm/src/main/scala/app/api/ScalaJsApiServerFactory.scala:65",
+        "id_local": "ScalaJsApi.persistEntityModifications",
+        "entry": {
+          "kind": "http",
+          "route": "POST /scalajsapi/*path",
+          "locator": "app/jvm/src/main/resources/routes:33"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "override def persistEntityModifications(modifications, waitUntilQueryReflectsModifications) = {\n  for (modification <- modifications) entityPermissions.checkAllowedForWrite(modification)\n  val future = entityAccess.persistEntityModificationsAsync(modifications)\n  if (waitUntilQueryReflectsModifications) Await.ready(future, atMost = Duration.Inf)\n}",
+        "edges": [
+          "routed through InternalApi.scalaJsApiPost which is an AuthenticatedAction (InternalApi.scala:52) resolving current User from session; body gates per-modification via AppEntityPermissions.checkAllowedF",
+          "AppEntityPermissions.checkAllowedForWrite (AppEntityPermissions.scala:53): for a TaskEntity write, requires documentToOwners.containsEntry(e.documentId, user.id) - i.e. a DocumentPermissionAndPlacemen"
+        ],
+        "note": "drop-in kept under a coherent name; this is the true client write surface of the app. Guard preconditions (auth + document access) promoted from _candidate_preconditions edges."
+      },
+      "entity": "TaskEntity",
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "documentId",
+          "contentHtml"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "DocumentPermissionAndPlacement",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "documentId",
+                      "op": "eq",
+                      "value": {
+                        "arg": "documentId"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "userId",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must be signed in to edit tasks.",
+          "precondition": "You can only create or edit tasks in a document shared with you."
+        }
+      },
+      "description": "Create a new task in a document with the given HTML content and tags. The signed-in user must have access to the document. Returns the id of the new task."
+    },
+    {
+      "tool": "share_document",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "DocumentPermissionAndPlacement",
+        "fields": [
+          "documentId",
+          "userId",
+          "orderToken"
+        ],
+        "set_on_create": {
+          "documentId": {
+            "$arg": "documentId"
+          },
+          "userId": {
+            "$arg": "userId"
+          },
+          "orderToken": null
+        }
+      },
+      "input_schema": {
+        "documentId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the document to share."
+        },
+        "loginName": {
+          "type": "text",
+          "required": true,
+          "description": "Login name of the user to grant access to (must exist)."
+        },
+        "userId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the user to grant access to (resolved to the row on create)."
+        }
+      },
+      "_evidence": {
+        "locator": "app/jvm/src/main/scala/app/controllers/ExternalApi.scala:63",
+        "id_local": "ExternalApi.shareDocument",
+        "entry": {
+          "kind": "http",
+          "route": "GET /externalapi/share/:docId/:loginName/:appSecret/",
+          "locator": "app/jvm/src/main/resources/routes:25"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "def shareDocument(documentIdString, loginName, applicationSecret) = Action { implicit request =>\n  validateApplicationSecret(applicationSecret)\n  val document = ...findById(documentIdString.toLong)\n  val user = ...findOne(User.loginName === loginName).getOrElse(throw new IllegalArgumentException(...))\n  requireNoExistingPermissions(user, document)\n  val greatestOrderToken = getGreatestDocumentOrderToken(user)\n  implicit val issuer = Users.getOrCreateRobotUser()\n  entityAccess.persistEntityModifications(EntityModification.createAddWithRandomId(\n    DocumentPermissionAndPlacement(documentId = do",
+        "edges": [
+          "findOne(User.loginName === loginName).getOrElse(throw new IllegalArgumentException(...)) and findById(documentId) (ExternalApi.scala:69-71)"
+        ]
+      },
+      "entity": "DocumentPermissionAndPlacement",
+      "_binds": {
+        "documentId": "DocumentEntity.id",
+        "loginName": "User.loginName"
+      },
+      "_output_schema": {
+        "body": "'OK'"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "documentId",
+          "loginName"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "loginName",
+                  "op": "eq",
+                  "value": {
+                    "arg": "loginName"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            },
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "DocumentEntity",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "documentId"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must be signed in to share a document.",
+          "precondition": "The user to share with does not exist, or that document does not exist.",
+          "fk_missing": "The user or document you are sharing does not exist."
+        }
+      },
+      "description": "Grant a user access to a document by creating the access link. Users with access can read and edit the document's tasks."
+    },
+    {
+      "tool": "list_accessible_documents",
+      "description": "List the access links (and thereby the documents) a user has been granted.",
+      "family": "search",
+      "entity": "DocumentPermissionAndPlacement",
+      "input_schema": {},
+      "exec_spec": {
+        "entity": "DocumentPermissionAndPlacement",
+        "rank": {
+          "method": "exact",
+          "fields": []
+        },
+        "scope": {
+          "owner_col": "userId"
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in to list your documents."
+        }
+      },
+      "_evidence": {
+        "locator": "app/jvm/src/main/scala/app/api/ScalaJsApiServerFactory.scala:39",
+        "id_local": "ScalaJsApi.getInitialData",
+        "entry": {
+          "kind": "http",
+          "route": "POST /scalajsapi/*path",
+          "locator": "app/jvm/src/main/resources/routes:33"
+        },
+        "why": "fetchAllForUser returns DocumentPermissionAndPlacement rows for the user's id (ref_code at ScalaJsApiServerFactory.scala:39); owner-scoped read over the access-links table.",
+        "entity_why": "the access-links table is what links a user to their documents",
+        "ref_code": "allAccessibleDocuments = UserDocument.fetchAllForUser()"
+      }
+    }
+  ],
+  "seed_state": {
+    "User": [
+      {
+        "id": 1,
+        "loginName": "ops@piga.example",
+        "passwordHash": "pw-operations",
+        "name": "Operations Example",
+        "isAdmin": true,
+        "lastUpdateTime": null
+      },
+      {
+        "id": 2,
+        "loginName": "colleague@piga.example",
+        "passwordHash": "pw-colleague",
+        "name": "Colleague Example",
+        "isAdmin": false,
+        "lastUpdateTime": null
+      },
+      {
+        "id": 3,
+        "loginName": "robot@piga.example",
+        "passwordHash": "pw-robot",
+        "name": "Robot Example",
+        "isAdmin": false,
+        "lastUpdateTime": null
+      }
+    ],
+    "DocumentEntity": [
+      {
+        "id": 1,
+        "name": "Product roadmap",
+        "lastUpdateTime": null
+      },
+      {
+        "id": 2,
+        "name": "Personal backlog",
+        "lastUpdateTime": null
+      }
+    ],
+    "DocumentPermissionAndPlacement": [
+      {
+        "id": 1,
+        "documentId": 1,
+        "userId": 1,
+        "orderToken": "a",
+        "lastUpdateTime": null
+      },
+      {
+        "id": 2,
+        "documentId": 1,
+        "userId": 2,
+        "orderToken": "b",
+        "lastUpdateTime": null
+      },
+      {
+        "id": 3,
+        "documentId": 2,
+        "userId": 1,
+        "orderToken": "a",
+        "lastUpdateTime": null
+      }
+    ],
+    "TaskEntity": [
+      {
+        "id": 1,
+        "documentId": 1,
+        "contentHtml": "Q3 planning",
+        "orderToken": "a",
+        "indentation": 0,
+        "collapsed": false,
+        "checked": false,
+        "delayedUntil": null,
+        "tags": [
+          "#plan"
+        ],
+        "lastContentModifierUserId": 1,
+        "lastUpdateTime": null
+      },
+      {
+        "id": 2,
+        "documentId": 1,
+        "contentHtml": "Design review",
+        "orderToken": "b",
+        "indentation": 1,
+        "collapsed": false,
+        "checked": true,
+        "delayedUntil": null,
+        "tags": [
+          "#design"
+        ],
+        "lastContentModifierUserId": 1,
+        "lastUpdateTime": null
+      },
+      {
+        "id": 3,
+        "documentId": 1,
+        "contentHtml": "Ship release",
+        "orderToken": "c",
+        "indentation": 1,
+        "collapsed": false,
+        "checked": false,
+        "delayedUntil": null,
+        "tags": [
+          "#release"
+        ],
+        "lastContentModifierUserId": 2,
+        "lastUpdateTime": null
+      }
+    ],
+    "EntityModificationEntity": [
+      {
+        "id": 1,
+        "userId": 1,
+        "entityId": 1,
+        "modification": {},
+        "date": "2026-08-01T00:00:00Z",
+        "instantNanos": 1
+      }
+    ]
+  },
+  "summary": "Piga is a Scala/Play + Scala.js hierarchical task-list editor for power users: users log in (SHA-512 password hash), create/edit/remove tasks and documents via a generic EntityModification RPC API, share documents between users via DocumentPermissionAndPlacement rows, and drive an external/task-tag automation API (insert/read tasks, regenerate order tokens, process #delayed_tasks); every mutation is duplicated as an immutable EntityModificationEntity audit log row.",
+  "_auth_candidates": [
+    {
+      "entity": "User",
+      "username_col": "loginName",
+      "password_col": "passwordHash"
+    }
+  ],
+  "_fk_gravity": {
+    "entity": "User",
+    "fk_count": 3
+  },
+  "_read_denied": "not_found",
+  "_no_edges": [
+    {
+      "id_local": "StandardActions.healthCheck",
+      "why": "public stateless health check; no auth middleware, no pre-checks, calls nothing mutating"
+    },
+    {
+      "id_local": "StandardActions.databaseSchema",
+      "why": "public secret-gated route; no pre-checks beyond secret validation, mutates nothing"
+    },
+    {
+      "id_local": "ExternalApi.regenerateOrderTokens",
+      "why": "public secret-gated (applicationSecret) route; no User wall and no pre-check beyond secret equality; reads all documents/tasks and writes orderToken directly, calls no other op (ExternalApi.scala:158)"
+    },
+    {
+      "id_local": "ExternalApi.processDelayedTasks",
+      "why": "public secret-gated (applicationSecret) route; no User wall beyond secret; recomputes task indentation/orderToken/delayedUntil for due #delayed_tasks inline via DelayedTasksHelper, calls no other op (ExternalApi.scala:196)"
+    },
+    {
+      "id_local": "StandardActions.clearOldEntityModifications",
+      "why": "public secret-gated route; no User wall beyond applicationSecret equality; deletes EntityModificationEntity rows older than 182 days directly (StandardActions.scala:42)"
+    },
+    {
+      "id_local": "Auth.logout",
+      "why": "public GET /logout/ route, no auth middleware; just clears the Play session cookie, no DB writes (routes:48, Auth.scala:54)"
+    }
+  ],
+  "auth": {
+    "account_entity": "User",
+    "username_col": "loginName",
+    "password_col": "passwordHash"
+  }
+}

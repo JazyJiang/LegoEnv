@@ -1,0 +1,80 @@
+{
+  "app": "thingsboard",
+  "role": "System tenant/profile and own-notification scalar metadata",
+  "domains": [
+    "operations",
+    "it_ops"
+  ],
+  "kinds": {
+    "create_record": [
+      "tenant_save",
+      "tenantprofile_save"
+    ],
+    "update_record": [
+      "tenant_update"
+    ],
+    "record_status_change": [
+      "tenantprofile_setdefault",
+      "notification_markasread"
+    ],
+    "delete_or_archive_row": [
+      "tenant_delete",
+      "notification_delete"
+    ]
+  },
+  "check_kinds": [
+    "record_exists",
+    "record_not_exists",
+    "record_field_equals",
+    "record_field_contains",
+    "record_field_unchanged"
+  ],
+  "carriers": {
+    "notes_field": {
+      "entity": "Notification",
+      "field": "body"
+    }
+  },
+  "login": {
+    "tool": "auth_login",
+    "user_field": "email",
+    "persona_entity": "User"
+  },
+  "content_entities": [
+    "Tenant",
+    "TenantProfile",
+    "Notification"
+  ],
+  "seed_helpers": [
+    "records"
+  ],
+  "tool_families_to_keep": [
+    ""
+  ],
+  "obs_reads": [
+    "tenant_search",
+    "notification_search"
+  ],
+  "known_patches": [
+    "Neutral prefix and integer id arguments/seeds",
+    "Synthetic existing SYS_ADMIN User1 without changing authorities",
+    "Actual optional textSearch in declared observation reads"
+  ],
+  "missing_tools": [
+    "TenantProfile read/list"
+  ],
+  "limitations": [
+    "All 134 original tools retained; seven declared tools certify system-admin scalar tenant/profile and notification records only. No transport, device provisioning, telemetry processing or alert/notification delivery claim.",
+    "User1 retains original SYS_ADMIN role, not tenant admin. Source authority checks preserved; tenant-admin rejection for system-only writes is tested.",
+    "notification_search is recipient scoped; notification mark/delete writes only check actor existence/authority, not target recipient. No comprehensive notification ACL claim.",
+    "tenantprofile_setdefault sets selected is_default true without clearing other profiles. TenantProfile has no source read/list; known ids required.",
+    "Many unclaimed source search scope.where values are literal session strings; unreadOnly/deliveryMethod/page/sort parameters are not fully implemented by notification search. No general pagination or tenant isolation claim."
+  ],
+  "smoke": {
+    "passed": true,
+    "date": "2026-10-24",
+    "report": "ok"
+  },
+  "register_file": "pack/newspecs3/thingsboard/register.py",
+  "base_spec": "pack/base_specs/thingsboard.spec.json"
+}

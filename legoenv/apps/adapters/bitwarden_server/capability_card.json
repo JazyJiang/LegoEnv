@@ -1,0 +1,82 @@
+{
+  "app": "bitwarden_server",
+  "role": "Vault synthetic note and project/folder scalar metadata",
+  "domains": [
+    "operations"
+  ],
+  "kinds": {
+    "create_record": [
+      "folder_create",
+      "project_create",
+      "secret_create"
+    ],
+    "update_record": [
+      "folder_rename",
+      "project_update"
+    ],
+    "delete_or_archive_row": [
+      "folder_delete",
+      "project_delete",
+      "secret_delete_soft"
+    ],
+    "record_status_change": [
+      "secret_restore_hard"
+    ]
+  },
+  "check_kinds": [
+    "record_exists",
+    "record_not_exists",
+    "record_field_equals",
+    "record_field_contains",
+    "record_field_unchanged"
+  ],
+  "carriers": {
+    "notes_field": {
+      "entity": "Secret",
+      "field": "Note"
+    }
+  },
+  "login": {
+    "tool": "sign_in",
+    "user_field": "username",
+    "persona_entity": "User"
+  },
+  "content_entities": [
+    "Secret",
+    "Project",
+    "Folder"
+  ],
+  "seed_helpers": [
+    "records"
+  ],
+  "tool_families_to_keep": [
+    ""
+  ],
+  "obs_reads": [
+    "secret_list",
+    "secret_get"
+  ],
+  "known_patches": [
+    "Neutral prefix",
+    "Integer identity schemas and synthetic source persona",
+    "Original source semantics bounded by actual probes"
+  ],
+  "missing_tools": [
+    "Folder read/list",
+    "Working current-secret update"
+  ],
+  "limitations": [
+    "All 198 source tools retained; nine declared tools certify synthetic string/scalar records only, not cryptographic secure storage or real Bitwarden service behavior.",
+    "Secret.Note is readable in the synthetic source panel. No real vault data/credentials, encryption/decryption, cryptographic key rotation or network effects used.",
+    "secret_update attempts malformed SecretVersion insertion and does not overwrite current Secret; it is not certified as an update capability. ProjectIds on secret_create does not create project links.",
+    "Ids arguments in declared tools target one actual numeric Id; no bulk handling. Folder rename/delete and Project update/delete lack full owner/org authorization; Secret reads lack membership enforcement.",
+    "Soft deletion uses fixed source timestamps and restore sets DeletedDate null. No full vault trash/sync, retention or organization-wide ACL claim."
+  ],
+  "smoke": {
+    "passed": true,
+    "date": "2026-10-24",
+    "report": "ok"
+  },
+  "register_file": "pack/newspecs3/bitwarden_server/register.py",
+  "base_spec": "pack/base_specs/bitwarden_server.spec.json"
+}

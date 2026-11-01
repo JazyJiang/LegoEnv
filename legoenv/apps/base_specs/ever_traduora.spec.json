@@ -1,0 +1,6097 @@
+{
+  "env_id": "ever_traduora",
+  "summary": "Traduora is a self-hosted translation-management web app (NestJS + TypeORM REST API). Users own Projects; each project groups Terms (keys) and Locales; the Translation matrix holds one value per (term,locale). Labels annotate terms/translations; ProjectUsers/ProjectClients carry per-project roles; work proceeds through invites, plans (string quotas), and file import/export.",
+  "auth": {
+    "account_entity": "User",
+    "username_col": "email",
+    "password_col": "encrypted_password",
+    "session_fields": {
+      "last_login": "last_login"
+    }
+  },
+  "entities": [
+    {
+      "name": "User",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false,
+          "max": 255
+        },
+        {
+          "name": "email",
+          "type": "text",
+          "nullable": false,
+          "max": 255
+        },
+        {
+          "name": "encrypted_password",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "encrypted_password_reset_token",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "password_reset_expires",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "login_attempts",
+          "type": "int",
+          "nullable": false,
+          "default": 0
+        },
+        {
+          "name": "last_login",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "num_projects_created",
+          "type": "int",
+          "nullable": false,
+          "default": 0
+        },
+        {
+          "name": "date_created",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "date_modified",
+          "type": "datetime",
+          "audit": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "email"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Locale",
+      "columns": [
+        {
+          "name": "code",
+          "type": "text",
+          "pk": true,
+          "max": 255
+        },
+        {
+          "name": "language",
+          "type": "text",
+          "nullable": false,
+          "max": 255
+        },
+        {
+          "name": "region",
+          "type": "text",
+          "nullable": false,
+          "max": 255
+        },
+        {
+          "name": "date_created",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "date_modified",
+          "type": "datetime",
+          "audit": true
+        }
+      ]
+    },
+    {
+      "name": "Plan",
+      "columns": [
+        {
+          "name": "code",
+          "type": "text",
+          "pk": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "max_strings",
+          "type": "int",
+          "nullable": false,
+          "default": 0
+        },
+        {
+          "name": "date_created",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "date_modified",
+          "type": "datetime",
+          "audit": true
+        }
+      ]
+    },
+    {
+      "name": "Project",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false,
+          "max": 255
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "nullable": true,
+          "max": 255
+        },
+        {
+          "name": "terms_count",
+          "type": "int",
+          "nullable": false,
+          "default": 0
+        },
+        {
+          "name": "locales_count",
+          "type": "int",
+          "nullable": false,
+          "default": 0
+        },
+        {
+          "name": "plan_code",
+          "type": "text",
+          "nullable": true,
+          "fk_to": "Plan.code",
+          "on_delete": "set_null"
+        },
+        {
+          "name": "date_created",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "date_modified",
+          "type": "datetime",
+          "audit": true
+        }
+      ]
+    },
+    {
+      "name": "ProjectUser",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "role",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "admin",
+            "editor",
+            "viewer"
+          ],
+          "default": "viewer"
+        },
+        {
+          "name": "project_id",
+          "type": "id",
+          "nullable": true,
+          "fk_to": "Project.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "user_id",
+          "type": "id",
+          "nullable": true,
+          "fk_to": "User.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "date_created",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "date_modified",
+          "type": "datetime",
+          "audit": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "project_id",
+            "user_id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Term",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "value",
+          "type": "text",
+          "nullable": false,
+          "max": 255
+        },
+        {
+          "name": "context",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "project_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Project.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "date_created",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "date_modified",
+          "type": "datetime",
+          "audit": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "project_id",
+            "value"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ProjectLocale",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "locale_code",
+          "type": "text",
+          "nullable": true,
+          "fk_to": "Locale.code",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "project_id",
+          "type": "id",
+          "nullable": true,
+          "fk_to": "Project.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "date_created",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "date_modified",
+          "type": "datetime",
+          "audit": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "project_id",
+            "locale_code"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Translation",
+      "columns": [
+        {
+          "name": "term_id",
+          "type": "id",
+          "pk": true,
+          "nullable": false,
+          "fk_to": "Term.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "project_locale_id",
+          "type": "id",
+          "pk": true,
+          "nullable": false,
+          "fk_to": "ProjectLocale.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "value",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "date_created",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "date_modified",
+          "type": "datetime",
+          "audit": true
+        }
+      ]
+    },
+    {
+      "name": "Invite",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "email",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "sent",
+            "accepted"
+          ],
+          "default": "sent"
+        },
+        {
+          "name": "role",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "admin",
+            "editor",
+            "viewer"
+          ],
+          "default": "viewer"
+        },
+        {
+          "name": "project_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Project.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "date_created",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "date_modified",
+          "type": "datetime",
+          "audit": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "project_id",
+            "email"
+          ]
+        }
+      ],
+      "_lifecycle": {
+        "col": "status",
+        "initial": "sent",
+        "states": [
+          "sent",
+          "accepted"
+        ],
+        "via": {
+          "Auth.signup": {
+            "col": "status",
+            "from": [
+              "sent"
+            ],
+            "to": "accepted"
+          },
+          "Auth.signupProvider": {
+            "col": "status",
+            "from": [
+              "sent"
+            ],
+            "to": "accepted"
+          }
+        }
+      }
+    },
+    {
+      "name": "Label",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "value",
+          "type": "text",
+          "nullable": false,
+          "max": 255
+        },
+        {
+          "name": "color",
+          "type": "text",
+          "nullable": false,
+          "max": 7,
+          "pattern": "^#[0-9a-fA-F]{6}$"
+        },
+        {
+          "name": "project_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Project.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "date_created",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "date_modified",
+          "type": "datetime",
+          "audit": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "project_id",
+            "value"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ProjectClient",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "role",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "admin",
+            "editor",
+            "viewer"
+          ],
+          "default": "viewer"
+        },
+        {
+          "name": "encrypted_secret",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "project_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Project.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "date_created",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "date_modified",
+          "type": "datetime",
+          "audit": true
+        }
+      ]
+    },
+    {
+      "name": "LabelTerm",
+      "columns": [
+        {
+          "name": "label_id",
+          "type": "id",
+          "pk": true,
+          "nullable": false,
+          "fk_to": "Label.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "term_id",
+          "type": "id",
+          "pk": true,
+          "nullable": false,
+          "fk_to": "Term.id",
+          "on_delete": "cascade"
+        }
+      ]
+    },
+    {
+      "name": "LabelTranslation",
+      "columns": [
+        {
+          "name": "label_id",
+          "type": "id",
+          "pk": true,
+          "nullable": false,
+          "fk_to": "Label.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "translation_term_id",
+          "type": "id",
+          "pk": true,
+          "nullable": false,
+          "fk_to": "Translation.term_id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "translation_project_locale_id",
+          "type": "id",
+          "pk": true,
+          "nullable": false,
+          "fk_to": "Translation.project_locale_id",
+          "on_delete": "cascade"
+        }
+      ]
+    }
+  ],
+  "tools": [
+    {
+      "tool": "sign_in",
+      "description": "Sign in with your account email and password. Every project, term, translation, label and member tool in this app requires this session first — it is what $actor resolves to. The password is verified against the account's stored credential.",
+      "family": "guard.auth",
+      "entity": "User",
+      "input_schema": {
+        "email": {
+          "type": "text",
+          "required": true
+        },
+        "encrypted_password": {
+          "type": "text",
+          "required": false
+        },
+        "password": {
+          "type": "text",
+          "required": false,
+          "description": "Existing runtime credential alias, still verified"
+        }
+      },
+      "exec_spec": {
+        "verify": {
+          "entity": "User",
+          "username_col": "email",
+          "password_col": "encrypted_password"
+        },
+        "entity": "User"
+      },
+      "guards": {
+        "required": [
+          "email"
+        ]
+      },
+      "_evidence": {
+        "locator": "api/src/controllers/auth.controller.ts:204",
+        "id_local": "Auth.authenticateUser",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/v1/auth/token",
+          "locator": "api/src/controllers/auth.controller.ts:204"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "switch (payload.grant_type) {\n  case GrantType.Password: { if (!payload.username || !payload.password) throw new BadRequestException('missing credentials'); const token = await this.authenticateUser(payload.username, payload.password); return { access_token: token, token_type: 'bearer', expires_in: `${config.authTokenExpires}s` }; }\n  case GrantType.ClientCredentials: { if (!payload.client_id || !payload.client_secret) throw new BadRequestException('missing credentials'); const token = await this.authenticateClient(payload.client_id, payload.client_secret); ... }\n  case GrantType.Provider: { i",
+        "edges": [
+          "user.service.ts:189-208 (findOneBy email, bcrypt compare; throws Unauthorized if none/match fails)"
+        ]
+      },
+      "_binds": {
+        "username": "User.email",
+        "client_id": "ProjectClient.id"
+      },
+      "_output_schema": {
+        "access_token": "JWT bearer token",
+        "token_type": "bearer",
+        "expires_in": "seconds"
+      }
+    },
+    {
+      "tool": "register",
+      "description": "Create a user account. The app is invitation-only: unless a pending invite exists for your email, signups are refused. On success the account is created and you are signed in.",
+      "family": "auth.register",
+      "entity": "User",
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true
+        },
+        "email": {
+          "type": "text",
+          "required": true
+        },
+        "password": {
+          "type": "text",
+          "required": true
+        }
+      },
+      "exec_spec": {
+        "fields": [
+          "name",
+          "email"
+        ],
+        "prechecks": [
+          {
+            "entity": "Invite",
+            "where": {
+              "email": {
+                "$arg": "email"
+              },
+              "status": "sent"
+            },
+            "message": "Signups are invitation based only. You need a pending invite for this email to register."
+          }
+        ],
+        "entity": "User"
+      },
+      "guards": {
+        "required": [
+          "name",
+          "email",
+          "password"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Invite",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "email",
+                      "op": "eq",
+                      "value": {
+                        "arg": "email"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "status",
+                      "op": "eq",
+                      "value": "sent"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "precondition": "This instance admits users by invitation only. Register with the email of a pending invite to be admitted."
+        }
+      },
+      "_evidence": {
+        "locator": "api/src/controllers/auth.controller.ts:83",
+        "id_local": "Auth.signup",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/v1/auth/signup",
+          "locator": "api/src/controllers/auth.controller.ts:71"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "const invites = await this.inviteRepo.find({ where: { email: normalizedEmail, status: InviteStatus.Sent }, relations: ['project'] });\nif (invites.length === 0 && !config.signupsEnabled) throw new ForbiddenException('Signups are invitation based only.');\nconst { user, isNewUser } = await this.userService.create({ grantType: GrantType.Password, ...payload });\nif (invites.length > 0) { await this.inviteRepo.manager.transaction(async entityManager => { invites.forEach(invite => (invite.status = InviteStatus.Accepted)); await entityManager.save(invites); const projectUsers = invites.map(invite => e",
+        "edges": [
+          "auth.controller.ts:85"
+        ]
+      },
+      "_binds": {
+        "name": "User.name",
+        "email": "User.email"
+      },
+      "_output_schema": {
+        "id": "User id",
+        "email": "User.email",
+        "name": "User.name",
+        "accessToken": "JWT bearer token"
+      }
+    },
+    {
+      "tool": "register_with_provider",
+      "description": "Create a user account via a social provider (Google) exchange for an authorization code. Refused unless signups are enabled, a pending invite exists for the account email, or the account already exists.",
+      "family": "auth.register",
+      "entity": "User",
+      "input_schema": {
+        "code": {
+          "type": "text",
+          "required": true
+        }
+      },
+      "exec_spec": {
+        "fields": [
+          "name",
+          "email"
+        ],
+        "set_on_create": {
+          "name": {
+            "lit": "provider-user"
+          },
+          "email": {
+            "lit": "provider@example.com"
+          }
+        },
+        "entity": "User"
+      },
+      "guards": {
+        "required": [
+          "code"
+        ]
+      },
+      "_evidence": {
+        "locator": "api/src/controllers/auth.controller.ts:139",
+        "id_local": "Auth.signupProvider",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/v1/auth/signup-provider",
+          "locator": "api/src/controllers/auth.controller.ts:127"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "const { id_token } = await this.authService.getTokenFromGoogle(code);\nconst decodedToken = this.jwtService.decode(id_token, { json: true });\nconst normalizedEmail = normalizeEmail(decodedToken.email);\nconst invites = await this.inviteRepo.find({ where: { email: normalizedEmail, status: InviteStatus.Sent }, relations: ['project'] });\nif (!config.signupsEnabled && invites.length === 0 && !(await this.userService.userExists(decodedToken.email))) throw new ForbiddenException('Signups are invitation based only.');\nconst { user, isNewUser } = await this.userService.create({ grantType: GrantType.Prov",
+        "edges": [
+          "auth.controller.ts:141"
+        ]
+      },
+      "_output_schema": {
+        "id": "User id",
+        "email": "User.email",
+        "name": "User.name",
+        "accessToken": "JWT bearer token"
+      }
+    },
+    {
+      "tool": "forgot_password",
+      "description": "Start a password reset for the account with the given email, by issuing a reset token and expiry on the account.",
+      "family": "update.field_set",
+      "entity": "User",
+      "input_schema": {
+        "email": {
+          "type": "text",
+          "required": true
+        }
+      },
+      "exec_spec": {
+        "row_key": {
+          "email": {
+            "$arg": "email"
+          }
+        },
+        "set": {
+          "password_reset_expires": "2026-01-01T08:00:00"
+        },
+        "fields": [],
+        "entity": "User"
+      },
+      "guards": {
+        "required": [
+          "email"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "email",
+                  "op": "eq",
+                  "value": {
+                    "arg": "email"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "precondition": "That email address is not registered on this instance."
+        }
+      },
+      "_evidence": {
+        "locator": "api/src/services/user.service.ts:75",
+        "id_local": "Auth.forgotPassword",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/v1/auth/forgot-password",
+          "locator": "api/src/controllers/auth.controller.ts:280"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "const user = await this.userRepo.findOneOrFail({ where: { email: normalizedEmail } });\nconst token = await new Promise(resolve => crypto.randomBytes(32, (err, buf) => resolve(buf.toString('hex'))));\nuser.encryptedPasswordResetToken = Buffer.from(await bcrypt.hash(token, 10), 'utf-8');\nuser.passwordResetExpires = moment().add(4, 'hours').toDate();\nawait this.userRepo.update(user.id, user);\nthen mailService.passwordResetToken(user, token)",
+        "edges": [
+          "user.service.ts:76-79"
+        ]
+      },
+      "_binds": {
+        "email": "User.email"
+      }
+    },
+    {
+      "tool": "reset_password",
+      "description": "Reset a forgotten password once the reset token issued by forgot_password is presented. Rejects an invalid or expired token.",
+      "family": "update.field_set",
+      "entity": "User",
+      "input_schema": {
+        "email": {
+          "type": "text",
+          "required": true
+        },
+        "token": {
+          "type": "text",
+          "required": true
+        },
+        "newPassword": {
+          "type": "text",
+          "required": true
+        }
+      },
+      "exec_spec": {
+        "row_key": {
+          "email": {
+            "$arg": "email"
+          }
+        },
+        "fields": [],
+        "entity": "User",
+        "set": {
+          "encrypted_password_reset_token": ""
+        }
+      },
+      "guards": {
+        "required": [
+          "email",
+          "token",
+          "newPassword"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "email",
+                  "op": "eq",
+                  "value": {
+                    "arg": "email"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "precondition": "That email address is not registered on this instance."
+        }
+      },
+      "_evidence": {
+        "locator": "api/src/services/user.service.ts:159",
+        "id_local": "Auth.resetPassword",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/v1/auth/reset-password",
+          "locator": "api/src/controllers/auth.controller.ts:290"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "const user = await this.userRepo.findOneByOrFail({ email: normalizedEmail });\nconst valid = await bcrypt.compare(token, user.encryptedPasswordResetToken.toString('utf8'));\nif (!valid) throw new UnauthorizedException('token is not valid');\nif (moment(user.passwordResetExpires).isBefore(Date.now())) throw new UnauthorizedException('token is expired');\nuser.encryptedPassword = Buffer.from(await bcrypt.hash(newPassword, 10), 'utf-8');\nuser.encryptedPasswordResetToken = Buffer.from('', 'utf-8');\nreturn await this.userRepo.save(user)",
+        "edges": [
+          "user.service.ts:160-173"
+        ]
+      },
+      "_binds": {
+        "email": "User.email"
+      }
+    },
+    {
+      "tool": "change_password",
+      "description": "Change your own password. Requires your current password to be presented first.",
+      "family": "update.field_set",
+      "entity": "User",
+      "input_schema": {
+        "oldPassword": {
+          "type": "text",
+          "required": true
+        },
+        "newPassword": {
+          "type": "text",
+          "required": true
+        }
+      },
+      "exec_spec": {
+        "row_key": {
+          "id": {
+            "$session": "account_id"
+          }
+        },
+        "fields": [],
+        "entity": "User"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "oldPassword",
+          "newPassword"
+        ],
+        "messages": {
+          "auth": "You must be signed in to change your password.",
+          "precondition": "The current password you supplied does not match your account."
+        }
+      },
+      "_evidence": {
+        "locator": "api/src/services/user.service.ts:137",
+        "id_local": "Auth.changePassword",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/v1/auth/change-password",
+          "locator": "api/src/controllers/auth.controller.ts:302"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "const requestingUser = this.authorizationService.getRequestUserOrClient(req, { mustBeUser: true });\nconst user = await this.userService.changePassword(requestingUser.id, payload.oldPassword, payload.newPassword);\n... const valid = bcrypt.compare(oldPassword, user.encryptedPassword.toString('utf8')); if (!valid) throw new UnauthorizedException('invalid credentials'); user.encryptedPassword = Buffer.from(await bcrypt.hash(newPassword, 10), 'utf-8'); save",
+        "edges": [
+          "auth.controller.ts:302, jwt.strategy.ts:33",
+          "user.service.ts:139-148"
+        ]
+      }
+    },
+    {
+      "tool": "get_my_profile",
+      "description": "Fetch your own account profile.",
+      "family": "crud.fetch",
+      "entity": "User",
+      "input_schema": {},
+      "exec_spec": {
+        "lookup_by": {
+          "id": {
+            "$session": "account_id"
+          }
+        },
+        "scope": {
+          "owner_col": "id"
+        },
+        "entity": "User"
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "Sign in to view your profile."
+        }
+      },
+      "_evidence": {
+        "locator": "api/src/controllers/user.controller.ts:20",
+        "id_local": "User.me",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v1/users/me",
+          "locator": "api/src/controllers/user.controller.ts:18"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "async me(@Req() req) { const user = this.auth.getRequestUserOrClient(req, { mustBeUser: true }); return { data: user }; }",
+        "edges": [
+          "user.controller.ts:18, jwt.strategy.ts:33"
+        ]
+      },
+      "_output_schema": {
+        "data": {
+          "id": "User.id",
+          "name": "User.name",
+          "email": "User.email"
+        }
+      }
+    },
+    {
+      "tool": "update_my_profile",
+      "description": "Update your own display name or email.",
+      "family": "update.field_set",
+      "entity": "User",
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": false
+        },
+        "email": {
+          "type": "text",
+          "required": false
+        }
+      },
+      "exec_spec": {
+        "row_key": {
+          "id": {
+            "$session": "account_id"
+          }
+        },
+        "fields": [
+          "name",
+          "email"
+        ],
+        "entity": "User"
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "Sign in to update your profile."
+        }
+      },
+      "_evidence": {
+        "locator": "api/src/controllers/user.controller.ts:35",
+        "id_local": "User.updateProfile",
+        "entry": {
+          "kind": "http",
+          "route": "PATCH /api/v1/users/me",
+          "locator": "api/src/controllers/user.controller.ts:27"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "const user = this.auth.getRequestUserOrClient(req, { mustBeUser: true });\nconst updated = await this.userService.updateUserData(user.id, payload);\nreturn { data: { id: updated.id, name: updated.name, email: updated.email } }",
+        "edges": [
+          "user.controller.ts:27, jwt.strategy.ts:33"
+        ]
+      },
+      "_binds": {
+        "name": "User.name",
+        "email": "User.email"
+      },
+      "_output_schema": {
+        "data": {
+          "id": "User.id",
+          "name": "User.name",
+          "email": "User.email"
+        }
+      }
+    },
+    {
+      "tool": "delete_my_account",
+      "description": "Delete your own account. Refused if you are the last admin of any project that still has other members.",
+      "family": "crud.delete",
+      "entity": "User",
+      "input_schema": {},
+      "exec_spec": {
+        "lookup_by": {
+          "id": {
+            "$session": "account_id"
+          }
+        },
+        "entity": "User"
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "ProjectUser",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "eq",
+                      "value": "admin"
+                    }
+                  ]
+                }
+              },
+              "op": "eq",
+              "n": 0
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in to delete your account.",
+          "precondition": "You cannot delete your account: you are the last admin of a project that still has other members."
+        }
+      },
+      "_evidence": {
+        "locator": "api/src/services/user.service.ts:108",
+        "id_local": "User.deleteAccount",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/v1/users/me",
+          "locator": "api/src/controllers/user.controller.ts:43"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "const ownedProjects = await this.projectUsersRepo.find({ where: { user: { id: user.id }, role: ProjectRole.Admin }, relations: ['project'] });\nfor (const ownedProject of ownedProjects) { const projectUsers = await this.projectUsersRepo.find({ where: { project: { id: ownedProject.project.id } }, relations: ['user'] }); const otherUsers = projectUsers.filter(u => u.user.id !== user.id); if (otherUsers.length > 0) { const otherAdmins = otherUsers.find(u => u.role === ProjectRole.Admin); if (!otherAdmins) throw new UnprocessableEntityException('cant delete account if last project admin and other u",
+        "edges": [
+          "user.controller.ts:43, jwt.strategy.ts:33",
+          "user.service.ts:108-135"
+        ]
+      }
+    },
+    {
+      "tool": "list_my_projects",
+      "description": "List the projects you are a member of, along with your role in each. Only projects where you hold a membership come back.",
+      "family": "search",
+      "entity": "ProjectUser",
+      "input_schema": {},
+      "exec_spec": {
+        "scope": {
+          "owner_col": "user_id"
+        },
+        "search_fields": [
+          "project_id"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "project_id"
+          ]
+        },
+        "entity": "ProjectUser"
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "Sign in to list your projects."
+        }
+      },
+      "_evidence": {
+        "locator": "api/src/controllers/project.controller.ts:40",
+        "id_local": "Project.list",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v1/projects",
+          "locator": "api/src/controllers/project.controller.ts:28"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "const user = this.auth.getRequestUserOrClient(req, { mustBeUser: true });\nconst memberships = await this.projectUserRepo.find({ where: { user: { id: user.id } }, relations: ['project'] });\nreturn { data: memberships.map(p => ({ ...p.project, role: p.role })) };",
+        "edges": [
+          "lists only memberships where user_id=actor (project.controller.ts:40)"
+        ]
+      },
+      "_output_schema": {
+        "data": "list of Project with role"
+      }
+    },
+    {
+      "tool": "create_project",
+      "description": "Create a new project. You become its admin member and the project is assigned the default plan and initial counters. Refused once you have created 100 projects.",
+      "family": "crud.insert",
+      "entity": "Project",
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true
+        },
+        "description": {
+          "type": "text",
+          "required": false
+        }
+      },
+      "exec_spec": {
+        "fields": [
+          "name",
+          "description"
+        ],
+        "set_on_create": {
+          "plan_code": {
+            "lit": "open-source"
+          },
+          "terms_count": {
+            "lit": 0
+          },
+          "locales_count": {
+            "lit": 0
+          }
+        },
+        "side_inserts": [
+          {
+            "entity": "ProjectUser",
+            "fields": {
+              "role": {
+                "lit": "admin"
+              },
+              "user_id": {
+                "$session": "account_id"
+              },
+              "project_id": {
+                "$ref": {
+                  "entity": "Project",
+                  "where": {
+                    "name": {
+                      "$arg": "name"
+                    }
+                  },
+                  "col": "id"
+                }
+              }
+            }
+          }
+        ],
+        "entity": "Project"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "name"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "num_projects_created",
+                      "op": "lt",
+                      "value": 100
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in to create a project.",
+          "precondition": "You have reached the limit of 100 projects per user."
+        }
+      },
+      "_evidence": {
+        "locator": "api/src/controllers/project.controller.ts:58",
+        "id_local": "Project.create",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/v1/projects",
+          "locator": "api/src/controllers/project.controller.ts:46"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "const user = this.auth.getRequestUserOrClient(req, { mustBeUser: true });\nif (user.numProjectsCreated >= config.maxProjectsPerUser) throw new TooManyRequestsException(...);\nawait this.projectRepo.manager.transaction(async tx => { let project = this.projectRepo.create(payload); project = await tx.save(project); const membership = this.projectUserRepo.create({ user, project, role: ProjectRole.Admin }); await tx.save(membership); const defaultPlan = await tx.findOneOrFail(Plan, { code: config.defaultProjectPlan }); project.plan = defaultPlan; await tx.save(project); user.numProjectsCreated += 1; ",
+        "edges": [
+          "tx.findOneOrFail(Plan, where code = config.defaultProjectPlan) (project.controller.ts:63, config.ts:28)",
+          "numProjectsCreated >= config.maxProjectsPerUser (100) guard (project.controller.ts:53)"
+        ]
+      },
+      "_binds": {
+        "name": "Project.name",
+        "description": "Project.description"
+      },
+      "_output_schema": {
+        "data": {
+          "id": "Project.id",
+          "name": "Project.name",
+          "description": "Project.description",
+          "localesCount": "Project.locales_count",
+          "termsCount": "Project.terms_count",
+          "role": "admin"
+        }
+      }
+    },
+    {
+      "tool": "get_project",
+      "description": "Fetch a project you are a member of.",
+      "family": "crud.fetch",
+      "entity": "Project",
+      "input_schema": {
+        "projectId": {
+          "type": "int",
+          "required": true
+        }
+      },
+      "exec_spec": {
+        "lookup_by": {
+          "id": {
+            "$arg": "projectId"
+          }
+        },
+        "entity": "Project"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "projectId"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "ProjectUser",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "project_id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "projectId"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "viewer",
+                          "editor",
+                          "admin"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in to view a project.",
+          "precondition": "You are not a member of this project.",
+          "not_found": "No such project."
+        }
+      },
+      "_evidence": {
+        "locator": "api/src/controllers/project.controller.ts:92",
+        "id_local": "Project.get",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v1/projects/:projectId",
+          "locator": "api/src/controllers/project.controller.ts:80"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "const user = this.auth.getRequestUserOrClient(req);\nconst membership = await this.auth.authorizeProjectAction(user, projectId, ProjectAction.ViewProject);\nreturn { data: { ...omit(membership.project, 'plan'), role: membership.role } };",
+        "edges": [
+          "membership gate: viewer+ via AuthorizationService.authorizeProjectAction; project lookup by projectId (authorization.service.ts:55)"
+        ]
+      },
+      "_binds": {
+        "projectId": "Project.id"
+      },
+      "_output_schema": {
+        "data": "Project row with id/name/description/localesCount/termsCount and caller's ProjectUser role"
+      }
+    },
+    {
+      "tool": "update_project",
+      "description": "Update a project's name or description. Requires editor or admin membership.",
+      "family": "update.field_set",
+      "entity": "Project",
+      "input_schema": {
+        "projectId": {
+          "type": "int",
+          "required": true
+        },
+        "name": {
+          "type": "text",
+          "required": false
+        },
+        "description": {
+          "type": "text",
+          "required": false
+        }
+      },
+      "exec_spec": {
+        "row_key": {
+          "id": {
+            "$arg": "projectId"
+          }
+        },
+        "fields": [
+          "name",
+          "description"
+        ],
+        "entity": "Project"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "projectId"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "ProjectUser",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "project_id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "projectId"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "editor",
+                          "admin"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in to update a project.",
+          "precondition": "Only an editor or admin of this project can update it.",
+          "not_found": "No such project."
+        }
+      },
+      "_evidence": {
+        "locator": "api/src/controllers/project.controller.ts:108",
+        "id_local": "Project.update",
+        "entry": {
+          "kind": "http",
+          "route": "PATCH /api/v1/projects/:projectId",
+          "locator": "api/src/controllers/project.controller.ts:96"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "const user = this.auth.getRequestUserOrClient(req, { mustBeUser: true });\nconst membership = await this.auth.authorizeProjectAction(user, projectId, ProjectAction.EditProject);\nawait this.projectRepo.update(projectId, payload);\nconst project = await this.projectRepo.findOneByOrFail({ id: projectId });\nreturn { data: { ...project, role: membership.role } };",
+        "edges": [
+          "membership gate editor+ (authorization.service.ts:55)"
+        ]
+      },
+      "_binds": {
+        "projectId": "Project.id",
+        "name": "Project.name",
+        "description": "Project.description"
+      },
+      "_output_schema": {
+        "data": "Project row with id/name/description/role"
+      }
+    },
+    {
+      "tool": "delete_project",
+      "description": "Delete a project. Requires admin membership; cascades to its terms, locales, translations, members, invites and clients.",
+      "family": "crud.delete",
+      "entity": "Project",
+      "input_schema": {
+        "projectId": {
+          "type": "int",
+          "required": true
+        }
+      },
+      "exec_spec": {
+        "lookup_by": {
+          "id": {
+            "$arg": "projectId"
+          }
+        },
+        "entity": "Project"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "projectId"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "ProjectUser",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "project_id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "projectId"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "admin"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in to delete a project.",
+          "precondition": "Only the admin of this project can delete it.",
+          "not_found": "No such project."
+        }
+      },
+      "_evidence": {
+        "locator": "api/src/controllers/project.controller.ts:125",
+        "id_local": "Project.delete",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/v1/projects/:projectId",
+          "locator": "api/src/controllers/project.controller.ts:113"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "const user = this.auth.getRequestUserOrClient(req, { mustBeUser: true });\nawait this.auth.authorizeProjectAction(user, projectId, ProjectAction.DeleteProject);\nawait this.projectRepo.manager.transaction(async tx => { await tx.delete(Project, { id: projectId }); user.numProjectsCreated -= 1; if (user.numProjectsCreated < 0) user.numProjectsCreated = 0; await tx.update(User, { id: user.id }, { numProjectsCreated: user.numProjectsCreated }); });",
+        "edges": [
+          "membership gate admin only, DeleteProject not in AllowedEditorActions (authorization.service.ts:55, actions.ts)"
+        ]
+      },
+      "_binds": {
+        "projectId": "Project.id"
+      }
+    },
+    {
+      "tool": "get_project_plan",
+      "description": "Fetch the plan (string quota) assigned to a project you can view.",
+      "family": "crud.fetch",
+      "entity": "Project",
+      "input_schema": {
+        "projectId": {
+          "type": "int",
+          "required": true
+        }
+      },
+      "exec_spec": {
+        "lookup_by": {
+          "id": {
+            "$arg": "projectId"
+          }
+        },
+        "entity": "Project"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "projectId"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "ProjectUser",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "project_id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "projectId"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "viewer",
+                          "editor",
+                          "admin"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in to view a project's plan.",
+          "precondition": "You are not a member of this project.",
+          "not_found": "No such project."
+        }
+      },
+      "_evidence": {
+        "locator": "api/src/controllers/project-plan.controller.ts:26",
+        "id_local": "Project.getPlan",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v1/projects/:projectId/plan",
+          "locator": "api/src/controllers/project-plan.controller.ts:15"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "const user = this.auth.getRequestUserOrClient(req, { mustBeUser: true });\nconst membership = await this.auth.authorizeProjectAction(user, projectId, ProjectAction.ViewProjectPlan);\nreturn { data: membership.project.plan };",
+        "edges": [
+          "membership gate viewer+ (authorization.service.ts:55)"
+        ]
+      },
+      "_binds": {
+        "projectId": "Project.id"
+      },
+      "_output_schema": {
+        "data": "the project's Plan row"
+      }
+    },
+    {
+      "tool": "get_project_stats",
+      "description": "Fetch translation-progress statistics for a project: how many strings are translated versus outstanding, grouped per locale.",
+      "family": "search.aggregate",
+      "entity": "Translation",
+      "input_schema": {
+        "projectId": {
+          "type": "int",
+          "required": true
+        }
+      },
+      "exec_spec": {
+        "group_by": [
+          "project_locale_id"
+        ],
+        "aggregate": [
+          {
+            "fn": "count",
+            "as": "translated"
+          }
+        ],
+        "entity": "Translation"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "projectId"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "ProjectUser",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "project_id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "projectId"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "viewer",
+                          "editor",
+                          "admin"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in to view project statistics.",
+          "precondition": "You are not a member of this project.",
+          "not_found": "No such project."
+        }
+      },
+      "_evidence": {
+        "locator": "api/src/controllers/project-stats.controller.ts:43",
+        "id_local": "Project.getStats",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v1/projects/:projectId/stats",
+          "locator": "api/src/controllers/project-stats.controller.ts:31"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "const membership = await this.auth.authorizeProjectAction(user, projectId, ProjectAction.ViewTranslation);\nconst termCount = membership.project.termsCount;\nconst translatedByLocale = await this.projectLocaleRepo.createQueryBuilder()... .andWhere(\"translations.value <> ''\")... .groupBy(localeCode);\nconst totalTranslated = _.sumBy(withDefaults, 'translated'); ... return { data: { projectStats, localeStats } };",
+        "edges": [
+          "membership gate viewer+ (authorization.service.ts:55)"
+        ]
+      },
+      "_binds": {
+        "projectId": "Project.id"
+      },
+      "_output_schema": {
+        "data": "projectStats{progress,translated,total,terms,locales} and per-locale localeStats"
+      }
+    },
+    {
+      "tool": "list_terms",
+      "description": "List all terms (source strings) of a project you can view, ordered alphabetically by value.",
+      "family": "search",
+      "entity": "Term",
+      "input_schema": {
+        "projectId": {
+          "type": "int",
+          "required": true
+        }
+      },
+      "exec_spec": {
+        "scope": {
+          "where": {
+            "project_id": {
+              "$arg": "projectId"
+            }
+          }
+        },
+        "search_fields": [
+          "project_id"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "project_id"
+          ]
+        },
+        "entity": "Term"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "projectId"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "ProjectUser",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "project_id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "projectId"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "viewer",
+                          "editor",
+                          "admin"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in to list terms.",
+          "precondition": "You are not a member of this project.",
+          "not_found": "No such project."
+        }
+      },
+      "_evidence": {
+        "locator": "api/src/controllers/term.controller.ts:40",
+        "id_local": "Term.list",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v1/projects/:projectId/terms",
+          "locator": "api/src/controllers/term.controller.ts:27"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "const membership = await this.auth.authorizeProjectAction(user, projectId, ProjectAction.ViewTerm);\nconst queryBuilder = this.termRepo.createQueryBuilder('term').leftJoinAndSelect('term.labels','label').where('term.project.id = :projectId',{projectId: membership.project.id});\nqueryBuilder.orderBy(getLexicalOrderClause('term.value'),'ASC');\nconst terms = await queryBuilder.getMany();",
+        "edges": [
+          "membership gate viewer+ (authorization.service.ts:55)"
+        ]
+      },
+      "_binds": {
+        "projectId": "Project.id"
+      },
+      "_output_schema": {
+        "data": "list of Term rows with labels"
+      }
+    },
+    {
+      "tool": "list_terms_by_label",
+      "description": "List the terms of a project that carry a particular label.",
+      "family": "search",
+      "entity": "Term",
+      "input_schema": {
+        "projectId": {
+          "type": "int",
+          "required": true
+        },
+        "labelId": {
+          "type": "int",
+          "required": true
+        }
+      },
+      "exec_spec": {
+        "scope": {
+          "where": {
+            "project_id": "$session.account_id"
+          }
+        },
+        "search_fields": [
+          "project_id"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "project_id"
+          ]
+        },
+        "entity": "Term"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "projectId",
+          "labelId"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "ProjectUser",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "project_id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "projectId"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "viewer",
+                          "editor",
+                          "admin"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in to list terms.",
+          "precondition": "You are not a member of this project.",
+          "not_found": "No such term or label."
+        }
+      },
+      "_evidence": {
+        "locator": "api/src/controllers/term.controller.ts:73",
+        "id_local": "Term.listByLabel",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v1/projects/:projectId/terms/filter-by-label",
+          "locator": "api/src/controllers/term.controller.ts:61"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "const membership = await this.auth.authorizeProjectAction(user, projectId, ProjectAction.ViewTerm);\nif (!labelId) return { data: [], message: 'No label provided for filtering' };\nconst queryBuilder = this.termRepo.createQueryBuilder('term').leftJoinAndSelect('term.labels','label').where('term.project.id = :projectId',{projectId: membership.project.id}).andWhere('label.id = :labelId',{labelId});\nqueryBuilder.orderBy(getLexicalOrderClause('term.value'),'ASC');",
+        "edges": [
+          "membership gate viewer+ (authorization.service.ts:55)"
+        ]
+      },
+      "_binds": {
+        "projectId": "Project.id",
+        "labelId": "Label.id"
+      },
+      "_output_schema": {
+        "data": "list of Term rows with labels",
+        "message": "string when no labelId given"
+      }
+    },
+    {
+      "tool": "create_term",
+      "description": "Add a new term (source string) to a project. For every locale the project already has, a blank translation row is seeded for this term, and the project's term counter is incremented. Requires editor or admin membership and a valid string quota.",
+      "family": "action.trigger",
+      "entity": "Term",
+      "input_schema": {
+        "projectId": {
+          "type": "int",
+          "required": true
+        },
+        "value": {
+          "type": "text",
+          "required": true
+        },
+        "context": {
+          "type": "text",
+          "required": false
+        }
+      },
+      "exec_spec": {
+        "target": {
+          "entity": "Project",
+          "lookup_by": {
+            "id": {
+              "$arg": "projectId"
+            }
+          }
+        },
+        "spawn": [
+          {
+            "entity": "Term",
+            "n": 1,
+            "set_on_spawn": {
+              "project_id": {
+                "$ref": {
+                  "entity": "Project",
+                  "where": {
+                    "id": {
+                      "$arg": "projectId"
+                    }
+                  },
+                  "col": "id"
+                }
+              },
+              "value": {
+                "$arg": "value"
+              },
+              "context": {
+                "$arg": "context"
+              }
+            }
+          },
+          {
+            "entity": "Translation",
+            "n": 1,
+            "set_on_spawn": {
+              "term_id": {
+                "$arg": "term_id"
+              }
+            }
+          }
+        ],
+        "entity": "Term"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "projectId",
+          "value"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "ProjectUser",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "project_id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "projectId"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "editor",
+                          "admin"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Project",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "projectId"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "plan_code",
+                      "op": "is_not_null"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in to add a term.",
+          "precondition": "Only an editor or admin can add terms, and the project needs a plan that allows more strings.",
+          "not_found": "No such project."
+        }
+      },
+      "_evidence": {
+        "locator": "api/src/controllers/term.controller.ts:113",
+        "id_local": "Term.create",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/v1/projects/:projectId/terms",
+          "locator": "api/src/controllers/term.controller.ts:101"
+        },
+        "entity_why": "primary effect spawn lands on this table",
+        "ref_code": "const membership = await this.auth.authorizeProjectAction(user, projectId, ProjectAction.AddTerm, 1);\nconst term = this.termRepo.create({ value: payload.value, context: payload.context, project: membership.project });\nawait this.termRepo.manager.transaction(async entityManager => { await entityManager.save(term); const projectLocales = await this.projectLocaleRepo.find({ where: { project: { id: membership.project.id } } }); const translations = projectLocales.map(pl => this.translationRepo.create({ projectLocale: pl, term, value: '', labels: [] })); await entityManager.save(translations); awai",
+        "edges": [
+          "membership gate editor+ (authorization.service.ts:55)",
+          "Plan.maxStrings quota guard in authorizeProjectAction (authorization.service.ts:69-73)"
+        ]
+      },
+      "_binds": {
+        "projectId": "Project.id",
+        "value": "Term.value",
+        "context": "Term.context"
+      },
+      "_output_schema": {
+        "data": "Term row with id/value/context/labels/date"
+      }
+    },
+    {
+      "tool": "update_term",
+      "description": "Update a term's value or context. Requires editor or admin membership.",
+      "family": "update.field_set",
+      "entity": "Term",
+      "input_schema": {
+        "projectId": {
+          "type": "int",
+          "required": true
+        },
+        "termId": {
+          "type": "int",
+          "required": true
+        },
+        "value": {
+          "type": "text",
+          "required": false
+        },
+        "context": {
+          "type": "text",
+          "required": false
+        }
+      },
+      "exec_spec": {
+        "row_key": {
+          "id": {
+            "$arg": "termId"
+          }
+        },
+        "fields": [
+          "value",
+          "context"
+        ],
+        "entity": "Term"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "projectId",
+          "termId"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "ProjectUser",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "project_id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "projectId"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "editor",
+                          "admin"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in to update a term.",
+          "precondition": "Only an editor or admin can update terms.",
+          "not_found": "No such term."
+        }
+      },
+      "_evidence": {
+        "locator": "api/src/controllers/term.controller.ts:166",
+        "id_local": "Term.update",
+        "entry": {
+          "kind": "http",
+          "route": "PATCH /api/v1/projects/:projectId/terms/:termId",
+          "locator": "api/src/controllers/term.controller.ts:154"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "await this.auth.authorizeProjectAction(user, projectId, ProjectAction.EditTerm);\nawait this.termRepo.findOneOrFail({ where: { id: termId, project: { id: projectId } } });\nawait this.termRepo.update({ id: termId }, { value: payload.value, context: payload.context });",
+        "edges": [
+          "membership gate editor+ (authorization.service.ts:55)"
+        ]
+      },
+      "_binds": {
+        "projectId": "Project.id",
+        "termId": "Term.id",
+        "value": "Term.value",
+        "context": "Term.context"
+      },
+      "_output_schema": {
+        "data": "Term row with id/value/context/labels/date"
+      }
+    },
+    {
+      "tool": "delete_term",
+      "description": "Delete a term from a project, cascading to its translations. The project's term counter is decremented. Requires editor or admin membership.",
+      "family": "crud.delete",
+      "entity": "Term",
+      "input_schema": {
+        "projectId": {
+          "type": "int",
+          "required": true
+        },
+        "termId": {
+          "type": "int",
+          "required": true
+        }
+      },
+      "exec_spec": {
+        "lookup_by": {
+          "id": {
+            "$arg": "termId"
+          }
+        },
+        "entity": "Term"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "projectId",
+          "termId"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "ProjectUser",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "project_id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "projectId"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "editor",
+                          "admin"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in to delete a term.",
+          "precondition": "Only an editor or admin can delete terms.",
+          "not_found": "No such term."
+        }
+      },
+      "_evidence": {
+        "locator": "api/src/controllers/term.controller.ts:195",
+        "id_local": "Term.delete",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/v1/projects/:projectId/terms/:termId",
+          "locator": "api/src/controllers/term.controller.ts:183"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "const membership = await this.auth.authorizeProjectAction(user, projectId, ProjectAction.DeleteTerm);\nawait this.termRepo.manager.transaction(async entityManager => { const term = await entityManager.findOneOrFail(Term, { where: { id: termId, project: { id: membership.project.id } } }); await entityManager.remove(term); await entityManager.decrement(Project, { id: membership.project.id }, 'termsCount', 1); });",
+        "edges": [
+          "membership gate editor+ (authorization.service.ts:55)"
+        ]
+      },
+      "_binds": {
+        "projectId": "Project.id",
+        "termId": "Term.id"
+      }
+    },
+    {
+      "tool": "list_locales",
+      "description": "List the known locale definitions (code, language, region) available to projects. This is the global catalogue any project can add.",
+      "family": "search",
+      "entity": "Locale",
+      "input_schema": {},
+      "exec_spec": {
+        "search_fields": [
+          "code"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "code"
+          ]
+        },
+        "entity": "Locale"
+      },
+      "guards": {},
+      "_evidence": {
+        "locator": "api/src/controllers/locale.controller.ts:25",
+        "id_local": "Locale.list",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v1/locales",
+          "locator": "api/src/controllers/locale.controller.ts:15"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "const locales = await this.localeRepo.find({ take: 1000 });\nreturn { data: locales.map(l => ({ code: l.code, language: l.language, region: l.region })) };"
+      },
+      "_output_schema": {
+        "data": "list of {code, language, region}"
+      }
+    },
+    {
+      "tool": "list_project_locales",
+      "description": "List the locales currently used by a project you can view.",
+      "family": "search",
+      "entity": "ProjectLocale",
+      "input_schema": {
+        "projectId": {
+          "type": "int",
+          "required": true
+        }
+      },
+      "exec_spec": {
+        "scope": {
+          "where": {
+            "project_id": "$session.account_id"
+          }
+        },
+        "search_fields": [
+          "project_id"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "project_id"
+          ]
+        },
+        "entity": "ProjectLocale"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "projectId"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "ProjectUser",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "project_id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "projectId"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "viewer",
+                          "editor",
+                          "admin"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in to list locales.",
+          "precondition": "You are not a member of this project.",
+          "not_found": "No such project."
+        }
+      },
+      "_evidence": {
+        "locator": "api/src/controllers/translation.controller.ts:49",
+        "id_local": "ProjectLocale.list",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v1/projects/:projectId/translations",
+          "locator": "api/src/controllers/translation.controller.ts:37"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "const membership = await this.auth.authorizeProjectAction(user, projectId, ProjectAction.ViewTranslation);\nconst locales = await this.projectLocaleRepo.find({ where: { project: { id: membership.project.id } }, relations: ['locale'] });\nreturn { data: _.chain(locales).map(v => _.pick(v, ['id','date','locale.code','locale.region','locale.language'])).value() };",
+        "edges": [
+          "membership gate viewer+ (authorization.service.ts:55)"
+        ]
+      },
+      "_binds": {
+        "projectId": "Project.id"
+      },
+      "_output_schema": {
+        "data": "list of ProjectLocale with locale.code/region/language"
+      }
+    },
+    {
+      "tool": "add_project_locale",
+      "description": "Add a locale to a project. A blank translation is seeded for every term the project already has, and the project's locale counter is incremented. Requires editor or admin membership and a known locale code.",
+      "family": "action.trigger",
+      "entity": "ProjectLocale",
+      "input_schema": {
+        "projectId": {
+          "type": "int",
+          "required": true
+        },
+        "code": {
+          "type": "text",
+          "required": true
+        }
+      },
+      "exec_spec": {
+        "target": {
+          "entity": "Project",
+          "lookup_by": {
+            "id": {
+              "$arg": "projectId"
+            }
+          }
+        },
+        "spawn": [
+          {
+            "entity": "ProjectLocale",
+            "n": 1,
+            "set_on_spawn": {
+              "project_id": {
+                "$ref": {
+                  "entity": "Project",
+                  "where": {
+                    "id": {
+                      "$arg": "projectId"
+                    }
+                  },
+                  "col": "id"
+                }
+              },
+              "locale_code": {
+                "$arg": "code"
+              }
+            }
+          },
+          {
+            "entity": "Translation",
+            "n": 1,
+            "set_on_spawn": {
+              "project_locale_id": {
+                "$arg": "project_locale_id"
+              }
+            }
+          }
+        ],
+        "entity": "ProjectLocale"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "projectId",
+          "code"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "ProjectUser",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "project_id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "projectId"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "editor",
+                          "admin"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Project",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "projectId"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "plan_code",
+                      "op": "is_not_null"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Locale",
+                "where": {
+                  "node": "field",
+                  "col": "code",
+                  "op": "eq",
+                  "value": {
+                    "arg": "code"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in to add a locale.",
+          "precondition": "Only an editor or admin can add locales; the locale code must be one this server knows and the project needs quota for more strings.",
+          "not_found": "No such project or unknown locale code."
+        }
+      },
+      "_evidence": {
+        "locator": "api/src/controllers/translation.controller.ts:73",
+        "id_local": "ProjectLocale.create",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/v1/projects/:projectId/translations",
+          "locator": "api/src/controllers/translation.controller.ts:59"
+        },
+        "entity_why": "primary effect spawn lands on this table",
+        "ref_code": "const membership = await this.auth.authorizeProjectAction(user, projectId, ProjectAction.AddTranslation, 0, 1);\nconst locale = await this.localeRepo.findOneBy({ code: payload.code }); if (!locale) throw new NotFoundException('unknown locale code');\nconst projectLocale = this.projectLocaleRepo.create({ locale, project: membership.project });\nawait this.termRepo.manager.transaction(async entityManager => { await entityManager.save(projectLocale); const terms = await entityManager.find(Term, { where: { project: { id: projectId } }, relations: ['labels'] }); const translations = terms.map(term => ",
+        "edges": [
+          "membership gate editor+ (authorization.service.ts:55)",
+          "Plan.maxStrings quota guard in authorizeProjectAction (authorization.service.ts:69-73)",
+          "translation.controller.ts:73-75"
+        ]
+      },
+      "_binds": {
+        "projectId": "Project.id",
+        "code": "Locale.code"
+      },
+      "_output_schema": {
+        "data": "ProjectLocale with id, locale{code,region,language} and date"
+      }
+    },
+    {
+      "tool": "list_translations",
+      "description": "List the translations for one locale of a project: each term id with its current value and labels.",
+      "family": "search",
+      "entity": "Translation",
+      "input_schema": {
+        "projectId": {
+          "type": "int",
+          "required": true
+        },
+        "localeCode": {
+          "type": "text",
+          "required": true
+        }
+      },
+      "exec_spec": {
+        "search_fields": [
+          "value"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "value"
+          ]
+        },
+        "entity": "Translation",
+        "scope": {
+          "where": {
+            "project_locale_id": {
+              "$ref": {
+                "entity": "ProjectLocale",
+                "where": {
+                  "project_id": {
+                    "$arg": "projectId"
+                  },
+                  "locale_code": {
+                    "$arg": "localeCode"
+                  }
+                },
+                "col": "id"
+              }
+            }
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "projectId",
+          "localeCode"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "ProjectUser",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "project_id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "projectId"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "viewer",
+                          "editor",
+                          "admin"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "ProjectLocale",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "project_id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "projectId"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "locale_code",
+                      "op": "eq",
+                      "value": {
+                        "arg": "localeCode"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in to view translations.",
+          "precondition": "You are not a member of this project, or this locale is not part of it.",
+          "not_found": "No such project."
+        }
+      },
+      "_evidence": {
+        "locator": "api/src/controllers/translation.controller.ts:129",
+        "id_local": "ProjectLocale.listTranslations",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v1/projects/:projectId/translations/:localeCode",
+          "locator": "api/src/controllers/translation.controller.ts:117"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "const projectLocale = await this.projectLocaleRepo.findOneOrFail({ where: { project: { id: membership.project.id }, locale: { code: localeCode } } });\nconst translations = await this.translationRepo.find({ where: { projectLocale: { id: projectLocale.id } }, relations: ['term','labels'] });\nconst result = translations.filter(t => !!t.term).map(t => ({ termId: t.term.id, value: t.value, labels: t.labels, date: t.date }));",
+        "edges": [
+          "membership gate viewer+ (authorization.service.ts:55)",
+          "translation.controller.ts:129-131"
+        ]
+      },
+      "_binds": {
+        "projectId": "Project.id",
+        "localeCode": "Locale.code"
+      },
+      "_output_schema": {
+        "data": "list of {termId, value, labels, date}"
+      }
+    },
+    {
+      "tool": "set_translation",
+      "description": "Set the translation value for a term in a locale. Creates the translation row if it does not yet exist; a freshly created translation inherits the term's labels. Requires editor or admin membership.",
+      "family": "crud.upsert",
+      "entity": "Translation",
+      "input_schema": {
+        "projectId": {
+          "type": "int",
+          "required": true
+        },
+        "localeCode": {
+          "type": "text",
+          "required": true
+        },
+        "termId": {
+          "type": "int",
+          "required": true
+        },
+        "value": {
+          "type": "text",
+          "required": true
+        }
+      },
+      "exec_spec": {
+        "key": {
+          "term_id": {
+            "$arg": "termId"
+          },
+          "project_locale_id": {
+            "$ref": {
+              "entity": "ProjectLocale",
+              "where": {
+                "project_id": {
+                  "$arg": "projectId"
+                },
+                "locale_code": {
+                  "$arg": "localeCode"
+                }
+              },
+              "col": "id"
+            }
+          }
+        },
+        "insert_fields": {
+          "term_id": {
+            "$arg": "termId"
+          },
+          "project_locale_id": {
+            "$ref": {
+              "entity": "ProjectLocale",
+              "where": {
+                "project_id": {
+                  "$arg": "projectId"
+                },
+                "locale_code": {
+                  "$arg": "localeCode"
+                }
+              },
+              "col": "id"
+            }
+          },
+          "value": {
+            "$arg": "value"
+          }
+        },
+        "set_on_exists": {
+          "value": {
+            "$arg": "value"
+          }
+        },
+        "entity": "Translation"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "projectId",
+          "localeCode",
+          "termId",
+          "value"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "ProjectUser",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "project_id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "projectId"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "editor",
+                          "admin"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Term",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "termId"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "project_id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "projectId"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "ProjectLocale",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "project_id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "projectId"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "locale_code",
+                      "op": "eq",
+                      "value": {
+                        "arg": "localeCode"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in to set a translation.",
+          "precondition": "Only an editor or admin can translate; the term and locale must belong to this project.",
+          "not_found": "No such project, term or locale."
+        }
+      },
+      "_evidence": {
+        "locator": "api/src/controllers/translation.controller.ts:174",
+        "id_local": "Translation.update",
+        "entry": {
+          "kind": "http",
+          "route": "PATCH /api/v1/projects/:projectId/translations/:localeCode",
+          "locator": "api/src/controllers/translation.controller.ts:156"
+        },
+        "entity_why": "primary effect row_upsert lands on this table",
+        "ref_code": "const projectLocale = await this.projectLocaleRepo.findOneOrFail({ where: { locale: { code: localeCode }, project: { id: projectId } } });\nconst term = await this.termRepo.findOneOrFail({ where: { project: { id: projectId }, id: payload.termId }, relations: ['labels'] });\nlet translation = await this.translationRepo.findOne({ where: { termId: term.id, projectLocale: { id: projectLocale.id } }, relations: ['labels'] });\nif (translation) { translation.value = payload.value; } else { translation = this.translationRepo.create({ value: payload.value, projectLocale, term, labels: term.labels }); }\na",
+        "edges": [
+          "membership gate editor+ (authorization.service.ts:55)",
+          "translation.controller.ts:174-178 (term.findOneOrFail where project.id AND id)",
+          "translation.controller.ts:168-172"
+        ]
+      },
+      "_binds": {
+        "projectId": "Project.id",
+        "localeCode": "Locale.code",
+        "termId": "Term.id",
+        "value": "Translation.value",
+        "projectLocaleId": "ProjectLocale.id"
+      },
+      "_output_schema": {
+        "data": "translation {termId, value, labels, date}"
+      }
+    },
+    {
+      "tool": "delete_project_locale",
+      "description": "Remove a locale from a project, cascading to its translations. The project's locale counter is decremented. Requires editor or admin membership.",
+      "family": "crud.delete",
+      "entity": "ProjectLocale",
+      "input_schema": {
+        "projectId": {
+          "type": "int",
+          "required": true
+        },
+        "localeCode": {
+          "type": "text",
+          "required": true
+        }
+      },
+      "exec_spec": {
+        "lookup_by": {
+          "project_id": {
+            "$arg": "projectId"
+          },
+          "locale_code": {
+            "$arg": "localeCode"
+          }
+        },
+        "entity": "ProjectLocale"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "projectId",
+          "localeCode"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "ProjectUser",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "project_id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "projectId"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "editor",
+                          "admin"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in to remove a locale.",
+          "precondition": "Only an editor or admin can remove locales.",
+          "not_found": "No such project."
+        }
+      },
+      "_evidence": {
+        "locator": "api/src/controllers/translation.controller.ts:238",
+        "id_local": "ProjectLocale.delete",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/v1/projects/:projectId/translations/:localeCode",
+          "locator": "api/src/controllers/translation.controller.ts:227"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "const membership = await this.auth.authorizeProjectAction(user, projectId, ProjectAction.DeleteTranslation);\nawait this.projectLocaleRepo.manager.transaction(async entityManager => { const projectLocale = await entityManager.findOneOrFail(ProjectLocale, { where: { project: { id: membership.project.id }, locale: { code: localeCode } } }); await entityManager.remove(projectLocale); await entityManager.decrement(Project, { id: membership.project.id }, 'localesCount', 1); });",
+        "edges": [
+          "membership gate editor+ (authorization.service.ts:55)"
+        ]
+      },
+      "_binds": {
+        "projectId": "Project.id",
+        "localeCode": "Locale.code"
+      }
+    },
+    {
+      "tool": "list_labels",
+      "description": "List the labels defined in a project you can view.",
+      "family": "search",
+      "entity": "Label",
+      "input_schema": {
+        "projectId": {
+          "type": "int",
+          "required": true
+        }
+      },
+      "exec_spec": {
+        "scope": {
+          "where": {
+            "project_id": {
+              "$arg": "projectId"
+            }
+          }
+        },
+        "search_fields": [
+          "project_id"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "project_id"
+          ]
+        },
+        "entity": "Label"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "projectId"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "ProjectUser",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "project_id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "projectId"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "viewer",
+                          "editor",
+                          "admin"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in to list labels.",
+          "precondition": "You are not a member of this project.",
+          "not_found": "No such project."
+        }
+      },
+      "_evidence": {
+        "locator": "api/src/controllers/project-label.controller.ts:41",
+        "id_local": "Label.list",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v1/projects/:projectId/labels",
+          "locator": "api/src/controllers/project-label.controller.ts:27"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "const membership = await this.auth.authorizeProjectAction(user, projectId, ProjectAction.ViewLabel);\nconst labels = await this.labelRepo.find({ where: { project: { id: membership.project.id } }, order: { value: 'ASC' } });",
+        "edges": [
+          "membership gate viewer+ (authorization.service.ts:55)"
+        ]
+      },
+      "_binds": {
+        "projectId": "Project.id"
+      },
+      "_output_schema": {
+        "data": "list of Label rows {id, value, color}"
+      }
+    },
+    {
+      "tool": "create_label",
+      "description": "Create a label in a project with a value and a hex color. Requires editor or admin membership.",
+      "family": "crud.insert",
+      "entity": "Label",
+      "input_schema": {
+        "projectId": {
+          "type": "int",
+          "required": true
+        },
+        "value": {
+          "type": "text",
+          "required": true
+        },
+        "color": {
+          "type": "text",
+          "required": true
+        }
+      },
+      "exec_spec": {
+        "fields": [
+          "value",
+          "color"
+        ],
+        "set_on_create": {
+          "project_id": {
+            "$ref": {
+              "entity": "Project",
+              "where": {
+                "id": {
+                  "$arg": "projectId"
+                }
+              },
+              "col": "id"
+            }
+          }
+        },
+        "entity": "Label"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "projectId",
+          "value",
+          "color"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "ProjectUser",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "project_id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "projectId"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "editor",
+                          "admin"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in to create a label.",
+          "precondition": "Only an editor or admin can create labels.",
+          "not_found": "No such project.",
+          "unique": "A label with this value already exists in this project."
+        }
+      },
+      "_evidence": {
+        "locator": "api/src/controllers/project-label.controller.ts:63",
+        "id_local": "Label.create",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/v1/projects/:projectId/labels",
+          "locator": "api/src/controllers/project-label.controller.ts:49"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "const membership = await this.auth.authorizeProjectAction(user, projectId, ProjectAction.AddLabel);\nconst label = this.labelRepo.create({ value: payload.value, color: payload.color, project: membership.project });\nawait this.labelRepo.save(label);",
+        "edges": [
+          "membership gate editor+ (authorization.service.ts:55)"
+        ]
+      },
+      "_binds": {
+        "projectId": "Project.id",
+        "value": "Label.value",
+        "color": "Label.color"
+      },
+      "_output_schema": {
+        "data": "Label row {id, value, color}"
+      }
+    },
+    {
+      "tool": "update_label",
+      "description": "Update a label's value or color. Requires editor or admin membership.",
+      "family": "update.field_set",
+      "entity": "Label",
+      "input_schema": {
+        "projectId": {
+          "type": "int",
+          "required": true
+        },
+        "labelId": {
+          "type": "int",
+          "required": true
+        },
+        "value": {
+          "type": "text",
+          "required": false
+        },
+        "color": {
+          "type": "text",
+          "required": false
+        }
+      },
+      "exec_spec": {
+        "row_key": {
+          "id": {
+            "$arg": "labelId"
+          }
+        },
+        "fields": [
+          "value",
+          "color"
+        ],
+        "entity": "Label"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "projectId",
+          "labelId"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "ProjectUser",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "project_id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "projectId"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "editor",
+                          "admin"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in to update a label.",
+          "precondition": "Only an editor or admin can update labels.",
+          "not_found": "No such label."
+        }
+      },
+      "_evidence": {
+        "locator": "api/src/controllers/project-label.controller.ts:92",
+        "id_local": "Label.update",
+        "entry": {
+          "kind": "http",
+          "route": "PATCH /api/v1/projects/:projectId/labels/:labelId",
+          "locator": "api/src/controllers/project-label.controller.ts:78"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "await this.auth.authorizeProjectAction(user, projectId, ProjectAction.EditLabel);\nawait this.labelRepo.findOneOrFail({ where: { id: labelId, project: { id: projectId } } });\nawait this.labelRepo.update({ id: labelId }, payload);",
+        "edges": [
+          "membership gate editor+ (authorization.service.ts:55)"
+        ]
+      },
+      "_binds": {
+        "projectId": "Project.id",
+        "labelId": "Label.id",
+        "value": "Label.value",
+        "color": "Label.color"
+      },
+      "_output_schema": {
+        "data": "Label row {id, value, color}"
+      }
+    },
+    {
+      "tool": "delete_label",
+      "description": "Delete a label from a project. Requires editor or admin membership.",
+      "family": "crud.delete",
+      "entity": "Label",
+      "input_schema": {
+        "projectId": {
+          "type": "int",
+          "required": true
+        },
+        "labelId": {
+          "type": "int",
+          "required": true
+        }
+      },
+      "exec_spec": {
+        "lookup_by": {
+          "id": {
+            "$arg": "labelId"
+          }
+        },
+        "entity": "Label"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "projectId",
+          "labelId"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "ProjectUser",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "project_id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "projectId"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "editor",
+                          "admin"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in to delete a label.",
+          "precondition": "Only an editor or admin can delete labels.",
+          "not_found": "No such label."
+        }
+      },
+      "_evidence": {
+        "locator": "api/src/controllers/project-label.controller.ts:110",
+        "id_local": "Label.delete",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/v1/projects/:projectId/labels/:labelId",
+          "locator": "api/src/controllers/project-label.controller.ts:100"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "const membership = await this.auth.authorizeProjectAction(user, projectId, ProjectAction.DeleteLabel);\nconst label = await this.labelRepo.findOneOrFail({ where: { id: labelId, project: { id: membership.project.id } } });\nawait this.labelRepo.remove(label);",
+        "edges": [
+          "membership gate editor+ (authorization.service.ts:55)"
+        ]
+      },
+      "_binds": {
+        "projectId": "Project.id",
+        "labelId": "Label.id"
+      }
+    },
+    {
+      "tool": "set_term_label",
+      "description": "Attach a label to a term by creating a LabelTerm join row. Requires editor or admin membership.",
+      "family": "crud.insert",
+      "entity": "LabelTerm",
+      "input_schema": {
+        "projectId": {
+          "type": "int",
+          "required": true
+        },
+        "labelId": {
+          "type": "int",
+          "required": true
+        },
+        "termId": {
+          "type": "int",
+          "required": true
+        }
+      },
+      "exec_spec": {
+        "fields": {
+          "label_id": {
+            "$arg": "labelId"
+          },
+          "term_id": {
+            "$arg": "termId"
+          }
+        },
+        "entity": "LabelTerm"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "projectId",
+          "labelId",
+          "termId"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "ProjectUser",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "project_id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "projectId"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "editor",
+                          "admin"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in to label a term.",
+          "precondition": "Only an editor or admin can label terms.",
+          "not_found": "No such label or term."
+        }
+      },
+      "_evidence": {
+        "locator": "api/src/controllers/project-label.controller.ts:126",
+        "id_local": "Label.labelTerm",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/v1/projects/:projectId/labels/:labelId/terms/:termId",
+          "locator": "api/src/controllers/project-label.controller.ts:114"
+        },
+        "entity_why": "primary effect link lands on this table",
+        "ref_code": "const membership = await this.auth.authorizeProjectAction(user, projectId, ProjectAction.EditLabel);\nconst label = await this.labelRepo.findOneOrFail({ where: { id: labelId, project: { id: membership.project.id } } });\nconst term = await this.termsRepo.findOneOrFail({ where: { id: termId, project: { id: membership.project.id } }, relations: ['labels'] });\nterm.labels.push(label); await this.termsRepo.save(term);\nconst translations = await this.translationsRepo.find({ where: { termId: term.id }, relations: ['labels'] });\ntranslations.forEach(t => { t.labels.push(label); }); await this.translati",
+        "edges": [
+          "membership gate editor+ (authorization.service.ts:55)"
+        ]
+      },
+      "_binds": {
+        "projectId": "Project.id",
+        "labelId": "Label.id",
+        "termId": "Term.id"
+      }
+    },
+    {
+      "tool": "unset_term_label",
+      "description": "Remove a label from a term by deleting its LabelTerm join row. Requires editor or admin membership.",
+      "family": "crud.delete",
+      "entity": "LabelTerm",
+      "input_schema": {
+        "projectId": {
+          "type": "int",
+          "required": true
+        },
+        "labelId": {
+          "type": "int",
+          "required": true
+        },
+        "termId": {
+          "type": "int",
+          "required": true
+        }
+      },
+      "exec_spec": {
+        "lookup_by": {
+          "label_id": {
+            "$arg": "labelId"
+          },
+          "term_id": {
+            "$arg": "termId"
+          }
+        },
+        "entity": "LabelTerm"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "projectId",
+          "labelId",
+          "termId"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "ProjectUser",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "project_id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "projectId"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "editor",
+                          "admin"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in to remove a label from a term.",
+          "precondition": "Only an editor or admin can unlabel terms.",
+          "not_found": "No such label or term."
+        }
+      },
+      "_evidence": {
+        "locator": "api/src/controllers/project-label.controller.ts:153",
+        "id_local": "Label.unlabelTerm",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/v1/projects/:projectId/labels/:labelId/terms/:termId",
+          "locator": "api/src/controllers/project-label.controller.ts:141"
+        },
+        "entity_why": "primary effect unlink lands on this table",
+        "ref_code": "const membership = await this.auth.authorizeProjectAction(user, projectId, ProjectAction.EditLabel);\nconst label = await this.labelRepo.findOneOrFail({ where: { id: labelId, project: { id: membership.project.id } } });\nconst term = await this.termsRepo.findOneOrFail({ where: { id: termId, project: { id: membership.project.id } }, relations: ['labels'] });\nterm.labels = term.labels.filter(t => t.id !== label.id); await this.termsRepo.save(term);",
+        "edges": [
+          "membership gate editor+ (authorization.service.ts:55)"
+        ]
+      },
+      "_binds": {
+        "projectId": "Project.id",
+        "labelId": "Label.id",
+        "termId": "Term.id"
+      }
+    },
+    {
+      "tool": "set_translation_label",
+      "description": "Attach a label to a specific translation of a term in a locale by creating a LabelTranslation join row. Requires editor or admin membership.",
+      "family": "crud.insert",
+      "entity": "LabelTranslation",
+      "input_schema": {
+        "projectId": {
+          "type": "int",
+          "required": true
+        },
+        "labelId": {
+          "type": "int",
+          "required": true
+        },
+        "termId": {
+          "type": "int",
+          "required": true
+        },
+        "localeCode": {
+          "type": "text",
+          "required": true
+        }
+      },
+      "exec_spec": {
+        "fields": {
+          "label_id": {
+            "$arg": "labelId"
+          },
+          "translation_term_id": {
+            "$arg": "termId"
+          },
+          "translation_project_locale_id": {
+            "$ref": {
+              "entity": "ProjectLocale",
+              "where": {
+                "project_id": {
+                  "$arg": "projectId"
+                },
+                "locale_code": {
+                  "$arg": "localeCode"
+                }
+              },
+              "col": "id"
+            }
+          }
+        },
+        "entity": "LabelTranslation"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "projectId",
+          "labelId",
+          "termId",
+          "localeCode"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "ProjectUser",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "project_id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "projectId"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "editor",
+                          "admin"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "ProjectLocale",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "project_id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "projectId"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "locale_code",
+                      "op": "eq",
+                      "value": {
+                        "arg": "localeCode"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in to label a translation.",
+          "precondition": "Only an editor or admin can label translations; the term and locale must belong to this project.",
+          "not_found": "No such label, term, locale or translation."
+        }
+      },
+      "_evidence": {
+        "locator": "api/src/controllers/project-label.controller.ts:172",
+        "id_local": "Label.labelTranslation",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/v1/projects/:projectId/labels/:labelId/terms/:termId/translations/:localeCode",
+          "locator": "api/src/controllers/project-label.controller.ts:160"
+        },
+        "entity_why": "primary effect link lands on this table",
+        "ref_code": "const membership = await this.auth.authorizeProjectAction(user, projectId, ProjectAction.EditLabel);\nconst label = await this.labelRepo.findOneOrFail({ where: { id: labelId, project: { id: membership.project.id } } });\nconst projectLocale = await this.projectLocaleRepo.findOneOrFail({ where: { project: { id: membership.project.id }, locale: { code: localeCode } } });\nconst translation = await this.translationsRepo.findOneOrFail({ where: { termId, projectLocale: { id: projectLocale.id } }, relations: ['labels'] });\ntranslation.labels.push(label); await this.translationsRepo.save(translation);",
+        "edges": [
+          "membership gate editor+ (authorization.service.ts:55)"
+        ]
+      },
+      "_binds": {
+        "projectId": "Project.id",
+        "labelId": "Label.id",
+        "termId": "Term.id",
+        "localeCode": "Locale.code",
+        "projectLocaleId": "ProjectLocale.id"
+      }
+    },
+    {
+      "tool": "unset_translation_label",
+      "description": "Remove a label from a specific translation of a term in a locale by deleting its LabelTranslation join row. Requires editor or admin membership.",
+      "family": "crud.delete",
+      "entity": "LabelTranslation",
+      "input_schema": {
+        "projectId": {
+          "type": "int",
+          "required": true
+        },
+        "labelId": {
+          "type": "int",
+          "required": true
+        },
+        "termId": {
+          "type": "int",
+          "required": true
+        },
+        "localeCode": {
+          "type": "text",
+          "required": true
+        }
+      },
+      "exec_spec": {
+        "lookup_by": {
+          "label_id": {
+            "$arg": "labelId"
+          },
+          "translation_term_id": {
+            "$arg": "termId"
+          },
+          "translation_project_locale_id": {
+            "$ref": {
+              "entity": "ProjectLocale",
+              "where": {
+                "project_id": {
+                  "$arg": "projectId"
+                },
+                "locale_code": {
+                  "$arg": "localeCode"
+                }
+              },
+              "col": "id"
+            }
+          }
+        },
+        "entity": "LabelTranslation"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "projectId",
+          "labelId",
+          "termId",
+          "localeCode"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "ProjectUser",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "project_id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "projectId"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "editor",
+                          "admin"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "ProjectLocale",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "project_id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "projectId"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "locale_code",
+                      "op": "eq",
+                      "value": {
+                        "arg": "localeCode"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in to unlabel a translation.",
+          "precondition": "Only an editor or admin can unlabel translations; the term and locale must belong to this project.",
+          "not_found": "No such label, term, locale or translation."
+        }
+      },
+      "_evidence": {
+        "locator": "api/src/controllers/project-label.controller.ts:212",
+        "id_local": "Label.unlabelTranslation",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/v1/projects/:projectId/labels/:labelId/terms/:termId/translations/:localeCode",
+          "locator": "api/src/controllers/project-label.controller.ts:200"
+        },
+        "entity_why": "primary effect unlink lands on this table",
+        "ref_code": "const membership = await this.auth.authorizeProjectAction(user, projectId, ProjectAction.EditLabel);\nconst label = await this.labelRepo.findOneOrFail({ where: { id: labelId, project: { id: membership.project.id } } });\nconst projectLocale = await this.projectLocaleRepo.findOneOrFail({ where: { project: { id: membership.project.id }, locale: { code: localeCode } } });\nconst translation = await this.translationsRepo.findOneOrFail({ where: { termId, projectLocale: { id: projectLocale.id } }, relations: ['labels'] });\ntranslation.labels = translation.labels.filter(t => t.id !== label.id); await th",
+        "edges": [
+          "membership gate editor+ (authorization.service.ts:55)"
+        ]
+      },
+      "_binds": {
+        "projectId": "Project.id",
+        "labelId": "Label.id",
+        "termId": "Term.id",
+        "localeCode": "Locale.code",
+        "projectLocaleId": "ProjectLocale.id"
+      }
+    },
+    {
+      "tool": "list_invites",
+      "description": "List the pending (sent) invites for a project you can view.",
+      "family": "search",
+      "entity": "Invite",
+      "input_schema": {
+        "projectId": {
+          "type": "int",
+          "required": true
+        }
+      },
+      "exec_spec": {
+        "scope": {
+          "where": {
+            "project_id": "$session.account_id"
+          }
+        },
+        "search_fields": [
+          "project_id",
+          "status"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "project_id",
+            "status"
+          ]
+        },
+        "entity": "Invite"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "projectId"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "ProjectUser",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "project_id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "projectId"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "viewer",
+                          "editor",
+                          "admin"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in to list invites.",
+          "precondition": "You are not a member of this project.",
+          "not_found": "No such project."
+        }
+      },
+      "_evidence": {
+        "locator": "api/src/controllers/project-invite.controller.ts:45",
+        "id_local": "ProjectInvite.list",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v1/projects/:projectId/invites",
+          "locator": "api/src/controllers/project-invite.controller.ts:33"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "await this.auth.authorizeProjectAction(user, projectId, ProjectAction.ViewProjectInvites);\nconst invites = await this.inviteRepo.find({ where: { project: { id: projectId }, status: InviteStatus.Sent } });",
+        "edges": [
+          "membership gate viewer+ (authorization.service.ts:55)"
+        ]
+      },
+      "_binds": {
+        "projectId": "Project.id"
+      },
+      "_output_schema": {
+        "data": "list of sent Invite rows {id, role, email, status}"
+      }
+    },
+    {
+      "tool": "invite_user",
+      "description": "Add a member to a project by email: registers them as a member with the given role if the account already exists, otherwise records a pending invite to their email. Requires admin membership.",
+      "family": "crud.upsert",
+      "entity": "ProjectUser",
+      "input_schema": {
+        "projectId": {
+          "type": "int",
+          "required": true
+        },
+        "email": {
+          "type": "text",
+          "required": true
+        },
+        "role": {
+          "type": "text",
+          "required": true
+        }
+      },
+      "exec_spec": {
+        "key": {
+          "project_id": {
+            "$arg": "projectId"
+          },
+          "email": {
+            "$ref": {
+              "entity": "User",
+              "where": {
+                "email": {
+                  "$arg": "email"
+                }
+              },
+              "col": "id"
+            }
+          }
+        },
+        "insert_fields": {
+          "user_id": {
+            "$ref": {
+              "entity": "User",
+              "where": {
+                "email": {
+                  "$arg": "email"
+                }
+              },
+              "col": "id"
+            }
+          },
+          "project_id": {
+            "$arg": "projectId"
+          },
+          "role": {
+            "$arg": "role"
+          }
+        },
+        "set_on_exists": {
+          "role": {
+            "$arg": "role"
+          }
+        },
+        "entity": "ProjectUser"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "projectId",
+          "email",
+          "role"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "ProjectUser",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "project_id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "projectId"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "admin"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "email",
+                  "op": "eq",
+                  "value": {
+                    "arg": "email"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in to invite a user.",
+          "precondition": "Only the admin of a project can invite users, and the email must be a known account (otherwise a plain invite is sent instead).",
+          "not_found": "No such project."
+        }
+      },
+      "_evidence": {
+        "locator": "api/src/controllers/project-invite.controller.ts:68",
+        "id_local": "ProjectInvite.inviteUser",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/v1/projects/:projectId/invites",
+          "locator": "api/src/controllers/project-invite.controller.ts:56"
+        },
+        "entity_why": "primary effect row_upsert lands on this table",
+        "ref_code": "const { project } = await this.auth.authorizeProjectAction(user, projectId, ProjectAction.InviteProjectUser);\nconst targetUser = await this.userRepo.findOne({ where: { email: normalizeEmail(inviteUserRequest.email) } });\nif (targetUser) { const record = this.projectUserRepo.create({ project: { id: projectId }, user: targetUser, role: inviteUserRequest.role }); let newProjectUser = await this.projectUserRepo.save(record); this.mail.invitedToProject(newProjectUser); return {...}; }\nelse { const record = this.inviteRepo.create({ email: normalizeEmail(inviteUserRequest.email), project: { id: proje",
+        "edges": [
+          "membership gate admin only, InviteProjectUser not in AllowedEditorActions (authorization.service.ts:55, actions.ts)",
+          "project-invite.controller.ts:68-76"
+        ]
+      },
+      "_binds": {
+        "projectId": "Project.id",
+        "email": "User.email",
+        "role": "ProjectUser.role",
+        "userId": "User.id"
+      },
+      "_output_schema": {
+        "data": "if user exists: {userId,name,email,role}; else {id,role,email,status}"
+      }
+    },
+    {
+      "tool": "update_invite_role",
+      "description": "Change the role granted to a pending invite. Requires editor or admin membership.",
+      "family": "update.field_set",
+      "entity": "Invite",
+      "input_schema": {
+        "projectId": {
+          "type": "int",
+          "required": true
+        },
+        "inviteId": {
+          "type": "int",
+          "required": true
+        },
+        "role": {
+          "type": "text",
+          "required": true
+        }
+      },
+      "exec_spec": {
+        "row_key": {
+          "id": {
+            "$arg": "inviteId"
+          }
+        },
+        "fields": [
+          "role"
+        ],
+        "entity": "Invite"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "projectId",
+          "inviteId",
+          "role"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "ProjectUser",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "project_id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "projectId"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "editor",
+                          "admin"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in to change an invite.",
+          "precondition": "Only an editor or admin can change invite roles.",
+          "not_found": "No such invite."
+        }
+      },
+      "_evidence": {
+        "locator": "api/src/controllers/project-invite.controller.ts:131",
+        "id_local": "ProjectInvite.updateRole",
+        "entry": {
+          "kind": "http",
+          "route": "PATCH /api/v1/projects/:projectId/invites/:inviteId",
+          "locator": "api/src/controllers/project-invite.controller.ts:117"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "await this.auth.authorizeProjectAction(requestingUser, projectId, ProjectAction.EditProjectInvites);\nconst targetInvite = await this.inviteRepo.findOneOrFail({ where: { id: inviteId }, relations: ['project'] });\ntargetInvite.role = updateProjectInviteRequest.role; const updated = await this.inviteRepo.save(targetInvite, { reload: true });",
+        "edges": [
+          "membership gate editor+ (authorization.service.ts:55)"
+        ]
+      },
+      "_binds": {
+        "projectId": "Project.id",
+        "inviteId": "Invite.id",
+        "role": "Invite.role"
+      },
+      "_output_schema": {
+        "data": "Invite row {id, role, email, status}"
+      }
+    },
+    {
+      "tool": "delete_invite",
+      "description": "Delete a pending invite, revoking the pending membership offer. Requires admin membership.",
+      "family": "crud.delete",
+      "entity": "Invite",
+      "input_schema": {
+        "projectId": {
+          "type": "int",
+          "required": true
+        },
+        "inviteId": {
+          "type": "int",
+          "required": true
+        }
+      },
+      "exec_spec": {
+        "lookup_by": {
+          "id": {
+            "$arg": "inviteId"
+          }
+        },
+        "entity": "Invite"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "projectId",
+          "inviteId"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "ProjectUser",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "project_id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "projectId"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "admin"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in to delete an invite.",
+          "precondition": "Only the admin of a project can delete invites.",
+          "not_found": "No such invite."
+        }
+      },
+      "_evidence": {
+        "locator": "api/src/controllers/project-invite.controller.ts:164",
+        "id_local": "ProjectInvite.delete",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/v1/projects/:projectId/invites/:inviteId",
+          "locator": "api/src/controllers/project-invite.controller.ts:151"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "await this.auth.authorizeProjectAction(requestingUser, projectId, ProjectAction.DeleteProjectInvites);\nconst targetInvite = await this.inviteRepo.findOneOrFail({ where: { id: inviteId } });\nawait this.inviteRepo.remove(targetInvite);",
+        "edges": [
+          "membership gate admin only (authorization.service.ts:55, actions.ts)"
+        ]
+      },
+      "_binds": {
+        "projectId": "Project.id",
+        "inviteId": "Invite.id"
+      }
+    },
+    {
+      "tool": "list_project_clients",
+      "description": "List the API clients configured for a project you can view.",
+      "family": "search",
+      "entity": "ProjectClient",
+      "input_schema": {
+        "projectId": {
+          "type": "int",
+          "required": true
+        }
+      },
+      "exec_spec": {
+        "scope": {
+          "where": {
+            "project_id": "$session.account_id"
+          }
+        },
+        "search_fields": [
+          "project_id"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "project_id"
+          ]
+        },
+        "entity": "ProjectClient"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "projectId"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "ProjectUser",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "project_id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "projectId"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "viewer",
+                          "editor",
+                          "admin"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in to list API clients.",
+          "precondition": "You are not a member of this project.",
+          "not_found": "No such project."
+        }
+      },
+      "_evidence": {
+        "locator": "api/src/controllers/project-client.controller.ts:45",
+        "id_local": "ProjectClient.list",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v1/projects/:projectId/clients",
+          "locator": "api/src/controllers/project-client.controller.ts:31"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "await this.auth.authorizeProjectAction(user, projectId, ProjectAction.ViewProjectClients);\nconst clients = await this.projectClientRepo.find({ where: { project: { id: projectId } } });",
+        "edges": [
+          "membership gate viewer+ (authorization.service.ts:55)"
+        ]
+      },
+      "_binds": {
+        "projectId": "Project.id"
+      },
+      "_output_schema": {
+        "data": "list of ProjectClient {id, name, role}"
+      }
+    },
+    {
+      "tool": "create_project_client",
+      "description": "Create an API client for a project with a role. The plaintext secret is only ever returned once, here. Requires admin membership.",
+      "family": "crud.insert",
+      "entity": "ProjectClient",
+      "input_schema": {
+        "projectId": {
+          "type": "int",
+          "required": true
+        },
+        "name": {
+          "type": "text",
+          "required": true
+        },
+        "role": {
+          "type": "text",
+          "required": true
+        }
+      },
+      "exec_spec": {
+        "fields": [
+          "name",
+          "role"
+        ],
+        "set_on_create": {
+          "project_id": {
+            "$arg": "projectId"
+          }
+        },
+        "entity": "ProjectClient"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "projectId",
+          "name",
+          "role"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "ProjectUser",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "project_id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "projectId"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "admin"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in to create an API client.",
+          "precondition": "Only the admin of a project can create API clients.",
+          "not_found": "No such project."
+        }
+      },
+      "_evidence": {
+        "locator": "api/src/controllers/project-client.controller.ts:65",
+        "id_local": "ProjectClient.create",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/v1/projects/:projectId/clients",
+          "locator": "api/src/controllers/project-client.controller.ts:53"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "const { secret, encryptedSecret } = await this.generateSecret();\nlet client = this.projectClientRepo.create({ project: { id: projectId }, name: addProjectClientRequest.name, role: addProjectClientRequest.role, encryptedSecret });\nclient = await this.projectClientRepo.save(client, { reload: true });\nreturn { data: { id: client.id, name: client.name, role: client.role, secret } };",
+        "edges": [
+          "membership gate admin only (actions.ts: AddProjectClient not editor-allowed)"
+        ]
+      },
+      "_binds": {
+        "projectId": "Project.id",
+        "name": "ProjectClient.name",
+        "role": "ProjectClient.role"
+      },
+      "_output_schema": {
+        "data": "ProjectClient {id,name,role} plus one-time generated plaintext secret"
+      }
+    },
+    {
+      "tool": "update_project_client",
+      "description": "Change the role of an API client. Requires editor or admin membership.",
+      "family": "update.field_set",
+      "entity": "ProjectClient",
+      "input_schema": {
+        "projectId": {
+          "type": "int",
+          "required": true
+        },
+        "clientId": {
+          "type": "int",
+          "required": true
+        },
+        "role": {
+          "type": "text",
+          "required": true
+        }
+      },
+      "exec_spec": {
+        "row_key": {
+          "id": {
+            "$arg": "clientId"
+          }
+        },
+        "fields": [
+          "role"
+        ],
+        "entity": "ProjectClient"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "projectId",
+          "clientId",
+          "role"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "ProjectUser",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "project_id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "projectId"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "editor",
+                          "admin"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in to update an API client.",
+          "precondition": "Only an editor or admin can change client roles.",
+          "not_found": "No such client."
+        }
+      },
+      "_evidence": {
+        "locator": "api/src/controllers/project-client.controller.ts:97",
+        "id_local": "ProjectClient.update",
+        "entry": {
+          "kind": "http",
+          "route": "PATCH /api/v1/projects/:projectId/clients/:clientId",
+          "locator": "api/src/controllers/project-client.controller.ts:85"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "const client = await this.projectClientRepo.findOneOrFail({ where: { project: { id: projectId }, id: clientId } });\nclient.role = updateProjectClientRequest.role; const updated = await this.projectClientRepo.save(client, { reload: true });",
+        "edges": [
+          "membership gate editor+ (authorization.service.ts:55)"
+        ]
+      },
+      "_binds": {
+        "projectId": "Project.id",
+        "clientId": "ProjectClient.id",
+        "role": "ProjectClient.role"
+      },
+      "_output_schema": {
+        "data": "ProjectClient row {id, name, role}"
+      }
+    },
+    {
+      "tool": "rotate_project_client_secret",
+      "description": "Rotate the secret of an API client, issuing a fresh one-time plaintext secret. Requires editor or admin membership.",
+      "family": "update.field_set",
+      "entity": "ProjectClient",
+      "input_schema": {
+        "projectId": {
+          "type": "int",
+          "required": true
+        },
+        "clientId": {
+          "type": "int",
+          "required": true
+        }
+      },
+      "exec_spec": {
+        "row_key": {
+          "id": {
+            "$arg": "clientId"
+          }
+        },
+        "fields": [],
+        "entity": "ProjectClient"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "projectId",
+          "clientId"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "ProjectUser",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "project_id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "projectId"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "editor",
+                          "admin"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in to rotate a secret.",
+          "precondition": "Only an editor or admin can rotate client secrets.",
+          "not_found": "No such client."
+        }
+      },
+      "_evidence": {
+        "locator": "api/src/controllers/project-client.controller.ts:129",
+        "id_local": "ProjectClient.rotateSecret",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/v1/projects/:projectId/clients/:clientId/rotate-secret",
+          "locator": "api/src/controllers/project-client.controller.ts:117"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "const client = await this.projectClientRepo.findOneOrFail({ where: { project: { id: projectId }, id: clientId } });\nconst { secret, encryptedSecret } = await this.generateSecret(); client.encryptedSecret = encryptedSecret; const updated = await this.projectClientRepo.save(client, { reload: true });\nreturn { data: { id: updated.id, name: updated.name, role: updated.role, secret } };",
+        "edges": [
+          "membership gate editor+ (authorization.service.ts:55)"
+        ]
+      },
+      "_binds": {
+        "projectId": "Project.id",
+        "clientId": "ProjectClient.id"
+      },
+      "_output_schema": {
+        "data": "ProjectClient {id,name,role} plus new one-time plaintext secret"
+      }
+    },
+    {
+      "tool": "delete_project_client",
+      "description": "Delete an API client. Requires admin membership.",
+      "family": "crud.delete",
+      "entity": "ProjectClient",
+      "input_schema": {
+        "projectId": {
+          "type": "int",
+          "required": true
+        },
+        "clientId": {
+          "type": "int",
+          "required": true
+        }
+      },
+      "exec_spec": {
+        "lookup_by": {
+          "id": {
+            "$arg": "clientId"
+          }
+        },
+        "entity": "ProjectClient"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "projectId",
+          "clientId"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "ProjectUser",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "project_id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "projectId"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "admin"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in to delete an API client.",
+          "precondition": "Only the admin of a project can delete API clients.",
+          "not_found": "No such client."
+        }
+      },
+      "_evidence": {
+        "locator": "api/src/controllers/project-client.controller.ts:158",
+        "id_local": "ProjectClient.delete",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/v1/projects/:projectId/clients/:clientId",
+          "locator": "api/src/controllers/project-client.controller.ts:146"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "const client = await this.projectClientRepo.findOneOrFail({ where: { project: { id: projectId }, id: clientId } });\nawait this.projectClientRepo.remove(client);",
+        "edges": [
+          "membership gate admin only (authorization.service.ts:55, actions.ts)"
+        ]
+      },
+      "_binds": {
+        "projectId": "Project.id",
+        "clientId": "ProjectClient.id"
+      }
+    },
+    {
+      "tool": "list_project_users",
+      "description": "List the members of a project you can view, with their roles.",
+      "family": "search",
+      "entity": "ProjectUser",
+      "input_schema": {
+        "projectId": {
+          "type": "int",
+          "required": true
+        }
+      },
+      "exec_spec": {
+        "scope": {
+          "where": {
+            "project_id": "$session.account_id"
+          }
+        },
+        "search_fields": [
+          "project_id"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "project_id"
+          ]
+        },
+        "entity": "ProjectUser"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "projectId"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "ProjectUser",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "project_id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "projectId"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "viewer",
+                          "editor",
+                          "admin"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in to list members.",
+          "precondition": "You are not a member of this project.",
+          "not_found": "No such project."
+        }
+      },
+      "_evidence": {
+        "locator": "api/src/controllers/project-user.controller.ts:33",
+        "id_local": "ProjectUser.list",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v1/projects/:projectId/users",
+          "locator": "api/src/controllers/project-user.controller.ts:21"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "await this.auth.authorizeProjectAction(user, projectId, ProjectAction.ViewProjectUsers);\nconst users = await this.projectUserRepo.find({ where: { project: { id: projectId } }, relations: ['user'] });",
+        "edges": [
+          "membership gate viewer+ (authorization.service.ts:55)"
+        ]
+      },
+      "_binds": {
+        "projectId": "Project.id"
+      },
+      "_output_schema": {
+        "data": "list of {userId, role, name, email}"
+      }
+    },
+    {
+      "tool": "update_project_user_role",
+      "description": "Change the role of a project member. You cannot change your own role. Requires editor or admin membership.",
+      "family": "update.field_set",
+      "entity": "ProjectUser",
+      "input_schema": {
+        "projectId": {
+          "type": "int",
+          "required": true
+        },
+        "userId": {
+          "type": "int",
+          "required": true
+        },
+        "role": {
+          "type": "text",
+          "required": true
+        }
+      },
+      "exec_spec": {
+        "row_key": {
+          "project_id": {
+            "$arg": "projectId"
+          },
+          "user_id": {
+            "$arg": "userId"
+          }
+        },
+        "fields": [
+          "role"
+        ],
+        "entity": "ProjectUser"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "projectId",
+          "userId",
+          "role"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "ProjectUser",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "project_id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "projectId"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "editor",
+                          "admin"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in to change a member's role.",
+          "precondition": "Only an editor or admin can change member roles, and you cannot change your own role.",
+          "not_found": "No such member."
+        }
+      },
+      "_evidence": {
+        "locator": "api/src/controllers/project-user.controller.ts:60",
+        "id_local": "ProjectUser.updateRole",
+        "entry": {
+          "kind": "http",
+          "route": "PATCH /api/v1/projects/:projectId/users/:userId",
+          "locator": "api/src/controllers/project-user.controller.ts:45"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "await this.auth.authorizeProjectAction(requestingUser, projectId, ProjectAction.EditProjectUsers);\nif (requestingUser.id === userId) throw new BadRequestException(`can't edit your own role`);\nconst targetUser = await this.projectUserRepo.findOneOrFail({ where: { user: { id: userId }, project: { id: projectId } }, relations: ['user','project'] });\ntargetUser.role = updateProjectUserRequest.role; const updated = await this.projectUserRepo.save(targetUser, { reload: true });",
+        "edges": [
+          "membership gate editor+ (authorization.service.ts:55)",
+          "project-user.controller.ts:53-57"
+        ]
+      },
+      "_binds": {
+        "projectId": "Project.id",
+        "userId": "User.id",
+        "role": "ProjectUser.role"
+      },
+      "_output_schema": {
+        "data": "project member {userId, role, name, email}"
+      }
+    },
+    {
+      "tool": "remove_project_user",
+      "description": "Remove a member from a project. You cannot remove yourself. Requires editor or admin membership.",
+      "family": "crud.delete",
+      "entity": "ProjectUser",
+      "input_schema": {
+        "projectId": {
+          "type": "int",
+          "required": true
+        },
+        "userId": {
+          "type": "int",
+          "required": true
+        }
+      },
+      "exec_spec": {
+        "lookup_by": {
+          "project_id": {
+            "$arg": "projectId"
+          },
+          "user_id": {
+            "$arg": "userId"
+          }
+        },
+        "entity": "ProjectUser"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "projectId",
+          "userId"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "ProjectUser",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "project_id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "projectId"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "editor",
+                          "admin"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in to remove a member.",
+          "precondition": "Only an editor or admin can remove members, and you cannot remove yourself.",
+          "not_found": "No such member."
+        }
+      },
+      "_evidence": {
+        "locator": "api/src/controllers/project-user.controller.ts:96",
+        "id_local": "ProjectUser.remove",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/v1/projects/:projectId/users/:userId",
+          "locator": "api/src/controllers/project-user.controller.ts:84"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "await this.auth.authorizeProjectAction(requestingUser, projectId, ProjectAction.DeleteProjectUsers);\nif (requestingUser.id === userId) throw new BadRequestException(`can't edit your own role`);\nconst targetUser = await this.projectUserRepo.findOne({ where: { user: { id: userId }, project: { id: projectId } }, relations: ['user','project'] }); if (!targetUser) throw new BadRequestException(`The specified user is not part of this project.`);\nawait this.projectUserRepo.remove(targetUser);",
+        "edges": [
+          "membership gate admin/editor (DeleteProjectUsers in AllowedEditorActions) (authorization.service.ts:55)",
+          "project-user.controller.ts:89-93"
+        ]
+      },
+      "_binds": {
+        "projectId": "Project.id",
+        "userId": "User.id"
+      }
+    },
+    {
+      "tool": "export_translations",
+      "description": "Export a project's strings and their translations for a locale as a downloadable file in the requested format.",
+      "family": "search",
+      "entity": "Term",
+      "input_schema": {
+        "projectId": {
+          "type": "int",
+          "required": true
+        },
+        "locale": {
+          "type": "text",
+          "required": true
+        },
+        "format": {
+          "type": "text",
+          "required": true
+        }
+      },
+      "exec_spec": {
+        "scope": {
+          "where": {
+            "project_id": "$session.account_id"
+          }
+        },
+        "search_fields": [
+          "value"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "value"
+          ]
+        },
+        "entity": "Term"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "projectId",
+          "locale",
+          "format"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "ProjectUser",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "project_id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "projectId"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "viewer",
+                          "editor",
+                          "admin"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "ProjectLocale",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "project_id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "projectId"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "locale_code",
+                      "op": "eq",
+                      "value": {
+                        "arg": "locale"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in to export translations.",
+          "precondition": "You are not a member of this project, or the requested locale is not part of it.",
+          "not_found": "No such project or unknown locale."
+        }
+      },
+      "_evidence": {
+        "locator": "api/src/controllers/exports.controller.ts:56",
+        "id_local": "Translation.export",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v1/projects/:projectId/exports",
+          "locator": "api/src/controllers/exports.controller.ts:38"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "const membership = await this.auth.authorizeProjectAction(user, projectId, ProjectAction.ExportTranslation);\nconst projectLocale = await this.projectLocaleRepo.findOne({ where: { project: { id: membership.project.id }, locale: { code: query.locale } } }); if (!projectLocale) throw new NotFoundException('unknown locale code');\nconst queryBuilder = this.termRepo.createQueryBuilder('term').leftJoinAndSelect('term.translations','translation',`translation.project_locale_id = :projectLocaleId`,{projectLocaleId: projectLocale.id}).where(`term.project_id = :projectId`,{projectId}); if (query.untransla",
+        "edges": [
+          "membership gate viewer+ (authorization.service.ts:55)"
+        ]
+      },
+      "_binds": {
+        "projectId": "Project.id",
+        "locale": "Locale.code",
+        "fallbackLocale": "Locale.code"
+      },
+      "_output_schema": "serialized file in the requested format"
+    },
+    {
+      "tool": "import_translations",
+      "description": "Import a translation file for a locale. Terms and translations are upserted; if the locale is not yet on the project it is created. Requires editor or admin membership and a valid string quota.",
+      "family": "action.trigger",
+      "entity": "ProjectLocale",
+      "input_schema": {
+        "projectId": {
+          "type": "int",
+          "required": true
+        },
+        "locale": {
+          "type": "text",
+          "required": true
+        },
+        "file": {
+          "type": "json",
+          "required": true
+        }
+      },
+      "exec_spec": {
+        "target": {
+          "entity": "Project",
+          "lookup_by": {
+            "id": {
+              "$arg": "projectId"
+            }
+          }
+        },
+        "spawn": [
+          {
+            "entity": "ProjectLocale",
+            "n": 1,
+            "set_on_spawn": {
+              "project_id": {
+                "$ref": {
+                  "entity": "Project",
+                  "where": {
+                    "id": {
+                      "$arg": "projectId"
+                    }
+                  },
+                  "col": "id"
+                }
+              },
+              "locale_code": {
+                "$arg": "locale"
+              }
+            }
+          }
+        ],
+        "entity": "ProjectLocale"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "projectId",
+          "locale",
+          "file"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "ProjectUser",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "project_id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "projectId"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "editor",
+                          "admin"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Project",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "projectId"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "plan_code",
+                      "op": "is_not_null"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in to import translations.",
+          "precondition": "Only an editor or admin can import, and the project needs quota for more strings.",
+          "not_found": "No such project."
+        }
+      },
+      "_evidence": {
+        "locator": "api/src/controllers/import.controller.ts:68",
+        "id_local": "Translation.importFile",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/v1/projects/:projectId/imports",
+          "locator": "api/src/controllers/import.controller.ts:55"
+        },
+        "entity_why": "primary effect row_upsert lands on this table",
+        "ref_code": "const membership = await this.auth.authorizeProjectAction(user, projectId, ProjectAction.ImportTranslation, 0, 0);\nconst locale = await this.localeRepo.findOneOrFail({ where: { code: query.locale } });\nreturn await this.termRepo.manager.transaction(async entityManager => { let projectLocale = await entityManager.findOne(ProjectLocale, {...}); if (!projectLocale) { await this.auth.authorizeProjectAction(user, projectId, ProjectAction.ImportTranslation, 0, 1); projectLocale = this.projectLocaleRepo.create({ locale, project: { id: membership.project.id } }); projectLocale = await entityManager.sa",
+        "edges": [
+          "membership gate editor+ (authorization.service.ts:55)",
+          "Plan.maxStrings quota guard in authorizeProjectAction (authorization.service.ts:69-73)"
+        ]
+      },
+      "_binds": {
+        "projectId": "Project.id",
+        "locale": "Locale.code",
+        "termId": "Term.id",
+        "projectLocaleId": "ProjectLocale.id"
+      },
+      "_output_schema": {
+        "data": "import result: terms{added,skipped} and translations{upserted}"
+      }
+    }
+  ],
+  "seed_state": {
+    "Locale": [
+      {
+        "code": "en-US",
+        "language": "English",
+        "region": "US",
+        "id": 1
+      },
+      {
+        "code": "es-ES",
+        "language": "Spanish",
+        "region": "ES",
+        "id": 2
+      },
+      {
+        "code": "de-DE",
+        "language": "German",
+        "region": "DE",
+        "id": 3
+      }
+    ],
+    "Plan": [
+      {
+        "code": "open-source",
+        "name": "Open Source",
+        "max_strings": 1000,
+        "id": 1
+      },
+      {
+        "code": "pro",
+        "name": "Pro",
+        "max_strings": 100000,
+        "id": 2
+      }
+    ],
+    "User": [
+      {
+        "id": 1,
+        "name": "Ada Lovelace",
+        "email": "ops@ever_traduora.example",
+        "encrypted_password": "pw-operations",
+        "num_projects_created": 0
+      },
+      {
+        "id": 2,
+        "name": "Grace Hopper",
+        "email": "colleague@ever_traduora.example",
+        "encrypted_password": "pw-colleague",
+        "num_projects_created": 0
+      }
+    ],
+    "Project": [
+      {
+        "id": 1,
+        "name": "Acme Website",
+        "description": "Marketing site strings",
+        "terms_count": 2,
+        "locales_count": 1,
+        "plan_code": "open-source"
+      }
+    ],
+    "ProjectUser": [
+      {
+        "id": 1,
+        "project_id": 1,
+        "user_id": 1,
+        "role": "admin"
+      },
+      {
+        "id": 2,
+        "project_id": 1,
+        "user_id": 2,
+        "role": "viewer"
+      }
+    ],
+    "ProjectLocale": [
+      {
+        "id": 1,
+        "project_id": 1,
+        "locale_code": "en-US"
+      }
+    ],
+    "Term": [
+      {
+        "id": 1,
+        "value": "Welcome",
+        "context": null,
+        "project_id": 1
+      },
+      {
+        "id": 2,
+        "value": "Sign in",
+        "context": null,
+        "project_id": 1
+      }
+    ],
+    "Translation": [
+      {
+        "term_id": 1,
+        "project_locale_id": 1,
+        "value": "Welcome",
+        "id": 1
+      },
+      {
+        "term_id": 2,
+        "project_locale_id": 1,
+        "value": "Sign in",
+        "id": 2
+      }
+    ],
+    "Label": [
+      {
+        "id": 1,
+        "value": "buttons",
+        "color": "#00aabb",
+        "project_id": 1
+      }
+    ],
+    "Invite": [
+      {
+        "id": 1,
+        "email": "newhire@example.com",
+        "status": "sent",
+        "role": "viewer",
+        "project_id": 1
+      }
+    ]
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "skeleton_spec v2 — input contract of the LegoEnv builder",
+  "type": "object",
+  "required": ["skeleton_id", "domain", "apps", "deliverable_atoms", "rule_atoms", "n_intents", "n_distractors_min", "predicate_budget", "chain"],
+  "additionalProperties": true,
+  "properties": {
+    "skeleton_id":      {"type": "string", "pattern": "^[a-z0-9_]{3,40}$", "description": "unique; the builder never sees it as a name to reuse"},
+    "domain":           {"type": "string", "description": "one of vocab.domains"},
+    "apps":             {"type": "array", "minItems": 1, "maxItems": 6, "uniqueItems": true, "items": {"type": "string"}, "description": "environment ids from vocab.apps"},
+    "standin_apps":     {"type": "object", "description": "optional: {original SaaS name: our app} for the README"},
+    "needs_newspecs":   {"type": "boolean", "description": "true when any app is one of the 7 long-tail specs (vikunja/mantisbt/outline/listmonk/cloudreve/directus/mastodon) or chatwoot/misskey"},
+    "deliverable_atoms": {"type": "array", "minItems": 1, "maxItems": 4, "items": {
+        "type": "object", "required": ["app", "kind", "pos", "neg", "check_kinds"], "additionalProperties": true,
+        "properties": {
+          "app":  {"type": "string"},
+          "kind": {"type": "string", "description": "from vocab.kind_tools; must have a write tool in this app's spec"},
+          "pos":  {"type": "integer", "minimum": 1, "maximum": 30, "description": "how many positive predicates this atom should carry (≈ fan-out)"},
+          "neg":  {"type": "integer", "minimum": 0, "maximum": 30, "description": "how many negative predicates (distractors / invariants)"},
+          "check_kinds": {"type": "array", "minItems": 1, "items": {"type": "string"}, "description": "from vocab.check_kinds: to what precision the pack checks this atom"}
+        }}},
+    "rule_atoms": {"type": "array", "minItems": 1, "maxItems": 3, "items": {
+        "type": "object", "required": ["archetype", "carrier"], "additionalProperties": true,
+        "properties": {
+          "archetype":     {"type": "string", "description": "from vocab.archetypes"},
+          "carrier":       {"type": "string", "description": "from vocab.carriers; where the literal rule text lives in the world (never in the goal)"},
+          "has_exception": {"type": "boolean", "description": "the rule has an override clause; at least one distractor must trip exactly it"},
+          "rule_shape":    {"type": "string", "maxLength": 400, "description": "abstract one-sentence shape: which kind of column/condition selects records and what happens; no proper nouns, no literal thresholds"}
+        }}},
+    "n_intents":         {"type": "integer", "minimum": 1, "maximum": 4, "description": "independently verifiable deliverables; normally == len(deliverable_atoms)"},
+    "n_distractors_min": {"type": "integer", "minimum": 2, "maximum": 10},
+    "predicate_budget":  {"type": "integer", "minimum": 8, "maximum": 60, "description": "pos+neg predicates must reach this"},
+    "delivery_shape":    {"type": "string"},
+    "chain":             {"type": "array", "minItems": 2, "items": {"type": "string"}, "description": "abstract intent chain: read carrier → select records → per-record actions → summary"},
+    "dataset_hint":      {"type": "array", "items": {"type": "string"}, "description": "optional datapool slugs that fit; the builder may pick others"},
+    "source":            {"type": "string", "description": "provenance: recombined | web:<url> | collaborator:<run> | manual"}
+  }
+}

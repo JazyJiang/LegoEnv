@@ -1,0 +1,5348 @@
+{
+  "env_id": "ergo",
+  "_prep_version": 3,
+  "entities": [
+    {
+      "name": "Account",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": false
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "name_casefolded",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "registered_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "verified",
+          "type": "bool",
+          "nullable": false,
+          "default": false
+        },
+        {
+          "name": "additional_nicks",
+          "type": "json"
+        },
+        {
+          "name": "settings",
+          "type": "json",
+          "nullable": false,
+          "default": "{}"
+        },
+        {
+          "name": "credentials",
+          "type": "json",
+          "nullable": false
+        },
+        {
+          "name": "vhost",
+          "type": "json"
+        },
+        {
+          "name": "suspended",
+          "type": "json"
+        },
+        {
+          "name": "read_markers",
+          "type": "json"
+        },
+        {
+          "name": "last_seen",
+          "type": "json"
+        },
+        {
+          "name": "user_modes",
+          "type": "text"
+        },
+        {
+          "name": "realname",
+          "type": "text"
+        },
+        {
+          "name": "channel_to_modes",
+          "type": "json"
+        },
+        {
+          "name": "push_subscriptions",
+          "type": "json"
+        },
+        {
+          "name": "metadata",
+          "type": "json"
+        }
+      ]
+    },
+    {
+      "name": "RegisteredChannel",
+      "columns": [
+        {
+          "name": "uuid",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "registered_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "founder",
+          "type": "text"
+        },
+        {
+          "name": "topic",
+          "type": "text"
+        },
+        {
+          "name": "topic_set_by",
+          "type": "text"
+        },
+        {
+          "name": "topic_set_time",
+          "type": "datetime"
+        },
+        {
+          "name": "modes",
+          "type": "json"
+        },
+        {
+          "name": "key",
+          "type": "text"
+        },
+        {
+          "name": "forward",
+          "type": "text"
+        },
+        {
+          "name": "user_limit",
+          "type": "int",
+          "default": 0
+        },
+        {
+          "name": "account_to_u_mode",
+          "type": "json"
+        },
+        {
+          "name": "bans",
+          "type": "json"
+        },
+        {
+          "name": "excepts",
+          "type": "json"
+        },
+        {
+          "name": "invites",
+          "type": "json"
+        },
+        {
+          "name": "settings",
+          "type": "json"
+        },
+        {
+          "name": "metadata",
+          "type": "json"
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "name"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ChannelPurgeRecord",
+      "columns": [
+        {
+          "name": "uuid",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "oper",
+          "type": "text"
+        },
+        {
+          "name": "purged_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "reason",
+          "type": "text"
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "name"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "IPBanInfo",
+      "columns": [
+        {
+          "name": "network",
+          "type": "text",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "require_sasl",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "reason",
+          "type": "text"
+        },
+        {
+          "name": "oper_reason",
+          "type": "text"
+        },
+        {
+          "name": "oper_name",
+          "type": "text"
+        },
+        {
+          "name": "time_created",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "duration",
+          "type": "int"
+        }
+      ]
+    },
+    {
+      "name": "KLineInfo",
+      "columns": [
+        {
+          "name": "mask",
+          "type": "text",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "require_sasl",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "reason",
+          "type": "text"
+        },
+        {
+          "name": "oper_reason",
+          "type": "text"
+        },
+        {
+          "name": "oper_name",
+          "type": "text"
+        },
+        {
+          "name": "time_created",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "duration",
+          "type": "int"
+        }
+      ]
+    },
+    {
+      "name": "HistoryItem",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "data",
+          "type": "json",
+          "nullable": false
+        },
+        {
+          "name": "msgid",
+          "type": "text",
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "name": "HistorySequence",
+      "columns": [
+        {
+          "name": "history_id",
+          "type": "id",
+          "pk": true,
+          "fk_to": "HistoryItem.id"
+        },
+        {
+          "name": "target",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "nanotime",
+          "type": "int",
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "name": "Conversation",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "target",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "correspondent",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "nanotime",
+          "type": "int",
+          "nullable": false
+        },
+        {
+          "name": "history_id",
+          "type": "id",
+          "fk_to": "HistoryItem.id"
+        }
+      ]
+    },
+    {
+      "name": "Correspondent",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "target",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "correspondent",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "nanotime",
+          "type": "int",
+          "nullable": false
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "target",
+            "correspondent"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "AccountMessage",
+      "columns": [
+        {
+          "name": "history_id",
+          "type": "id",
+          "pk": true,
+          "fk_to": "HistoryItem.id"
+        },
+        {
+          "name": "account",
+          "type": "text",
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "name": "ForgetRecord",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "account",
+          "type": "text",
+          "nullable": false
+        }
+      ]
+    }
+  ],
+  "tools": [
+    {
+      "tool": "account_register",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Account",
+        "fields": [
+          "name_casefolded",
+          "credentials",
+          "settings",
+          "user_modes",
+          "realname",
+          "additional_nicks",
+          "vhost",
+          "suspended",
+          "read_markers",
+          "last_seen",
+          "channel_to_modes",
+          "push_subscriptions",
+          "metadata",
+          "verified"
+        ],
+        "set_on_create": {
+          "name": {
+            "$arg": "account"
+          },
+          "name_casefolded": {
+            "$arg": "account"
+          },
+          "credentials": {
+            "$arg": "passphrase"
+          },
+          "verified": {
+            "lit": false
+          },
+          "settings": {
+            "lit": {}
+          }
+        }
+      },
+      "input_schema": {
+        "account": {
+          "type": "text",
+          "required": true,
+          "description": "The new account name (case-insensitive; must be unique)."
+        },
+        "passphrase": {
+          "type": "text",
+          "required": true,
+          "description": "The account passphrase."
+        }
+      },
+      "_evidence": {
+        "locator": "irc/accounts.go:353",
+        "id_local": "Account.register",
+        "entry": {
+          "kind": "rpc",
+          "route": "REGISTER <account> <passphrase> [email]",
+          "locator": "irc/commands.go:295"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "func (am *AccountManager) Register(client *Client, account, callbackNamespace, callbackValue, passphrase, certfp string) error {\n ...\n tx.Set(accountKey, \"1\", setOptions)\n tx.Set(accountNameKey, account, setOptions)\n tx.Set(registeredTimeKey, registeredTimeStr, setOptions)\n tx.Set(credentialsKey, credStr, setOptions)\n tx.Set(settingsKey, settingsStr, setOptions)\n ...\n}",
+        "edges": [
+          "REGISTER stores the account under its unique account-name key; an already-taken name is rejected (accounts.go:353)"
+        ]
+      },
+      "entity": "Account",
+      "_binds": {
+        "account": "Account.name"
+      },
+      "_output_schema": {
+        "success": "bool",
+        "error": "str (on failure)"
+      },
+      "guards": {
+        "required": [
+          "account",
+          "passphrase"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Account",
+                "where": {
+                  "node": "field",
+                  "col": "name_casefolded",
+                  "op": "eq",
+                  "value": {
+                    "arg": "account"
+                  }
+                }
+              },
+              "op": "eq",
+              "n": 0
+            }
+          ]
+        ],
+        "messages": {
+          "precondition": "That account name is already registered.",
+          "unique": "That account name is already registered."
+        }
+      },
+      "description": "Register a new IRC account with a passphrase. Fails if registration is disabled, the account name is already taken, or the passphrase is too weak."
+    },
+    {
+      "tool": "account_verify",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Account",
+        "row_key": {
+          "name_casefolded": {
+            "$arg": "account"
+          }
+        },
+        "fields": [
+          "name_casefolded",
+          "credentials",
+          "verified",
+          "additional_nicks",
+          "settings",
+          "vhost",
+          "suspended",
+          "read_markers",
+          "last_seen",
+          "user_modes",
+          "realname",
+          "channel_to_modes",
+          "push_subscriptions",
+          "metadata"
+        ],
+        "set": {
+          "verified": true
+        }
+      },
+      "input_schema": {
+        "account": {
+          "type": "text",
+          "required": true,
+          "description": "The account name to verify."
+        },
+        "code": {
+          "type": "text",
+          "required": true,
+          "description": "The verification code emailed at registration time."
+        }
+      },
+      "_evidence": {
+        "locator": "irc/accounts.go:899",
+        "id_local": "Account.verify",
+        "entry": {
+          "kind": "rpc",
+          "route": "VERIFY <account> <code>",
+          "locator": "irc/commands.go:389"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "func (am *AccountManager) Verify(client *Client, account string, code string, admin bool) error {\n ... if !admin { if !utils.SecretTokensMatch(storedCode, code) { return errAccountVerificationInvalidCode } }\n tx.Set(verifiedKey, \"1\", nil); tx.Delete(verificationCodeKey) ...\n}",
+        "edges": [
+          "Verify loads raw account; returns errAccountDoesNotExist if missing (accounts.go:899)"
+        ]
+      },
+      "entity": "Account",
+      "_binds": {
+        "account": "Account.name"
+      },
+      "_output_schema": {
+        "success": "bool",
+        "error": "str (on failure)"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Account",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "name_casefolded",
+                      "op": "eq",
+                      "value": {
+                        "arg": "account"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "verified",
+                      "op": "eq",
+                      "value": false
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "account",
+          "code"
+        ],
+        "messages": {
+          "precondition": "No unverified account matches this code; it may already be verified.",
+          "not_found": "No account by that name exists."
+        }
+      },
+      "description": "Verify a pending account using the emailed verification code, marking it verified and loggable."
+    },
+    {
+      "tool": "account_saregister",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Account",
+        "fields": [
+          "name_casefolded",
+          "credentials",
+          "settings",
+          "user_modes",
+          "realname",
+          "additional_nicks",
+          "vhost",
+          "suspended",
+          "read_markers",
+          "last_seen",
+          "channel_to_modes",
+          "push_subscriptions",
+          "metadata",
+          "verified"
+        ],
+        "set_on_create": {
+          "name": {
+            "$arg": "accountName"
+          },
+          "name_casefolded": {
+            "$arg": "accountName"
+          },
+          "credentials": {
+            "$arg": "passphrase"
+          },
+          "verified": {
+            "lit": true
+          },
+          "settings": {
+            "lit": {}
+          }
+        }
+      },
+      "input_schema": {
+        "accountName": {
+          "type": "text",
+          "required": true,
+          "description": "The new account name (must be unique)."
+        },
+        "passphrase": {
+          "type": "text",
+          "required": true,
+          "description": "The account passphrase."
+        }
+      },
+      "_evidence": {
+        "locator": "irc/accounts.go:1041",
+        "id_local": "Account.saregister",
+        "entry": {
+          "kind": "http",
+          "route": "POST /v1/ns/saregister",
+          "locator": "irc/api.go:42"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "func (am *AccountManager) SARegister(account, passphrase string) (err error) {\n\terr = am.Register(nil, account, \"admin\", \"\", passphrase, \"\")\n\tif err == nil { err = am.Verify(nil, account, \"\", true) }\n\treturn\n}",
+        "edges": [
+          "SARegister delegates to Register, inheriting the duplicate-name rejection (accounts.go:1041)"
+        ]
+      },
+      "entity": "Account",
+      "_binds": {
+        "accountName": "Account.name"
+      },
+      "_output_schema": {
+        "success": "bool",
+        "error": "str (on failure)"
+      },
+      "guards": {
+        "required": [
+          "accountName",
+          "passphrase"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Account",
+                "where": {
+                  "node": "field",
+                  "col": "name_casefolded",
+                  "op": "eq",
+                  "value": {
+                    "arg": "accountName"
+                  }
+                }
+              },
+              "op": "eq",
+              "n": 0
+            }
+          ]
+        ],
+        "messages": {
+          "unique": "That account name is already registered.",
+          "precondition": "That account name is already registered."
+        }
+      },
+      "description": "Register a new account and immediately verify it in one step (the services/admin registration endpoint). Fails if the account name is already taken."
+    },
+    {
+      "tool": "sign_in",
+      "op": "action",
+      "family": "guard.auth",
+      "exec_spec": {
+        "verify": {
+          "entity": "Account",
+          "username_col": "name_casefolded",
+          "password_col": "credentials"
+        }
+      },
+      "input_schema": {
+        "name_casefolded": {
+          "type": "text",
+          "required": true,
+          "description": "The casefolded registered account name to sign in with."
+        },
+        "credentials": {
+          "type": "text",
+          "required": true,
+          "description": "The account passphrase, compared against the stored value."
+        }
+      },
+      "_evidence": {
+        "locator": "irc/nickserv.go:831",
+        "entry": {
+          "kind": "rpc",
+          "route": "NS IDENTIFY <username> [password]",
+          "locator": "irc/nickserv.go:106"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "func (am *AccountManager) AuthenticateByPassphrase(client *Client, accountName string, passphrase string) (err error) {\n ...\n var account ClientAccount\n defer func() { if err == nil { am.Login(client, account) } }()\n account, err = am.checkPassphrase(accountName, passphrase)\n}\nfunc (am *AccountManager) checkPassphrase(...) {\n if !account.Verified { err = errAccountUnverified } else if account.Suspended != nil { err = errAccountSuspended }\n ... passwd.CompareHashAndPassword(account.Credentials.PassphraseHash, []byte(passphrase)) ...\n}"
+      },
+      "entity": "Account",
+      "_binds": {
+        "account": "Account.name_casefolded"
+      },
+      "_output_schema": {
+        "account": "the ClientAccount row after login"
+      },
+      "guards": {
+        "required": [
+          "name_casefolded",
+          "credentials"
+        ]
+      },
+      "description": "Sign in to the IRC network with a registered account name and passphrase. Everything that touches a registered account, channel or their settings requires this first; the session it opens is what $actor resolves to.",
+      "id_local": "Account.login"
+    },
+    {
+      "tool": "account_checkauth",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Account",
+        "lookup_by": {
+          "name_casefolded": {
+            "$arg": "accountName"
+          }
+        }
+      },
+      "input_schema": {
+        "accountName": {
+          "type": "text",
+          "required": true,
+          "description": "The account name to look up."
+        }
+      },
+      "_evidence": {
+        "locator": "irc/api.go:161",
+        "id_local": "Account.checkAuth",
+        "entry": {
+          "kind": "http",
+          "route": "POST /v1/check_auth",
+          "locator": "irc/api.go:30"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "func (a *ergoAPI) handleCheckAuth(w http.ResponseWriter, r *http.Request) {\n ...\n if request.AccountName != \"\" && request.Passphrase != \"\" { account, err = a.server.accounts.checkPassphrase(request.AccountName, request.Passphrase) }\n else if request.Certfp != \"\" { account, err = a.server.accounts.checkCertOrCookieAuth(nil, request.Certfp, nil, nil, \"\") }\n ...\n}"
+      },
+      "entity": "Account",
+      "_binds": {
+        "accountName": "Account.name"
+      },
+      "_output_schema": {
+        "accountName": "the account name on success"
+      },
+      "guards": {
+        "required": [
+          "accountName"
+        ],
+        "messages": {
+          "not_found": "No account by that name exists."
+        }
+      },
+      "description": "Resolve an account's identity from a name+passphrase (or cert) pair and return its account row. Fails if the credentials do not match.",
+      "id_local": "Account.checkAuth"
+    },
+    {
+      "tool": "sign_out",
+      "description": "End the current signed-in session.",
+      "family": "guard.logout",
+      "entity": "Account",
+      "input_schema": {},
+      "guards": {},
+      "id_local": "Account.logout",
+      "_evidence": {
+        "locator": "irc/nickserv.go:831",
+        "id_local": "Account.login",
+        "entry": {
+          "kind": "rpc",
+          "route": "NS IDENTIFY / LOGOUT",
+          "locator": "irc/nickserv.go:106"
+        },
+        "ref_code": "logging in sets session auth; the network's services / web session can be ended."
+      }
+    },
+    {
+      "tool": "account_unregister",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "Account",
+        "lookup_by": {
+          "name_casefolded": {
+            "$arg": "account"
+          }
+        }
+      },
+      "input_schema": {
+        "account": "text",
+        "code": "text"
+      },
+      "_evidence": {
+        "locator": "irc/accounts.go:1907",
+        "id_local": "Account.unregister",
+        "entry": {
+          "kind": "rpc",
+          "route": "NS UNREGISTER <account> <code>",
+          "locator": "irc/nickserv.go:191"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "func (am *AccountManager) Unregister(account string, erase bool) error {\n ...\n tx.Delete(accountKey); tx.Delete(accountNameKey); tx.Delete(verifiedKey); tx.Delete(registeredTimeKey); tx.Delete(credentialsKey); tx.Delete(settingsKey) ...\n // also unregisters every channel the account founded\n}",
+        "edges": [
+          "nsUnregisterHandler requires account==client.AccountName() OR oper accreg capab (nickserv.go:1129)"
+        ]
+      },
+      "entity": "Account",
+      "_binds": {
+        "account": "Account.name"
+      },
+      "_output_schema": {
+        "success": "bool",
+        "error": "str (on failure)"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Account",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "name",
+                      "op": "eq",
+                      "value": {
+                        "arg": "account"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "name",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Account",
+                "where": {
+                  "node": "field",
+                  "col": "name_casefolded",
+                  "op": "eq",
+                  "value": {
+                    "arg": "account"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "account",
+          "code"
+        ],
+        "messages": {
+          "precondition": "You can only unregister your own account.",
+          "not_found": "No account by that name exists.",
+          "confirm": "The confirmation code does not match this account."
+        }
+      }
+    },
+    {
+      "tool": "account_setpassword",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Account",
+        "row_key": {
+          "name_casefolded": {
+            "$arg": "target"
+          }
+        },
+        "fields": [
+          "name",
+          "name_casefolded",
+          "verified",
+          "additional_nicks",
+          "settings",
+          "credentials",
+          "vhost",
+          "suspended",
+          "read_markers",
+          "last_seen",
+          "user_modes",
+          "realname",
+          "channel_to_modes",
+          "push_subscriptions",
+          "metadata"
+        ],
+        "set": {
+          "credentials": {
+            "$arg": "newpass"
+          }
+        }
+      },
+      "input_schema": {
+        "target": {
+          "type": "text",
+          "description": "The account whose passphrase to change.",
+          "required": true
+        },
+        "newpass": {
+          "type": "text",
+          "description": "The new passphrase.",
+          "required": true
+        }
+      },
+      "_evidence": {
+        "locator": "irc/accounts.go:542",
+        "id_local": "Account.setPassword",
+        "entry": {
+          "kind": "rpc",
+          "route": "NS PASSWD <target> <newpass> [oldpass]",
+          "locator": "irc/nickserv.go:227"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "func (am *AccountManager) setPassword(accountName, password string, hasPrivs bool) (err error) {\n ...\n credStr, err = tx.Get(credKey) ...\n creds.SetPassphrase(password, am.server.Config().Accounts.Registration.BcryptCost)\n am.server.store.Update(func(tx *buntdb.Tx) error { if credStr != curCredStr { return errCASFailed }; tx.Set(credKey, newCredStr, nil) })\n}",
+        "edges": [
+          "NS PASSWD either needs login (3-arg form) or oper accreg (2-arg form) (nickserv.go:1202)",
+          "setPassword requires account exist; NS PASSWD 3-arg form confirms current password (accounts.go:542)"
+        ]
+      },
+      "entity": "Account",
+      "_binds": {
+        "target": "Account.name"
+      },
+      "_output_schema": {
+        "success": "bool",
+        "error": "str (on failure)"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Account",
+                "where": {
+                  "node": "field",
+                  "col": "name",
+                  "op": "eq",
+                  "value": {
+                    "session": "account_name"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Account",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "name_casefolded",
+                      "op": "eq",
+                      "value": {
+                        "arg": "target"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "verified",
+                      "op": "eq",
+                      "value": true
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "target",
+          "newpass"
+        ],
+        "messages": {
+          "precondition": "Changing this account's passphrase requires you to be that account or an operator with the accreg capability.",
+          "not_found": "No such account exists."
+        }
+      },
+      "description": "Set an account's passphrase (the account owner on the 3-arg form always confirms the current passphrase; an operator may reset it on the 2-arg form)."
+    },
+    {
+      "tool": "account_sendpass",
+      "op": "action",
+      "family": "action.emit",
+      "exec_spec": {
+        "channel": "event",
+        "record": {
+          "table": "AccountLog"
+        }
+      },
+      "input_schema": {
+        "account": {
+          "type": "text",
+          "required": true,
+          "description": "The account to email a reset code to."
+        }
+      },
+      "_evidence": {
+        "locator": "irc/accounts.go:1143",
+        "id_local": "Account.sendpass",
+        "entry": {
+          "kind": "rpc",
+          "route": "NS SENDPASS <account>",
+          "locator": "irc/nickserv.go:355"
+        },
+        "entity_why": "fell back to the entity prefix of id_local",
+        "ref_code": "func (am *AccountManager) NsSendpass(client *Client, accountName string) (err error) {\n ...\n record := PasswordResetRecord{TimeCreated: time.Now().UTC(), Code: utils.GenerateSecretToken()}\n ... tx.Set(recordKey, recordVal, &buntdb.SetOptions{Expires: true, TTL: ...}) ... email.SendMail(...)\n}"
+      },
+      "entity": "Account",
+      "_binds": {
+        "account": "Account.name"
+      },
+      "_output_schema": {
+        "success": "bool",
+        "error": "str (on failure)"
+      },
+      "guards": {
+        "required": [
+          "account"
+        ],
+        "messages": {
+          "precondition": "The target account must exist with a verified email address.",
+          "not_found": "No such account exists."
+        }
+      },
+      "description": "Email a password-reset link/code for an account that has a verified email on file.",
+      "id_local": "Account.sendpass"
+    },
+    {
+      "tool": "account_resetpass",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Account",
+        "row_key": {
+          "name_casefolded": {
+            "$arg": "account"
+          }
+        },
+        "fields": [
+          "name",
+          "name_casefolded",
+          "verified",
+          "additional_nicks",
+          "settings",
+          "credentials",
+          "vhost",
+          "suspended",
+          "read_markers",
+          "last_seen",
+          "user_modes",
+          "realname",
+          "channel_to_modes",
+          "push_subscriptions",
+          "metadata"
+        ],
+        "set": {
+          "credentials": {
+            "$arg": "new_password"
+          }
+        }
+      },
+      "input_schema": {
+        "account": {
+          "type": "text",
+          "required": true,
+          "description": "The account to reset."
+        },
+        "code": {
+          "type": "text",
+          "required": true,
+          "description": "The emailed reset code."
+        },
+        "new_password": {
+          "type": "text",
+          "required": true,
+          "description": "The new passphrase."
+        }
+      },
+      "_evidence": {
+        "locator": "irc/accounts.go:1215",
+        "id_local": "Account.resetpass",
+        "entry": {
+          "kind": "rpc",
+          "route": "NS RESETPASS <account> <code> <new_password>",
+          "locator": "irc/nickserv.go:366"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "func (am *AccountManager) NsResetpass(client *Client, accountName, code, password string) (err error) {\n ... if utils.SecretTokensMatch(record.Code, code) { success = true; tx.Delete(key) }\n if success { return am.setPassword(accountName, password, true) } else { return errAccountInvalidCredentials }\n}"
+      },
+      "entity": "Account",
+      "_binds": {
+        "account": "Account.name"
+      },
+      "_output_schema": {
+        "success": "bool",
+        "error": "str (on failure)"
+      },
+      "guards": {
+        "required": [
+          "account",
+          "code",
+          "new_password"
+        ],
+        "messages": {
+          "precondition": "That reset code is invalid or has expired.",
+          "not_found": "No such account exists."
+        }
+      },
+      "description": "Reset an account's passphrase using the emailed reset code. Fails if the code is wrong or has expired.",
+      "id_local": "Account.resetpass"
+    },
+    {
+      "tool": "account_setemailrequest",
+      "op": "action",
+      "family": "action.emit",
+      "exec_spec": {
+        "channel": "event",
+        "record": {
+          "table": "AccountLog"
+        }
+      },
+      "input_schema": {
+        "email": {
+          "type": "text",
+          "required": true,
+          "description": "The new email address to set."
+        }
+      },
+      "_evidence": {
+        "locator": "irc/accounts.go:1055",
+        "id_local": "Account.setEmailRequest",
+        "entry": {
+          "kind": "rpc",
+          "route": "NS SET email <address> [password]",
+          "locator": "irc/nickserv.go:256"
+        },
+        "entity_why": "fell back to the entity prefix of id_local",
+        "ref_code": "func (am *AccountManager) NsSetEmail(client *Client, emailAddr string) (err error) {\n ...\n record := EmailChangeRecord{TimeCreated: time.Now().UTC(), Code: utils.GenerateSecretToken(), Email: emailAddr}\n ... tx.Set(recordKey, recordVal, nil) ... email.SendMail(...)\n}",
+        "edges": [
+          "client.Account()!= '' (serviceRunCommand authRequired, nickserv.go:256)"
+        ]
+      },
+      "entity": "Account",
+      "_output_schema": {
+        "success": "bool",
+        "error": "str (on failure)"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Account",
+                "where": {
+                  "node": "field",
+                  "col": "name_casefolded",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "email"
+        ],
+        "messages": {
+          "auth": "Sign in before changing your email address.",
+          "precondition": "Sign in before requesting an email change."
+        }
+      },
+      "description": "Request a change to the current account's email address; emails a confirmation code that the next tool consumes. Requires being signed in as that account.",
+      "id_local": "Account.setEmailRequest"
+    },
+    {
+      "tool": "account_confirmemailchange",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Account",
+        "row_key": {
+          "name_casefolded": {
+            "$session": "account_id"
+          }
+        },
+        "fields": [
+          "name",
+          "name_casefolded",
+          "verified",
+          "additional_nicks",
+          "settings",
+          "credentials",
+          "vhost",
+          "suspended",
+          "read_markers",
+          "last_seen",
+          "user_modes",
+          "realname",
+          "channel_to_modes",
+          "push_subscriptions",
+          "metadata"
+        ],
+        "set": {
+          "settings": null
+        }
+      },
+      "input_schema": {
+        "code": {
+          "type": "text",
+          "required": true,
+          "description": "The confirmation code emailed by the change request."
+        }
+      },
+      "_evidence": {
+        "locator": "irc/accounts.go:1105",
+        "id_local": "Account.confirmEmailChange",
+        "entry": {
+          "kind": "rpc",
+          "route": "NS VERIFYEMAIL <code>",
+          "locator": "irc/nickserv.go:284"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "func (am *AccountManager) NsVerifyEmail(client *Client, code string) (err error) {\n ... if utils.SecretTokensMatch(record.Code, code) { success=true; tx.Delete(key) }\n ... munger := func(in AccountSettings)(out AccountSettings, err error){ out=in; out.Email=record.Email; return }\n _, err = am.ModifyAccountSettings(casefoldedAccount, munger)\n}",
+        "edges": [
+          "NsVerifyEmail requires client.Account() (accounts.go:1105)"
+        ]
+      },
+      "entity": "Account",
+      "_output_schema": {
+        "success": "bool",
+        "error": "str (on failure)"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Account",
+                "where": {
+                  "node": "field",
+                  "col": "name_casefolded",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "code"
+        ],
+        "messages": {
+          "auth": "Sign in before confirming an email change.",
+          "precondition": "That confirmation code is invalid or has expired."
+        }
+      },
+      "description": "Confirm a pending email change for the current account using the emailed code, updating the account's email. Requires being signed in as that account.",
+      "id_local": "Account.confirmEmailChange"
+    },
+    {
+      "tool": "account_setsettings",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Account",
+        "row_key": {
+          "name_casefolded": {
+            "$session": "account_id"
+          }
+        },
+        "fields": [
+          "name",
+          "name_casefolded",
+          "verified",
+          "additional_nicks",
+          "settings",
+          "credentials",
+          "vhost",
+          "suspended",
+          "read_markers",
+          "last_seen",
+          "user_modes",
+          "realname",
+          "channel_to_modes",
+          "push_subscriptions",
+          "metadata"
+        ],
+        "set": {
+          "settings": {
+            "$arg": "value"
+          }
+        }
+      },
+      "input_schema": {
+        "setting": {
+          "type": "text",
+          "required": true,
+          "description": "The setting key to change."
+        },
+        "value": {
+          "type": "text",
+          "required": true,
+          "description": "The new value for the setting."
+        }
+      },
+      "_evidence": {
+        "locator": "irc/nickserv.go:542",
+        "id_local": "Account.setSettings",
+        "entry": {
+          "kind": "rpc",
+          "route": "NS SET <setting> <value>",
+          "locator": "irc/nickserv.go:278"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "func nsSetHandler(...) {\n ...\n switch key { case \"multiclient\": ... out.AllowBouncer = newValue ... }\n if munger != nil { finalSettings, err = server.accounts.ModifyAccountSettings(account, munger) }\n}\nfunc (am *AccountManager) ModifyAccountSettings(account string, munger settingsMunger) (...) {\n ... tx.Set(key, serializedValue, nil) ...\n}",
+        "edges": [
+          "NS SET authRequired:true (nickserv.go:278)"
+        ]
+      },
+      "entity": "Account",
+      "_output_schema": {
+        "success": "bool",
+        "error": "str (on failure)"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Account",
+                "where": {
+                  "node": "field",
+                  "col": "name_casefolded",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "setting",
+          "value"
+        ],
+        "messages": {
+          "auth": "Sign in before changing your settings.",
+          "precondition": "Sign in to change your own account settings."
+        }
+      },
+      "description": "Update one of the current account's settings (e.g. multiclient/bouncer mode). Requires being signed in as that account.",
+      "id_local": "Account.setSettings"
+    },
+    {
+      "tool": "account_getsettings",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Account",
+        "lookup_by": {
+          "name_casefolded": {
+            "$session": "account_id"
+          }
+        },
+        "scope": {
+          "owner_col": "name_casefolded"
+        }
+      },
+      "input_schema": {
+        "setting": {
+          "type": "text",
+          "required": true,
+          "description": "The setting key to read."
+        }
+      },
+      "_evidence": {
+        "locator": "irc/nickserv.go:425",
+        "id_local": "Account.getSettings",
+        "entry": {
+          "kind": "rpc",
+          "route": "NS GET <setting>",
+          "locator": "irc/nickserv.go:256"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "func nsGetHandler(...) { ... accountData, err := server.accounts.LoadAccount(account) ... displaySetting(service, params[0], accountData.Settings, client, rb) }"
+      },
+      "entity": "Account",
+      "_output_schema": {
+        "setting": "str",
+        "value": "str"
+      },
+      "guards": {
+        "required": [
+          "setting"
+        ],
+        "requires_auth": true,
+        "messages": {
+          "auth": "Sign in before reading your settings."
+        }
+      },
+      "description": "Read one of the current account's settings. Requires being signed in as that account.",
+      "id_local": "Account.getSettings"
+    },
+    {
+      "tool": "account_suspend",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Account",
+        "row_key": {
+          "name_casefolded": {
+            "$arg": "account"
+          }
+        },
+        "fields": [
+          "name",
+          "name_casefolded",
+          "verified",
+          "additional_nicks",
+          "settings",
+          "credentials",
+          "vhost",
+          "suspended",
+          "read_markers",
+          "last_seen",
+          "user_modes",
+          "realname",
+          "channel_to_modes",
+          "push_subscriptions",
+          "metadata"
+        ],
+        "set": {
+          "suspended": {
+            "$arg": "reason"
+          }
+        }
+      },
+      "input_schema": {
+        "account": {
+          "type": "text",
+          "required": true,
+          "description": "The account to suspend."
+        },
+        "duration": {
+          "type": "text",
+          "required": false,
+          "description": "Optional suspension duration."
+        },
+        "reason": {
+          "type": "text",
+          "required": false,
+          "description": "Optional reason for the suspension."
+        }
+      },
+      "_evidence": {
+        "locator": "irc/accounts.go:1759",
+        "id_local": "Account.suspend",
+        "entry": {
+          "kind": "rpc",
+          "route": "NS SUSPEND ADD <account> [DURATION <dur>] [reason]",
+          "locator": "irc/nickserv.go:391"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "func (am *AccountManager) Suspend(accountName string, duration time.Duration, operName, reason string) (err error) {\n ...\n suspension := AccountSuspension{TimeCreated: time.Now().UTC(), Duration: duration, ...}\n tx.Get(existsKey) ... tx.Set(suspensionKey, string(suspensionStr), setOptions)\n // then disconnect the account's clients\n}",
+        "edges": [
+          "nsSuspendAdd requires oper (suspend command is oper-gated, nickserv.go:1504)"
+        ]
+      },
+      "entity": "Account",
+      "_binds": {
+        "account": "Account.name"
+      },
+      "_output_schema": {
+        "success": "bool",
+        "error": "str (on failure)"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Account",
+                "where": {
+                  "node": "field",
+                  "col": "name_casefolded",
+                  "op": "eq",
+                  "value": {
+                    "arg": "account"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "account"
+        ],
+        "messages": {
+          "precondition": "No such account exists to suspend.",
+          "not_found": "No such account exists."
+        }
+      },
+      "description": "Suspend an account, optionally for a duration, on the operator's authority. Suspended accounts cannot sign in.",
+      "id_local": "Account.suspend"
+    },
+    {
+      "tool": "account_unsuspend",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Account",
+        "row_key": {
+          "name_casefolded": {
+            "$arg": "account"
+          }
+        },
+        "fields": [
+          "name",
+          "name_casefolded",
+          "verified",
+          "additional_nicks",
+          "settings",
+          "credentials",
+          "vhost",
+          "suspended",
+          "read_markers",
+          "last_seen",
+          "user_modes",
+          "realname",
+          "channel_to_modes",
+          "push_subscriptions",
+          "metadata"
+        ],
+        "set": {
+          "suspended": null
+        }
+      },
+      "input_schema": {
+        "account": {
+          "type": "text",
+          "required": true,
+          "description": "The account to unsuspend."
+        }
+      },
+      "_evidence": {
+        "locator": "irc/accounts.go:1821",
+        "id_local": "Account.unsuspend",
+        "entry": {
+          "kind": "rpc",
+          "route": "NS SUSPEND DEL <account>",
+          "locator": "irc/nickserv.go:391"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "func (am *AccountManager) Unsuspend(accountName string) (err error) {\n ...\n tx.Get(existsKey) ... tx.Delete(suspensionKey)\n}",
+        "edges": [
+          "nsSuspendRemove requires oper (nickserv.go:1504)"
+        ]
+      },
+      "entity": "Account",
+      "_binds": {
+        "account": "Account.name"
+      },
+      "_output_schema": {
+        "success": "bool",
+        "error": "str (on failure)"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Account",
+                "where": {
+                  "node": "field",
+                  "col": "name_casefolded",
+                  "op": "eq",
+                  "value": {
+                    "arg": "account"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "account"
+        ],
+        "messages": {
+          "precondition": "No such account exists to unsuspend.",
+          "not_found": "No such account exists."
+        }
+      },
+      "description": "Lift a previous suspension on an account, on the operator's authority, so it can sign in again.",
+      "id_local": "Account.unsuspend"
+    },
+    {
+      "tool": "account_dropnick",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Account",
+        "row_key": {
+          "name_casefolded": {
+            "$session": "account_id"
+          }
+        },
+        "fields": [
+          "name",
+          "name_casefolded",
+          "verified",
+          "additional_nicks",
+          "settings",
+          "credentials",
+          "vhost",
+          "suspended",
+          "read_markers",
+          "last_seen",
+          "user_modes",
+          "realname",
+          "channel_to_modes",
+          "push_subscriptions",
+          "metadata"
+        ],
+        "set": {
+          "additional_nicks": null
+        }
+      },
+      "input_schema": {
+        "nickname": {
+          "type": "text",
+          "required": true,
+          "description": "The nickname to release from this account."
+        }
+      },
+      "_evidence": {
+        "locator": "irc/nickserv.go:758",
+        "id_local": "Account.dropNick",
+        "entry": {
+          "kind": "rpc",
+          "route": "NS DROP [nickname]",
+          "locator": "irc/nickserv.go:66"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "func nsDropHandler(...) { err := server.accounts.SetNickReserved(client, nick, sadrop, false) ... }\nfunc (am *AccountManager) SetNickReserved(...) { ... tx.Set(nicksKey, string(marshaledNicks), nil) }",
+        "edges": [
+          "NS DROP authRequired:true (nickserv.go:66)"
+        ]
+      },
+      "entity": "Account",
+      "_binds": {
+        "nickname": "Account.additional_nicks"
+      },
+      "_output_schema": {
+        "success": "bool",
+        "error": "str (on failure)"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Account",
+                "where": {
+                  "node": "field",
+                  "col": "name_casefolded",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "messages": {
+          "auth": "Sign in before dropping a grouped nickname.",
+          "precondition": "You can only drop a nickname reserved to your own account."
+        }
+      },
+      "description": "Release one of the current account's grouped nicknames so it is no longer associated with this account.",
+      "id_local": "Account.dropNick"
+    },
+    {
+      "tool": "account_groupnick",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Account",
+        "row_key": {
+          "name_casefolded": {
+            "$session": "account_id"
+          }
+        },
+        "fields": [
+          "name",
+          "name_casefolded",
+          "verified",
+          "additional_nicks",
+          "settings",
+          "credentials",
+          "vhost",
+          "suspended",
+          "read_markers",
+          "last_seen",
+          "user_modes",
+          "realname",
+          "channel_to_modes",
+          "push_subscriptions",
+          "metadata"
+        ],
+        "set": {
+          "additional_nicks": null
+        }
+      },
+      "input_schema": {
+        "nick": {
+          "type": "text",
+          "required": true,
+          "description": "The nickname to group under this account."
+        }
+      },
+      "_evidence": {
+        "locator": "irc/nickserv.go:809",
+        "id_local": "Account.groupNick",
+        "entry": {
+          "kind": "rpc",
+          "route": "NS GROUP",
+          "locator": "irc/nickserv.go:96"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "func nsGroupHandler(...) { err := server.accounts.SetNickReserved(client, nick, false, true) ... }",
+        "edges": [
+          "NS GROUP authRequired:true (nickserv.go:96)"
+        ]
+      },
+      "entity": "Account",
+      "_output_schema": {
+        "success": "bool",
+        "error": "str (on failure)"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Account",
+                "where": {
+                  "node": "field",
+                  "col": "name_casefolded",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "nick"
+        ],
+        "messages": {
+          "auth": "Sign in before grouping a nickname.",
+          "precondition": "You can only reserve a nickname to your own account."
+        }
+      },
+      "description": "Group a nickname into the current account so the account also owns that nick.",
+      "id_local": "Account.groupNick"
+    },
+    {
+      "tool": "account_setcertfp",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Account",
+        "row_key": {
+          "name_casefolded": {
+            "$session": "account_id"
+          }
+        },
+        "fields": [
+          "name",
+          "name_casefolded",
+          "verified",
+          "additional_nicks",
+          "settings",
+          "credentials",
+          "vhost",
+          "suspended",
+          "read_markers",
+          "last_seen",
+          "user_modes",
+          "realname",
+          "channel_to_modes",
+          "push_subscriptions",
+          "metadata"
+        ],
+        "set": {
+          "credentials": null
+        }
+      },
+      "input_schema": {
+        "fingerprint": {
+          "type": "text",
+          "required": true,
+          "description": "The certificate fingerprint to add or remove."
+        }
+      },
+      "_evidence": {
+        "locator": "irc/accounts.go:791",
+        "id_local": "Account.setCertfp",
+        "entry": {
+          "kind": "rpc",
+          "route": "NS CERT ADD/DEL <fingerprint>",
+          "locator": "irc/nickserv.go:376"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "func (am *AccountManager) addRemoveCertfp(account, certfp string, add bool, hasPrivs bool) (err error) {\n ... if add { err = creds.AddCertfp(certfp) } else { err = creds.RemoveCertfp(certfp) } ...\n tx.Set(certfpKey, cfAccount, nil) ... tx.Set(credKey, newCredStr, nil)\n}",
+        "edges": [
+          "NS CERT authRequired:true (nickserv.go:376)"
+        ]
+      },
+      "entity": "Account",
+      "_output_schema": {
+        "success": "bool",
+        "error": "str (on failure)"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Account",
+                "where": {
+                  "node": "field",
+                  "col": "name_casefolded",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "fingerprint"
+        ],
+        "messages": {
+          "auth": "Sign in before managing your certificate fingerprints.",
+          "precondition": "You can only manage your own client certificates."
+        }
+      },
+      "description": "Add or remove a client certificate fingerprint as a login credential for the current account.",
+      "id_local": "Account.setCertfp"
+    },
+    {
+      "tool": "account_listaccounts",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Account"
+      },
+      "input_schema": {
+        "searchRegex": {
+          "type": "text",
+          "required": false,
+          "description": "Optional regex to filter account names; empty lists all."
+        }
+      },
+      "_evidence": {
+        "locator": "irc/nickserv.go:883",
+        "id_local": "Account.listAccounts",
+        "entry": {
+          "kind": "http",
+          "route": "POST /v1/ns/list",
+          "locator": "irc/api.go:40"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "func nsListHandler(...) { names := server.accounts.AllNicks(); for _, a := range names { if searchRegex==nil || searchRegex.MatchString(a) { ... } } }",
+        "scope_why": "genuinely global: an operator's account directory over the whole network, gated at the API boundary by an oper bearer token."
+      },
+      "entity": "Account",
+      "_output_schema": {
+        "accounts": "list of account details",
+        "totalCount": "int"
+      },
+      "description": "List accounts whose names match a case-insensitive search term (all accounts visible to operators).",
+      "id_local": "Account.listAccounts"
+    },
+    {
+      "tool": "account_accountdetails",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Account",
+        "lookup_by": {
+          "name_casefolded": {
+            "$arg": "accountName"
+          }
+        }
+      },
+      "input_schema": {
+        "accountName": {
+          "type": "text",
+          "required": true,
+          "description": "The account name to look up."
+        }
+      },
+      "_evidence": {
+        "locator": "irc/api.go:465",
+        "id_local": "Account.accountDetails",
+        "entry": {
+          "kind": "http",
+          "route": "POST /v1/ns/info",
+          "locator": "irc/api.go:39"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "func (a *ergoAPI) handleAccountDetails(...) { accountData, err := a.server.accounts.LoadAccount(request.AccountName) ... response.Channels = a.server.channels.ChannelsForAccount(...) }"
+      },
+      "entity": "Account",
+      "_binds": {
+        "accountName": "Account.name"
+      },
+      "_output_schema": {
+        "accountName": "str",
+        "email": "str",
+        "registeredAt": "str",
+        "channels": "list of str"
+      },
+      "guards": {
+        "required": [
+          "accountName"
+        ],
+        "messages": {
+          "not_found": "No account by that name exists."
+        }
+      },
+      "description": "Fetch one account's registration details and the channels it has registered. Fails if the account does not exist.",
+      "id_local": "Account.accountDetails"
+    },
+    {
+      "tool": "account_setrealname",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Account",
+        "row_key": {
+          "name_casefolded": {
+            "$session": "account_id"
+          }
+        },
+        "fields": [
+          "name",
+          "name_casefolded",
+          "verified",
+          "additional_nicks",
+          "settings",
+          "credentials",
+          "vhost",
+          "suspended",
+          "read_markers",
+          "last_seen",
+          "user_modes",
+          "realname",
+          "channel_to_modes",
+          "push_subscriptions",
+          "metadata"
+        ],
+        "set": {
+          "realname": {
+            "$arg": "realname"
+          }
+        }
+      },
+      "input_schema": {
+        "realname": {
+          "type": "text",
+          "required": true,
+          "description": "The new real-name / gecos string."
+        }
+      },
+      "_evidence": {
+        "locator": "irc/handlers.go:3817",
+        "id_local": "Account.setRealname",
+        "entry": {
+          "kind": "rpc",
+          "route": "SETNAME <realname>",
+          "locator": "irc/commands.go:334"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "func setnameHandler(...) { ... client.SetRealname(realname) ... }\nfunc (client *Client) SetRealname(realname string) { ... if alwaysOn { client.markDirty(IncludeRealname) } }",
+        "edges": [
+          "SETNAME only persists for logged-in always-on clients (getters.go:423)"
+        ]
+      },
+      "entity": "Account",
+      "_output_schema": {
+        "success": "bool",
+        "error": "str (on failure)"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Account",
+                "where": {
+                  "node": "field",
+                  "col": "name_casefolded",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "realname"
+        ],
+        "messages": {
+          "auth": "Sign in before setting your real name.",
+          "precondition": "You can only change your own realname."
+        }
+      },
+      "description": "Set the real-name (gecos) field of the current account.",
+      "id_local": "Account.setRealname"
+    },
+    {
+      "tool": "account_setreadmarker",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Account",
+        "row_key": {
+          "name_casefolded": {
+            "$session": "account_id"
+          }
+        },
+        "fields": [
+          "name",
+          "name_casefolded",
+          "verified",
+          "additional_nicks",
+          "settings",
+          "credentials",
+          "vhost",
+          "suspended",
+          "read_markers",
+          "last_seen",
+          "user_modes",
+          "realname",
+          "channel_to_modes",
+          "push_subscriptions",
+          "metadata"
+        ],
+        "set": {
+          "read_markers": null
+        }
+      },
+      "input_schema": {
+        "target": {
+          "type": "text",
+          "required": true,
+          "description": "The conversation target (channel or nick) being marked read."
+        },
+        "timestamp": {
+          "type": "text",
+          "required": true,
+          "description": "The read timestamp, in IRC 'tagsecs' epoch format."
+        }
+      },
+      "_evidence": {
+        "locator": "irc/handlers.go:3225",
+        "id_local": "Account.setReadMarker",
+        "entry": {
+          "kind": "rpc",
+          "route": "MARKREAD <target> <timestamp>",
+          "locator": "irc/commands.go:213"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "func markReadHandler(...) { ... result := client.SetReadMarker(cftarget, readTime) ... }\nfunc (client *Client) SetReadMarker(cfname string, now time.Time) {... client.readMarkers[cfname]=now ...}",
+        "edges": [
+          "read markers are persisted per-account (server.go:313)"
+        ]
+      },
+      "entity": "Account",
+      "_output_schema": {
+        "success": "bool",
+        "error": "str (on failure)"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Account",
+                "where": {
+                  "node": "field",
+                  "col": "name_casefolded",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "target",
+          "timestamp"
+        ],
+        "messages": {
+          "auth": "Sign in before setting a read marker.",
+          "precondition": "You can only update your own read markers."
+        }
+      },
+      "description": "Record the highest-read marker for a conversation target on the current account.",
+      "id_local": "Account.setReadMarker"
+    },
+    {
+      "tool": "account_setusermodes",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Account",
+        "row_key": {
+          "name_casefolded": {
+            "$session": "account_id"
+          }
+        },
+        "fields": [
+          "name",
+          "name_casefolded",
+          "verified",
+          "additional_nicks",
+          "settings",
+          "credentials",
+          "vhost",
+          "suspended",
+          "read_markers",
+          "last_seen",
+          "user_modes",
+          "realname",
+          "channel_to_modes",
+          "push_subscriptions",
+          "metadata"
+        ],
+        "set": {
+          "user_modes": null
+        }
+      },
+      "input_schema": {
+        "nick": {
+          "type": "text",
+          "required": true,
+          "description": "The nick whose user modes to change."
+        },
+        "modestring": {
+          "type": "text",
+          "required": true,
+          "description": "The mode changes, e.g. '+i'."
+        }
+      },
+      "_evidence": {
+        "locator": "irc/handlers.go:2058",
+        "id_local": "Account.setUserModes",
+        "entry": {
+          "kind": "rpc",
+          "route": "MODE <nick> <modestring>",
+          "locator": "irc/commands.go:222"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "func umodeHandler(...) { ... applied = ApplyUserModeChanges(target, changes, msg.Command==\"SAMODE\", nil) ... }",
+        "edges": [
+          "umodeHandler property check (handlers.go:2058)"
+        ]
+      },
+      "entity": "Account",
+      "_output_schema": {
+        "success": "bool",
+        "error": "str (on failure)"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Account",
+                "where": {
+                  "node": "field",
+                  "col": "name_casefolded",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "nick",
+          "modestring"
+        ],
+        "messages": {
+          "auth": "Sign in before changing user modes.",
+          "precondition": "You may only change your own user modes unless you hold the sa-mode operator privilege."
+        }
+      },
+      "description": "Apply a user-mode change to a nick (self-modes require no privilege; other nicks need the operator sa-mode privilege).",
+      "id_local": "Account.setUserModes"
+    },
+    {
+      "tool": "account_setvhost",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Account",
+        "row_key": {
+          "name_casefolded": {
+            "$arg": "user"
+          }
+        },
+        "fields": [
+          "name",
+          "name_casefolded",
+          "verified",
+          "additional_nicks",
+          "settings",
+          "credentials",
+          "vhost",
+          "suspended",
+          "read_markers",
+          "last_seen",
+          "user_modes",
+          "realname",
+          "channel_to_modes",
+          "push_subscriptions",
+          "metadata"
+        ],
+        "set": {
+          "vhost": {
+            "$arg": "vhost"
+          }
+        }
+      },
+      "input_schema": {
+        "user": {
+          "type": "text",
+          "required": true,
+          "description": "The account to assign the vhost to."
+        },
+        "vhost": {
+          "type": "text",
+          "required": true,
+          "description": "The virtual host string to assign."
+        }
+      },
+      "_evidence": {
+        "locator": "irc/accounts.go:2182",
+        "id_local": "Account.setVHost",
+        "entry": {
+          "kind": "rpc",
+          "route": "HS SET <user> <vhost>",
+          "locator": "irc/hostserv.go:62"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "func (am *AccountManager) VHostSet(account string, vhost string) (...){ output.Enabled=true; output.ApprovedVHost=vhost ... tx.Set(key, vhstr, nil) }",
+        "edges": [
+          "HS SET capabs:[vhosts] (hostserv.go:62)"
+        ]
+      },
+      "entity": "Account",
+      "_binds": {
+        "user": "Account.name",
+        "vhost": "Account.vhost"
+      },
+      "_output_schema": {
+        "success": "bool",
+        "error": "str (on failure)"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Account",
+                "where": {
+                  "node": "field",
+                  "col": "name_casefolded",
+                  "op": "eq",
+                  "value": {
+                    "arg": "user"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "user",
+          "vhost"
+        ],
+        "messages": {
+          "precondition": "No such account exists to assign a vhost.",
+          "not_found": "No such account exists."
+        }
+      },
+      "description": "Assign a cloaked/virtual host to an account (operator vhosts capability required).",
+      "id_local": "Account.setVHost"
+    },
+    {
+      "tool": "account_setvhostenabled",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Account",
+        "row_key": {
+          "name_casefolded": {
+            "$session": "account_id"
+          }
+        },
+        "fields": [
+          "name",
+          "name_casefolded",
+          "verified",
+          "additional_nicks",
+          "settings",
+          "credentials",
+          "vhost",
+          "suspended",
+          "read_markers",
+          "last_seen",
+          "user_modes",
+          "realname",
+          "channel_to_modes",
+          "push_subscriptions",
+          "metadata"
+        ],
+        "set": {
+          "vhost": {
+            "enabled": {
+              "$arg": "enabled"
+            }
+          }
+        }
+      },
+      "input_schema": {
+        "enabled": {
+          "type": "bool",
+          "required": true,
+          "description": "True to show the approved vhost, false to hide it."
+        }
+      },
+      "_evidence": {
+        "locator": "irc/accounts.go:2193",
+        "id_local": "Account.setVHostEnabled",
+        "entry": {
+          "kind": "rpc",
+          "route": "HS ON / HS OFF",
+          "locator": "irc/hostserv.go:35"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "func (am *AccountManager) VHostSetEnabled(client *Client, enabled bool) (...) { ... if input.ApprovedVHost == \"\" { return errNoVhost }; output.Enabled = enabled ... }",
+        "edges": [
+          "HS ON/OFF authRequired:true (hostserv.go:35)"
+        ]
+      },
+      "entity": "Account",
+      "_output_schema": {
+        "success": "bool",
+        "error": "str (on failure)"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Account",
+                "where": {
+                  "node": "field",
+                  "col": "name_casefolded",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "messages": {
+          "auth": "Sign in before toggling your vhost.",
+          "precondition": "Enable a vhost first; you have no approved vhost."
+        }
+      },
+      "description": "Toggle whether the current account's assigned vhost is shown. Requires a vhost to have been assigned first.",
+      "id_local": "Account.setVHostEnabled"
+    },
+    {
+      "tool": "account_rename",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Account",
+        "row_key": {
+          "name_casefolded": {
+            "$arg": "oldName"
+          }
+        },
+        "fields": [
+          "name",
+          "name_casefolded",
+          "verified",
+          "additional_nicks",
+          "settings",
+          "credentials",
+          "vhost",
+          "suspended",
+          "read_markers",
+          "last_seen",
+          "user_modes",
+          "realname",
+          "channel_to_modes",
+          "push_subscriptions",
+          "metadata"
+        ],
+        "set": {
+          "name": {
+            "$arg": "newName"
+          }
+        }
+      },
+      "input_schema": {
+        "oldName": {
+          "type": "text",
+          "required": true,
+          "description": "The current account name."
+        },
+        "newName": {
+          "type": "text",
+          "required": true,
+          "description": "The new account name."
+        }
+      },
+      "_evidence": {
+        "locator": "irc/accounts.go:1878",
+        "id_local": "Account.rename",
+        "entry": {
+          "kind": "rpc",
+          "route": "NS RENAME <oldName> <newName>",
+          "locator": "irc/nickserv.go:405"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "func (am *AccountManager) Rename(oldName, newName string) (err error) {\n ... if newCfName != accountData.NameCasefolded { return errInvalidAccountRename }; tx.Set(key, newName, nil) }",
+        "edges": [
+          "nsRenameHandler (nickserv.go:1657)"
+        ]
+      },
+      "entity": "Account",
+      "_binds": {
+        "oldName": "Account.name",
+        "newName": "Account.name"
+      },
+      "_output_schema": {
+        "success": "bool",
+        "error": "str (on failure)"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Account",
+                "where": {
+                  "node": "field",
+                  "col": "name_casefolded",
+                  "op": "eq",
+                  "value": {
+                    "arg": "oldName"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "oldName",
+          "newName"
+        ],
+        "messages": {
+          "precondition": "No such account exists to rename.",
+          "not_found": "No such account exists."
+        }
+      },
+      "description": "Rename an account to a new display name. Fails if the new name (casefolded) does not match, or is already in use.",
+      "id_local": "Account.rename"
+    },
+    {
+      "tool": "channel_register",
+      "op": "update",
+      "family": "crud.upsert",
+      "exec_spec": {
+        "entity": "RegisteredChannel",
+        "key": {
+          "name": {
+            "$arg": "channel"
+          }
+        },
+        "insert_fields": {
+          "name": {
+            "$arg": "channel"
+          },
+          "founder": {
+            "$session": "account_name"
+          }
+        },
+        "set_on_exists": {
+          "founder": {
+            "$session": "account_name"
+          }
+        },
+        "set_on_create": {
+          "registered_at": {
+            "sym": "$now"
+          },
+          "modes": {
+            "lit": []
+          },
+          "account_to_u_mode": {
+            "lit": {}
+          }
+        }
+      },
+      "input_schema": {
+        "channel": {
+          "type": "text",
+          "required": true,
+          "description": "The channel name to register, e.g. #general."
+        }
+      },
+      "_evidence": {
+        "locator": "irc/chanserv.go:420",
+        "id_local": "Channel.register",
+        "entry": {
+          "kind": "rpc",
+          "route": "CS REGISTER #channel",
+          "locator": "irc/chanserv.go:49"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "func (cm *ChannelManager) SetRegistered(channelName string, account string) (err error) {\n if account == \"\" { return errAuthRequired } ... err = channel.SetRegistered(account); if err == nil { err = channel.Store(IncludeAllAttrs) }\n}\nfunc (channel *Channel) SetRegistered(founder string) error { channel.registeredFounder=founder; channel.registeredTime=time.Now().UTC(); channel.accountToUMode[founder]=modes.ChannelFounder }",
+        "edges": [
+          "CS REGISTER claims an existing channel by name, setting its founder (chanserv.go:420, channelmanager.go:209)"
+        ]
+      },
+      "entity": "RegisteredChannel",
+      "_binds": {
+        "channel": "RegisteredChannel.name"
+      },
+      "_output_schema": {
+        "success": "bool",
+        "error": "str (on failure)"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "channel"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "RegisteredChannel",
+                "where": {
+                  "node": "field",
+                  "col": "name",
+                  "op": "eq",
+                  "value": {
+                    "arg": "channel"
+                  }
+                }
+              },
+              "op": "eq",
+              "n": 0
+            },
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Account",
+                "where": {
+                  "node": "field",
+                  "col": "name",
+                  "op": "eq",
+                  "value": {
+                    "session": "account_name"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in before registering a channel.",
+          "precondition": "That channel name is already registered.",
+          "unique": "That channel name is already registered."
+        }
+      },
+      "description": "Register a channel so it becomes a persisted registered channel owned by the current account; if it is already registered, it re-assigns the founder to you. Requires being a channel operator.",
+      "id_local": "Channel.register"
+    },
+    {
+      "tool": "channel_unregister",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "RegisteredChannel",
+        "lookup_by": {
+          "name": {
+            "$arg": "channel"
+          }
+        }
+      },
+      "input_schema": {
+        "channel": {
+          "type": "text",
+          "required": true,
+          "description": "The registered channel to unregister."
+        },
+        "code": {
+          "type": "text",
+          "required": true,
+          "description": "Confirmation code."
+        }
+      },
+      "_evidence": {
+        "locator": "irc/chanserv.go:493",
+        "id_local": "Channel.unregister",
+        "entry": {
+          "kind": "rpc",
+          "route": "CS UNREGISTER #channel <code>",
+          "locator": "irc/chanserv.go:61"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "func (cm *ChannelManager) SetUnregistered(channelName, account string) (err error) {\n ... cm.server.dstore.Delete(datastore.TableChannels, uuid); entry.channel.SetUnregistered(account) ...\n}",
+        "edges": [
+          "csUnregisterHandler csPrivsCheck: founder or chanreg capab (chanserv.go:477)"
+        ]
+      },
+      "entity": "RegisteredChannel",
+      "_binds": {
+        "channel": "RegisteredChannel.name"
+      },
+      "_output_schema": {
+        "success": "bool",
+        "error": "str (on failure)"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "RegisteredChannel",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "name",
+                      "op": "eq",
+                      "value": {
+                        "arg": "channel"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "founder",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "channel",
+          "code"
+        ],
+        "messages": {
+          "auth": "Sign in before unregistering a channel.",
+          "precondition": "Only the channel founder can unregister it.",
+          "not_found": "No such registered channel exists."
+        }
+      },
+      "description": "Unregister a channel, freeing its name. Requires being the channel founder.",
+      "id_local": "Channel.unregister"
+    },
+    {
+      "tool": "channel_transfer",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "RegisteredChannel",
+        "row_key": {
+          "name": {
+            "$arg": "channel"
+          }
+        },
+        "fields": [
+          "founder",
+          "topic",
+          "topic_set_by",
+          "topic_set_time",
+          "modes",
+          "key",
+          "forward",
+          "user_limit",
+          "account_to_u_mode",
+          "bans",
+          "excepts",
+          "invites",
+          "settings",
+          "metadata"
+        ],
+        "set": {
+          "founder": {
+            "$arg": "target"
+          }
+        }
+      },
+      "input_schema": {
+        "channel": {
+          "type": "text",
+          "required": true,
+          "description": "The registered channel to transfer."
+        },
+        "target": {
+          "type": "text",
+          "required": true,
+          "description": "The account to become the new founder."
+        },
+        "code": {
+          "type": "text",
+          "required": false,
+          "description": "Confirmation code, required on first transfer."
+        }
+      },
+      "_evidence": {
+        "locator": "irc/channel.go:371",
+        "id_local": "Channel.transfer",
+        "entry": {
+          "kind": "rpc",
+          "route": "CS TRANSFER [accept] #channel user [code]",
+          "locator": "irc/chanserv.go:103"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "func (channel *Channel) Transfer(client *Client, target string, hasPrivs bool) {\n ... channel.transferOwnership(cftarget); return channelTransferComplete ...\n}\nfunc (channel *Channel) transferOwnership(newOwner string) { delete(channel.accountToUMode, channel.registeredFounder); channel.registeredFounder=newOwner; ... }",
+        "edges": [
+          "csTransfer requires isFounder or oper chanreg (chanserv.go:563)"
+        ]
+      },
+      "entity": "RegisteredChannel",
+      "_binds": {
+        "channel": "RegisteredChannel.name",
+        "target": "Account.name"
+      },
+      "_output_schema": {
+        "success": "bool",
+        "error": "str (on failure)"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "RegisteredChannel",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "name",
+                      "op": "eq",
+                      "value": {
+                        "arg": "channel"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "founder",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "channel",
+          "target"
+        ],
+        "messages": {
+          "auth": "Sign in before transferring a channel.",
+          "precondition": "Only the channel founder can transfer it.",
+          "not_found": "No such registered channel exists."
+        }
+      },
+      "description": "Transfer the founder status of a registered channel to another account. Requires being the current founder.",
+      "id_local": "Channel.transfer"
+    },
+    {
+      "tool": "channel_setamodes",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "RegisteredChannel",
+        "row_key": {
+          "name": {
+            "$arg": "channel"
+          }
+        },
+        "fields": [
+          "founder",
+          "topic",
+          "topic_set_by",
+          "topic_set_time",
+          "modes",
+          "key",
+          "forward",
+          "user_limit",
+          "account_to_u_mode",
+          "bans",
+          "excepts",
+          "invites",
+          "settings",
+          "metadata"
+        ],
+        "set": {
+          "account_to_u_mode": {
+            "mode": {
+              "$arg": "modechange"
+            },
+            "account": {
+              "$arg": "account"
+            }
+          }
+        }
+      },
+      "input_schema": {
+        "channel": {
+          "type": "text",
+          "required": true,
+          "description": "The registered channel."
+        },
+        "modechange": {
+          "type": "text",
+          "required": true,
+          "description": "The access-mode change, e.g. '+o' or '-v'."
+        },
+        "account": {
+          "type": "text",
+          "required": false,
+          "description": "The account whose access mode is changed."
+        }
+      },
+      "_evidence": {
+        "locator": "irc/modes.go:370",
+        "id_local": "Channel.setAmodes",
+        "entry": {
+          "kind": "rpc",
+          "route": "CS AMODE #channel [+mode] [account]",
+          "locator": "irc/chanserv.go:75"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "func (channel *Channel) ProcessAccountToUmodeChange(client, change) (...) {\n ... case modes.Add: channel.accountToUMode[change.Arg]=change.Mode ...\n case modes.Remove: delete(channel.accountToUMode, change.Arg) ...\n if changed { channel.MarkDirty(IncludeLists) } }",
+        "edges": [
+          "ProcessAccountToUmodeChange privs: founder/oper or higher mode (modes.go:391)"
+        ]
+      },
+      "entity": "RegisteredChannel",
+      "_binds": {
+        "channel": "RegisteredChannel.name",
+        "account": "Account.name"
+      },
+      "_output_schema": {
+        "success": "bool",
+        "error": "str (on failure)"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "RegisteredChannel",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "name",
+                      "op": "eq",
+                      "value": {
+                        "arg": "channel"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "founder",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "channel",
+          "modechange"
+        ],
+        "messages": {
+          "auth": "Sign in before changing channel access.",
+          "precondition": "You lack the privilege to change channel access modes.",
+          "not_found": "No such registered channel exists."
+        }
+      },
+      "description": "Change the access mode (op/voice/etc.) granted to an account in this channel. Requires founder or other higher channel privilege.",
+      "id_local": "Channel.setAmodes"
+    },
+    {
+      "tool": "channel_setmodes",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "RegisteredChannel",
+        "row_key": {
+          "name": {
+            "$arg": "channel"
+          }
+        },
+        "fields": [
+          "founder",
+          "topic",
+          "topic_set_by",
+          "topic_set_time",
+          "modes",
+          "key",
+          "forward",
+          "user_limit",
+          "account_to_u_mode",
+          "bans",
+          "excepts",
+          "invites",
+          "settings",
+          "metadata"
+        ],
+        "set": {
+          "modes": null,
+          "key": null,
+          "forward": null,
+          "user_limit": null,
+          "bans": null,
+          "invites": null,
+          "excepts": null
+        }
+      },
+      "input_schema": {
+        "channel": {
+          "type": "text",
+          "required": true,
+          "description": "The registered channel."
+        },
+        "modestring": {
+          "type": "text",
+          "required": true,
+          "description": "The channel mode changes, e.g. '+lk' with arguments."
+        }
+      },
+      "_evidence": {
+        "locator": "irc/modes.go:155",
+        "id_local": "Channel.setModes",
+        "entry": {
+          "kind": "rpc",
+          "route": "MODE #channel <modestring>",
+          "locator": "irc/commands.go:222"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "func (channel *Channel) ApplyChannelModeChanges(client, isSamode, changes, rb) (...) {\n ... case modes.BanMask...: channel.lists[change.Mode].Add(...)/.Remove(...) ...\n case modes.UserLimit: channel.setUserLimit(val) ... case modes.Forward: channel.setForward(change.Arg) ...\n case modes.Key: channel.setKey(change.Arg) ... } // setters call MarkDirty",
+        "edges": [
+          "ApplyChannelModeChanges hasPrivs: founder/oper/samode or channel-user-mode level (modes.go:164)"
+        ]
+      },
+      "entity": "RegisteredChannel",
+      "_binds": {
+        "channel": "RegisteredChannel.name"
+      },
+      "_output_schema": {
+        "success": "bool",
+        "error": "str (on failure)"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "RegisteredChannel",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "name",
+                      "op": "eq",
+                      "value": {
+                        "arg": "channel"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "founder",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "channel",
+          "modestring"
+        ],
+        "messages": {
+          "auth": "Sign in before changing channel modes.",
+          "precondition": "You lack the privilege to change this channel's modes.",
+          "not_found": "No such registered channel exists."
+        }
+      },
+      "description": "Change channel modes and their arguments (key, user limit, forward, bans, invites, excepts). Requires founder or other channel privilege.",
+      "id_local": "Channel.setModes"
+    },
+    {
+      "tool": "channel_settopic",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "RegisteredChannel",
+        "row_key": {
+          "name": {
+            "$arg": "channel"
+          }
+        },
+        "fields": [
+          "founder",
+          "topic",
+          "topic_set_by",
+          "topic_set_time",
+          "modes",
+          "key",
+          "forward",
+          "user_limit",
+          "account_to_u_mode",
+          "bans",
+          "excepts",
+          "invites",
+          "settings",
+          "metadata"
+        ],
+        "set": {
+          "topic": {
+            "$arg": "topic"
+          },
+          "topic_set_by": {
+            "$session": "account_name"
+          },
+          "topic_set_time": "2026-01-01T00:00:00"
+        }
+      },
+      "input_schema": {
+        "channel": {
+          "type": "text",
+          "required": true,
+          "description": "The channel whose topic to set."
+        },
+        "topic": {
+          "type": "text",
+          "required": true,
+          "description": "The new topic text."
+        }
+      },
+      "_evidence": {
+        "locator": "irc/channel.go:1242",
+        "id_local": "Channel.setTopic",
+        "entry": {
+          "kind": "rpc",
+          "route": "TOPIC #channel <topic>",
+          "locator": "irc/commands.go:354"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "func (channel *Channel) SetTopic(client, topic string, rb) {\n ... channel.topic=topic; channel.topicSetBy=client.nickMaskString; channel.topicSetTime=time.Now().UTC() ...\n channel.MarkDirty(IncludeTopic) }",
+        "edges": [
+          "SetTopic requires membership + halfop+ when +t set (channel.go:1242)"
+        ]
+      },
+      "entity": "RegisteredChannel",
+      "_binds": {
+        "channel": "RegisteredChannel.name",
+        "topic": "RegisteredChannel.topic"
+      },
+      "_output_schema": {
+        "success": "bool",
+        "error": "str (on failure)"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "RegisteredChannel",
+                "where": {
+                  "node": "field",
+                  "col": "name",
+                  "op": "eq",
+                  "value": {
+                    "arg": "channel"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "channel",
+          "topic"
+        ],
+        "messages": {
+          "auth": "Sign in before setting a topic.",
+          "precondition": "You are not in the channel (or lack half-op with +t set).",
+          "not_found": "No such channel exists."
+        },
+        "requires_auth": true
+      },
+      "description": "Set a channel's topic. Requires channel membership (and half-operator or higher when the channel is mode +t).",
+      "id_local": "Channel.setTopic"
+    },
+    {
+      "tool": "channel_setsettings",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "RegisteredChannel",
+        "row_key": {
+          "name": {
+            "$arg": "channel"
+          }
+        },
+        "fields": [
+          "founder",
+          "topic",
+          "topic_set_by",
+          "topic_set_time",
+          "modes",
+          "key",
+          "forward",
+          "user_limit",
+          "account_to_u_mode",
+          "bans",
+          "excepts",
+          "invites",
+          "settings",
+          "metadata"
+        ],
+        "set": {
+          "settings": {
+            "$arg": "value"
+          }
+        }
+      },
+      "input_schema": {
+        "channel": {
+          "type": "text",
+          "required": true,
+          "description": "The registered channel."
+        },
+        "setting": {
+          "type": "text",
+          "required": true,
+          "description": "The settings key to change."
+        },
+        "value": {
+          "type": "text",
+          "required": true,
+          "description": "The new value for the setting."
+        }
+      },
+      "_evidence": {
+        "locator": "irc/getters.go:801",
+        "id_local": "Channel.setSettings",
+        "entry": {
+          "kind": "rpc",
+          "route": "CS SET #channel <setting> <value>",
+          "locator": "irc/chanserv.go:161"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "func (channel *Channel) SetSettings(settings ChannelSettings) { defer channel.MarkDirty(IncludeSettings); channel.settings = settings }",
+        "edges": [
+          "csSetHandler csPrivsCheck (chanserv.go:844)"
+        ]
+      },
+      "entity": "RegisteredChannel",
+      "_binds": {
+        "channel": "RegisteredChannel.name"
+      },
+      "_output_schema": {
+        "success": "bool",
+        "error": "str (on failure)"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "RegisteredChannel",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "name",
+                      "op": "eq",
+                      "value": {
+                        "arg": "channel"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "founder",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "channel",
+          "setting",
+          "value"
+        ],
+        "messages": {
+          "auth": "Sign in before changing channel settings.",
+          "precondition": "You lack the privilege to change this channel's settings.",
+          "not_found": "No such registered channel exists."
+        }
+      },
+      "description": "Update one of a registered channel's settings. Requires channel operator/founder privilege.",
+      "id_local": "Channel.setSettings"
+    },
+    {
+      "tool": "channel_getsettings",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "RegisteredChannel",
+        "lookup_by": {
+          "name": {
+            "$arg": "channel"
+          }
+        },
+        "scope": {
+          "owner_col": "founder"
+        }
+      },
+      "input_schema": {
+        "channel": {
+          "type": "text",
+          "required": true,
+          "description": "The registered channel."
+        },
+        "setting": {
+          "type": "text",
+          "required": true,
+          "description": "The settings key to read."
+        }
+      },
+      "_evidence": {
+        "locator": "irc/chanserv.go:829",
+        "id_local": "Channel.getSettings",
+        "entry": {
+          "kind": "rpc",
+          "route": "CS GET #channel <setting>",
+          "locator": "irc/chanserv.go:151"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "func csGetHandler(...) { channel := server.channels.Get(chname); ... if !csPrivsCheck(service, info, client, rb) { return }; displayChannelSetting(...) }",
+        "edges": [
+          "csGetHandler csPrivsCheck (chanserv.go:829)"
+        ]
+      },
+      "entity": "RegisteredChannel",
+      "_binds": {
+        "channel": "RegisteredChannel.name"
+      },
+      "_output_schema": {
+        "setting": "str",
+        "value": "str"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "RegisteredChannel",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "name",
+                      "op": "eq",
+                      "value": {
+                        "arg": "channel"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "founder",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "channel",
+          "setting"
+        ],
+        "messages": {
+          "auth": "Sign in before reading channel settings.",
+          "precondition": "You lack the privilege to read this channel's settings.",
+          "not_found": "No such registered channel exists."
+        }
+      },
+      "description": "Read one of a registered channel's settings. Requires channel operator/founder privilege.",
+      "id_local": "Channel.getSettings"
+    },
+    {
+      "tool": "channel_clear",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "RegisteredChannel",
+        "row_key": {
+          "name": {
+            "$arg": "channel"
+          }
+        },
+        "fields": [
+          "founder",
+          "topic",
+          "topic_set_by",
+          "topic_set_time",
+          "modes",
+          "key",
+          "forward",
+          "user_limit",
+          "account_to_u_mode",
+          "bans",
+          "excepts",
+          "invites",
+          "settings",
+          "metadata"
+        ],
+        "set": {
+          "bans": null,
+          "invites": null,
+          "excepts": null,
+          "account_to_u_mode": null
+        }
+      },
+      "input_schema": {
+        "channel": {
+          "type": "text",
+          "required": true,
+          "description": "The registered channel."
+        },
+        "target": {
+          "type": "text",
+          "required": true,
+          "description": "What to clear: 'users' or 'access'."
+        }
+      },
+      "_evidence": {
+        "locator": "irc/channel.go:343",
+        "id_local": "Channel.clear",
+        "entry": {
+          "kind": "rpc",
+          "route": "CS CLEAR #channel <users|access>",
+          "locator": "irc/chanserv.go:90"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "func (channel *Channel) resetAccess() { defer channel.MarkDirty(IncludeLists); channel.initializeLists(); if channel.registeredFounder != \"\" { channel.accountToUMode[channel.registeredFounder] = modes.ChannelFounder } }",
+        "edges": [
+          "csClear csPrivsCheck (chanserv.go:529)"
+        ]
+      },
+      "entity": "RegisteredChannel",
+      "_binds": {
+        "channel": "RegisteredChannel.name"
+      },
+      "_output_schema": {
+        "success": "bool",
+        "error": "str (on failure)"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "RegisteredChannel",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "name",
+                      "op": "eq",
+                      "value": {
+                        "arg": "channel"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "founder",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "channel",
+          "target"
+        ],
+        "messages": {
+          "auth": "Sign in before clearing channel access.",
+          "precondition": "You lack the privilege to clear this channel's access.",
+          "not_found": "No such registered channel exists."
+        }
+      },
+      "description": "Reset a registered channel's access lists (users or access), restoring the founder to their founder mode. Requires founder or other channel privilege.",
+      "id_local": "Channel.clear"
+    },
+    {
+      "tool": "channel_setmetadata",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "RegisteredChannel",
+        "row_key": {
+          "name": {
+            "$arg": "target"
+          }
+        },
+        "fields": [
+          "founder",
+          "topic",
+          "topic_set_by",
+          "topic_set_time",
+          "modes",
+          "key",
+          "forward",
+          "user_limit",
+          "account_to_u_mode",
+          "bans",
+          "excepts",
+          "invites",
+          "settings",
+          "metadata"
+        ],
+        "set": {
+          "metadata": {
+            "key": {
+              "$arg": "key"
+            },
+            "value": {
+              "$arg": "value"
+            }
+          }
+        }
+      },
+      "input_schema": {
+        "target": {
+          "type": "text",
+          "required": true,
+          "description": "The channel to set metadata on."
+        },
+        "key": {
+          "type": "text",
+          "required": true,
+          "description": "The metadata key."
+        },
+        "value": {
+          "type": "text",
+          "required": true,
+          "description": "The metadata value."
+        }
+      },
+      "_evidence": {
+        "locator": "irc/getters.go:898",
+        "id_local": "Channel.setMetadata",
+        "entry": {
+          "kind": "rpc",
+          "route": "METADATA <target> SET <key> <value>",
+          "locator": "irc/commands.go:217"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "func (channel *Channel) SetMetadata(key, value string, limit int) (...) { defer channel.MarkDirty(IncludeAllAttrs); channel.metadata[key]=value; return }",
+        "edges": [
+          "metadataCanIEditThisTarget: channel requires operator or oper metadata capab (metadata.go:222)"
+        ]
+      },
+      "entity": "RegisteredChannel",
+      "_binds": {
+        "target": "RegisteredChannel.name"
+      },
+      "_output_schema": {
+        "success": "bool",
+        "error": "str (on failure)"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "RegisteredChannel",
+                "where": {
+                  "node": "field",
+                  "col": "name",
+                  "op": "eq",
+                  "value": {
+                    "arg": "target"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "target",
+          "key",
+          "value"
+        ],
+        "messages": {
+          "auth": "Sign in before setting channel metadata.",
+          "precondition": "You are not a channel operator (or lack the metadata capability).",
+          "not_found": "No such channel exists."
+        },
+        "requires_auth": true
+      },
+      "description": "Set a key/value metadata entry on a channel. Requires being a channel operator or holding the oper metadata capability.",
+      "id_local": "Channel.setMetadata"
+    },
+    {
+      "tool": "channel_deletemetadata",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "RegisteredChannel",
+        "row_key": {
+          "name": {
+            "$arg": "target"
+          }
+        },
+        "fields": [
+          "founder",
+          "topic",
+          "topic_set_by",
+          "topic_set_time",
+          "modes",
+          "key",
+          "forward",
+          "user_limit",
+          "account_to_u_mode",
+          "bans",
+          "excepts",
+          "invites",
+          "settings",
+          "metadata"
+        ],
+        "set": {
+          "metadata": {
+            "delete": {
+              "$arg": "key"
+            }
+          }
+        }
+      },
+      "input_schema": {
+        "target": {
+          "type": "text",
+          "required": true,
+          "description": "The channel to delete metadata from."
+        },
+        "key": {
+          "type": "text",
+          "required": true,
+          "description": "The metadata key to remove."
+        }
+      },
+      "_evidence": {
+        "locator": "irc/getters.go:942",
+        "id_local": "Channel.deleteMetadata",
+        "entry": {
+          "kind": "rpc",
+          "route": "METADATA <target> CLEAR <key>",
+          "locator": "irc/commands.go:217"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "func (channel *Channel) DeleteMetadata(key string) (updated bool) { defer channel.MarkDirty(IncludeAllAttrs); delete(channel.metadata, key); return }",
+        "edges": [
+          "metadataCanIEditThisTarget (metadata.go:222)"
+        ]
+      },
+      "entity": "RegisteredChannel",
+      "_binds": {
+        "target": "RegisteredChannel.name"
+      },
+      "_output_schema": {
+        "success": "bool",
+        "error": "str (on failure)"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "RegisteredChannel",
+                "where": {
+                  "node": "field",
+                  "col": "name",
+                  "op": "eq",
+                  "value": {
+                    "arg": "target"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "target",
+          "key"
+        ],
+        "messages": {
+          "auth": "Sign in before deleting channel metadata.",
+          "precondition": "You are not a channel operator (or lack the metadata capability).",
+          "not_found": "No such channel exists."
+        },
+        "requires_auth": true
+      },
+      "description": "Remove a key/value metadata entry from a channel. Requires being a channel operator or holding the oper metadata capability.",
+      "id_local": "Channel.deleteMetadata"
+    },
+    {
+      "tool": "channel_purge",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "ChannelPurgeRecord",
+        "fields": {
+          "name": {
+            "$arg": "channel"
+          },
+          "reason": {
+            "$arg": "reason"
+          }
+        },
+        "set_on_create": {
+          "oper": {
+            "$session": "account_id"
+          },
+          "purged_at": "2026-01-01T00:00:00"
+        },
+        "unique_on": [
+          "name"
+        ]
+      },
+      "input_schema": {
+        "channel": {
+          "type": "text",
+          "required": true,
+          "description": "The channel to purge (its name is recorded)."
+        },
+        "code": {
+          "type": "text",
+          "required": false,
+          "description": "Confirmation code."
+        },
+        "reason": {
+          "type": "text",
+          "required": false,
+          "description": "Optional purge reason."
+        }
+      },
+      "_evidence": {
+        "locator": "irc/chanserv.go:663",
+        "id_local": "Channel.purge",
+        "entry": {
+          "kind": "rpc",
+          "route": "CS PURGE ADD #channel <code> [reason]",
+          "locator": "irc/chanserv.go:118"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "func (cm *ChannelManager) Purge(chname string, record ChannelPurgeRecord) (err error) {\n record.NameCasefolded=chname; record.UUID=utils.GenerateUUIDv4() ... channel.Purge(\"\") ... cm.server.dstore.Set(datastore.TableChannelPurges, record.UUID, purgeBytes, time.Time{})\n}",
+        "edges": [
+          "CS PURGE requires oper chanreg capab (chanserv.go:128); purge record unique per channel"
+        ]
+      },
+      "entity": "ChannelPurgeRecord",
+      "_binds": {
+        "channel": "ChannelPurgeRecord.name",
+        "reason": "ChannelPurgeRecord.reason"
+      },
+      "_output_schema": {
+        "success": "bool",
+        "error": "str (on failure)"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "RegisteredChannel",
+                "where": {
+                  "node": "field",
+                  "col": "name",
+                  "op": "eq",
+                  "value": {
+                    "arg": "channel"
+                  }
+                }
+              },
+              "op": "eq",
+              "n": 0
+            }
+          ]
+        ],
+        "required": [
+          "channel"
+        ],
+        "messages": {
+          "precondition": "That channel is already registered; purge is for unregistered channels.",
+          "unique": "That channel already has a purge record."
+        }
+      },
+      "description": "Record that a channel was purged, making it unjoinable. Refuses to purge an already-purged channel.",
+      "id_local": "Channel.purge"
+    },
+    {
+      "tool": "channel_unpurge",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "ChannelPurgeRecord",
+        "lookup_by": {
+          "name": {
+            "$arg": "channel"
+          }
+        }
+      },
+      "input_schema": {
+        "channel": {
+          "type": "text",
+          "required": true,
+          "description": "The channel to unpurge."
+        }
+      },
+      "_evidence": {
+        "locator": "irc/chanserv.go:712",
+        "id_local": "Channel.unpurge",
+        "entry": {
+          "kind": "rpc",
+          "route": "CS PURGE DEL #channel",
+          "locator": "irc/chanserv.go:118"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "func (cm *ChannelManager) Unpurge(chname string) (err error) { ... delete(cm.purgedChannels, chname); cm.server.dstore.Delete(datastore.TableChannelPurges, record.UUID) }"
+      },
+      "entity": "ChannelPurgeRecord",
+      "_binds": {
+        "channel": "ChannelPurgeRecord.name"
+      },
+      "_output_schema": {
+        "success": "bool",
+        "error": "str (on failure)"
+      },
+      "guards": {
+        "required": [
+          "channel"
+        ],
+        "messages": {
+          "not_found": "No purge record exists for that channel.",
+          "auth": "Sign in before unpurging a channel."
+        },
+        "requires_auth": true
+      },
+      "description": "Remove a channel's purge record so the channel can be joined again.",
+      "id_local": "Channel.unpurge"
+    },
+    {
+      "tool": "channel_listchannels",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "RegisteredChannel"
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "irc/api.go:704",
+        "id_local": "Channel.listChannels",
+        "entry": {
+          "kind": "http",
+          "route": "POST /v1/list",
+          "locator": "irc/api.go:26"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "func (a *ergoAPI) handleList(w,r) { channels := a.server.channels.ListableChannels(); for _, c := range channels { response.Channels = append(response.Channels, c.apiData()) } }",
+        "scope_why": "genuinely public directory of listable channels; no ownership boundary at the API (gated by oper bearer token at the boundary)."
+      },
+      "entity": "RegisteredChannel",
+      "_output_schema": {
+        "channels": "list of channel data"
+      },
+      "description": "List channels that are listable in the public directory.",
+      "id_local": "Channel.listChannels"
+    },
+    {
+      "tool": "channel_rename",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "RegisteredChannel",
+        "row_key": {
+          "name": {
+            "$arg": "old"
+          }
+        },
+        "fields": [
+          "founder",
+          "topic",
+          "topic_set_by",
+          "topic_set_time",
+          "modes",
+          "key",
+          "forward",
+          "user_limit",
+          "account_to_u_mode",
+          "bans",
+          "excepts",
+          "invites",
+          "settings",
+          "metadata"
+        ],
+        "set": {
+          "name": {
+            "$arg": "new"
+          }
+        }
+      },
+      "input_schema": {
+        "old": {
+          "type": "text",
+          "required": true,
+          "description": "The current channel name."
+        },
+        "new": {
+          "type": "text",
+          "required": true,
+          "description": "The new channel name."
+        }
+      },
+      "_evidence": {
+        "locator": "irc/handlers.go:3707",
+        "id_local": "Channel.rename",
+        "entry": {
+          "kind": "rpc",
+          "route": "RENAME <old> <new>",
+          "locator": "irc/commands.go:311"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "func (cm *ChannelManager) Rename(name, newName string) (err error) { ... entry.channel.Rename(newName, newCfname); channel.MarkDirty(IncludeAllAttrs) ... }",
+        "edges": [
+          "RENAME rewrites a registered channel's name; renaming a channel that is not registered fails (channelmanager.go:280)"
+        ]
+      },
+      "entity": "RegisteredChannel",
+      "_binds": {
+        "old": "RegisteredChannel.name",
+        "new": "RegisteredChannel.name"
+      },
+      "_output_schema": {
+        "success": "bool",
+        "error": "str (on failure)"
+      },
+      "guards": {
+        "required": [
+          "old",
+          "new"
+        ],
+        "messages": {
+          "not_found": "No such channel exists.",
+          "precondition": "You need the operator channel:rename capability."
+        },
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "RegisteredChannel",
+                "where": {
+                  "node": "field",
+                  "col": "name",
+                  "op": "eq",
+                  "value": {
+                    "arg": "old"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ]
+      },
+      "description": "Rename a channel. Requires the operator 'channel:rename' capability.",
+      "id_local": "Channel.rename"
+    },
+    {
+      "tool": "channel_join",
+      "op": "action",
+      "family": "action.emit",
+      "exec_spec": {
+        "channel": "event",
+        "record": {
+          "table": "DispatchLog"
+        }
+      },
+      "input_schema": {
+        "channel": {
+          "type": "text",
+          "description": "The channel to join.",
+          "required": true
+        },
+        "key": {
+          "type": "text",
+          "description": "The channel key, if the channel is +k."
+        }
+      },
+      "_evidence": {
+        "locator": "irc/handlers.go:1481",
+        "id_local": "Channel.join",
+        "entry": {
+          "kind": "rpc",
+          "route": "JOIN <channel> [key]",
+          "locator": "irc/commands.go:182"
+        },
+        "entity_why": "cannot determine the entity",
+        "ref_code": "func (cm *ChannelManager) Join(client, name, key string, isSajoin bool, rb) {\n ... if _, ok := cm.purgedChannels[casefoldedName]; ok { return nil, errChannelPurged, false } ...\n err, forward = channel.Join(client, key, isSajoin || newChannel, rb) ...\n}"
+      },
+      "_output_schema": {
+        "success": "bool",
+        "error": "str (on failure)"
+      },
+      "guards": {
+        "required": [
+          "channel"
+        ]
+      },
+      "description": "Join the current client to a channel (or create it). Refuses an invite-only, keyed or purged channel you are not allowed into.",
+      "id_local": "Channel.join"
+    },
+    {
+      "tool": "channel_part",
+      "op": "action",
+      "family": "action.emit",
+      "exec_spec": {
+        "channel": "event",
+        "record": {
+          "table": "DispatchLog"
+        }
+      },
+      "input_schema": {
+        "channel": {
+          "type": "text",
+          "description": "The channel to leave.",
+          "required": true
+        },
+        "message": {
+          "type": "text",
+          "description": "Optional part message."
+        }
+      },
+      "_evidence": {
+        "locator": "irc/channel.go:1038",
+        "id_local": "Channel.part",
+        "entry": {
+          "kind": "rpc",
+          "route": "PART <channel> [message]",
+          "locator": "irc/commands.go:259"
+        },
+        "entity_why": "cannot determine the entity",
+        "ref_code": "func (channel *Channel) Part(client, message string, rb) { ... channel.Quit(client) ... channel.AddHistoryItem(history.Item{Type: history.Part, ...}) }"
+      },
+      "_output_schema": {
+        "success": "bool",
+        "error": "str (on failure)"
+      },
+      "guards": {
+        "required": [
+          "channel"
+        ]
+      },
+      "description": "Leave a channel. Records a PART in the channel's message history.",
+      "id_local": "Channel.part"
+    },
+    {
+      "tool": "channel_kick",
+      "op": "action",
+      "family": "action.emit",
+      "exec_spec": {
+        "channel": "event",
+        "record": {
+          "table": "DispatchLog"
+        }
+      },
+      "input_schema": {
+        "channel": {
+          "type": "text",
+          "description": "The channel.",
+          "required": true
+        },
+        "nick": {
+          "type": "text",
+          "description": "The user to kick.",
+          "required": true
+        },
+        "comment": {
+          "type": "text",
+          "description": "Optional kick reason."
+        }
+      },
+      "_evidence": {
+        "locator": "irc/channel.go:1542",
+        "id_local": "Channel.kick",
+        "entry": {
+          "kind": "rpc",
+          "route": "KICK #channel <nick> [comment]",
+          "locator": "irc/commands.go:186"
+        },
+        "entity_why": "cannot determine the entity",
+        "ref_code": "func (channel *Channel) Kick(client, target, comment string, rb, hasPrivs bool) { ... }"
+      },
+      "_output_schema": {
+        "success": "bool",
+        "error": "str (on failure)"
+      },
+      "guards": {
+        "required": [
+          "channel",
+          "nick"
+        ]
+      },
+      "description": "Kick a user out of a channel. Requires channel operator or higher privilege.",
+      "id_local": "Channel.kick"
+    },
+    {
+      "tool": "channel_sendprivmsg",
+      "op": "action",
+      "family": "action.emit",
+      "exec_spec": {
+        "channel": "event",
+        "record": {
+          "table": "DispatchLog"
+        }
+      },
+      "input_schema": {
+        "target": {
+          "type": "text",
+          "description": "The recipient channel or nick.",
+          "required": true
+        },
+        "message": {
+          "type": "text",
+          "description": "The message text.",
+          "required": true
+        }
+      },
+      "_evidence": {
+        "locator": "irc/handlers.go:2476",
+        "id_local": "Channel.sendPrivmsg",
+        "entry": {
+          "kind": "rpc",
+          "route": "PRIVMSG <target> <message>",
+          "locator": "irc/commands.go:282"
+        },
+        "entity_why": "cannot determine the entity",
+        "ref_code": "func dispatchMessageToTarget(client, tags, histType, command, target string, message utils.SplitMessage, rb) {... channel.SendSplitMessage(...) ...}"
+      },
+      "_output_schema": {
+        "success": "bool",
+        "error": "str (on failure)"
+      },
+      "guards": {
+        "required": [
+          "target",
+          "message"
+        ]
+      },
+      "description": "Send a private message; if the target is a channel or nick with persisted history, the message is recorded.",
+      "id_local": "Channel.sendPrivmsg"
+    },
+    {
+      "tool": "channel_invite",
+      "op": "action",
+      "family": "action.emit",
+      "exec_spec": {
+        "channel": "event",
+        "record": {
+          "table": "DispatchLog"
+        }
+      },
+      "input_schema": {
+        "nick": {
+          "type": "text",
+          "description": "The user to invite.",
+          "required": true
+        },
+        "channel": {
+          "type": "text",
+          "description": "The channel to invite them to.",
+          "required": true
+        }
+      },
+      "_evidence": {
+        "locator": "irc/handlers.go:1429",
+        "id_local": "Channel.invite",
+        "entry": {
+          "kind": "rpc",
+          "route": "INVITE <nick> <channel>",
+          "locator": "irc/commands.go:170"
+        },
+        "entity_why": "cannot determine the entity",
+        "ref_code": "func (channel *Channel) Invite(invitee, inviter, rb) { ... if hasPrivs { invitee.Invite(chcfname, createdAt) } ... }"
+      },
+      "_output_schema": {
+        "success": "bool",
+        "error": "str (on failure)"
+      },
+      "guards": {
+        "required": [
+          "nick",
+          "channel"
+        ]
+      },
+      "description": "Invite a user to a channel, adding them to the invite list. Requires channel operator or higher privilege.",
+      "id_local": "Channel.invite"
+    },
+    {
+      "tool": "history_between",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "HistoryItem",
+        "pagination": {
+          "default_limit": 20
+        },
+        "rank": {
+          "method": "exact"
+        },
+        "search_fields": [
+          "msgid"
+        ]
+      },
+      "input_schema": {
+        "target": {
+          "type": "text",
+          "required": true,
+          "description": "The channel or nick whose history to fetch."
+        },
+        "limit": {
+          "type": "int",
+          "description": "Maximum number of messages to return (default 20)."
+        }
+      },
+      "_evidence": {
+        "locator": "irc/histserv.go:220",
+        "id_local": "History.between",
+        "entry": {
+          "kind": "rpc",
+          "route": "HISTORY <target> [limit]",
+          "locator": "irc/commands.go:163"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "func easySelectHistory(...) { channel, sequence, err := server.GetHistorySequence(nil, client, params[0]); ... items, err = sequence.Between(history.Selector{}, history.Selector{}, limit) }",
+        "scope_why": "genuinely global: history is scoped at runtime by channel membership cutoff in GetHistorySequence, not by a row-level owner column; no owner_col is measurable in this schema."
+      },
+      "entity": "HistoryItem",
+      "_output_schema": {
+        "items": "list of history items"
+      },
+      "guards": {
+        "required": [
+          "target"
+        ],
+        "messages": {
+          "auth": "Sign in before reading message history.",
+          "precondition": "History is scoped to your channel membership."
+        },
+        "requires_auth": true
+      },
+      "description": "Fetch recent message history for a channel or nick target (most recent last, newest after the given before-time).",
+      "id_local": "History.between"
+    },
+    {
+      "tool": "history_deletemessage",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "HistoryItem",
+        "lookup_by": {
+          "msgid": {
+            "$arg": "msgid"
+          }
+        }
+      },
+      "input_schema": {
+        "target": {
+          "type": "text",
+          "required": true,
+          "description": "The channel or nick the message belongs to."
+        },
+        "msgid": {
+          "type": "text",
+          "required": true,
+          "description": "The message id to delete."
+        }
+      },
+      "_evidence": {
+        "locator": "irc/sqlite/history.go:722",
+        "id_local": "History.deleteMessage",
+        "entry": {
+          "kind": "rpc",
+          "route": "HISTSERV DELETE <target> <msgid>",
+          "locator": "irc/histserv.go:52"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "func (s *SQLite) DeleteMsgid(msgid string) (err error) { _, id, _, _, err := s.lookupMsgid(ctx, msgid, true); if err == sql.ErrNoRows { return history.ErrNotFound }; s.deleteHistoryIDs(ctx, []uint64{id}) }"
+      },
+      "entity": "HistoryItem",
+      "_binds": {
+        "msgid": "HistoryItem.msgid"
+      },
+      "_output_schema": {
+        "success": "bool",
+        "error": "str (on failure)"
+      },
+      "guards": {
+        "required": [
+          "target",
+          "msgid"
+        ],
+        "messages": {
+          "not_found": "No message with that id exists.",
+          "auth": "Sign in before deleting history."
+        },
+        "requires_auth": true
+      },
+      "description": "Delete a single message from history by its message id. Fails if the message cannot be found.",
+      "id_local": "History.deleteMessage"
+    },
+    {
+      "tool": "history_forget",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "ForgetRecord",
+        "fields": [
+          "account"
+        ]
+      },
+      "input_schema": {
+        "account": {
+          "type": "text",
+          "required": true,
+          "description": "The account whose history to forget."
+        }
+      },
+      "_evidence": {
+        "locator": "irc/sqlite/history.go:568",
+        "id_local": "History.forget",
+        "entry": {
+          "kind": "rpc",
+          "route": "HISTSERV FORGET <account>",
+          "locator": "irc/histserv.go:41"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "func (s *SQLite) Forget(account string) { if s.db==nil || account==\"\" { return }; INSERT INTO forget (account) VALUES (?); ... }"
+      },
+      "entity": "ForgetRecord",
+      "_binds": {
+        "account": "Account.name"
+      },
+      "_output_schema": {
+        "success": "bool",
+        "error": "str (on failure)"
+      },
+      "guards": {
+        "required": [
+          "account"
+        ],
+        "messages": {
+          "auth": "Sign in before requesting a history forget."
+        },
+        "requires_auth": true
+      },
+      "description": "Request that all of an account's stored message history be erased (a forget request is recorded and processed asynchronously).",
+      "id_local": "History.forget"
+    },
+    {
+      "tool": "server_dline",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "IPBanInfo",
+        "fields": [
+          "reason"
+        ],
+        "set_on_create": {
+          "network": {
+            "$arg": "host"
+          },
+          "oper_name": {
+            "$session": "account_id"
+          },
+          "time_created": "2026-01-01T00:00:00",
+          "duration": 0
+        }
+      },
+      "input_schema": {
+        "host": {
+          "type": "text",
+          "required": true,
+          "description": "The host or network (CIDR) to ban."
+        },
+        "duration": {
+          "type": "int",
+          "required": false,
+          "description": "Optional ban duration; zero means permanent."
+        },
+        "reason": {
+          "type": "text",
+          "required": false,
+          "description": "Optional ban reason."
+        }
+      },
+      "_evidence": {
+        "locator": "irc/dline.go:100",
+        "id_local": "Server.dline",
+        "entry": {
+          "kind": "rpc",
+          "route": "DLINE [andkill] [duration] <host> [reason]",
+          "locator": "irc/commands.go:146"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "func (dm *DLineManager) AddNetwork(network flatip.IPNet, duration time.Duration, requireSASL bool, reason, operReason, operName string) error {\n info := IPBanInfo{... TimeCreated: time.Now().UTC(), Duration: duration}; id := dm.addNetworkInternal(network, info); return dm.persistDline(id, info) }\nfunc (dm *DLineManager) persistDline(id, info) error { ... tx.Set(dlineKey, bstr, setOptions) }"
+      },
+      "entity": "IPBanInfo",
+      "_binds": {
+        "host": "IPBanInfo.network",
+        "reason": "IPBanInfo.reason"
+      },
+      "_output_schema": {
+        "success": "bool",
+        "error": "str (on failure)"
+      },
+      "guards": {
+        "required": [
+          "host"
+        ],
+        "messages": {
+          "auth": "This is an operator action; sign in as an operator."
+        },
+        "requires_auth": true
+      },
+      "description": "Add a network-wide D-line ban for a host/network. Operator authority required.",
+      "id_local": "Server.dline"
+    },
+    {
+      "tool": "server_undline",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "IPBanInfo",
+        "lookup_by": {
+          "network": {
+            "$arg": "host"
+          }
+        }
+      },
+      "input_schema": {
+        "host": {
+          "type": "text",
+          "required": true,
+          "description": "The host or network whose D-line to remove."
+        }
+      },
+      "_evidence": {
+        "locator": "irc/dline.go:200",
+        "id_local": "Server.undline",
+        "entry": {
+          "kind": "rpc",
+          "route": "UNDLINE <host>",
+          "locator": "irc/commands.go:363"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "func (dm *DLineManager) RemoveNetwork(network flatip.IPNet) error { ... delete(dm.networks, id); return dm.unpersistDline(id) }\nfunc (dm *DLineManager) unpersistDline(id) error { tx.Delete(dlineKey); return nil }"
+      },
+      "entity": "IPBanInfo",
+      "_binds": {
+        "host": "IPBanInfo.network"
+      },
+      "_output_schema": {
+        "success": "bool",
+        "error": "str (on failure)"
+      },
+      "guards": {
+        "required": [
+          "host"
+        ],
+        "messages": {
+          "auth": "This is an operator action; sign in as an operator.",
+          "not_found": "No D-line exists for that host."
+        },
+        "requires_auth": true
+      },
+      "description": "Remove a D-line ban for a host/network. Operator authority required.",
+      "id_local": "Server.undline"
+    },
+    {
+      "tool": "server_kline",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "KLineInfo",
+        "fields": [
+          "reason"
+        ],
+        "set_on_create": {
+          "mask": {
+            "$arg": "mask"
+          },
+          "oper_name": {
+            "$session": "account_id"
+          },
+          "time_created": "2026-01-01T00:00:00",
+          "duration": 0
+        }
+      },
+      "input_schema": {
+        "mask": {
+          "type": "text",
+          "required": true,
+          "description": "The user mask (nick!user@host) to ban."
+        },
+        "duration": {
+          "type": "int",
+          "required": false,
+          "description": "Optional ban duration; zero means permanent."
+        },
+        "reason": {
+          "type": "text",
+          "required": false,
+          "description": "Optional ban reason."
+        }
+      },
+      "_evidence": {
+        "locator": "irc/kline.go:69",
+        "id_local": "Server.kline",
+        "entry": {
+          "kind": "rpc",
+          "route": "KLINE [duration] <mask> [reason]",
+          "locator": "irc/commands.go:195"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "func (km *KLineManager) AddMask(mask string, duration time.Duration, requireSASL bool, reason, operReason, operName string) error { ... km.persistKline(mask, info) }"
+      },
+      "entity": "KLineInfo",
+      "_binds": {
+        "mask": "KLineInfo.mask",
+        "reason": "KLineInfo.reason"
+      },
+      "_output_schema": {
+        "success": "bool",
+        "error": "str (on failure)"
+      },
+      "guards": {
+        "required": [
+          "mask"
+        ],
+        "messages": {
+          "auth": "This is an operator action; sign in as an operator."
+        },
+        "requires_auth": true
+      },
+      "description": "Add a user-mask K-line ban. Operator authority required.",
+      "id_local": "Server.kline"
+    },
+    {
+      "tool": "server_unkline",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "KLineInfo",
+        "lookup_by": {
+          "mask": {
+            "$arg": "mask"
+          }
+        }
+      },
+      "input_schema": {
+        "mask": {
+          "type": "text",
+          "required": true,
+          "description": "The user mask whose K-line to remove."
+        }
+      },
+      "_evidence": {
+        "locator": "irc/kline.go:171",
+        "id_local": "Server.unkline",
+        "entry": {
+          "kind": "rpc",
+          "route": "UNKLINE <mask>",
+          "locator": "irc/commands.go:372"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "func (km *KLineManager) RemoveMask(mask string) (err error) { delete(km.entries, mask); return km.unpersistKline(mask) }"
+      },
+      "entity": "KLineInfo",
+      "_binds": {
+        "mask": "KLineInfo.mask"
+      },
+      "_output_schema": {
+        "success": "bool",
+        "error": "str (on failure)"
+      },
+      "guards": {
+        "required": [
+          "mask"
+        ],
+        "messages": {
+          "auth": "This is an operator action; sign in as an operator.",
+          "not_found": "No K-line exists for that mask."
+        },
+        "requires_auth": true
+      },
+      "description": "Remove a K-line ban for a user mask. Operator authority required.",
+      "id_local": "Server.unkline"
+    },
+    {
+      "tool": "server_setcloaksecret",
+      "op": "action",
+      "family": "action.emit",
+      "exec_spec": {
+        "channel": "event",
+        "record": {
+          "table": "DispatchLog"
+        }
+      },
+      "input_schema": {
+        "secret": {
+          "type": "text",
+          "required": true,
+          "description": "The new cloak secret."
+        }
+      },
+      "_evidence": {
+        "locator": "irc/hostserv.go:196",
+        "id_local": "Server.setCloakSecret",
+        "entry": {
+          "kind": "rpc",
+          "route": "HS SETCLOAKSECRET <secret> [code]",
+          "locator": "irc/hostserv.go:82"
+        },
+        "entity_why": "cannot determine the entity",
+        "ref_code": "func StoreCloakSecret(dstore datastore.Datastore, secret string) { ... dstore.Set(datastore.TableMetadata, cloakSecretUUID, []byte(secret), time.Time{}) }"
+      },
+      "_output_schema": {
+        "success": "bool",
+        "error": "str (on failure)"
+      },
+      "guards": {
+        "required": [
+          "secret"
+        ],
+        "messages": {
+          "auth": "This is an operator action; sign in as an operator."
+        },
+        "requires_auth": true
+      },
+      "description": "Set the server-wide cloak secret used to generate cloaked hosts. Operator authority required.",
+      "id_local": "Server.setCloakSecret"
+    },
+    {
+      "tool": "server_rehash",
+      "op": "action",
+      "family": "action.emit",
+      "exec_spec": {
+        "channel": "event",
+        "record": {
+          "table": "DispatchLog"
+        }
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "irc/server.go:683",
+        "id_local": "Server.rehash",
+        "entry": {
+          "kind": "http",
+          "route": "POST /v1/rehash",
+          "locator": "irc/api.go:24"
+        },
+        "entity_why": "cannot determine the entity",
+        "ref_code": "func (server *Server) rehash() error {\n\tconfig := server.Config()\n\tnewConfig, err := LoadConfig(config.Datastore.Path)\n\tif err != nil { return err }\n\tif err := server.applyConfig(newConfig); err != nil { return err }\n\tserver.logger.Info(\"server\", \"rehashing complete\")\n\treturn nil\n}"
+      },
+      "_output_schema": {
+        "success": "bool",
+        "error": "str (on failure)"
+      },
+      "description": "Reload the server configuration from disk, applying any changes.",
+      "id_local": "Server.rehash",
+      "guards": {
+        "messages": {
+          "auth": "This is an operator action; sign in as an operator."
+        },
+        "requires_auth": true
+      }
+    },
+    {
+      "tool": "server_setdefcon",
+      "op": "action",
+      "family": "action.emit",
+      "exec_spec": {
+        "channel": "event",
+        "record": {
+          "table": "DispatchLog"
+        }
+      },
+      "input_schema": {
+        "defcon": {
+          "type": "int",
+          "required": true,
+          "description": "The defence level (0-5)."
+        }
+      },
+      "_evidence": {
+        "locator": "irc/api.go:133",
+        "id_local": "Server.setDefcon",
+        "entry": {
+          "kind": "http",
+          "route": "POST /v1/defcon",
+          "locator": "irc/api.go:27"
+        },
+        "entity_why": "cannot determine the entity",
+        "ref_code": "func (a *ergoAPI) handleDefcon(...) { ... a.server.SetDefcon(changeRequested) ... }"
+      },
+      "_output_schema": {
+        "success": "bool",
+        "error": "str (on failure)"
+      },
+      "guards": {
+        "required": [
+          "defcon"
+        ],
+        "messages": {
+          "auth": "This is an operator action; sign in as an operator."
+        },
+        "requires_auth": true
+      },
+      "description": "Set the server's global defence level (DEFCON). Operator authority required.",
+      "id_local": "Server.setDefcon"
+    },
+    {
+      "tool": "server_webpushregister",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Account",
+        "row_key": {
+          "name_casefolded": {
+            "$session": "account_id"
+          }
+        },
+        "fields": [
+          "name",
+          "name_casefolded",
+          "verified",
+          "additional_nicks",
+          "settings",
+          "credentials",
+          "vhost",
+          "suspended",
+          "read_markers",
+          "last_seen",
+          "user_modes",
+          "realname",
+          "channel_to_modes",
+          "push_subscriptions",
+          "metadata"
+        ],
+        "set": {
+          "push_subscriptions": null
+        }
+      },
+      "input_schema": {
+        "endpoint": {
+          "type": "text",
+          "required": true,
+          "description": "The web-push subscription endpoint URL."
+        },
+        "keys": {
+          "type": "text",
+          "required": true,
+          "description": "The subscription keys (JSON) from the browser."
+        }
+      },
+      "_evidence": {
+        "locator": "irc/handlers.go:4336",
+        "id_local": "Server.webpushRegister",
+        "entry": {
+          "kind": "rpc",
+          "route": "WEBPUSH REGISTER <endpoint> <keys>",
+          "locator": "irc/commands.go:403"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "func webpushHandler(...) { ... if err := client.addPushSubscription(endpoint, keys); err == nil { rb.Add(... \"WEBPUSH\", \"REGISTER\" ...) } }",
+        "edges": [
+          "webpushHandler requires client.Account()!='' (handlers.go:4346)"
+        ]
+      },
+      "entity": "Account",
+      "_output_schema": {
+        "success": "bool",
+        "error": "str (on failure)"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Account",
+                "where": {
+                  "node": "field",
+                  "col": "name_casefolded",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "endpoint",
+          "keys"
+        ],
+        "messages": {
+          "auth": "Sign in before registering a push subscription.",
+          "precondition": "You must sign in before registering a web-push endpoint."
+        }
+      },
+      "description": "Register a web-push subscription endpoint so the current account receives browser notifications for mentions and direct messages.",
+      "id_local": "Server.webpushRegister"
+    },
+    {
+      "tool": "server_webpushunregister",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Account",
+        "row_key": {
+          "name_casefolded": {
+            "$session": "account_id"
+          }
+        },
+        "fields": [
+          "name",
+          "name_casefolded",
+          "verified",
+          "additional_nicks",
+          "settings",
+          "credentials",
+          "vhost",
+          "suspended",
+          "read_markers",
+          "last_seen",
+          "user_modes",
+          "realname",
+          "channel_to_modes",
+          "push_subscriptions",
+          "metadata"
+        ],
+        "set": {
+          "push_subscriptions": null
+        }
+      },
+      "input_schema": {
+        "endpoint": {
+          "type": "text",
+          "required": true,
+          "description": "The web-push subscription endpoint URL to remove."
+        }
+      },
+      "_evidence": {
+        "locator": "irc/handlers.go:4407",
+        "id_local": "Server.webpushUnregister",
+        "entry": {
+          "kind": "rpc",
+          "route": "WEBPUSH UNREGISTER <endpoint>",
+          "locator": "irc/commands.go:403"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "func webpushHandler(...) { case \"UNREGISTER\": client.deletePushSubscription(endpoint, true); ... }",
+        "edges": [
+          "webpushHandler requires client.Account()!='' (handlers.go:4346)"
+        ]
+      },
+      "entity": "Account",
+      "_output_schema": {
+        "success": "bool",
+        "error": "str (on failure)"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Account",
+                "where": {
+                  "node": "field",
+                  "col": "name_casefolded",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "endpoint"
+        ],
+        "messages": {
+          "auth": "Sign in before removing a push subscription.",
+          "precondition": "You must sign in before removing a web-push endpoint."
+        }
+      },
+      "description": "Remove a web-push subscription endpoint for the current account so it stops receiving browser notifications.",
+      "id_local": "Server.webpushUnregister"
+    }
+  ],
+  "seed_state": {
+    "Account": [
+      {
+        "name": "ada",
+        "name_casefolded": "ops@ergo.example",
+        "registered_at": "2026-01-01T00:00:00",
+        "verified": true,
+        "additional_nicks": [
+          "ada_"
+        ],
+        "settings": {
+          "email": "ada@example.com",
+          "multiclient": false
+        },
+        "credentials": "pw-operations",
+        "suspended": null,
+        "realname": "Ada Lovelace",
+        "id": 1
+      },
+      {
+        "name": "bob",
+        "name_casefolded": "member@ergo.example",
+        "registered_at": "2026-01-01T00:00:00",
+        "verified": true,
+        "additional_nicks": [
+          "bob_"
+        ],
+        "settings": {
+          "email": "bob@example.com",
+          "multiclient": true
+        },
+        "credentials": "pw-member",
+        "suspended": null,
+        "id": 2
+      },
+      {
+        "name": "cara",
+        "name_casefolded": "third@ergo.example",
+        "registered_at": "2026-01-01T00:00:00",
+        "verified": true,
+        "additional_nicks": [],
+        "settings": {
+          "email": "cara@example.com",
+          "multiclient": false
+        },
+        "credentials": "pw-third",
+        "suspended": null,
+        "id": 3
+      }
+    ],
+    "RegisteredChannel": [
+      {
+        "name": "#general",
+        "founder": "ada",
+        "registered_at": "2026-01-01T00:00:00",
+        "topic": "Welcome to the network.",
+        "topic_set_by": "ada",
+        "topic_set_time": "2026-01-01T00:00:00",
+        "modes": [],
+        "key": "",
+        "user_limit": 0,
+        "account_to_u_mode": {
+          "ada": 999
+        },
+        "bans": [],
+        "excepts": [],
+        "invites": [],
+        "id": 1
+      },
+      {
+        "name": "#dev",
+        "founder": "bob",
+        "registered_at": "2026-01-01T00:00:00",
+        "topic": "Development channel",
+        "topic_set_by": "bob",
+        "topic_set_time": "2026-01-01T00:00:00",
+        "modes": [],
+        "key": "",
+        "user_limit": 0,
+        "account_to_u_mode": {
+          "bob": 999
+        },
+        "bans": [],
+        "excepts": [],
+        "invites": [],
+        "id": 2
+      }
+    ]
+  },
+  "summary": "Ergo is a self-hosted IRC server (Go) that persists registered accounts, registered channels, channel purge records, and D/K-lines in a buntdb KV datastore, plus an optional SQLite/MySQL/PostgreSQL backend storing per-channel and per-account message history. The IRC protocol commands and an operator web API form the op surface.",
+  "_auth_candidates": [
+    {
+      "entity": "Account",
+      "username_col": "name_casefolded",
+      "password_col": "credentials"
+    }
+  ],
+  "_fk_gravity": {
+    "entity": "HistoryItem",
+    "fk_count": 3
+  },
+  "_read_denied": "not_found",
+  "_no_edges": [
+    {
+      "id_local": "Account.login",
+      "why": "login authenticates and sets session state; triggers no further persisted ops; guarded by credential check in auth effect (nickserv.go:831)"
+    },
+    {
+      "id_local": "Channel.join",
+      "why": "in-memory client membership change; for always-on clients, persistence is implicit via markDirty; triggers no downstream op (channelmanager.go:105)"
+    },
+    {
+      "id_local": "Channel.part",
+      "why": "removes client from in-memory membership and records Part history; no downstream DB op (channel.go:1038)"
+    },
+    {
+      "id_local": "Channel.sendPrivmsg",
+      "why": "pure message relay with optional history write as side effect; the history write is not a separate reachable op (handlers.go:2476)"
+    },
+    {
+      "id_local": "Channel.invite",
+      "why": "adds per-client invite exemption in memory; no downstream op (handlers.go:1429)"
+    },
+    {
+      "id_local": "History.addChannelItem",
+      "why": "internal persistence callback from message relay; no route, no auth, no downstream op (channel.go:743)"
+    },
+    {
+      "id_local": "History.addDirectMessage",
+      "why": "internal persistence callback from DM relay; no route, no auth, no downstream op (client.go:1778)"
+    },
+    {
+      "id_local": "Server.rehash",
+      "why": "reloads config from disk; no DB writes, no downstream op (server.go:683)"
+    },
+    {
+      "id_local": "Server.setDefcon",
+      "why": "sets in-memory defcon level; no DB writes, no downstream op (api.go:133)"
+    },
+    {
+      "id_local": "Channel.kick",
+      "why": "in-memory membership removal and history recording; no downstream op (channel.go:1542)"
+    },
+    {
+      "id_local": "Channel.rename",
+      "why": "rewrites channel name in memory and reindexes; no downstream op (channelmanager.go:280)"
+    },
+    {
+      "id_local": "Channel.unpurge",
+      "why": "deletes a channel purge record by UUID; no triggers, the deletion is the op (channelmanager.go:439)"
+    },
+    {
+      "id_local": "Server.dline",
+      "why": "oper gated standalone dline write with no downstream triggers (Server.go)"
+    },
+    {
+      "id_local": "Server.undline",
+      "why": "oper gated standalone undline write with no downstream triggers (Server.go)"
+    },
+    {
+      "id_local": "Server.kline",
+      "why": "oper gated standalone kline write with no downstream triggers (Server.go)"
+    },
+    {
+      "id_local": "Server.unkline",
+      "why": "oper gated standalone unkline write with no downstream triggers (Server.go)"
+    },
+    {
+      "id_local": "Server.setCloakSecret",
+      "why": "oper gated standalone setCloakSecret write with no downstream triggers (Server.go)"
+    },
+    {
+      "id_local": "History.deleteMessage",
+      "why": "deletes a history item by msgid from the DB; no downstream triggers (sqlite/history.go:722)"
+    }
+  ],
+  "auth": {
+    "account_entity": "Account",
+    "username_col": "name_casefolded",
+    "password_col": "credentials",
+    "session_fields": {
+      "account_name": "name"
+    }
+  }
+}

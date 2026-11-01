@@ -1,0 +1,176 @@
+{
+  "app": "tolgee_platform",
+  "role": "localization and translation review platform (Tolgee-style)",
+  "domains": [
+    "localization",
+    "translation_review"
+  ],
+  "kinds": {
+    "create_record": [
+      "language_create",
+      "translationcomment_create"
+    ],
+    "update_record": [
+      "project_edit",
+      "language_edit",
+      "namespace_edit",
+      "key_edit",
+      "translationcomment_update"
+    ],
+    "record_status_change": [
+      "translation_setstate"
+    ],
+    "attach_note_or_task": [
+      "translationcomment_create"
+    ],
+    "delete_or_archive_row": [
+      "key_softdelete",
+      "translationcomment_delete"
+    ]
+  },
+  "check_kinds": [
+    "record_exists",
+    "record_not_exists",
+    "record_field_equals",
+    "record_field_contains",
+    "record_field_unchanged",
+    "record_field_in_set",
+    "note_or_task_exists",
+    "note_or_task_not_exists",
+    "row_deleted_or_archived",
+    "action_done",
+    "action_not_done"
+  ],
+  "carriers": {
+    "notes_field": {
+      "entity": "Project",
+      "field": "description"
+    }
+  },
+  "login": {
+    "tool": "useraccount_authenticate",
+    "user_field": "username",
+    "persona_entity": "UserAccount"
+  },
+  "content_entities": [
+    "Organization",
+    "OrganizationRole",
+    "Permission",
+    "ProjectContributor",
+    "TranslationAgency",
+    "SsoTenant",
+    "Project",
+    "Language",
+    "LanguageStats",
+    "Namespace",
+    "QuickStart",
+    "Key",
+    "KeyMeta",
+    "Tag",
+    "KeyComment",
+    "KeyCodeReference",
+    "Screenshot",
+    "KeyScreenshotReference",
+    "Label",
+    "KeysDistance",
+    "Translation",
+    "TranslationComment",
+    "TranslationQaIssue",
+    "TranslationSuggestion",
+    "LanguageQaConfig",
+    "ProjectQaConfig",
+    "Task",
+    "TaskKey",
+    "TaskAssignee",
+    "Automation",
+    "AutomationAction",
+    "AutomationTrigger",
+    "Branch",
+    "BranchMerge",
+    "BranchMergeChange",
+    "Import",
+    "ImportFile",
+    "ImportKey",
+    "ImportLanguage",
+    "ImportSettings",
+    "ImportTranslation",
+    "ImportFileIssue",
+    "ImportFileIssueParam",
+    "BatchJob",
+    "BatchJobChunkExecution",
+    "MtServiceConfig",
+    "MtCreditBucket",
+    "AutoTranslationConfig",
+    "Notification",
+    "NotificationSetting",
+    "WebhookConfig",
+    "ContentDeliveryConfig",
+    "ContentStorage",
+    "Glossary",
+    "GlossaryProject",
+    "GlossaryTerm",
+    "GlossaryTermTranslation",
+    "TranslationMemory",
+    "TranslationMemoryProject",
+    "Prompt",
+    "UploadedImage",
+    "ActivityRevision",
+    "ActivityModifiedEntity",
+    "ActivityDescribingEntity",
+    "SlackConfig",
+    "Invitation",
+    "KeyMetaTags"
+  ],
+  "seed_helpers": [
+    "add_users",
+    "localization_project",
+    "keys",
+    "translations",
+    "comments"
+  ],
+  "tool_families_to_keep": [
+    "useraccount_authenticate",
+    "project_get",
+    "project_list",
+    "project_edit",
+    "language_",
+    "namespace_",
+    "key_",
+    "translation_setstate",
+    "translationcomment_",
+    "exportservice_export"
+  ],
+  "obs_reads": [
+    "project_list",
+    "project_list_with_stats",
+    "key_search",
+    "language_list",
+    "namespace_list",
+    "namespace_list_used",
+    "exportservice_export"
+  ],
+  "known_patches": [
+    "Raw tolgee-platform.spec.json mapped to app tolgee_platform; env_id tolgee_platform",
+    "Integer persona UserAccount.id=1 with known local password; clear domain demo seeds",
+    "Retype 28 existing numeric identifier arguments across 24 tools from text to id; no write arguments added",
+    "Wire search/limit filters on 7 original list tools; exact name filter on namespace_get_by_name",
+    "Optional keyId/languageId/limit read filters on exportservice_export"
+  ],
+  "known_limitations": [
+    "translation_setbykey requires an undeclared language argument and treats key names as numeric FKs; no usable translation-text creation/update tool is advertised or invented.",
+    "key_create depends on missing session.project_id and cannot create a key in this login context; seed keys with helpers.",
+    "project_create reports ok but spawns an empty Project row with only id and an incomplete Language row; complete project creation is not advertised.",
+    "project_edit defaultNamespaceId/baseLanguageId writes target id-typed FK columns and cannot repoint those FKs; no such capability is advertised.",
+    "key_edit namespace/description and key_complexedit translations/states metadata do not implement the promised relation writes.",
+    "exportservice_export returns Translation rows, not a formatted export artifact; languages/format do not implement actual formatting or project authorization.",
+    "translation_setstate has only an authentication guard, so signed-in users without project Permission can review translations; existing comment-author and language-create permission guards still work. Global project isolation is not certified.",
+    "key_softdelete works for one integer id, but list ids fail and deleted_by_id retains an unresolved session expression; no bulk or author-attribution guarantee is made."
+  ],
+  "smoke": {
+    "passed": true,
+    "date": "2026-10-24",
+    "report": "ok"
+  },
+  "register_file": "pack/newspecs3/tolgee_platform/register.py",
+  "base_spec": "pack/base_specs/tolgee_platform.spec.json"
+}

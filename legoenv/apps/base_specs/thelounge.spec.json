@@ -1,0 +1,2752 @@
+{
+  "env_id": "thelounge",
+  "_prep_version": 3,
+  "entities": [
+    {
+      "name": "User",
+      "columns": [
+        {
+          "name": "name",
+          "type": "text",
+          "pk": true
+        },
+        {
+          "name": "password",
+          "type": "text",
+          "nullable": false,
+          "description": "bcrypt hash (11 rounds). Set by the client on session refresh and when the user changes their password; not an audit timestamp."
+        },
+        {
+          "name": "log",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "sessions",
+          "type": "json"
+        },
+        {
+          "name": "clientSettings",
+          "type": "json"
+        },
+        {
+          "name": "browser",
+          "type": "json"
+        },
+        {
+          "name": "networks",
+          "type": "json"
+        }
+      ]
+    },
+    {
+      "name": "Network",
+      "columns": [
+        {
+          "name": "uuid",
+          "type": "text",
+          "pk": true
+        },
+        {
+          "name": "nick",
+          "type": "text"
+        },
+        {
+          "name": "name",
+          "type": "text"
+        },
+        {
+          "name": "host",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "port",
+          "type": "int",
+          "default": 6667
+        },
+        {
+          "name": "tls",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "userDisconnected",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "rejectUnauthorized",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "password",
+          "type": "text"
+        },
+        {
+          "name": "awayMessage",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "commands",
+          "type": "json"
+        },
+        {
+          "name": "username",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "realname",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "leaveMessage",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "sasl",
+          "type": "text",
+          "enum": [
+            "",
+            "plain",
+            "external"
+          ],
+          "default": ""
+        },
+        {
+          "name": "saslAccount",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "saslPassword",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "proxyHost",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "proxyPort",
+          "type": "int",
+          "default": 1080
+        },
+        {
+          "name": "proxyUsername",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "proxyPassword",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "proxyEnabled",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "ignoreList",
+          "type": "json"
+        },
+        {
+          "name": "channels",
+          "type": "json"
+        }
+      ]
+    },
+    {
+      "name": "Channel",
+      "columns": [
+        {
+          "name": "id",
+          "type": "int",
+          "pk": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "key",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "type",
+          "type": "text",
+          "enum": [
+            "channel",
+            "lobby",
+            "query",
+            "special"
+          ],
+          "default": "channel"
+        },
+        {
+          "name": "muted",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "state",
+          "type": "int",
+          "enum": [
+            0,
+            1
+          ],
+          "default": 0
+        }
+      ]
+    },
+    {
+      "name": "Message",
+      "columns": [
+        {
+          "name": "id",
+          "type": "int",
+          "pk": true
+        },
+        {
+          "name": "network",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "channel",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "time",
+          "type": "int",
+          "nullable": false
+        },
+        {
+          "name": "type",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "message",
+            "notice",
+            "action",
+            "join",
+            "part",
+            "quit",
+            "kick",
+            "nick",
+            "away",
+            "back",
+            "topic",
+            "mode",
+            "ctcp",
+            "ctcp_request",
+            "chghost",
+            "wallops",
+            "invite",
+            "log",
+            "error",
+            "unhandled"
+          ]
+        },
+        {
+          "name": "msg",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "msgid",
+          "type": "text",
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "name": "StoredFile",
+      "columns": [
+        {
+          "name": "url",
+          "type": "text",
+          "pk": true
+        },
+        {
+          "name": "referenceCount",
+          "type": "int"
+        }
+      ]
+    },
+    {
+      "name": "UploadedFile",
+      "columns": [
+        {
+          "name": "name",
+          "type": "text",
+          "pk": true
+        },
+        {
+          "name": "url",
+          "type": "text"
+        }
+      ]
+    },
+    {
+      "name": "STSPolicy",
+      "columns": [
+        {
+          "name": "host",
+          "type": "text",
+          "pk": true
+        },
+        {
+          "name": "port",
+          "type": "int",
+          "nullable": false
+        },
+        {
+          "name": "duration",
+          "type": "int",
+          "nullable": false
+        },
+        {
+          "name": "expires",
+          "type": "int",
+          "nullable": false
+        }
+      ]
+    }
+  ],
+  "tools": [
+    {
+      "tool": "sign_in",
+      "op": "action",
+      "family": "guard.auth",
+      "exec_spec": {
+        "verify": {
+          "entity": "User",
+          "username_col": "name",
+          "password_col": "password"
+        }
+      },
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "Your The Lounge username (the account name, e.g. ada)."
+        },
+        "password": {
+          "type": "text",
+          "required": true,
+          "description": "Your account password (compared against the stored bcrypt hash)."
+        },
+        "user": {
+          "type": "text",
+          "required": false,
+          "description": "Alias for name; either name or user selects the account."
+        }
+      },
+      "_evidence": {
+        "locator": "server/plugins/auth/local.ts:7",
+        "id_local": "Auth.login",
+        "entry": {
+          "kind": "rpc",
+          "route": "auth:perform",
+          "locator": "server/server.ts:949"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "Auth.auth(manager, client, data.user, data.password, authCallback); ... if client && token in sessions authCallback(true)",
+        "edges": [
+          "Auth.auth checks client.config.password exists + bcrypt compare (server/plugins/auth/local.ts:7)"
+        ]
+      },
+      "entity": "User",
+      "_binds": {
+        "user": "User.name"
+      },
+      "_output_schema": {
+        "success": "bool"
+      },
+      "guards": {
+        "required": [
+          "name",
+          "password"
+        ],
+        "messages": {
+          "required": "Both your username and password are needed to sign in."
+        }
+      },
+      "description": "Sign in with your The Lounge username and password. Returns a session token; every chat operation below (networks, channels, messages, settings) requires this first because $session resolves to the authenticated user."
+    },
+    {
+      "tool": "sign_out",
+      "op": "action",
+      "family": "guard.logout",
+      "exec_spec": {
+        "entity": "User"
+      },
+      "input_schema": {
+        "tokenToSignOut": {
+          "type": "text",
+          "required": true,
+          "description": "The session token to revoke."
+        }
+      },
+      "_evidence": {
+        "locator": "server/server.ts:844",
+        "id_local": "Auth.logout",
+        "entry": {
+          "kind": "rpc",
+          "route": "sign-out",
+          "locator": "server/server.ts:834"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "delete client.config.sessions[tokenToSignOut]; client.save(); emit sign-out",
+        "edges": [
+          "sign-out socket handler only attached after performAuthentication (server/server.ts:426,834,949)"
+        ]
+      },
+      "entity": "User",
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "name",
+                  "op": "eq",
+                  "value": {
+                    "session": "name"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "precondition": "You need to be signed in to sign out."
+        }
+      },
+      "description": "End the current session by invalidating the given session token. After this the account is signed out until it signs in again."
+    },
+    {
+      "tool": "push_register",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "User",
+        "row_key": {
+          "name": {
+            "$session": "name"
+          }
+        },
+        "set": {
+          "sessions": {
+            "$arg": "subscription"
+          }
+        }
+      },
+      "input_schema": {
+        "token": {
+          "type": "text",
+          "required": true,
+          "description": "The session token this push subscription belongs to."
+        },
+        "subscription": {
+          "type": "json",
+          "required": true,
+          "description": "The account's sessions map with this token's push subscription added; persisted via client.save()."
+        }
+      },
+      "_evidence": {
+        "locator": "server/client.ts:860",
+        "id_local": "Session.pushRegister",
+        "entry": {
+          "kind": "rpc",
+          "route": "push:register",
+          "locator": "server/server.ts:702"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "client.registerPushSubscription(client.config.sessions[token], subscription); ... client.save()",
+        "edges": [
+          "performAuthentication before initializeClient attaches socket handlers (server/server.ts:426,949,1075)"
+        ]
+      },
+      "entity": "User",
+      "_binds": {
+        "subscription": "User.sessions"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "name",
+                  "op": "eq",
+                  "value": {
+                    "session": "name"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "token",
+          "subscription"
+        ],
+        "messages": {
+          "precondition": "You must be signed in to register push notifications."
+        }
+      },
+      "description": "Register a browser push (web notification) subscription for your account so the client can deliver notifications. Stored against your user record; overwrites the stored subscription."
+    },
+    {
+      "tool": "push_unregister",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "User",
+        "row_key": {
+          "name": {
+            "$session": "name"
+          }
+        },
+        "set": {
+          "sessions": {
+            "$arg": "subscription"
+          }
+        }
+      },
+      "input_schema": {
+        "token": {
+          "type": "text",
+          "required": true,
+          "description": "The session token whose push subscription to remove."
+        },
+        "subscription": {
+          "type": "json",
+          "required": true,
+          "description": "The account's sessions map after removing the token's push subscription; persisted via client.save()."
+        }
+      },
+      "_evidence": {
+        "locator": "server/client.ts:891",
+        "id_local": "Session.pushUnregister",
+        "entry": {
+          "kind": "rpc",
+          "route": "push:unregister",
+          "locator": "server/server.ts:722"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "client.unregisterPushSubscription(token);",
+        "edges": [
+          "performAuthentication before initializeClient attaches socket handlers (server/server.ts:426,949,1075)"
+        ]
+      },
+      "entity": "User",
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "name",
+                  "op": "eq",
+                  "value": {
+                    "session": "name"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "token",
+          "subscription"
+        ],
+        "messages": {
+          "precondition": "You must be signed in to unregister push notifications."
+        }
+      },
+      "description": "Remove a browser push (web notification) subscription from your account. Stored against your user record."
+    },
+    {
+      "tool": "user_change_password",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "User",
+        "row_key": {
+          "name": {
+            "$session": "name"
+          }
+        },
+        "set": {
+          "password": {
+            "$arg": "new_password"
+          }
+        }
+      },
+      "input_schema": {
+        "old_password": {
+          "type": "text",
+          "required": true,
+          "description": "The current password — the change is refused unless it matches."
+        },
+        "new_password": {
+          "type": "text",
+          "required": true,
+          "description": "The new password to store."
+        },
+        "verify_password": {
+          "type": "text",
+          "required": false,
+          "description": "Client-supplied confirmation/hash; the new password is stored under this value."
+        }
+      },
+      "_evidence": {
+        "locator": "server/client.ts:437",
+        "id_local": "User.changePassword",
+        "entry": {
+          "kind": "rpc",
+          "route": "change-password",
+          "locator": "server/server.ts:552"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "Helper.password.compare(old, client.config.password).then((matching) => { if (!matching) emit error; else { const hash = Helper.password.hash(p1); client.setPassword(hash, ...) }})",
+        "edges": [
+          "Helper.password.compare(old, client.config.password) must match (server/server.ts:566)",
+          "performAuthentication before initializeClient attaches socket handlers (server/server.ts:426,949,1075)"
+        ]
+      },
+      "entity": "User",
+      "_output_schema": {
+        "success": "bool"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "name",
+                  "op": "eq",
+                  "value": {
+                    "session": "name"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "old_password",
+          "new_password"
+        ],
+        "messages": {
+          "precondition": "You must be signed in to change your password."
+        }
+      },
+      "description": "Change the signed-in user's password. Succeeds only if the old password matches; the new password replaces the stored hash."
+    },
+    {
+      "tool": "user_set_setting",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "User",
+        "row_key": {
+          "name": {
+            "$session": "name"
+          }
+        },
+        "set": {
+          "clientSettings": {
+            "$arg": "value"
+          }
+        }
+      },
+      "input_schema": {
+        "key": {
+          "type": "text",
+          "required": true,
+          "description": "The setting key to write."
+        },
+        "value": {
+          "type": "json",
+          "required": true,
+          "description": "The JSON value to store under that key."
+        }
+      },
+      "_evidence": {
+        "locator": "server/server.ts:749",
+        "id_local": "User.setSetting",
+        "entry": {
+          "kind": "rpc",
+          "route": "setting:set",
+          "locator": "server/server.ts:749"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "if (client.config.clientSettings[name] !== value) { client.config.clientSettings[name] = value; ... client.save(); }",
+        "edges": [
+          "performAuthentication before initializeClient attaches socket handlers (server/server.ts:426,949,1075)"
+        ]
+      },
+      "entity": "User",
+      "_binds": {
+        "name": "User.clientSettings",
+        "value": "User.clientSettings"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "name",
+                  "op": "eq",
+                  "value": {
+                    "session": "name"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "value"
+        ],
+        "messages": {
+          "precondition": "You must be signed in before changing your settings."
+        }
+      },
+      "description": "Store one client-side setting (e.g. your preferred theme) under a key for the signed-in user. The value is saved to the user's config."
+    },
+    {
+      "tool": "user_get_all_settings",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "User",
+        "lookup_by": {
+          "name": {
+            "$session": "name"
+          }
+        }
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "server/server.ts:786",
+        "id_local": "User.getSetting",
+        "entry": {
+          "kind": "rpc",
+          "route": "setting:get",
+          "locator": "server/server.ts:786"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "socket.emit('setting:all', client.config.clientSettings);",
+        "edges": [
+          "performAuthentication before initializeClient attaches socket handlers (server/server.ts:426,949,1075)"
+        ]
+      },
+      "entity": "User",
+      "_output_schema": {
+        "clientSettings": "json"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "name",
+                  "op": "eq",
+                  "value": {
+                    "session": "name"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "precondition": "You must be signed in to read your settings."
+        }
+      },
+      "description": "Read all client settings of the signed-in user (a JSON map of key to value)."
+    },
+    {
+      "tool": "network_create",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Network",
+        "fields": [
+          "host",
+          "name",
+          "port",
+          "tls",
+          "nick",
+          "username",
+          "realname",
+          "password",
+          "sasl",
+          "saslAccount",
+          "saslPassword",
+          "leaveMessage"
+        ],
+        "set_on_create": {
+          "channels": {
+            "$arg": "join"
+          }
+        }
+      },
+      "input_schema": {
+        "host": {
+          "type": "text",
+          "required": true,
+          "description": "The IRC server hostname to connect to."
+        },
+        "name": {
+          "type": "text",
+          "required": false,
+          "description": "How this network is shown in the UI (defaults to host)."
+        },
+        "port": {
+          "type": "int",
+          "required": false,
+          "description": "The IRC port (default 6667)."
+        },
+        "tls": {
+          "type": "bool",
+          "required": false,
+          "description": "Whether to connect over TLS (default false)."
+        },
+        "nick": {
+          "type": "text",
+          "required": false,
+          "description": "The nickname to use on this network."
+        },
+        "username": {
+          "type": "text",
+          "required": false,
+          "description": "The IRC username (ident) for this network."
+        },
+        "realname": {
+          "type": "text",
+          "required": false,
+          "description": "The real name shown on this network."
+        },
+        "password": {
+          "type": "text",
+          "required": false,
+          "description": "The IRC server password if the network requires one."
+        },
+        "sasl": {
+          "type": "text",
+          "required": false,
+          "description": "SASL mechanism ('', 'plain' or 'external')."
+        },
+        "saslAccount": {
+          "type": "text",
+          "required": false,
+          "description": "The SASL account name."
+        },
+        "saslPassword": {
+          "type": "text",
+          "required": false,
+          "description": "The SASL password."
+        },
+        "leaveMessage": {
+          "type": "text",
+          "required": false,
+          "description": "The quit/part message for this network."
+        },
+        "join": {
+          "type": "json",
+          "required": false,
+          "description": "List of channels to join on connect."
+        }
+      },
+      "_evidence": {
+        "locator": "server/client.ts:344",
+        "id_local": "Network.create",
+        "entry": {
+          "kind": "rpc",
+          "route": "network:new",
+          "locator": "server/server.ts:506"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "socket.on('network:new', (data) => { data.uuid=null; data.commands=null; data.ignoreList=null; client.connectToNetwork(data); });",
+        "edges": [
+          "network:new always creates a fresh network (uuid nulled) (server/server.ts:506)",
+          "performAuthentication before initializeClient attaches socket handlers (server/server.ts:426,949,1075)"
+        ]
+      },
+      "entity": "Network",
+      "_binds": {
+        "host": "Network.host",
+        "name": "Network.name",
+        "port": "Network.port",
+        "tls": "Network.tls",
+        "nick": "Network.nick",
+        "username": "Network.username",
+        "realname": "Network.realname",
+        "password": "Network.password",
+        "sasl": "Network.sasl",
+        "saslAccount": "Network.saslAccount",
+        "saslPassword": "Network.saslPassword",
+        "leaveMessage": "Network.leaveMessage",
+        "join": "Network.channels",
+        "channels": "Network.channels"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "name",
+                  "op": "eq",
+                  "value": {
+                    "session": "name"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "host"
+        ],
+        "messages": {
+          "precondition": "You must be signed in before connecting to a network.",
+          "required": "A host is required to connect to a network."
+        }
+      },
+      "description": "Connect to a new IRC network and add it to the signed-in user's network list. Requires a host; an optional channel list (join) is joined on connect."
+    },
+    {
+      "tool": "network_edit",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Network",
+        "row_key": {
+          "uuid": {
+            "$arg": "uuid"
+          }
+        },
+        "fields": [
+          "nick",
+          "host",
+          "name",
+          "port",
+          "tls",
+          "rejectUnauthorized",
+          "password",
+          "username",
+          "realname",
+          "leaveMessage",
+          "sasl",
+          "saslAccount",
+          "saslPassword",
+          "proxyHost",
+          "proxyPort",
+          "proxyUsername",
+          "proxyPassword",
+          "proxyEnabled"
+        ],
+        "set": {
+          "commands": {
+            "$arg": "commands"
+          }
+        }
+      },
+      "input_schema": {
+        "uuid": {
+          "type": "text",
+          "required": true,
+          "description": "The uuid of the network to edit."
+        },
+        "nick": {
+          "type": "text",
+          "required": false,
+          "description": "Nickname for this network."
+        },
+        "host": {
+          "type": "text",
+          "required": false,
+          "description": "The IRC server hostname."
+        },
+        "name": {
+          "type": "text",
+          "required": false,
+          "description": "Display name of the network."
+        },
+        "port": {
+          "type": "int",
+          "required": false,
+          "description": "The IRC port."
+        },
+        "tls": {
+          "type": "bool",
+          "required": false,
+          "description": "Whether to use TLS."
+        },
+        "rejectUnauthorized": {
+          "type": "bool",
+          "required": false,
+          "description": "Whether to reject self-signed TLS certificates."
+        },
+        "password": {
+          "type": "text",
+          "required": false,
+          "description": "The IRC server password."
+        },
+        "username": {
+          "type": "text",
+          "required": false,
+          "description": "The IRC username (ident)."
+        },
+        "realname": {
+          "type": "text",
+          "required": false,
+          "description": "The real name for this network."
+        },
+        "leaveMessage": {
+          "type": "text",
+          "required": false,
+          "description": "The quit/part message."
+        },
+        "sasl": {
+          "type": "text",
+          "required": false,
+          "description": "SASL mechanism ('', 'plain' or 'external')."
+        },
+        "saslAccount": {
+          "type": "text",
+          "required": false,
+          "description": "The SASL account name."
+        },
+        "saslPassword": {
+          "type": "text",
+          "required": false,
+          "description": "The SASL password."
+        },
+        "commands": {
+          "type": "text",
+          "required": false,
+          "description": "Newline-separated commands to emit on connect."
+        },
+        "proxyHost": {
+          "type": "text",
+          "required": false,
+          "description": "Connect through this SOCKS proxy host."
+        },
+        "proxyPort": {
+          "type": "int",
+          "required": false,
+          "description": "SOCKS proxy port."
+        },
+        "proxyUsername": {
+          "type": "text",
+          "required": false,
+          "description": "SOCKS proxy username."
+        },
+        "proxyPassword": {
+          "type": "text",
+          "required": false,
+          "description": "SOCKS proxy password."
+        },
+        "proxyEnabled": {
+          "type": "bool",
+          "required": false,
+          "description": "Whether the proxy is enabled."
+        }
+      },
+      "_evidence": {
+        "locator": "server/models/network.ts:406",
+        "id_local": "Network.edit",
+        "entry": {
+          "kind": "rpc",
+          "route": "network:edit",
+          "locator": "server/server.ts:531"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "edit(client, args) { this.nick=args.nick; ... this.commands=...split('\\n'); ... if (!this.validate(client)) return; ... client.save(); }",
+        "edges": [
+          "network:edit looks up by uuid, returns if not found (server/server.ts:536)",
+          "performAuthentication before initializeClient attaches socket handlers (server/server.ts:426,949,1075)"
+        ]
+      },
+      "entity": "Network",
+      "_binds": {
+        "uuid": "Network.uuid",
+        "nick": "Network.nick",
+        "host": "Network.host",
+        "name": "Network.name",
+        "port": "Network.port",
+        "tls": "Network.tls",
+        "rejectUnauthorized": "Network.rejectUnauthorized",
+        "password": "Network.password",
+        "username": "Network.username",
+        "realname": "Network.realname",
+        "leaveMessage": "Network.leaveMessage",
+        "sasl": "Network.sasl",
+        "saslAccount": "Network.saslAccount",
+        "saslPassword": "Network.saslPassword",
+        "commands": "Network.commands",
+        "proxyHost": "Network.proxyHost",
+        "proxyPort": "Network.proxyPort",
+        "proxyUsername": "Network.proxyUsername",
+        "proxyPassword": "Network.proxyPassword",
+        "proxyEnabled": "Network.proxyEnabled"
+      },
+      "_output_schema": {
+        "network": "the edited Network config"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "name",
+                  "op": "eq",
+                  "value": {
+                    "session": "name"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "uuid"
+        ],
+        "messages": {
+          "not_found": "That network does not exist.",
+          "precondition": "You must be signed in to edit a network."
+        }
+      },
+      "description": "Edit the connection settings of one of the signed-in user's IRC networks, addressed by its uuid. The change is saved once the edited config validates."
+    },
+    {
+      "tool": "network_get",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Network",
+        "lookup_by": {
+          "uuid": {
+            "$arg": "uuid"
+          }
+        }
+      },
+      "input_schema": {
+        "uuid": {
+          "type": "text",
+          "required": true,
+          "description": "The uuid of the network to read."
+        }
+      },
+      "_evidence": {
+        "locator": "server/models/network.ts:598",
+        "id_local": "Network.get",
+        "entry": {
+          "kind": "rpc",
+          "route": "network:get",
+          "locator": "server/server.ts:517"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "socket.emit('network:info', network.exportForEdit());",
+        "edges": [
+          "performAuthentication before initializeClient attaches socket handlers (server/server.ts:426,949,1075)"
+        ]
+      },
+      "entity": "Network",
+      "_binds": {
+        "uuid": "Network.uuid"
+      },
+      "_output_schema": {
+        "network": "exportForEdit() - editable Network config"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "name",
+                  "op": "eq",
+                  "value": {
+                    "session": "name"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "uuid"
+        ],
+        "messages": {
+          "not_found": "That network does not exist.",
+          "precondition": "You must be signed in to read a network."
+        }
+      },
+      "description": "Read one of the signed-in user's IRC networks, addressed by its uuid, as its editable config. Fails if the network does not exist."
+    },
+    {
+      "tool": "network_quit",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "Network",
+        "lookup_by": {
+          "uuid": {
+            "$arg": "network"
+          }
+        }
+      },
+      "input_schema": {
+        "network": {
+          "type": "text",
+          "required": true,
+          "description": "The uuid of the network to quit and remove."
+        },
+        "quitMessage": {
+          "type": "text",
+          "required": false,
+          "description": "The quit message sent to the IRC server when leaving."
+        }
+      },
+      "_evidence": {
+        "locator": "server/plugins/inputs/quit.ts:9",
+        "id_local": "Network.quit",
+        "entry": {
+          "kind": "rpc",
+          "route": "/quit (IRC input)",
+          "locator": "server/plugins/inputs/quit.ts:9"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "const input = function (network, chan, cmd, args) { client.networks = _.without(client.networks, network); network.destroy(); client.save(); ... network.quit(quitMessage); }",
+        "edges": [
+          "performAuthentication before initializeClient attaches socket handlers (server/server.ts:426,949,1075)"
+        ]
+      },
+      "entity": "Network",
+      "_binds": {
+        "network": "Network.uuid",
+        "quitMessage": "Network.leaveMessage"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "name",
+                  "op": "eq",
+                  "value": {
+                    "session": "name"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "network"
+        ],
+        "messages": {
+          "not_found": "That network does not exist.",
+          "precondition": "You must be signed in to quit a network."
+        }
+      },
+      "description": "Quit an IRC network and remove it from the signed-in user's network list, sending an optional quit message to the server. Fails if the network does not exist."
+    },
+    {
+      "tool": "network_disconnect",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Network",
+        "row_key": {
+          "uuid": {
+            "$arg": "network"
+          }
+        },
+        "set": {
+          "userDisconnected": true
+        }
+      },
+      "input_schema": {
+        "network": {
+          "type": "text",
+          "required": true,
+          "description": "The uuid of the network to disconnect."
+        }
+      },
+      "_evidence": {
+        "locator": "server/plugins/inputs/disconnect.ts:8",
+        "id_local": "Network.disconnect",
+        "entry": {
+          "kind": "rpc",
+          "route": "/disconnect (IRC input)",
+          "locator": "server/plugins/inputs/disconnect.ts:7"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "network.quit(quitMessage); network.userDisconnected = true; this.save();",
+        "edges": [
+          "performAuthentication before initializeClient attaches socket handlers (server/server.ts:426,949,1075)"
+        ]
+      },
+      "entity": "Network",
+      "_binds": {
+        "network": "Network.uuid"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "name",
+                  "op": "eq",
+                  "value": {
+                    "session": "name"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "network"
+        ],
+        "messages": {
+          "not_found": "That network does not exist.",
+          "precondition": "You must be signed in to disconnect a network."
+        }
+      },
+      "description": "Disconnect an IRC network and mark it as user-disconnected, so it stays disconnected rather than auto-reconnecting. Fails if the network does not exist."
+    },
+    {
+      "tool": "network_connect",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Network",
+        "row_key": {
+          "uuid": {
+            "$arg": "network"
+          }
+        },
+        "set": {
+          "userDisconnected": false
+        }
+      },
+      "input_schema": {
+        "network": {
+          "type": "text",
+          "required": true,
+          "description": "The uuid of the network to reconnect."
+        }
+      },
+      "_evidence": {
+        "locator": "server/plugins/inputs/connect.ts:11",
+        "id_local": "Network.connect",
+        "entry": {
+          "kind": "rpc",
+          "route": "/connect (IRC input)",
+          "locator": "server/plugins/inputs/connect.ts:8"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "network.userDisconnected = false; this.save(); irc.connect();",
+        "edges": [
+          "performAuthentication before initializeClient attaches socket handlers (server/server.ts:426,949,1075)"
+        ]
+      },
+      "entity": "Network",
+      "_binds": {
+        "network": "Network.uuid",
+        "host": "Network.host",
+        "port": "Network.port",
+        "tls": "Network.tls"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "name",
+                  "op": "eq",
+                  "value": {
+                    "session": "name"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "network"
+        ],
+        "messages": {
+          "not_found": "That network does not exist.",
+          "precondition": "You must be signed in to reconnect a network."
+        }
+      },
+      "description": "Reconnect a disconnected IRC network and mark it as connected again. Fails if the network does not exist."
+    },
+    {
+      "tool": "network_ignore_add",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Network",
+        "row_key": {
+          "uuid": {
+            "$arg": "network"
+          }
+        },
+        "set": {
+          "ignoreList": {
+            "$arg": "mask"
+          }
+        }
+      },
+      "input_schema": {
+        "network": {
+          "type": "int",
+          "required": true,
+          "description": "The uuid of the network whose ignore list to change."
+        },
+        "mask": {
+          "type": "text",
+          "required": true,
+          "description": "The hostmask to add to or remove from the ignore list (e.g. nick!user@host)."
+        }
+      },
+      "_evidence": {
+        "locator": "server/plugins/inputs/ignore.ts:17",
+        "id_local": "Network.ignoreAdd",
+        "entry": {
+          "kind": "rpc",
+          "route": "/ignore (IRC input)",
+          "locator": "server/plugins/inputs/ignore.ts:10"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "network.ignoreList.push({...hostmask, when: Date.now()}); client.save();",
+        "edges": [
+          "performAuthentication before initializeClient attaches socket handlers (server/server.ts:426,949,1075)"
+        ]
+      },
+      "entity": "Network",
+      "_binds": {
+        "network": "Network.uuid",
+        "mask": "Network.ignoreList"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "name",
+                  "op": "eq",
+                  "value": {
+                    "session": "name"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "network",
+          "mask"
+        ],
+        "messages": {
+          "not_found": "That network does not exist.",
+          "precondition": "You must be signed in to change an ignore list."
+        }
+      },
+      "description": "Add a hostmask to a network's ignore list so messages from that host are hidden. Fails if the network does not exist."
+    },
+    {
+      "tool": "network_ignore_remove",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Network",
+        "row_key": {
+          "uuid": {
+            "$arg": "network"
+          }
+        },
+        "set": {
+          "ignoreList": {
+            "$arg": "mask"
+          }
+        }
+      },
+      "input_schema": {
+        "network": {
+          "type": "int",
+          "required": true,
+          "description": "The uuid of the network whose ignore list to change."
+        },
+        "mask": {
+          "type": "text",
+          "required": true,
+          "description": "The hostmask to add to or remove from the ignore list (e.g. nick!user@host)."
+        }
+      },
+      "_evidence": {
+        "locator": "server/plugins/inputs/ignore.ts:75",
+        "id_local": "Network.ignoreRemove",
+        "entry": {
+          "kind": "rpc",
+          "route": "/unignore (IRC input)",
+          "locator": "server/plugins/inputs/ignore.ts:75"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "network.ignoreList.splice(idx, 1); client.save();",
+        "edges": [
+          "performAuthentication before initializeClient attaches socket handlers (server/server.ts:426,949,1075)"
+        ]
+      },
+      "entity": "Network",
+      "_binds": {
+        "network": "Network.uuid",
+        "mask": "Network.ignoreList"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "name",
+                  "op": "eq",
+                  "value": {
+                    "session": "name"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "network",
+          "mask"
+        ],
+        "messages": {
+          "not_found": "That network does not exist.",
+          "precondition": "You must be signed in to change an ignore list."
+        }
+      },
+      "description": "Remove a hostmask from a network's ignore list so its messages are shown again. Fails if the network does not exist."
+    },
+    {
+      "tool": "network_sort_channels",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Network",
+        "row_key": {
+          "uuid": {
+            "$arg": "network"
+          }
+        },
+        "set": {
+          "channels": {
+            "$arg": "order"
+          }
+        }
+      },
+      "input_schema": {
+        "network": {
+          "type": "int",
+          "required": true,
+          "description": "The uuid of the network whose channels to reorder."
+        },
+        "order": {
+          "type": "json",
+          "required": true,
+          "description": "Array of channel ids in the desired display order."
+        }
+      },
+      "_evidence": {
+        "locator": "server/client.ts:729",
+        "id_local": "Network.sortChannels",
+        "entry": {
+          "kind": "rpc",
+          "route": "sort:channels",
+          "locator": "server/server.ts:609"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "sortChannels(netid, order) {\n  const network = _.find(this.networks, {uuid: netid});\n  if (!network) { return; }\n  network.channels.sort((a, b) => {\n    if (a.type === ChanType.LOBBY) { return -1; }\n    else if (b.type === ChanType.LOBBY) { return 1; }\n    return order.indexOf(a.id) - order.indexOf(b.id);\n  });\n  this.save();\n  this.emit(\"sync_sort:channels\", {network, order});\n}",
+        "edges": [
+          "performAuthentication before initializeClient attaches socket handlers (server/server.ts:426,949,1075)"
+        ]
+      },
+      "entity": "Network",
+      "_binds": {
+        "network": "Network.uuid",
+        "order": "Channel.id"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "name",
+                  "op": "eq",
+                  "value": {
+                    "session": "name"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "network",
+          "order"
+        ],
+        "messages": {
+          "not_found": "That network does not exist.",
+          "precondition": "You must be signed in to reorder channels."
+        }
+      },
+      "description": "Reorder the channels of an IRC network in the signed-in user's UI by giving the desired order of channel ids (the lobby always stays first). Fails if the network does not exist."
+    },
+    {
+      "tool": "user_sort_networks",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "User",
+        "row_key": {
+          "name": {
+            "$session": "name"
+          }
+        },
+        "set": {
+          "networks": {
+            "$arg": "order"
+          }
+        }
+      },
+      "input_schema": {
+        "order": {
+          "type": "json",
+          "required": true,
+          "description": "Array of network uuids in the desired display order."
+        }
+      },
+      "_evidence": {
+        "locator": "server/client.ts:755",
+        "id_local": "User.sortNetworks",
+        "entry": {
+          "kind": "rpc",
+          "route": "sort:networks",
+          "locator": "server/server.ts:597"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "sortNetworks(order) {\n  this.networks.sort((a, b) => order.indexOf(a.uuid) - order.indexOf(b.uuid));\n  this.save();\n  this.emit(\"sync_sort:networks\", {order});\n}",
+        "edges": [
+          "performAuthentication before initializeClient attaches socket handlers (server/server.ts:426,949,1075)"
+        ]
+      },
+      "entity": "User",
+      "_binds": {
+        "order": "Network.uuid"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "name",
+                  "op": "eq",
+                  "value": {
+                    "session": "name"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "order"
+        ],
+        "messages": {
+          "precondition": "You must be signed in to reorder networks."
+        }
+      },
+      "description": "Reorder the signed-in user's IRC networks in the UI by giving the desired order of network uuids."
+    },
+    {
+      "tool": "network_set_away",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Network",
+        "row_key": {
+          "uuid": {
+            "$arg": "network"
+          }
+        },
+        "set": {
+          "awayMessage": {
+            "$arg": "reason"
+          }
+        }
+      },
+      "input_schema": {
+        "network": {
+          "type": "int",
+          "required": true,
+          "description": "The uuid of the network to set away/back on."
+        },
+        "reason": {
+          "type": "text",
+          "required": false,
+          "description": "The away message; empty or omitted to return from away."
+        }
+      },
+      "_evidence": {
+        "locator": "server/plugins/inputs/away.ts:10",
+        "id_local": "Channel.setAway",
+        "entry": {
+          "kind": "rpc",
+          "route": "/away and /back (IRC input)",
+          "locator": "server/plugins/inputs/away.ts:6"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "network.awayMessage = reason; this.save();",
+        "edges": [
+          "socket handler only attached after performAuthentication (server/server.ts:426,949)"
+        ]
+      },
+      "entity": "Network",
+      "_binds": {
+        "network": "Network.uuid",
+        "reason": "Network.awayMessage"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "name",
+                  "op": "eq",
+                  "value": {
+                    "session": "name"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "network"
+        ],
+        "messages": {
+          "not_found": "That network does not exist.",
+          "precondition": "You must be signed in to set away status."
+        }
+      },
+      "description": "Mark the signed-in user away (or back) on an IRC network. Give an empty reason to clear away (come back). Fails if the network does not exist."
+    },
+    {
+      "tool": "channel_set_muted",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Channel",
+        "row_key": {
+          "id": {
+            "$arg": "target"
+          }
+        },
+        "set": {
+          "muted": {
+            "$arg": "muted"
+          }
+        }
+      },
+      "input_schema": {
+        "target": {
+          "type": "int",
+          "required": true,
+          "description": "The id of the channel to mute or unmute."
+        },
+        "muted": {
+          "type": "bool",
+          "required": true,
+          "description": "True to mute the channel, false to unmute it."
+        }
+      },
+      "_evidence": {
+        "locator": "server/plugins/inputs/mute.ts:24",
+        "id_local": "Channel.setMuted",
+        "entry": {
+          "kind": "rpc",
+          "route": "/mute and /unmute (IRC input)",
+          "locator": "server/plugins/inputs/mute.ts:24"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "change_mute_state(client, target, valueToSet); client.save();",
+        "edges": [
+          "socket handler only attached after performAuthentication (server/server.ts:426,949)"
+        ]
+      },
+      "entity": "Channel",
+      "_binds": {
+        "target": "Channel.id",
+        "muted": "Channel.muted"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "name",
+                  "op": "eq",
+                  "value": {
+                    "session": "name"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "target",
+          "muted"
+        ],
+        "messages": {
+          "not_found": "That channel does not exist.",
+          "precondition": "You must be signed in to mute a channel."
+        }
+      },
+      "description": "Mute or unmute a channel so its messages are hidden (or shown again), addressed by the channel id. Fails if the channel does not exist."
+    },
+    {
+      "tool": "channel_change_mute",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Channel",
+        "row_key": {
+          "id": {
+            "$arg": "target"
+          }
+        },
+        "set": {
+          "muted": {
+            "$arg": "setMutedTo"
+          }
+        }
+      },
+      "input_schema": {
+        "target": {
+          "type": "int",
+          "required": true,
+          "description": "The id of the channel to (un)mute."
+        },
+        "setMutedTo": {
+          "type": "bool",
+          "required": true,
+          "description": "The desired muted state: true to mute, false to unmute."
+        }
+      },
+      "_evidence": {
+        "locator": "server/server.ts:801",
+        "id_local": "Client.muteChange",
+        "entry": {
+          "kind": "rpc",
+          "route": "mute:change",
+          "locator": "server/server.ts:801"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "chan.setMuteStatus(setMutedTo); ... client.save();",
+        "edges": [
+          "performAuthentication before initializeClient attaches socket handlers (server/server.ts:426,949,1075)"
+        ]
+      },
+      "entity": "Channel",
+      "_binds": {
+        "target": "Channel.id",
+        "setMutedTo": "Channel.muted"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "name",
+                  "op": "eq",
+                  "value": {
+                    "session": "name"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "target",
+          "setMutedTo"
+        ],
+        "messages": {
+          "not_found": "That channel does not exist.",
+          "precondition": "You must be signed in to change a channel's mute state."
+        }
+      },
+      "description": "Change the muted state of a channel addressed by its id. Fails if the channel does not exist."
+    },
+    {
+      "tool": "channel_send_message",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Message",
+        "fields": [
+          "network",
+          "channel",
+          "msgid"
+        ],
+        "set_on_create": {
+          "time": {
+            "$arg": "time"
+          },
+          "type": {
+            "$const": "message"
+          },
+          "msg": {
+            "$arg": "text"
+          }
+        }
+      },
+      "input_schema": {
+        "target": {
+          "type": "int",
+          "required": true,
+          "description": "The id of the channel to send the message in."
+        },
+        "text": {
+          "type": "text",
+          "required": true,
+          "description": "The message text, or an IRC command starting with '/'."
+        },
+        "time": {
+          "type": "int",
+          "required": false,
+          "description": "Epoch-millisecond timestamp for the message; defaults to now."
+        },
+        "network": {
+          "type": "text",
+          "required": false,
+          "description": "The uuid of the network owning the channel (used to locate the message log)."
+        },
+        "channel": {
+          "type": "text",
+          "required": false,
+          "description": "The lowercased channel name (used to locate the message log)."
+        },
+        "msgid": {
+          "type": "text",
+          "required": false,
+          "description": "An optional client-generated message id."
+        }
+      },
+      "_evidence": {
+        "locator": "server/client.ts:453",
+        "id_local": "Channel.sendMessage",
+        "entry": {
+          "kind": "rpc",
+          "route": "input (socket)",
+          "locator": "server/client.ts:453"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "client.input(data) -> inputLine -> if message: text='say '+...; cmd handled; irc.raw(text)",
+        "edges": [
+          "socket handler only attached after performAuthentication (server/server.ts:426,949)"
+        ]
+      },
+      "entity": "Message",
+      "_binds": {
+        "target": "Channel.id"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "name",
+                  "op": "eq",
+                  "value": {
+                    "session": "name"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "target",
+          "text"
+        ],
+        "messages": {
+          "precondition": "You must be signed in to send a message.",
+          "required": "Both the channel target and the message text are required."
+        }
+      },
+      "description": "Send a chat message (or run an IRC command such as /join, /nick, /away) in a channel of a joined IRC network, addressed by the channel id. Plain text is sent to the server; IRC commands are interpreted client-side."
+    },
+    {
+      "tool": "channel_clear_history",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "Message",
+        "lookup_by": {
+          "network": {
+            "$arg": "network"
+          },
+          "channel": {
+            "$arg": "channel"
+          }
+        }
+      },
+      "input_schema": {
+        "network": {
+          "type": "int",
+          "required": true,
+          "description": "The uuid of the network owning the channel."
+        },
+        "channel": {
+          "type": "text",
+          "required": true,
+          "description": "The lowercased channel name whose history to clear."
+        }
+      },
+      "_evidence": {
+        "locator": "server/client.ts:654",
+        "id_local": "Client.clearHistory",
+        "entry": {
+          "kind": "rpc",
+          "route": "history:clear",
+          "locator": "server/server.ts:545"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "target.chan.messages = []; ... messageStorage.deleteChannel(target.network, target.chan);",
+        "edges": [
+          "performAuthentication before initializeClient attaches socket handlers (server/server.ts:426,949,1075)"
+        ]
+      },
+      "entity": "Message",
+      "_binds": {
+        "network": "Message.network",
+        "channel": "Message.channel"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "name",
+                  "op": "eq",
+                  "value": {
+                    "session": "name"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "network",
+          "channel"
+        ],
+        "messages": {
+          "not_found": "No stored messages matched that network and channel.",
+          "precondition": "You must be signed in to clear message history."
+        }
+      },
+      "description": "Clear the stored message history for a channel, addressed by its network uuid and lowercased channel name. Fails if no messages matched."
+    },
+    {
+      "tool": "message_get",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Message",
+        "lookup_by": {
+          "id": {
+            "$arg": "lastId"
+          }
+        }
+      },
+      "input_schema": {
+        "target": {
+          "type": "int",
+          "required": true,
+          "description": "The id of the channel the message lives in (address helper; not used to resolve the row)."
+        },
+        "lastId": {
+          "type": "int",
+          "required": true,
+          "description": "The id of the stored message to fetch."
+        }
+      },
+      "_evidence": {
+        "locator": "server/client.ts:599",
+        "id_local": "Client.getHistory",
+        "entry": {
+          "kind": "rpc",
+          "route": "more (socket)",
+          "locator": "server/server.ts:496"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "messages = chan.messages.slice(startIndex, index); return {chan, messages, totalMessages}",
+        "edges": [
+          "performAuthentication before initializeClient attaches socket handlers (server/server.ts:426,949,1075)"
+        ],
+        "scope_why": "No scope: Message rows carry network/channel but no per-user column (The Lounge keeps per-user message DBs, flattened here), so the runtime's owner/where scope cannot express user ownership and any col-scope would match nothing. Treated as a self-hosted single-operator log read by id."
+      },
+      "entity": "Message",
+      "_binds": {
+        "target": "Channel.id",
+        "lastId": "Message.id"
+      },
+      "_output_schema": {
+        "messages": "list of Message rows",
+        "totalMessages": "int"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "name",
+                  "op": "eq",
+                  "value": {
+                    "session": "name"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "target",
+          "lastId"
+        ],
+        "messages": {
+          "not_found": "No message found at that id.",
+          "precondition": "You must be signed in to read message history.",
+          "required": "Both the lastId and target are required."
+        }
+      },
+      "description": "Fetch one stored chat message by its id. Because every user's chat messages share one storage table with no per-user column, the id is the only address — this is effectively reading your own client's log by id."
+    },
+    {
+      "tool": "message_search",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Message",
+        "search_fields": [
+          "msg"
+        ],
+        "rank": {
+          "method": "exact"
+        },
+        "filter": {
+          "op": "and",
+          "clauses": [
+            {
+              "col": "msg",
+              "mode": "substring",
+              "val": {
+                "$arg": "searchTerm"
+              }
+            },
+            {
+              "col": "network",
+              "mode": "exact",
+              "val": {
+                "$arg": "networkUuid"
+              },
+              "optional": true
+            },
+            {
+              "col": "channel",
+              "mode": "exact",
+              "val": {
+                "$arg": "channelName"
+              },
+              "optional": true
+            }
+          ]
+        },
+        "pagination": {
+          "default_limit": 20
+        }
+      },
+      "input_schema": {
+        "searchTerm": {
+          "type": "text",
+          "required": true,
+          "description": "The text to search for in message content."
+        },
+        "networkUuid": {
+          "type": "text",
+          "required": false,
+          "description": "Limit to this network's messages (its uuid)."
+        },
+        "channelName": {
+          "type": "text",
+          "required": false,
+          "description": "Limit to this channel's messages (lowercased name)."
+        },
+        "offset": {
+          "type": "int",
+          "required": false,
+          "description": "Page offset into the results."
+        }
+      },
+      "_evidence": {
+        "locator": "server/plugins/messageStorage/sqlite.ts:452",
+        "id_local": "Client.searchMessages",
+        "entry": {
+          "kind": "rpc",
+          "route": "search (socket)",
+          "locator": "server/server.ts:796"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "SELECT ... FROM messages WHERE type='message' AND json_extract(msg, '$.text') LIKE ? ESCAPE '@' ... network = ? AND channel = ? ORDER BY time DESC LIMIT 100 OFFSET ?",
+        "edges": [
+          "performAuthentication before initializeClient attaches socket handlers (server/server.ts:426,949,1075)"
+        ],
+        "scope_why": "No scope: same reason as message_get — the flattened Message table has no per-user column, so owner/where scope cannot express user ownership. Real The Lounge searches a per-user log; here the practical boundary is the network/channel filter args."
+      },
+      "entity": "Message",
+      "_binds": {
+        "networkUuid": "Message.network",
+        "channelName": "Message.channel"
+      },
+      "_output_schema": {
+        "results": "list of Message rows"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "name",
+                  "op": "eq",
+                  "value": {
+                    "session": "name"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "searchTerm"
+        ],
+        "messages": {
+          "precondition": "You must be signed in to search message history.",
+          "required": "A search term is required."
+        }
+      },
+      "description": "Search stored chat messages for text, optionally narrowed to one network and one channel. Returns matching Message rows newest first, up to a page of 20."
+    },
+    {
+      "tool": "upload_file",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "UploadedFile",
+        "fields": [
+          "name",
+          "url"
+        ],
+        "set_on_create": {
+          "name": {
+            "$arg": "name"
+          },
+          "url": {
+            "$arg": "url"
+          }
+        }
+      },
+      "input_schema": {
+        "token": {
+          "type": "text",
+          "required": true,
+          "description": "A one-time upload token; consumed on use."
+        },
+        "file": {
+          "type": "json",
+          "required": true,
+          "description": "The file to upload (name and stream)."
+        },
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "The generated 16-hex file name."
+        },
+        "url": {
+          "type": "text",
+          "required": true,
+          "description": "The resulting upload URL."
+        }
+      },
+      "_evidence": {
+        "locator": "server/plugins/uploader.ts:170",
+        "id_local": "Upload.upload",
+        "entry": {
+          "kind": "rpc",
+          "route": "upload:new/:token (HTTP POST)",
+          "locator": "server/plugins/uploader.ts:141"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "if (uploadTokens.delete(req.params.token) !== true) abort('Invalid upload token'); ... fs.mkdirSync(destDir); fileStream.pipe(streamWriter); res.status(200).json({url: uploadUrl});",
+        "edges": [
+          "socket handler only attached after performAuthentication (server/server.ts:426,949)"
+        ]
+      },
+      "entity": "UploadedFile",
+      "_output_schema": {
+        "url": "generated upload URL"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "name",
+                  "op": "eq",
+                  "value": {
+                    "session": "name"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "token",
+          "file",
+          "name",
+          "url"
+        ],
+        "messages": {
+          "precondition": "You must be signed in to upload a file."
+        }
+      },
+      "description": "Upload a file for a channel and register a new UploadedFile record: the file is written to disk under its generated 16-hex name and its public URL is returned. Requires a one-time upload token; the token is consumed by this call."
+    },
+    {
+      "tool": "upload_get_file",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "UploadedFile",
+        "lookup_by": {
+          "name": {
+            "$arg": "name"
+          }
+        }
+      },
+      "input_schema": {
+        "name": {
+          "type": "int",
+          "required": true,
+          "description": "The generated 16-hex upload name."
+        },
+        "slug": {
+          "type": "text",
+          "required": false,
+          "description": "The original filename slug in the URL path; not used to resolve the file."
+        }
+      },
+      "_evidence": {
+        "locator": "server/plugins/uploader.ts:156",
+        "id_local": "Upload.getFile",
+        "entry": {
+          "kind": "http",
+          "route": "GET /uploads/:name/:slug*",
+          "locator": "server/plugins/uploader.ts:133"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "nameRegex = /^[0-9a-f]{16}$/; if (!nameRegex.test(name)) return 404; ... res.sendFile(filePath)"
+      },
+      "entity": "UploadedFile",
+      "_binds": {
+        "name": "UploadedFile.name"
+      },
+      "_output_schema": {
+        "file": "file bytes + detected mime type"
+      },
+      "guards": {
+        "required": [
+          "name"
+        ],
+        "messages": {
+          "not_found": "That upload could not be found (invalid or missing name)."
+        }
+      },
+      "description": "Fetch a previously uploaded file by its generated name. Fails (404) if the name is not a valid 16-hex name or the file is missing."
+    }
+  ],
+  "seed_state": {
+    "User": [
+      {
+        "name": "ops@thelounge.example",
+        "password": "pw-operations",
+        "log": false,
+        "sessions": {},
+        "clientSettings": {},
+        "browser": {},
+        "networks": [
+          "net-bridge"
+        ],
+        "id": 1
+      },
+      {
+        "name": "member@thelounge.example",
+        "password": "pw-member",
+        "log": true,
+        "sessions": {},
+        "clientSettings": {},
+        "browser": {},
+        "networks": [],
+        "id": 2
+      }
+    ],
+    "Network": [
+      {
+        "uuid": "net-bridge",
+        "nick": "ada",
+        "name": "ExampleNet",
+        "host": "irc.example.net",
+        "port": 6697,
+        "tls": true,
+        "userDisconnected": false,
+        "rejectUnauthorized": false,
+        "password": "",
+        "awayMessage": "",
+        "commands": {},
+        "username": "",
+        "realname": "",
+        "leaveMessage": "",
+        "sasl": "",
+        "saslAccount": "",
+        "saslPassword": "",
+        "proxyHost": "",
+        "proxyPort": 1080,
+        "proxyUsername": "",
+        "proxyPassword": "",
+        "proxyEnabled": false,
+        "ignoreList": [],
+        "channels": [],
+        "id": 1
+      }
+    ],
+    "Channel": [
+      {
+        "id": 1,
+        "name": "lobby",
+        "key": "",
+        "type": "lobby",
+        "muted": false,
+        "state": 1
+      },
+      {
+        "id": 2,
+        "name": "general",
+        "key": "",
+        "type": "channel",
+        "muted": false,
+        "state": 1
+      }
+    ],
+    "Message": [
+      {
+        "id": 1,
+        "network": "net-bridge",
+        "channel": "general",
+        "time": 1600000000000,
+        "type": "message",
+        "msg": "hello world",
+        "msgid": "a"
+      },
+      {
+        "id": 2,
+        "network": "net-bridge",
+        "channel": "general",
+        "time": 1600000001000,
+        "type": "message",
+        "msg": "second chat line",
+        "msgid": "b"
+      },
+      {
+        "id": 3,
+        "network": "net-bridge",
+        "channel": "general",
+        "time": 1600000002000,
+        "type": "message",
+        "msg": "hello again",
+        "msgid": "c"
+      }
+    ]
+  },
+  "summary": "The Lounge (thelounge) is a self-hosted web IRC client: a socket.io/express server that persists each user's chat networks/channels/settings/sessions in per-user JSON files, archived chat messages in a per-user SQLite DB (or text logs), uploaded files on disk, link-preview media in a content-addressed storage folder, and per-host IRC STS policies in a JSON file. It exposes CLI user-management commands, socket.io RPCs for network/session/settings/message CRUD, and HTTP endpoints for uploads.",
+  "_auth_candidates": [
+    {
+      "entity": "User",
+      "username_col": "name",
+      "password_col": "password"
+    },
+    {
+      "entity": "Network",
+      "username_col": "username",
+      "password_col": "password"
+    }
+  ],
+  "_session_fields": [
+    "browser",
+    "name",
+    "sessions"
+  ],
+  "_read_denied": "not_found",
+  "_no_edges": [
+    {
+      "id_local": "StoredFile.store",
+      "why": "internal helper called by LinkPrefetch link.ts:344; no guards, no pre-check ops"
+    },
+    {
+      "id_local": "STSPolicy.update",
+      "why": "internal, invoked from irc-events/cap.ts when server advertises STS; no app-level guard"
+    },
+    {
+      "id_local": "Message.index",
+      "why": "internal persist call from Chan.writeUserLog; no guards"
+    },
+    {
+      "id_local": "StoredFile.dereference",
+      "why": "internal preview-cleanup helper; no guards"
+    },
+    {
+      "id_local": "User.remove",
+      "why": "operator CLI command with no in-app auth (server/command-line/users/remove.ts:8)"
+    },
+    {
+      "id_local": "Session.refresh",
+      "why": "internal session-touch called by Auth.login; no guards, no pre-check"
+    }
+  ],
+  "auth": {
+    "account_entity": "User",
+    "username_col": "name",
+    "password_col": "password",
+    "session_fields": {
+      "name": "name",
+      "browser": "browser",
+      "sessions": "sessions"
+    }
+  }
+}

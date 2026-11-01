@@ -1,0 +1,5526 @@
+{
+  "env_id": "wordpress",
+  "_prep_version": 3,
+  "entities": [
+    {
+      "name": "Post",
+      "columns": [
+        {
+          "name": "ID",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "post_author",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "User.ID",
+          "default": "0"
+        },
+        {
+          "name": "post_date",
+          "type": "datetime",
+          "nullable": false,
+          "audit": false,
+          "default": "0000-00-00 00:00:00"
+        },
+        {
+          "name": "post_date_gmt",
+          "type": "datetime",
+          "nullable": false,
+          "audit": false,
+          "default": "0000-00-00 00:00:00"
+        },
+        {
+          "name": "post_content",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "post_title",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "post_excerpt",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "post_status",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "publish",
+            "draft",
+            "pending",
+            "private",
+            "future",
+            "auto-draft",
+            "inherit",
+            "trash"
+          ],
+          "default": "publish"
+        },
+        {
+          "name": "comment_status",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "open",
+            "closed"
+          ],
+          "default": "open"
+        },
+        {
+          "name": "ping_status",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "open",
+            "closed"
+          ],
+          "default": "open"
+        },
+        {
+          "name": "post_password",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        },
+        {
+          "name": "post_name",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        },
+        {
+          "name": "to_ping",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        },
+        {
+          "name": "pinged",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        },
+        {
+          "name": "post_modified",
+          "type": "datetime",
+          "nullable": false,
+          "audit": true,
+          "default": "0000-00-00 00:00:00"
+        },
+        {
+          "name": "post_modified_gmt",
+          "type": "datetime",
+          "nullable": false,
+          "audit": true,
+          "default": "0000-00-00 00:00:00"
+        },
+        {
+          "name": "post_content_filtered",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        },
+        {
+          "name": "post_parent",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Post.ID",
+          "default": "0"
+        },
+        {
+          "name": "guid",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        },
+        {
+          "name": "menu_order",
+          "type": "int",
+          "nullable": false,
+          "default": "0"
+        },
+        {
+          "name": "post_type",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "post",
+            "page",
+            "attachment",
+            "revision",
+            "nav_menu_item",
+            "custom-post-type",
+            "user_request"
+          ],
+          "default": "post"
+        },
+        {
+          "name": "post_mime_type",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        },
+        {
+          "name": "comment_count",
+          "type": "int",
+          "nullable": false,
+          "default": "0"
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "post_name",
+            "post_type"
+          ]
+        },
+        {
+          "kind": "unique",
+          "cols": [
+            "guid"
+          ]
+        }
+      ],
+      "_lifecycle": {
+        "col": "post_status",
+        "initial": "auto-draft",
+        "states": [
+          "auto-draft",
+          "draft",
+          "pending",
+          "publish",
+          "future",
+          "private",
+          "inherit",
+          "trash"
+        ],
+        "via": {
+          "Post.wp_publish_post": {
+            "col": "post_status",
+            "from": [
+              "draft",
+              "pending"
+            ],
+            "to": "publish"
+          },
+          "Post.wp_trash_post": {
+            "col": "post_status",
+            "from": [
+              "*"
+            ],
+            "to": "trash"
+          },
+          "Post.wp_untrash_post": {
+            "col": "post_status",
+            "from": [
+              "trash"
+            ],
+            "to": "draft"
+          },
+          "Post.wp_insert_post": {
+            "col": "post_status",
+            "from": [
+              "draft"
+            ],
+            "to": "publish"
+          },
+          "Post.check_and_publish_future_post": {
+            "col": "post_status",
+            "from": [
+              "future"
+            ],
+            "to": "publish"
+          }
+        }
+      }
+    },
+    {
+      "name": "Postmeta",
+      "columns": [
+        {
+          "name": "meta_id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "post_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Post.ID",
+          "default": "0"
+        },
+        {
+          "name": "meta_key",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "meta_value",
+          "type": "text",
+          "nullable": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "post_id",
+            "meta_key"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Revision",
+      "columns": [
+        {
+          "name": "ID",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "post_author",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "User.ID",
+          "default": "0"
+        },
+        {
+          "name": "post_date",
+          "type": "datetime",
+          "nullable": false,
+          "default": "0000-00-00 00:00:00"
+        },
+        {
+          "name": "post_date_gmt",
+          "type": "datetime",
+          "nullable": false,
+          "default": "0000-00-00 00:00:00"
+        },
+        {
+          "name": "post_content",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "post_title",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "post_excerpt",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "post_status",
+          "type": "text",
+          "nullable": false,
+          "default": "inherit"
+        },
+        {
+          "name": "post_name",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        },
+        {
+          "name": "post_modified",
+          "type": "datetime",
+          "nullable": false,
+          "default": "0000-00-00 00:00:00"
+        },
+        {
+          "name": "post_modified_gmt",
+          "type": "datetime",
+          "nullable": false,
+          "default": "0000-00-00 00:00:00"
+        },
+        {
+          "name": "post_parent",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Post.ID",
+          "default": "0"
+        },
+        {
+          "name": "guid",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        },
+        {
+          "name": "menu_order",
+          "type": "int",
+          "nullable": false,
+          "default": "0"
+        },
+        {
+          "name": "post_type",
+          "type": "text",
+          "nullable": false,
+          "default": "revision"
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "post_name",
+            "post_type"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Attachment",
+      "columns": [
+        {
+          "name": "ID",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "post_author",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "User.ID",
+          "default": "0"
+        },
+        {
+          "name": "post_date",
+          "type": "datetime",
+          "nullable": false,
+          "default": "0000-00-00 00:00:00"
+        },
+        {
+          "name": "post_date_gmt",
+          "type": "datetime",
+          "nullable": false,
+          "default": "0000-00-00 00:00:00"
+        },
+        {
+          "name": "post_content",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "post_title",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "post_excerpt",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "post_status",
+          "type": "text",
+          "nullable": false,
+          "default": "inherit"
+        },
+        {
+          "name": "post_name",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        },
+        {
+          "name": "post_parent",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Post.ID",
+          "default": "0"
+        },
+        {
+          "name": "guid",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        },
+        {
+          "name": "menu_order",
+          "type": "int",
+          "nullable": false,
+          "default": "0"
+        },
+        {
+          "name": "post_type",
+          "type": "text",
+          "nullable": false,
+          "default": "attachment"
+        },
+        {
+          "name": "post_mime_type",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        }
+      ]
+    },
+    {
+      "name": "Term",
+      "columns": [
+        {
+          "name": "term_id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        },
+        {
+          "name": "slug",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        },
+        {
+          "name": "term_group",
+          "type": "int",
+          "nullable": false,
+          "default": "0"
+        }
+      ]
+    },
+    {
+      "name": "TermTaxonomy",
+      "columns": [
+        {
+          "name": "term_taxonomy_id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "term_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Term.term_id",
+          "default": "0"
+        },
+        {
+          "name": "taxonomy",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "category",
+            "post_tag",
+            "nav_menu",
+            "link_category",
+            "post_format"
+          ],
+          "default": ""
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "parent",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "TermTaxonomy.term_taxonomy_id",
+          "default": "0"
+        },
+        {
+          "name": "count",
+          "type": "int",
+          "nullable": false,
+          "default": "0"
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "term_id",
+            "taxonomy"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "TermRelationships",
+      "columns": [
+        {
+          "name": "object_id",
+          "type": "id",
+          "pk": true,
+          "nullable": false,
+          "fk_to": "Post.ID",
+          "default": "0"
+        },
+        {
+          "name": "term_taxonomy_id",
+          "type": "id",
+          "pk": true,
+          "nullable": false,
+          "fk_to": "TermTaxonomy.term_taxonomy_id",
+          "default": "0"
+        },
+        {
+          "name": "term_order",
+          "type": "int",
+          "nullable": false,
+          "default": "0"
+        }
+      ]
+    },
+    {
+      "name": "Termmeta",
+      "columns": [
+        {
+          "name": "meta_id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "term_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Term.term_id",
+          "default": "0"
+        },
+        {
+          "name": "meta_key",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "meta_value",
+          "type": "text",
+          "nullable": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "term_id",
+            "meta_key"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Comment",
+      "columns": [
+        {
+          "name": "comment_ID",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "comment_post_ID",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Post.ID",
+          "default": "0"
+        },
+        {
+          "name": "comment_author",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        },
+        {
+          "name": "comment_author_email",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        },
+        {
+          "name": "comment_author_url",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        },
+        {
+          "name": "comment_author_IP",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        },
+        {
+          "name": "comment_date",
+          "type": "datetime",
+          "nullable": false,
+          "default": "0000-00-00 00:00:00"
+        },
+        {
+          "name": "comment_date_gmt",
+          "type": "datetime",
+          "nullable": false,
+          "default": "0000-00-00 00:00:00"
+        },
+        {
+          "name": "comment_content",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "comment_karma",
+          "type": "int",
+          "nullable": false,
+          "default": "0"
+        },
+        {
+          "name": "comment_approved",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "1",
+            "0",
+            "spam",
+            "trash",
+            "post-trashed"
+          ],
+          "default": "1"
+        },
+        {
+          "name": "comment_agent",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        },
+        {
+          "name": "comment_type",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "comment",
+            "trackback",
+            "pingback"
+          ],
+          "default": "comment"
+        },
+        {
+          "name": "comment_parent",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Comment.comment_ID",
+          "default": "0"
+        },
+        {
+          "name": "user_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "User.ID",
+          "default": "0"
+        }
+      ],
+      "_lifecycle": {
+        "col": "comment_approved",
+        "initial": "0",
+        "states": [
+          "1",
+          "0",
+          "spam",
+          "trash",
+          "post-trashed"
+        ],
+        "via": {
+          "Comment.wp_set_comment_status": {
+            "col": "comment_approved",
+            "from": [
+              "0",
+              "1",
+              "*"
+            ],
+            "to": "spam"
+          },
+          "Comment.wp_trash_comment": {
+            "col": "comment_approved",
+            "from": [
+              "*"
+            ],
+            "to": "trash"
+          },
+          "Comment.wp_untrash_comment": {
+            "col": "comment_approved",
+            "from": [
+              "trash"
+            ],
+            "to": "1"
+          }
+        }
+      }
+    },
+    {
+      "name": "Commentmeta",
+      "columns": [
+        {
+          "name": "meta_id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "comment_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Comment.comment_ID",
+          "default": "0"
+        },
+        {
+          "name": "meta_key",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "meta_value",
+          "type": "text",
+          "nullable": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "comment_id",
+            "meta_key"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "User",
+      "columns": [
+        {
+          "name": "ID",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "user_login",
+          "type": "text",
+          "nullable": false,
+          "default": "",
+          "max": 60
+        },
+        {
+          "name": "user_pass",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        },
+        {
+          "name": "user_nicename",
+          "type": "text",
+          "nullable": false,
+          "default": "",
+          "max": 50
+        },
+        {
+          "name": "user_email",
+          "type": "text",
+          "nullable": false,
+          "default": "",
+          "max": 100
+        },
+        {
+          "name": "user_url",
+          "type": "text",
+          "nullable": false,
+          "default": "",
+          "max": 100
+        },
+        {
+          "name": "user_registered",
+          "type": "datetime",
+          "nullable": false,
+          "audit": false,
+          "default": "0000-00-00 00:00:00"
+        },
+        {
+          "name": "user_activation_key",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        },
+        {
+          "name": "user_status",
+          "type": "int",
+          "nullable": false,
+          "default": "0"
+        },
+        {
+          "name": "display_name",
+          "type": "text",
+          "nullable": false,
+          "default": "",
+          "max": 250
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "user_login"
+          ]
+        },
+        {
+          "kind": "unique",
+          "cols": [
+            "user_nicename"
+          ]
+        },
+        {
+          "kind": "unique",
+          "cols": [
+            "user_email"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Usermeta",
+      "columns": [
+        {
+          "name": "umeta_id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "user_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "User.ID",
+          "default": "0"
+        },
+        {
+          "name": "meta_key",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "meta_value",
+          "type": "text",
+          "nullable": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "user_id",
+            "meta_key"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Option",
+      "columns": [
+        {
+          "name": "option_id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "option_name",
+          "type": "text",
+          "nullable": false,
+          "default": "",
+          "max": 191
+        },
+        {
+          "name": "option_value",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "autoload",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "yes",
+            "no",
+            "on",
+            "off",
+            "auto"
+          ],
+          "default": "yes"
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "option_name"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Link",
+      "columns": [
+        {
+          "name": "link_id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "link_url",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        },
+        {
+          "name": "link_name",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        },
+        {
+          "name": "link_image",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        },
+        {
+          "name": "link_target",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        },
+        {
+          "name": "link_description",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        },
+        {
+          "name": "link_visible",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "Y",
+            "N"
+          ],
+          "default": "Y"
+        },
+        {
+          "name": "link_owner",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "User.ID",
+          "default": "1"
+        },
+        {
+          "name": "link_rating",
+          "type": "int",
+          "nullable": false,
+          "default": "0"
+        },
+        {
+          "name": "link_updated",
+          "type": "datetime",
+          "nullable": false,
+          "default": "0000-00-00 00:00:00"
+        },
+        {
+          "name": "link_rel",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        },
+        {
+          "name": "link_notes",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "link_rss",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        }
+      ]
+    },
+    {
+      "name": "Blog",
+      "columns": [
+        {
+          "name": "blog_id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "site_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Site.id",
+          "default": "0"
+        },
+        {
+          "name": "domain",
+          "type": "text",
+          "nullable": false,
+          "default": "",
+          "max": 200
+        },
+        {
+          "name": "path",
+          "type": "text",
+          "nullable": false,
+          "default": "",
+          "max": 100
+        },
+        {
+          "name": "registered",
+          "type": "datetime",
+          "nullable": false,
+          "audit": false,
+          "default": "0000-00-00 00:00:00"
+        },
+        {
+          "name": "last_updated",
+          "type": "datetime",
+          "nullable": false,
+          "audit": true,
+          "default": "0000-00-00 00:00:00"
+        },
+        {
+          "name": "public",
+          "type": "int",
+          "nullable": false,
+          "default": "1"
+        },
+        {
+          "name": "archived",
+          "type": "int",
+          "nullable": false,
+          "default": "0"
+        },
+        {
+          "name": "mature",
+          "type": "int",
+          "nullable": false,
+          "default": "0"
+        },
+        {
+          "name": "spam",
+          "type": "int",
+          "nullable": false,
+          "default": "0"
+        },
+        {
+          "name": "deleted",
+          "type": "int",
+          "nullable": false,
+          "default": "0"
+        },
+        {
+          "name": "lang_id",
+          "type": "int",
+          "nullable": false,
+          "default": "0"
+        }
+      ]
+    },
+    {
+      "name": "Blogmeta",
+      "columns": [
+        {
+          "name": "meta_id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "blog_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Blog.blog_id",
+          "default": "0"
+        },
+        {
+          "name": "meta_key",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "meta_value",
+          "type": "text",
+          "nullable": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "blog_id",
+            "meta_key"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Site",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "domain",
+          "type": "text",
+          "nullable": false,
+          "default": "",
+          "max": 200
+        },
+        {
+          "name": "path",
+          "type": "text",
+          "nullable": false,
+          "default": "",
+          "max": 100
+        }
+      ]
+    },
+    {
+      "name": "Sitemeta",
+      "columns": [
+        {
+          "name": "meta_id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "site_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Site.id",
+          "default": "0"
+        },
+        {
+          "name": "meta_key",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "meta_value",
+          "type": "text",
+          "nullable": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "site_id",
+            "meta_key"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Signup",
+      "columns": [
+        {
+          "name": "signup_id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "domain",
+          "type": "text",
+          "nullable": false,
+          "default": "",
+          "max": 200
+        },
+        {
+          "name": "path",
+          "type": "text",
+          "nullable": false,
+          "default": "",
+          "max": 100
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "user_login",
+          "type": "text",
+          "nullable": false,
+          "default": "",
+          "max": 60
+        },
+        {
+          "name": "user_email",
+          "type": "text",
+          "nullable": false,
+          "default": "",
+          "max": 100
+        },
+        {
+          "name": "registered",
+          "type": "datetime",
+          "nullable": false,
+          "default": "0000-00-00 00:00:00"
+        },
+        {
+          "name": "activated",
+          "type": "datetime",
+          "nullable": false,
+          "default": "0000-00-00 00:00:00"
+        },
+        {
+          "name": "active",
+          "type": "int",
+          "nullable": false,
+          "default": "0"
+        },
+        {
+          "name": "activation_key",
+          "type": "text",
+          "nullable": false,
+          "default": "",
+          "max": 50
+        },
+        {
+          "name": "meta",
+          "type": "text",
+          "nullable": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "activation_key"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "RegistrationLog",
+      "columns": [
+        {
+          "name": "ID",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "email",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        },
+        {
+          "name": "IP",
+          "type": "text",
+          "nullable": false,
+          "default": "",
+          "max": 30
+        },
+        {
+          "name": "blog_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Blog.blog_id",
+          "default": "0"
+        },
+        {
+          "name": "date_registered",
+          "type": "datetime",
+          "nullable": false,
+          "default": "0000-00-00 00:00:00"
+        }
+      ]
+    },
+    {
+      "name": "UserRequest",
+      "columns": [
+        {
+          "name": "ID",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "post_author",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "User.ID",
+          "default": "0"
+        },
+        {
+          "name": "post_date",
+          "type": "datetime",
+          "nullable": false,
+          "default": "0000-00-00 00:00:00"
+        },
+        {
+          "name": "post_date_gmt",
+          "type": "datetime",
+          "nullable": false,
+          "default": "0000-00-00 00:00:00"
+        },
+        {
+          "name": "post_content",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "post_title",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "post_status",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "request-pending",
+            "request-confirmed",
+            "request-completed",
+            "request-failed"
+          ],
+          "default": "request-pending"
+        },
+        {
+          "name": "post_name",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        },
+        {
+          "name": "post_modified",
+          "type": "datetime",
+          "nullable": false,
+          "default": "0000-00-00 00:00:00"
+        },
+        {
+          "name": "post_modified_gmt",
+          "type": "datetime",
+          "nullable": false,
+          "default": "0000-00-00 00:00:00"
+        },
+        {
+          "name": "post_parent",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "User.ID",
+          "default": "0"
+        },
+        {
+          "name": "guid",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        },
+        {
+          "name": "menu_order",
+          "type": "int",
+          "nullable": false,
+          "default": "0"
+        },
+        {
+          "name": "post_type",
+          "type": "text",
+          "nullable": false,
+          "default": "user_request"
+        },
+        {
+          "name": "post_password",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        },
+        {
+          "name": "post_mime_type",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        }
+      ],
+      "_lifecycle": {
+        "col": "post_status",
+        "initial": "request-pending",
+        "states": [
+          "request-pending",
+          "request-confirmed",
+          "request-completed",
+          "request-failed"
+        ],
+        "via": {
+          "UserRequest.wp_confirm_user_request": {
+            "col": "post_status",
+            "from": [
+              "request-pending"
+            ],
+            "to": "request-confirmed"
+          },
+          "UserRequest.wp_complete_user_request": {
+            "col": "post_status",
+            "from": [
+              "request-confirmed"
+            ],
+            "to": "request-completed"
+          },
+          "UserRequest.wp_fail_user_request": {
+            "col": "post_status",
+            "from": [
+              "request-confirmed"
+            ],
+            "to": "request-failed"
+          }
+        }
+      }
+    }
+  ],
+  "tools": [
+    {
+      "tool": "create_post",
+      "op": "create",
+      "family": "crud.insert",
+      "description": "Create a new post or page in the site. Needs a title; the current user becomes the author; slug, status, content and comment/ping policy are optional.",
+      "exec_spec": {
+        "entity": "Post",
+        "fields": {
+          "post_title": {
+            "$arg": "title"
+          },
+          "post_content": {
+            "$arg": "content"
+          },
+          "post_excerpt": {
+            "$arg": "excerpt"
+          },
+          "post_status": {
+            "$arg": "status"
+          },
+          "post_name": {
+            "$arg": "slug"
+          },
+          "post_author": {
+            "$arg": "author"
+          },
+          "comment_status": {
+            "$arg": "comment_status"
+          },
+          "ping_status": {
+            "$arg": "ping_status"
+          }
+        },
+        "set_on_create": {
+          "post_type": "post",
+          "post_parent": 0,
+          "post_author": {
+            "$session": "account_id"
+          }
+        }
+      },
+      "input_schema": {
+        "title": {
+          "type": "text",
+          "required": true,
+          "description": "Title of the new post."
+        },
+        "content": {
+          "type": "text",
+          "description": "Post body content."
+        },
+        "excerpt": {
+          "type": "text",
+          "description": "Short excerpt shown in listings."
+        },
+        "slug": {
+          "type": "text",
+          "description": "URL slug; must be unique for its post type."
+        },
+        "status": {
+          "type": "text",
+          "description": "Publish status: publish, draft, pending, private, future or trash."
+        },
+        "author": {
+          "type": "int",
+          "description": "Author user id; defaults to the current user."
+        },
+        "comment_status": {
+          "type": "text",
+          "description": "Whether comments are open or closed."
+        },
+        "ping_status": {
+          "type": "text",
+          "description": "Whether pings are open or closed."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "title"
+        ],
+        "messages": {
+          "auth": "Sign in first — create a post needs a logged-in user.",
+          "precondition": "You are not allowed to create a post: the required condition is not met.",
+          "required": "Missing required attribute.",
+          "not_found": "That row does not exist.",
+          "fk": "The referenced parent does not exist.",
+          "fk_missing": "A required reference is missing — supply the missing id.",
+          "unique": "That value is already taken.",
+          "on_child": "This row still has children referencing it and cannot be deleted.",
+          "off_panel": "That attribute is not editable through this operation.",
+          "constraint": "The request violates a data rule."
+        }
+      },
+      "_evidence": {
+        "locator": "wp-includes/rest-api/endpoints/class-wp-rest-posts-controller.php:741",
+        "id_local": "Post.WP_REST_Posts_Controller_create_item",
+        "entry": {
+          "kind": "http",
+          "route": "POST /wp-json/wp/v2/posts",
+          "locator": "wp-includes/rest-api/endpoints/class-wp-rest-posts-controller.php:76"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "$prepared_post=$this->prepare_item_for_database($request); $prepared_post->post_type=$this->post_type; $post_id=wp_insert_post(wp_slash((array)$prepared_post),true,false); ... do_action('rest_insert_post') ... handle_terms; meta->update_value"
+      },
+      "_binds": {
+        "title": "Post.post_title",
+        "content": "Post.post_content",
+        "excerpt": "Post.post_excerpt",
+        "slug": "Post.post_name",
+        "status": "Post.post_status",
+        "author": "Post.post_author",
+        "comment_status": "Post.comment_status",
+        "ping_status": "Post.ping_status"
+      },
+      "_output_schema": {
+        "id": "WP_REST_Response (201) with created post"
+      },
+      "entity": "Post"
+    },
+    {
+      "tool": "update_post",
+      "op": "update",
+      "family": "update.field_set",
+      "description": "Edit an existing post's title, body, status or slug. Only the post's author can edit it.",
+      "exec_spec": {
+        "entity": "Post",
+        "row_key": {
+          "ID": {
+            "$arg": "id"
+          }
+        },
+        "set": {
+          "post_title": {
+            "$arg": "title"
+          },
+          "post_content": {
+            "$arg": "content"
+          },
+          "post_status": {
+            "$arg": "status"
+          },
+          "post_name": {
+            "$arg": "slug"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the post to edit."
+        },
+        "title": {
+          "type": "text",
+          "description": "New title."
+        },
+        "content": {
+          "type": "text",
+          "description": "New body content."
+        },
+        "status": {
+          "type": "text",
+          "description": "New publish status."
+        },
+        "slug": {
+          "type": "text",
+          "description": "New URL slug."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "id"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Post",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "ID",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "post_author",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in first — update a post needs a logged-in user.",
+          "precondition": "You can only edit a post you authored.",
+          "required": "Missing required attribute.",
+          "not_found": "No such post to update.",
+          "fk": "The referenced parent does not exist.",
+          "fk_missing": "A required reference is missing — supply the missing id.",
+          "unique": "That value is already taken.",
+          "on_child": "This row still has children referencing it and cannot be deleted.",
+          "off_panel": "That attribute is not editable through this operation.",
+          "constraint": "The request violates a data rule."
+        }
+      },
+      "_evidence": {
+        "locator": "wp-includes/rest-api/endpoints/class-wp-rest-posts-controller.php:944",
+        "id_local": "Post.WP_REST_Posts_Controller_update_item",
+        "entry": {
+          "kind": "http",
+          "route": "POST /wp-json/wp/v2/posts/{id}",
+          "locator": "wp-includes/rest-api/endpoints/class-wp-rest-posts-controller.php:112"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "$post_id=wp_update_post(wp_slash((array)$post),true,false); handle_terms; meta->update_value; wp_after_insert_post($post,true,$post_before)",
+        "edges": [
+          "wp-includes/rest-api/endpoints/class-wp-rest-posts-controller.php:901"
+        ]
+      },
+      "_binds": {
+        "id": "Post.ID",
+        "title": "Post.post_title",
+        "content": "Post.post_content",
+        "status": "Post.post_status",
+        "slug": "Post.post_name"
+      },
+      "_output_schema": {
+        "id": "WP_REST_Response with updated post"
+      },
+      "entity": "Post"
+    },
+    {
+      "tool": "delete_post",
+      "op": "delete",
+      "family": "crud.delete",
+      "description": "Send a post to the trash, or permanently delete it when force is true. Only its author can delete it.",
+      "exec_spec": {
+        "entity": "Post",
+        "lookup_by": {
+          "ID": {
+            "$arg": "id"
+          }
+        },
+        "on_child": "detach"
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the post to delete."
+        },
+        "force": {
+          "type": "bool",
+          "description": "True to delete permanently instead of trashing."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "id"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Post",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "ID",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "post_author",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in first — delete a post needs a logged-in user.",
+          "precondition": "You can only delete a post you authored.",
+          "required": "Missing required attribute.",
+          "not_found": "No such post to delete.",
+          "fk": "The referenced parent does not exist.",
+          "fk_missing": "A required reference is missing — supply the missing id.",
+          "unique": "That value is already taken.",
+          "on_child": "This row still has children referencing it and cannot be deleted.",
+          "off_panel": "That attribute is not editable through this operation.",
+          "constraint": "The request violates a data rule."
+        }
+      },
+      "_evidence": {
+        "locator": "wp-includes/rest-api/endpoints/class-wp-rest-posts-controller.php:1090",
+        "id_local": "Post.WP_REST_Posts_Controller_delete_item",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /wp-json/wp/v2/posts/{id}",
+          "locator": "wp-includes/rest-api/endpoints/class-wp-rest-posts-controller.php:135"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "if($force){$result=wp_delete_post($id,true);}else{if(!$supports_trash) error; $result=wp_trash_post($id);}",
+        "edges": [
+          "wp-includes/rest-api/endpoints/class-wp-rest-posts-controller.php:1071"
+        ]
+      },
+      "_binds": {
+        "id": "Post.ID"
+      },
+      "_output_schema": {
+        "id": "WP_REST_Response deleted=true"
+      },
+      "entity": "Post"
+    },
+    {
+      "tool": "upload_attachment",
+      "op": "create",
+      "family": "crud.insert",
+      "description": "Upload a media file and attach it to a post. The current user becomes the owner.",
+      "exec_spec": {
+        "entity": "Attachment",
+        "fields": {
+          "post_title": {
+            "$arg": "title"
+          },
+          "post_parent": {
+            "$arg": "post"
+          }
+        },
+        "set_on_create": {
+          "post_type": "attachment",
+          "post_status": "inherit",
+          "post_author": {
+            "$session": "account_id"
+          }
+        }
+      },
+      "input_schema": {
+        "file": {
+          "type": "text",
+          "required": true,
+          "description": "The uploaded file path or content."
+        },
+        "title": {
+          "type": "text",
+          "description": "Media title / file name."
+        },
+        "post": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the post to attach this media to."
+        },
+        "alt_text": {
+          "type": "text",
+          "description": "Alternative text for the image."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "file",
+          "post"
+        ],
+        "messages": {
+          "auth": "Sign in first — upload media needs a logged-in user.",
+          "precondition": "You are not allowed to upload media: the required condition is not met.",
+          "required": "Missing required attribute.",
+          "not_found": "That row does not exist.",
+          "fk": "That post does not exist.",
+          "fk_missing": "A required reference is missing — supply the missing id.",
+          "unique": "That value is already taken.",
+          "on_child": "This row still has children referencing it and cannot be deleted.",
+          "off_panel": "That attribute is not editable through this operation.",
+          "constraint": "The request violates a data rule."
+        }
+      },
+      "_evidence": {
+        "locator": "wp-includes/rest-api/endpoints/class-wp-rest-attachments-controller.php:510",
+        "id_local": "Attachment.WP_REST_Attachments_Controller_create_item",
+        "entry": {
+          "kind": "http",
+          "route": "POST /wp-json/wp/v2/media",
+          "locator": "wp-includes/rest-api/endpoints/class-wp-rest-attachments-controller.php:87 (parent::register_routes)"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "$file=$this->upload_from_file($files,$headers,$time); $attachment=$this->prepare_item_for_database($request); $attachment->post_mime_type=$type; $attachment->guid=$url; $id=wp_insert_attachment(wp_slash((array)$attachment),$file,0,true,false); if($alt) update_post_meta($id,'_wp_attachment_image_alt',$alt)"
+      },
+      "_binds": {
+        "title": "Post.post_title",
+        "post": "Post.post_parent"
+      },
+      "_output_schema": {
+        "id": "WP_REST_Response"
+      },
+      "entity": "Attachment"
+    },
+    {
+      "tool": "update_attachment",
+      "op": "update",
+      "family": "update.field_set",
+      "description": "Edit a media item's title, parent post or status.",
+      "exec_spec": {
+        "entity": "Attachment",
+        "row_key": {
+          "ID": {
+            "$arg": "id"
+          }
+        },
+        "set": {
+          "post_title": {
+            "$arg": "title"
+          },
+          "post_parent": {
+            "$arg": "parent"
+          },
+          "post_status": {
+            "$arg": "status"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the media item."
+        },
+        "title": {
+          "type": "text",
+          "description": "New title."
+        },
+        "parent": {
+          "type": "int",
+          "description": "Id of the post this media belongs to."
+        },
+        "status": {
+          "type": "text",
+          "description": "New status."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "Sign in first — update media needs a logged-in user.",
+          "precondition": "You can only edit media you uploaded.",
+          "required": "Missing required attribute.",
+          "not_found": "No such media item.",
+          "fk": "The referenced parent does not exist.",
+          "fk_missing": "A required reference is missing — supply the missing id.",
+          "unique": "That value is already taken.",
+          "on_child": "This row still has children referencing it and cannot be deleted.",
+          "off_panel": "That attribute is not editable through this operation.",
+          "constraint": "The request violates a data rule."
+        }
+      },
+      "_evidence": {
+        "locator": "wp-includes/rest-api/endpoints/class-wp-rest-attachments-controller.php:971",
+        "id_local": "Attachment.WP_REST_Attachments_Controller_update_item",
+        "entry": {
+          "kind": "http",
+          "route": "POST /wp-json/wp/v2/media/{id}",
+          "locator": "wp-includes/rest-api/endpoints/class-wp-rest-attachments-controller.php:971"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "if(isset($request['alt_text'])) update_post_meta($data['id'],'_wp_attachment_image_alt',$request['alt_text']); parent::update_item($request)"
+      },
+      "_binds": {
+        "id": "Post.ID",
+        "title": "Post.post_title",
+        "parent": "Post.post_parent",
+        "status": "Post.post_status"
+      },
+      "_output_schema": {
+        "id": "WP_REST_Response"
+      },
+      "entity": "Attachment"
+    },
+    {
+      "tool": "create_autosave",
+      "op": "create",
+      "family": "crud.insert",
+      "description": "Save an in-progress autosave revision of a post without publishing it.",
+      "exec_spec": {
+        "entity": "Revision",
+        "fields": {
+          "post_content": {
+            "$arg": "content"
+          }
+        },
+        "set_on_create": {
+          "post_type": "revision",
+          "post_status": "inherit",
+          "post_parent": {
+            "$arg": "id"
+          },
+          "post_author": {
+            "$session": "account_id"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the post this revision belongs to."
+        },
+        "content": {
+          "type": "text",
+          "description": "The revisioned content."
+        },
+        "title": {
+          "type": "text",
+          "description": "The revisioned title."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "Sign in first — save an autosave revision needs a logged-in user.",
+          "precondition": "You are not allowed to save an autosave revision: the required condition is not met.",
+          "required": "Missing required attribute.",
+          "not_found": "No such post to revise.",
+          "fk": "The referenced parent does not exist.",
+          "fk_missing": "A required reference is missing — supply the missing id.",
+          "unique": "That value is already taken.",
+          "on_child": "This row still has children referencing it and cannot be deleted.",
+          "off_panel": "That attribute is not editable through this operation.",
+          "constraint": "The request violates a data rule."
+        }
+      },
+      "_evidence": {
+        "locator": "wp-includes/rest-api/endpoints/class-wp-rest-autosaves-controller.php:211",
+        "id_local": "Revision.WP_REST_Autosaves_Controller_create_item",
+        "entry": {
+          "kind": "http",
+          "route": "POST /wp-json/wp/v2/posts/{id}/autosaves",
+          "locator": "wp-includes/rest-api/endpoints/class-wp-rest-autosaves-controller.php:105"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "if($should_update_parent_draft_post){$autosave_id=wp_update_post(...);}else{$autosave_id=$this->create_post_autosave((array)$prepared_post,(array)$request->get_param('meta'));} ... update_metadata('post',$revision_id,$meta_key,...)"
+      },
+      "_binds": {
+        "id": "Post.ID",
+        "content": "Post.post_content",
+        "title": "Post.post_title"
+      },
+      "_output_schema": {
+        "id": "WP_REST_Response with autosave"
+      },
+      "entity": "Revision"
+    },
+    {
+      "tool": "delete_revision",
+      "op": "delete",
+      "family": "crud.delete",
+      "description": "Permanently delete a revision of a post. Revisions can only be force-deleted, not trashed.",
+      "exec_spec": {
+        "entity": "Revision",
+        "lookup_by": {
+          "ID": {
+            "$arg": "id"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the revision to delete."
+        },
+        "parent": {
+          "type": "int",
+          "description": "Id of the revision's parent post."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "Sign in first — delete a revision needs a logged-in user.",
+          "precondition": "You are not allowed to delete a revision: the required condition is not met.",
+          "required": "Missing required attribute.",
+          "not_found": "No such revision.",
+          "fk": "The referenced parent does not exist.",
+          "fk_missing": "A required reference is missing — supply the missing id.",
+          "unique": "That value is already taken.",
+          "on_child": "This row still has children referencing it and cannot be deleted.",
+          "off_panel": "That attribute is not editable through this operation.",
+          "constraint": "The request violates a data rule."
+        }
+      },
+      "_evidence": {
+        "locator": "wp-includes/rest-api/endpoints/class-wp-rest-revisions-controller.php:503",
+        "id_local": "Revision.WP_REST_Revisions_Controller_delete_item",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /wp-json/wp/v2/posts/{parent}/revisions/{id}",
+          "locator": "wp-includes/rest-api/endpoints/class-wp-rest-revisions-controller.php:126"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "if(!$force) return rest_trash_not_supported(501); $result=wp_delete_post($request['id'],true)"
+      },
+      "_binds": {
+        "parent": "Post.ID",
+        "id": "Revision.ID"
+      },
+      "_output_schema": {
+        "id": "WP_REST_Response deleted=true"
+      },
+      "entity": "Revision"
+    },
+    {
+      "tool": "submit_comment",
+      "op": "create",
+      "family": "crud.insert",
+      "description": "Post a comment on a post through the public comment form. Fails if comments on that post are closed, or as a guest when registration is required.",
+      "exec_spec": {
+        "entity": "Comment",
+        "fields": {
+          "comment_post_ID": {
+            "$arg": "comment_post_ID"
+          },
+          "comment_author": {
+            "$arg": "author"
+          },
+          "comment_author_email": {
+            "$arg": "email"
+          },
+          "comment_author_url": {
+            "$arg": "url"
+          },
+          "comment_content": {
+            "$arg": "comment"
+          },
+          "comment_parent": {
+            "$arg": "comment_parent"
+          }
+        },
+        "set_on_create": {
+          "comment_type": "comment",
+          "user_id": {
+            "$session": "account_id"
+          },
+          "comment_approved": "1",
+          "comment_parent": 0
+        }
+      },
+      "input_schema": {
+        "comment_post_ID": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the post being commented on."
+        },
+        "author": {
+          "type": "text",
+          "description": "Display name (used when submitting as a guest)."
+        },
+        "email": {
+          "type": "text",
+          "description": "Email address (used when submitting as a guest)."
+        },
+        "url": {
+          "type": "text",
+          "description": "Website of the commenter."
+        },
+        "comment": {
+          "type": "text",
+          "required": true,
+          "description": "The comment text."
+        },
+        "comment_parent": {
+          "type": "int",
+          "description": "Id of the comment this replies to."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "comment_post_ID",
+          "comment"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Post",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "ID",
+                      "op": "eq",
+                      "value": {
+                        "arg": "comment_post_ID"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "comment_status",
+                      "op": "eq",
+                      "value": "open"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in first — submit a comment needs a logged-in user.",
+          "precondition": "Comments are closed on that post, or it does not exist.",
+          "required": "Missing required attribute.",
+          "not_found": "That row does not exist.",
+          "fk": "That post does not exist.",
+          "fk_missing": "A required reference is missing — supply the missing id.",
+          "unique": "That value is already taken.",
+          "on_child": "This row still has children referencing it and cannot be deleted.",
+          "off_panel": "That attribute is not editable through this operation.",
+          "constraint": "The request violates a data rule."
+        }
+      },
+      "_evidence": {
+        "locator": "wp-includes/comment.php:3936-4157",
+        "id_local": "Comment.wp_handle_comment_submission",
+        "entry": {
+          "kind": "http",
+          "route": "POST /wp-comments-post.php",
+          "locator": "wp-comments-post.php:25"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "$post = get_post($comment_post_id); if( empty($post->comment_status) ) return new WP_Error('comment_id_not_found'); $status=get_post_status($post); if(('private'===$status)&&!current_user_can('read_post',$comment_post_id)) return new WP_Error(...); if(!comments_open(...)) return WP_Error('comment_closed',403); ... $user=wp_get_current_user(); if($user->exists()){...} else { if(get_option('comment_registration')) return new WP_Error('not_logged_in',403); } ... $comment_id = wp_new_comment(wp_slash($commentdata),true); return get_comment($comment_id);",
+        "edges": [
+          "wp-includes/comment.php:4005",
+          "wp-includes/comment.php:4089"
+        ]
+      },
+      "_binds": {
+        "comment_post_ID": "Comment.comment_post_ID",
+        "author": "Comment.comment_author",
+        "email": "Comment.comment_author_email",
+        "url": "Comment.comment_author_url",
+        "comment": "Comment.comment_content",
+        "comment_parent": "Comment.comment_parent"
+      },
+      "_output_schema": {
+        "id": "WP_Comment on success"
+      },
+      "entity": "Comment"
+    },
+    {
+      "tool": "create_comment",
+      "op": "create",
+      "family": "crud.insert",
+      "description": "Create a comment on a post via the REST API, as a specific author, with full control over its fields and approval status.",
+      "exec_spec": {
+        "entity": "Comment",
+        "fields": {
+          "comment_post_ID": {
+            "$arg": "post"
+          },
+          "comment_author": {
+            "$arg": "author_name"
+          },
+          "comment_author_email": {
+            "$arg": "author_email"
+          },
+          "comment_author_url": {
+            "$arg": "author_url"
+          },
+          "comment_author_IP": {
+            "$arg": "author_ip"
+          },
+          "comment_agent": {
+            "$arg": "author_user_agent"
+          },
+          "comment_content": {
+            "$arg": "content"
+          },
+          "comment_type": {
+            "$arg": "type"
+          },
+          "comment_parent": {
+            "$arg": "parent"
+          },
+          "user_id": {
+            "$arg": "author"
+          },
+          "comment_date": {
+            "$arg": "date"
+          },
+          "comment_date_gmt": {
+            "$arg": "date_gmt"
+          },
+          "comment_approved": {
+            "$arg": "status"
+          }
+        },
+        "set_on_create": {
+          "comment_parent": 0,
+          "user_id": {
+            "$session": "account_id"
+          }
+        }
+      },
+      "input_schema": {
+        "post": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the post this comment belongs to."
+        },
+        "content": {
+          "type": "text",
+          "required": true,
+          "description": "The comment text."
+        },
+        "author": {
+          "type": "int",
+          "description": "User id of the comment author."
+        },
+        "author_name": {
+          "type": "text",
+          "description": "Author display name."
+        },
+        "author_email": {
+          "type": "text",
+          "description": "Author email."
+        },
+        "author_url": {
+          "type": "text",
+          "description": "Author website."
+        },
+        "author_ip": {
+          "type": "text",
+          "description": "Author IP address."
+        },
+        "author_user_agent": {
+          "type": "text",
+          "description": "Author user agent."
+        },
+        "parent": {
+          "type": "int",
+          "description": "Id of a parent comment this replies to."
+        },
+        "date": {
+          "type": "datetime",
+          "description": "Comment date."
+        },
+        "type": {
+          "type": "text",
+          "description": "Comment type."
+        },
+        "status": {
+          "type": "text",
+          "description": "Approval status (approved / unapproved)."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "post",
+          "content"
+        ],
+        "messages": {
+          "auth": "Sign in first — create a comment needs a logged-in user.",
+          "precondition": "You are not allowed to create a comment: the required condition is not met.",
+          "required": "Missing required attribute.",
+          "not_found": "That row does not exist.",
+          "fk": "That post does not exist.",
+          "fk_missing": "A required reference is missing — supply the missing id.",
+          "unique": "That value is already taken.",
+          "on_child": "This row still has children referencing it and cannot be deleted.",
+          "off_panel": "That attribute is not editable through this operation.",
+          "constraint": "The request violates a data rule."
+        }
+      },
+      "_evidence": {
+        "locator": "wp-includes/rest-api/endpoints/class-wp-rest-comments-controller.php:650-859",
+        "id_local": "Comment.RestComments.create_item",
+        "entry": {
+          "kind": "http",
+          "route": "POST /wp-json/wp/v2/comments",
+          "locator": "wp-includes/rest-api/endpoints/class-wp-rest-comments-controller.php:58"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "$prepared_comment['comment_approved'] = 'note'===$prepared_comment['comment_type'] ? '1' : wp_allow_comment($prepared_comment,true); ... $comment_id = wp_insert_comment( wp_filter_comment( wp_slash((array)$prepared_comment) ) ); if(isset($request['status'])) $this->handle_status_param($request['status'],$comment_id); do_action('rest_insert_comment',$comment,$request,true);",
+        "edges": [
+          "wp-includes/rest-api/endpoints/class-wp-rest-comments-controller.php:543",
+          "wp-includes/rest-api/endpoints/class-wp-rest-comments-controller.php:571",
+          "wp-includes/rest-api/endpoints/class-wp-rest-comments-controller.php:563"
+        ]
+      },
+      "_binds": {
+        "post": "Comment.comment_post_ID",
+        "content": "Comment.comment_content",
+        "author": "Comment.user_id",
+        "author_name": "Comment.comment_author",
+        "author_email": "Comment.comment_author_email",
+        "author_url": "Comment.comment_author_url",
+        "author_ip": "Comment.comment_author_IP",
+        "author_user_agent": "Comment.comment_agent",
+        "parent": "Comment.comment_parent",
+        "date": "Comment.comment_date",
+        "type": "Comment.comment_type",
+        "status": "Comment.comment_approved",
+        "date_gmt": "Comment.comment_date_gmt"
+      },
+      "_output_schema": {
+        "id": "WP_REST_Response 201"
+      },
+      "entity": "Comment"
+    },
+    {
+      "tool": "update_comment",
+      "op": "update",
+      "family": "update.field_set",
+      "description": "Edit a comment's content, author, status (approve/unapprove) or parent.",
+      "exec_spec": {
+        "entity": "Comment",
+        "row_key": {
+          "comment_ID": {
+            "$arg": "id"
+          }
+        },
+        "set": {
+          "comment_content": {
+            "$arg": "content"
+          },
+          "comment_author": {
+            "$arg": "author_name"
+          },
+          "comment_author_email": {
+            "$arg": "author_email"
+          },
+          "comment_author_url": {
+            "$arg": "author_url"
+          },
+          "comment_parent": {
+            "$arg": "parent"
+          },
+          "comment_date": {
+            "$arg": "date"
+          },
+          "comment_approved": {
+            "$arg": "status"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the comment to edit."
+        },
+        "content": {
+          "type": "text",
+          "description": "New comment text."
+        },
+        "author_name": {
+          "type": "text",
+          "description": "New author name."
+        },
+        "author_email": {
+          "type": "text",
+          "description": "New author email."
+        },
+        "author_url": {
+          "type": "text",
+          "description": "New author website."
+        },
+        "parent": {
+          "type": "int",
+          "description": "New parent comment id."
+        },
+        "date": {
+          "type": "datetime",
+          "description": "New comment date."
+        },
+        "status": {
+          "type": "text",
+          "description": "New approval status."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "id"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Usermeta",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "meta_key",
+                      "op": "eq",
+                      "value": "wp_capabilities"
+                    },
+                    {
+                      "node": "field",
+                      "col": "meta_value",
+                      "op": "icontains",
+                      "value": "administrator"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in first — moderate a comment needs a logged-in user.",
+          "precondition": "Only an administrator can edit comments.",
+          "required": "Missing required attribute.",
+          "not_found": "No such comment.",
+          "fk": "The referenced parent does not exist.",
+          "fk_missing": "A required reference is missing — supply the missing id.",
+          "unique": "That value is already taken.",
+          "on_child": "This row still has children referencing it and cannot be deleted.",
+          "off_panel": "That attribute is not editable through this operation.",
+          "constraint": "The request violates a data rule."
+        }
+      },
+      "_evidence": {
+        "locator": "wp-includes/rest-api/endpoints/class-wp-rest-comments-controller.php:894-1008",
+        "id_local": "Comment.RestComments.update_item",
+        "entry": {
+          "kind": "http",
+          "route": "POST /wp-json/wp/v2/comments/{id}",
+          "locator": "wp-includes/rest-api/endpoints/class-wp-rest-comments-controller.php:90"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "$updated = wp_update_comment( wp_slash((array)$prepared_args), true ); if(isset($request['status'])) $this->handle_status_param($request['status'],$id); do_action('rest_insert_comment',$comment,$request,false);",
+        "edges": [
+          "wp-includes/rest-api/endpoints/class-wp-rest-comments-controller.php:1959"
+        ]
+      },
+      "_binds": {
+        "id": "Comment.comment_ID",
+        "content": "Comment.comment_content",
+        "author": "Comment.user_id",
+        "author_name": "Comment.comment_author",
+        "author_email": "Comment.comment_author_email",
+        "author_url": "Comment.comment_author_url",
+        "parent": "Comment.comment_parent",
+        "date": "Comment.comment_date",
+        "status": "Comment.comment_approved"
+      },
+      "_output_schema": {
+        "id": "WP_REST_Response"
+      },
+      "entity": "Comment"
+    },
+    {
+      "tool": "delete_comment",
+      "op": "delete",
+      "family": "crud.delete",
+      "description": "Trash or permanently delete a comment. Moderators use force to purge it entirely.",
+      "exec_spec": {
+        "entity": "Comment",
+        "lookup_by": {
+          "comment_ID": {
+            "$arg": "id"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the comment to delete."
+        },
+        "force": {
+          "type": "bool",
+          "description": "True to delete permanently instead of trashing."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "id"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Usermeta",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "meta_key",
+                      "op": "eq",
+                      "value": "wp_capabilities"
+                    },
+                    {
+                      "node": "field",
+                      "col": "meta_value",
+                      "op": "icontains",
+                      "value": "administrator"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in first — delete a comment needs a logged-in user.",
+          "precondition": "Only an administrator can delete comments.",
+          "required": "Missing required attribute.",
+          "not_found": "No such comment.",
+          "fk": "The referenced parent does not exist.",
+          "fk_missing": "A required reference is missing — supply the missing id.",
+          "unique": "That value is already taken.",
+          "on_child": "This row still has children referencing it and cannot be deleted.",
+          "off_panel": "That attribute is not editable through this operation.",
+          "constraint": "The request violates a data rule."
+        }
+      },
+      "_evidence": {
+        "locator": "wp-includes/rest-api/endpoints/class-wp-rest-comments-controller.php:1042-1098",
+        "id_local": "Comment.RestComments.delete_item",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /wp-json/wp/v2/comments/{id}",
+          "locator": "wp-includes/rest-api/endpoints/class-wp-rest-comments-controller.php:96"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "if($force){ $result = wp_delete_comment($comment->comment_ID,true); } else { ... if('trash'===$comment->comment_approved) return new WP_Error('rest_already_trashed',410); $result = wp_trash_comment($comment->comment_ID); }",
+        "edges": [
+          "wp-includes/rest-api/endpoints/class-wp-rest-comments-controller.php:1959"
+        ]
+      },
+      "_binds": {
+        "id": "Comment.comment_ID"
+      },
+      "_output_schema": {
+        "id": "WP_REST_Response"
+      },
+      "entity": "Comment"
+    },
+    {
+      "tool": "get_comment",
+      "op": "read",
+      "family": "crud.fetch",
+      "description": "Fetch a single comment by id. Comments are public, so any signed-in user can read them.",
+      "exec_spec": {
+        "entity": "Comment",
+        "lookup_by": {
+          "comment_ID": {
+            "$arg": "id"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the comment to fetch."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "Sign in first — fetch a comment needs a logged-in user.",
+          "precondition": "You are not allowed to fetch a comment: the required condition is not met.",
+          "required": "Missing required attribute.",
+          "not_found": "No such comment.",
+          "fk": "The referenced parent does not exist.",
+          "fk_missing": "A required reference is missing — supply the missing id.",
+          "unique": "That value is already taken.",
+          "on_child": "This row still has children referencing it and cannot be deleted.",
+          "off_panel": "That attribute is not editable through this operation.",
+          "constraint": "The request violates a data rule."
+        }
+      },
+      "_evidence": {
+        "locator": "wp-includes/rest-api/endpoints/class-wp-rest-comments-controller.php:479-489",
+        "id_local": "Comment.RestComments.get_item",
+        "entry": {
+          "kind": "http",
+          "route": "GET /wp-json/wp/v2/comments/{id}",
+          "locator": "wp-includes/rest-api/endpoints/class-wp-rest-comments-controller.php:78"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "$comment = $this->get_comment($request['id']); $data = $this->prepare_item_for_response($comment,$request);",
+        "edges": [
+          "wp-includes/rest-api/endpoints/class-wp-rest-comments-controller.php:442",
+          "wp-includes/rest-api/endpoints/class-wp-rest-comments-controller.php:1935"
+        ]
+      },
+      "_binds": {
+        "id": "Comment.comment_ID"
+      },
+      "_output_schema": {
+        "id": "WP_REST_Response"
+      },
+      "entity": "Comment"
+    },
+    {
+      "tool": "list_comments",
+      "op": "search",
+      "family": "search",
+      "description": "List comments, optionally filtered by post, author, status, type, parent, or free-text search.",
+      "exec_spec": {
+        "entity": "Comment",
+        "rank": {
+          "method": "exact"
+        },
+        "search_fields": [
+          "comment_content",
+          "comment_author",
+          "comment_author_email"
+        ]
+      },
+      "input_schema": {
+        "post": {
+          "type": "int",
+          "description": "Only comments on this post."
+        },
+        "author": {
+          "type": "int",
+          "description": "Only comments by this user."
+        },
+        "author_email": {
+          "type": "text",
+          "description": "Only comments from this email."
+        },
+        "status": {
+          "type": "text",
+          "description": "Filter by approval status."
+        },
+        "type": {
+          "type": "text",
+          "description": "Filter by comment type."
+        },
+        "parent": {
+          "type": "int",
+          "description": "Only replies to this comment."
+        },
+        "search": {
+          "type": "text",
+          "description": "Free-text search over comment content and author."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "Sign in first — list comments needs a logged-in user.",
+          "precondition": "You are not allowed to list comments: the required condition is not met.",
+          "required": "Missing required attribute.",
+          "not_found": "That row does not exist.",
+          "fk": "The referenced parent does not exist.",
+          "fk_missing": "A required reference is missing — supply the missing id.",
+          "unique": "That value is already taken.",
+          "on_child": "This row still has children referencing it and cannot be deleted.",
+          "off_panel": "That attribute is not editable through this operation.",
+          "constraint": "The request violates a data rule."
+        }
+      },
+      "_evidence": {
+        "locator": "wp-includes/rest-api/endpoints/class-wp-rest-comments-controller.php:236-355",
+        "id_local": "Comment.RestComments.get_items",
+        "entry": {
+          "kind": "http",
+          "route": "GET /wp-json/wp/v2/comments",
+          "locator": "wp-includes/rest-api/endpoints/class-wp-rest-comments-controller.php:52"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "$query = new WP_Comment_Query(); $query_result = $query->query($prepared_args); foreach($query_result as $comment){ if(!$this->check_read_permission($comment,$request)) continue; ... }",
+        "edges": [
+          "wp-includes/rest-api/endpoints/class-wp-rest-comments-controller.php:141"
+        ]
+      },
+      "_binds": {
+        "post": "Comment.comment_post_ID",
+        "author": "Comment.user_id",
+        "author_email": "Comment.comment_author_email",
+        "status": "Comment.comment_approved",
+        "type": "Comment.comment_type",
+        "parent": "Comment.comment_parent"
+      },
+      "_output_schema": {
+        "id": "WP_REST_Response[]"
+      },
+      "entity": "Comment"
+    },
+    {
+      "tool": "reply_to_comment",
+      "op": "create",
+      "family": "crud.insert",
+      "description": "Post an administrative reply to an existing comment, as the current (moderator) user.",
+      "exec_spec": {
+        "entity": "Comment",
+        "fields": {
+          "comment_post_ID": {
+            "$arg": "comment_post_ID"
+          },
+          "comment_author": {
+            "$arg": "author"
+          },
+          "comment_author_email": {
+            "$arg": "email"
+          },
+          "comment_author_url": {
+            "$arg": "url"
+          },
+          "comment_content": {
+            "$arg": "content"
+          },
+          "comment_type": {
+            "$arg": "comment_type"
+          },
+          "comment_parent": {
+            "$arg": "comment_ID"
+          }
+        },
+        "set_on_create": {
+          "user_id": {
+            "$session": "account_id"
+          },
+          "comment_approved": "1"
+        }
+      },
+      "input_schema": {
+        "comment_post_ID": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the post being replied on."
+        },
+        "content": {
+          "type": "text",
+          "required": true,
+          "description": "Reply text."
+        },
+        "comment_ID": {
+          "type": "int",
+          "description": "Id of the comment being replied to."
+        },
+        "comment_type": {
+          "type": "text",
+          "description": "Comment type."
+        },
+        "author": {
+          "type": "text",
+          "description": "Author display name."
+        },
+        "email": {
+          "type": "text",
+          "description": "Author email."
+        },
+        "url": {
+          "type": "text",
+          "description": "Author website."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "comment_post_ID",
+          "content"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Usermeta",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "meta_key",
+                      "op": "eq",
+                      "value": "wp_capabilities"
+                    },
+                    {
+                      "node": "field",
+                      "col": "meta_value",
+                      "op": "icontains",
+                      "value": "administrator"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in first — reply to a comment needs a logged-in user.",
+          "precondition": "Only an administrator can reply to comments.",
+          "required": "Missing required attribute.",
+          "not_found": "That row does not exist.",
+          "fk": "That post does not exist.",
+          "fk_missing": "A required reference is missing — supply the missing id.",
+          "unique": "That value is already taken.",
+          "on_child": "This row still has children referencing it and cannot be deleted.",
+          "off_panel": "That attribute is not editable through this operation.",
+          "constraint": "The request violates a data rule."
+        }
+      },
+      "_evidence": {
+        "locator": "wp-admin/includes/ajax-actions.php:1327-1478",
+        "id_local": "Comment.wp_ajax_replyto_comment",
+        "entry": {
+          "kind": "http",
+          "route": "POST /wp-admin/admin-ajax.php?action=replyto-comment",
+          "locator": "wp-admin/includes/ajax-actions.php:1327"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "check_ajax_referer($action,'_ajax_nonce-replyto-comment'); if(!current_user_can('edit_post',$comment_post_id)) wp_die(-1); ... if(!empty($_POST['approve_parent'])){ ... if(wp_set_comment_status($parent,'approve')) $comment_auto_approved=true; } $comment_id = wp_new_comment($commentdata);",
+        "edges": [
+          "wp-admin/includes/ajax-actions.php:1341",
+          "wp-admin/includes/ajax-actions.php:1359",
+          "wp-admin/includes/ajax-actions.php:1410"
+        ]
+      },
+      "_binds": {
+        "comment_post_ID": "Comment.comment_post_ID",
+        "content": "Comment.comment_content",
+        "comment_ID": "Comment.comment_parent",
+        "comment_type": "Comment.comment_type",
+        "author": "Comment.comment_author",
+        "email": "Comment.comment_author_email",
+        "url": "Comment.comment_author_url"
+      },
+      "_output_schema": {
+        "id": "WP_Ajax_Response"
+      },
+      "entity": "Comment"
+    },
+    {
+      "tool": "edit_comment",
+      "op": "update",
+      "family": "update.field_set",
+      "description": "Edit a comment (content, author fields, date, parent) from the admin comment screen.",
+      "exec_spec": {
+        "entity": "Comment",
+        "row_key": {
+          "comment_ID": {
+            "$arg": "comment_ID"
+          }
+        },
+        "set": {
+          "comment_content": {
+            "$arg": "content"
+          },
+          "comment_author": {
+            "$arg": "comment_author"
+          },
+          "comment_author_email": {
+            "$arg": "comment_author_email"
+          },
+          "comment_author_url": {
+            "$arg": "comment_author_url"
+          },
+          "comment_parent": {
+            "$arg": "comment_parent"
+          },
+          "comment_date": {
+            "$arg": "comment_date"
+          },
+          "comment_approved": {
+            "$arg": "status"
+          }
+        }
+      },
+      "input_schema": {
+        "comment_ID": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the comment to edit."
+        },
+        "content": {
+          "type": "text",
+          "description": "New content."
+        },
+        "status": {
+          "type": "text",
+          "description": "New approval status."
+        },
+        "comment_author": {
+          "type": "text",
+          "description": "Author name."
+        },
+        "comment_author_email": {
+          "type": "text",
+          "description": "Author email."
+        },
+        "comment_author_url": {
+          "type": "text",
+          "description": "Author website."
+        },
+        "comment_parent": {
+          "type": "int",
+          "description": "New parent comment."
+        },
+        "comment_date": {
+          "type": "datetime",
+          "description": "New comment date."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "comment_ID"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Usermeta",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "meta_key",
+                      "op": "eq",
+                      "value": "wp_capabilities"
+                    },
+                    {
+                      "node": "field",
+                      "col": "meta_value",
+                      "op": "icontains",
+                      "value": "administrator"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in first — edit a comment needs a logged-in user.",
+          "precondition": "Only an administrator can edit comments.",
+          "required": "Missing required attribute.",
+          "not_found": "No such comment.",
+          "fk": "The referenced parent does not exist.",
+          "fk_missing": "A required reference is missing — supply the missing id.",
+          "unique": "That value is already taken.",
+          "on_child": "This row still has children referencing it and cannot be deleted.",
+          "off_panel": "That attribute is not editable through this operation.",
+          "constraint": "The request violates a data rule."
+        }
+      },
+      "_evidence": {
+        "locator": "wp-admin/includes/ajax-actions.php:1486-1504",
+        "id_local": "Comment.wp_ajax_edit_comment",
+        "entry": {
+          "kind": "http",
+          "route": "POST /wp-admin/admin-ajax.php?action=edit-comment",
+          "locator": "wp-admin/includes/ajax-actions.php:1486"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "check_ajax_referer('replyto-comment','_ajax_nonce-replyto-comment'); if(!current_user_can('edit_comment',$comment_id)) wp_die(-1); $updated = edit_comment();",
+        "edges": [
+          "wp-admin/includes/ajax-actions.php:1491"
+        ]
+      },
+      "_binds": {
+        "comment_ID": "Comment.comment_ID",
+        "content": "Comment.comment_content",
+        "status": "Comment.comment_approved",
+        "comment_author": "Comment.comment_author",
+        "comment_author_email": "Comment.comment_author_email",
+        "comment_author_url": "Comment.comment_author_url",
+        "comment_parent": "Comment.comment_parent",
+        "comment_date": "Comment.comment_date"
+      },
+      "_output_schema": {
+        "id": "WP_Ajax_Response"
+      },
+      "entity": "Comment"
+    },
+    {
+      "tool": "moderate_comment",
+      "op": "delete",
+      "family": "crud.delete",
+      "description": "Trash, spam, or permanently delete a comment from the admin moderation screen.",
+      "exec_spec": {
+        "entity": "Comment",
+        "lookup_by": {
+          "comment_ID": {
+            "$arg": "id"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the comment to moderate."
+        },
+        "trash": {
+          "type": "bool",
+          "description": "Move the comment to the trash."
+        },
+        "spam": {
+          "type": "bool",
+          "description": "Mark the comment as spam."
+        },
+        "delete": {
+          "type": "bool",
+          "description": "Permanently delete the comment."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "id"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Usermeta",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "meta_key",
+                      "op": "eq",
+                      "value": "wp_capabilities"
+                    },
+                    {
+                      "node": "field",
+                      "col": "meta_value",
+                      "op": "icontains",
+                      "value": "administrator"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in first — moderate a comment needs a logged-in user.",
+          "precondition": "Only an administrator can moderate comments.",
+          "required": "Missing required attribute.",
+          "not_found": "No such comment.",
+          "fk": "The referenced parent does not exist.",
+          "fk_missing": "A required reference is missing — supply the missing id.",
+          "unique": "That value is already taken.",
+          "on_child": "This row still has children referencing it and cannot be deleted.",
+          "off_panel": "That attribute is not editable through this operation.",
+          "constraint": "The request violates a data rule."
+        }
+      },
+      "_evidence": {
+        "locator": "wp-admin/includes/ajax-actions.php:740-803",
+        "id_local": "Comment.wp_ajax_delete_comment",
+        "entry": {
+          "kind": "http",
+          "route": "POST /wp-admin/admin-ajax.php?action=delete-comment",
+          "locator": "wp-admin/includes/ajax-actions.php:740"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "if(!current_user_can('edit_comment',$comment->comment_ID)) wp_die(-1); check_ajax_referer(\"delete-comment_$id\"); if(isset($_POST['trash'])&&'1'===$_POST['trash']){ $result=wp_trash_comment($comment); } elseif(isset($_POST['untrash'])...) { $result=wp_untrash_comment($comment); } elseif(isset($_POST['spam'])...) { $result=wp_spam_comment($comment); } elseif(isset($_POST['delete'])&&'1'===$_POST['delete']){ $result=wp_delete_comment($comment); }",
+        "edges": [
+          "wp-admin/includes/ajax-actions.php:749"
+        ]
+      },
+      "_binds": {
+        "id": "Comment.comment_ID"
+      },
+      "_output_schema": {
+        "id": "WP_Ajax_Response|die"
+      },
+      "entity": "Comment"
+    },
+    {
+      "tool": "create_term",
+      "op": "create",
+      "family": "crud.insert",
+      "description": "Create a taxonomy term (category, tag, or custom taxonomy) with a name and optional slug.",
+      "exec_spec": {
+        "entity": "Term",
+        "fields": {
+          "name": {
+            "$arg": "name"
+          },
+          "slug": {
+            "$arg": "slug"
+          }
+        },
+        "set_on_create": {
+          "term_group": 0
+        }
+      },
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "The term name."
+        },
+        "slug": {
+          "type": "text",
+          "description": "URL slug for the term."
+        },
+        "description": {
+          "type": "text",
+          "description": "Term description."
+        },
+        "parent": {
+          "type": "int",
+          "description": "Id of a parent term, for hierarchical taxonomies."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "name"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Usermeta",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "meta_key",
+                      "op": "eq",
+                      "value": "wp_capabilities"
+                    },
+                    {
+                      "node": "field",
+                      "col": "meta_value",
+                      "op": "icontains",
+                      "value": "administrator"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in first — create a term needs a logged-in user.",
+          "precondition": "Only an administrator can create terms.",
+          "required": "Missing required attribute.",
+          "not_found": "That row does not exist.",
+          "fk": "The referenced parent does not exist.",
+          "fk_missing": "A required reference is missing — supply the missing id.",
+          "unique": "That term already exists.",
+          "on_child": "This row still has children referencing it and cannot be deleted.",
+          "off_panel": "That attribute is not editable through this operation.",
+          "constraint": "The request violates a data rule."
+        }
+      },
+      "_evidence": {
+        "locator": "wp-includes/rest-api/endpoints/class-wp-rest-terms-controller.php:550",
+        "id_local": "Term.rest_create",
+        "entry": {
+          "kind": "http",
+          "route": "POST /wp-json/wp/v2/<taxonomy>",
+          "locator": "wp-includes/rest-api/endpoints/class-wp-rest-terms-controller.php:95"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "$term = wp_insert_term( wp_slash( $prepared_term->name ), $this->taxonomy, wp_slash( (array)$prepared_term ) ); ... meta update via meta->update_value",
+        "edges": [
+          "wp-includes/rest-api/endpoints/class-wp-rest-terms-controller.php:505"
+        ]
+      },
+      "_binds": {
+        "name": "Term.name",
+        "slug": "Term.slug",
+        "description": "TermTaxonomy.description",
+        "parent": "TermTaxonomy.parent"
+      },
+      "_output_schema": {
+        "id": "WP_REST_Response|WP_Error"
+      },
+      "entity": "Term"
+    },
+    {
+      "tool": "update_term",
+      "op": "update",
+      "family": "update.field_set",
+      "description": "Rename or re-slug a taxonomy term.",
+      "exec_spec": {
+        "entity": "Term",
+        "row_key": {
+          "term_id": {
+            "$arg": "id"
+          }
+        },
+        "set": {
+          "name": {
+            "$arg": "name"
+          },
+          "slug": {
+            "$arg": "slug"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the term to edit."
+        },
+        "name": {
+          "type": "text",
+          "description": "New name."
+        },
+        "slug": {
+          "type": "text",
+          "description": "New slug."
+        },
+        "description": {
+          "type": "text",
+          "description": "New description."
+        },
+        "parent": {
+          "type": "int",
+          "description": "New parent term."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "id"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Usermeta",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "meta_key",
+                      "op": "eq",
+                      "value": "wp_capabilities"
+                    },
+                    {
+                      "node": "field",
+                      "col": "meta_value",
+                      "op": "icontains",
+                      "value": "administrator"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in first — update a term needs a logged-in user.",
+          "precondition": "Only an administrator can edit terms.",
+          "required": "Missing required attribute.",
+          "not_found": "No such term.",
+          "fk": "The referenced parent does not exist.",
+          "fk_missing": "A required reference is missing — supply the missing id.",
+          "unique": "That value is already taken.",
+          "on_child": "This row still has children referencing it and cannot be deleted.",
+          "off_panel": "That attribute is not editable through this operation.",
+          "constraint": "The request violates a data rule."
+        }
+      },
+      "_evidence": {
+        "locator": "wp-includes/rest-api/endpoints/class-wp-rest-terms-controller.php:699",
+        "id_local": "Term.rest_update",
+        "entry": {
+          "kind": "http",
+          "route": "POST /wp-json/wp/v2/<taxonomy>/{id}",
+          "locator": "wp-includes/rest-api/endpoints/class-wp-rest-terms-controller.php:125"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "$update = wp_update_term( $term->term_id, $term->taxonomy, wp_slash( (array)$prepared_term ) );",
+        "edges": [
+          "wp-includes/rest-api/endpoints/class-wp-rest-terms-controller.php:650"
+        ]
+      },
+      "_binds": {
+        "id": "Term.term_id",
+        "name": "Term.name",
+        "slug": "Term.slug",
+        "description": "TermTaxonomy.description",
+        "parent": "TermTaxonomy.parent"
+      },
+      "_output_schema": {
+        "id": "WP_REST_Response|WP_Error"
+      },
+      "entity": "Term"
+    },
+    {
+      "tool": "delete_term",
+      "op": "delete",
+      "family": "crud.delete",
+      "description": "Permanently delete a taxonomy term and unlink it from the posts it was assigned to.",
+      "exec_spec": {
+        "entity": "Term",
+        "lookup_by": {
+          "term_id": {
+            "$arg": "id"
+          }
+        },
+        "on_child": "detach"
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the term to delete."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "id"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Usermeta",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "meta_key",
+                      "op": "eq",
+                      "value": "wp_capabilities"
+                    },
+                    {
+                      "node": "field",
+                      "col": "meta_value",
+                      "op": "icontains",
+                      "value": "administrator"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in first — delete a term needs a logged-in user.",
+          "precondition": "Only an administrator can delete terms.",
+          "required": "Missing required attribute.",
+          "not_found": "No such term.",
+          "fk": "The referenced parent does not exist.",
+          "fk_missing": "A required reference is missing — supply the missing id.",
+          "unique": "That value is already taken.",
+          "on_child": "That term is still assigned to content; reassign it first.",
+          "off_panel": "That attribute is not editable through this operation.",
+          "constraint": "The request violates a data rule."
+        }
+      },
+      "_evidence": {
+        "locator": "wp-includes/rest-api/endpoints/class-wp-rest-terms-controller.php:779",
+        "id_local": "Term.rest_delete",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /wp-json/wp/v2/<taxonomy>/{id}",
+          "locator": "wp-includes/rest-api/endpoints/class-wp-rest-terms-controller.php:130"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "if ( ! $force ) return rest_trash_not_supported; $retval = wp_delete_term( $term->term_id, $term->taxonomy );",
+        "edges": [
+          "wp-includes/rest-api/endpoints/class-wp-rest-terms-controller.php:751"
+        ]
+      },
+      "_binds": {
+        "id": "Term.term_id"
+      },
+      "_output_schema": {
+        "id": "WP_REST_Response|WP_Error"
+      },
+      "entity": "Term"
+    },
+    {
+      "tool": "update_user",
+      "op": "update",
+      "family": "update.field_set",
+      "description": "Update a user's profile fields (email, display name, URL, password, nicename).",
+      "exec_spec": {
+        "entity": "User",
+        "row_key": {
+          "ID": {
+            "$arg": "ID"
+          }
+        },
+        "set": {
+          "user_pass": {
+            "$arg": "user_pass"
+          },
+          "user_nicename": {
+            "$arg": "user_nicename"
+          },
+          "user_email": {
+            "$arg": "user_email"
+          },
+          "user_url": {
+            "$arg": "user_url"
+          },
+          "display_name": {
+            "$arg": "display_name"
+          }
+        }
+      },
+      "input_schema": {
+        "ID": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the user to update."
+        },
+        "user_pass": {
+          "type": "text",
+          "description": "New password."
+        },
+        "user_email": {
+          "type": "text",
+          "description": "New email."
+        },
+        "user_nicename": {
+          "type": "text",
+          "description": "New nicename."
+        },
+        "user_url": {
+          "type": "text",
+          "description": "New website URL."
+        },
+        "display_name": {
+          "type": "text",
+          "description": "New display name."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "ID"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "ID",
+                  "op": "eq",
+                  "value": {
+                    "arg": "ID"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in first — update a user needs a logged-in user.",
+          "precondition": "That user could not be found.",
+          "required": "Missing required attribute.",
+          "not_found": "No such user.",
+          "fk": "The referenced parent does not exist.",
+          "fk_missing": "A required reference is missing — supply the missing id.",
+          "unique": "That value is already taken.",
+          "on_child": "This row still has children referencing it and cannot be deleted.",
+          "off_panel": "That attribute is not editable through this operation.",
+          "constraint": "The request violates a data rule."
+        }
+      },
+      "_evidence": {
+        "locator": "wp-includes/user.php:2735",
+        "id_local": "User.wp_update_user",
+        "entry": {
+          "kind": "http",
+          "route": "POST /wp-admin/user-edit.php",
+          "locator": "wp-includes/user.php:2735 (core; admin entry wp-admin/user-edit.php:171 edit_user)"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "$user_id = (int) ( $userdata['ID'] ?? 0 ); if ( ! $user_id ) return new WP_Error('invalid_user_id'); if ( ! empty( $userdata['user_pass'] ) && $userdata['user_pass'] !== $user_obj->user_pass ) { $userdata['user_pass'] = wp_hash_password( $userdata['user_pass'] ); ... } $userdata = array_merge( $user, $userdata ); $user_id = wp_insert_user( $userdata );",
+        "edges": [
+          "wp-includes/user.php:2752"
+        ]
+      },
+      "_binds": {
+        "ID": "User.ID",
+        "user_pass": "User.user_pass",
+        "user_email": "User.user_email",
+        "user_nicename": "User.user_nicename",
+        "user_url": "User.user_url",
+        "display_name": "User.display_name",
+        "meta_key": "Usermeta.meta_key",
+        "meta_value": "Usermeta.meta_value"
+      },
+      "_output_schema": {
+        "id": "int updated user ID, or WP_Error"
+      },
+      "entity": "User"
+    },
+    {
+      "tool": "delete_user",
+      "op": "delete",
+      "family": "crud.delete",
+      "description": "Delete a user account. The user's posts are reassigned to another user when given, otherwise deleted; either way the user must be cleared from referenced rows first.",
+      "exec_spec": {
+        "entity": "User",
+        "lookup_by": {
+          "ID": {
+            "$arg": "id"
+          }
+        },
+        "guard_last": {}
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the user to delete."
+        },
+        "reassign": {
+          "type": "int",
+          "description": "Id of the user who takes over this user's posts."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "id"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Usermeta",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "meta_key",
+                      "op": "eq",
+                      "value": "wp_capabilities"
+                    },
+                    {
+                      "node": "field",
+                      "col": "meta_value",
+                      "op": "icontains",
+                      "value": "administrator"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in first — delete a user needs a logged-in user.",
+          "precondition": "Only an administrator can delete users.",
+          "required": "Missing required attribute.",
+          "not_found": "No such user.",
+          "fk": "The referenced parent does not exist.",
+          "fk_missing": "A required reference is missing — supply the missing id.",
+          "unique": "That value is already taken.",
+          "on_child": "That user still owns content; reassign or delete it first.",
+          "off_panel": "That attribute is not editable through this operation.",
+          "constraint": "The request violates a data rule.",
+          "guard_last": "You cannot delete the last user — at least one account must remain."
+        }
+      },
+      "_evidence": {
+        "locator": "wp-admin/includes/user.php:351",
+        "id_local": "User.wp_delete_user",
+        "entry": {
+          "kind": "http",
+          "route": "POST /wp-admin/users.php?action=delete (bulk)",
+          "locator": "wp-admin/includes/user.php:351"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "if ( null === $reassign ) { $post_ids = $wpdb->get_col( ... post_author = %d AND post_type IN ('$post_types_to_delete') ); foreach( $post_ids as $post_id ) wp_delete_post( $post_id ); ... } else { $wpdb->update( $wpdb->posts, array('post_author' => $reassign), array('post_author' => $id ) ); ... } $meta = $wpdb->get_col( SELECT umeta_id FROM usermeta WHERE user_id = %d ); foreach( $meta as $mid ) delete_metadata_by_mid('user',$mid); $wpdb->delete( $wpdb->users, array('ID' => $id ) );",
+        "edges": [
+          "wp-admin/users.php:207"
+        ]
+      },
+      "_binds": {
+        "id": "User.ID"
+      },
+      "_output_schema": {
+        "bool": "true on success, false if invalid/nonexistent"
+      },
+      "entity": "User"
+    },
+    {
+      "tool": "log_out",
+      "op": "action",
+      "family": "guard.logout",
+      "description": "End the current session and sign the user out.",
+      "exec_spec": {
+        "entity": "User"
+      },
+      "input_schema": {},
+      "guards": {
+        "messages": {
+          "not_found": "You are not signed in."
+        }
+      },
+      "_evidence": {
+        "locator": "wp-includes/pluggable.php:744",
+        "id_local": "User.wp_logout",
+        "entry": {
+          "kind": "http",
+          "route": "GET/POST /wp-login.php?action=logout",
+          "locator": "wp-includes/pluggable.php:744"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "$user_id = get_current_user_id(); wp_destroy_current_session(); wp_clear_auth_cookie(); wp_set_current_user( 0 ); do_action( 'wp_logout', $user_id );"
+      },
+      "_output_schema": {
+        "void": ""
+      },
+      "entity": "User"
+    },
+    {
+      "tool": "sign_in",
+      "description": "Sign in with a username and password. Nearly everything else on this site requires a signed-in session; it is what `$actor` resolves to.",
+      "family": "guard.auth",
+      "entity": "User",
+      "input_schema": {
+        "user_login": {
+          "type": "text",
+          "required": true,
+          "description": "The account username."
+        },
+        "user_pass": {
+          "type": "text",
+          "required": true,
+          "description": "The account password."
+        }
+      },
+      "exec_spec": {
+        "verify": {
+          "entity": "User",
+          "username_col": "user_login",
+          "password_col": "user_pass"
+        }
+      },
+      "guards": {
+        "messages": {
+          "auth": "Wrong username or password."
+        }
+      },
+      "_evidence": {
+        "id_local": "User.wp_signon",
+        "locator": "wp-includes/user.php:41",
+        "ref_code": "$user = wp_authenticate( $credentials['user_login'], $credentials['user_password'] ); if ( is_wp_error( $user ) ) return $user; wp_set_auth_cookie( $user->ID, ... )",
+        "entry": {
+          "kind": "http",
+          "route": "POST /wp-login.php action=login",
+          "locator": "wp-includes/user.php:41"
+        }
+      }
+    },
+    {
+      "tool": "register",
+      "op": "create",
+      "family": "auth.register",
+      "description": "Create a new account on the site with a username, email and password. The new account can then sign in and act as its own user. Fails if the username or email is already in use.",
+      "exec_spec": {
+        "entity": "User",
+        "fields": {
+          "user_login": {
+            "$arg": "user_login"
+          },
+          "user_email": {
+            "$arg": "user_email"
+          },
+          "user_pass": {
+            "$arg": "user_pass"
+          }
+        },
+        "prechecks": [
+          {
+            "entity": "User",
+            "where": {
+              "user_login": {
+                "$arg": "user_login"
+              }
+            },
+            "negate": true,
+            "message": "That username is already registered."
+          },
+          {
+            "entity": "User",
+            "where": {
+              "user_email": {
+                "$arg": "user_email"
+              }
+            },
+            "negate": true,
+            "message": "That email address is already registered."
+          }
+        ]
+      },
+      "input_schema": {
+        "user_login": {
+          "type": "text",
+          "required": true,
+          "description": "The desired username."
+        },
+        "user_email": {
+          "type": "text",
+          "required": true,
+          "description": "The account email address."
+        },
+        "user_pass": {
+          "type": "text",
+          "required": true,
+          "description": "The account password."
+        }
+      },
+      "guards": {
+        "required": [
+          "user_login",
+          "user_email",
+          "user_pass"
+        ],
+        "messages": {
+          "not_found": "That row does not exist.",
+          "register": "Registration failed: that username or email is already taken.",
+          "unique": "That username or email is already in use.",
+          "constraint": "The request violates a data rule."
+        }
+      },
+      "_evidence": {
+        "locator": "wp-includes/user.php:3551",
+        "id_local": "User.register_new_user",
+        "entry": {
+          "kind": "http",
+          "route": "POST /wp-login.php?action=register",
+          "locator": "wp-includes/user.php:3551"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "$user_pass = wp_generate_password( 12, false ); $user_id = wp_create_user( $sanitized_user_login, $user_pass, $user_email ); ... update_user_meta( $user_id, 'default_password_nag', true );",
+        "edges": [
+          "wp-includes/user.php:3570-3580"
+        ]
+      },
+      "_binds": {
+        "user_login": "User.user_login",
+        "user_email": "User.user_email",
+        "user_pass": "User.user_pass"
+      },
+      "_output_schema": {
+        "int": "new user ID, or WP_Error (existing_user_login / existing_user_email)"
+      },
+      "entity": "User"
+    },
+    {
+      "tool": "create_privacy_request",
+      "op": "create",
+      "family": "crud.insert",
+      "description": "File a GDPR data-export or erasure request for an account whose email matches the given address.",
+      "exec_spec": {
+        "entity": "UserRequest",
+        "fields": {
+          "post_name": {
+            "$arg": "action_name"
+          },
+          "post_title": {
+            "$arg": "post_title"
+          },
+          "post_content": {
+            "$arg": "request_data"
+          },
+          "post_status": {
+            "$arg": "status"
+          }
+        },
+        "set_on_create": {
+          "post_type": "user_request",
+          "post_author": {
+            "$session": "account_id"
+          },
+          "post_parent": 0
+        }
+      },
+      "input_schema": {
+        "email_address": {
+          "type": "text",
+          "required": true,
+          "description": "The account email the request is about."
+        },
+        "action_name": {
+          "type": "text",
+          "required": true,
+          "description": "The requested action key."
+        },
+        "request_data": {
+          "type": "json",
+          "description": "Extra request payload."
+        },
+        "status": {
+          "type": "text",
+          "description": "Request status."
+        },
+        "post_title": {
+          "type": "text",
+          "description": "Request label."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "email_address",
+          "action_name"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "user_email",
+                  "op": "eq",
+                  "value": {
+                    "arg": "email_address"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in first — file a privacy request needs a logged-in user.",
+          "precondition": "No account has that email address.",
+          "required": "Missing required attribute.",
+          "not_found": "That row does not exist.",
+          "fk": "That account does not exist.",
+          "fk_missing": "A required reference is missing — supply the missing id.",
+          "unique": "That value is already taken.",
+          "on_child": "This row still has children referencing it and cannot be deleted.",
+          "off_panel": "That attribute is not editable through this operation.",
+          "constraint": "The request violates a data rule."
+        }
+      },
+      "_evidence": {
+        "locator": "wp-includes/user.php:4806 (caller wp-admin/includes/privacy-tools.php:149)",
+        "id_local": "UserRequest.wp_create_user_request",
+        "entry": {
+          "kind": "http",
+          "route": "POST /wp-admin/tools.php?page=export_personal_data | erase_personal_data",
+          "locator": "wp-includes/user.php:4806"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "$request_id = wp_insert_post( array( 'post_author'=>$user_id, 'post_name'=>$action_name, 'post_title'=>$email_address, 'post_content'=>wp_json_encode($request_data), 'post_status'=>'request-'.$status, 'post_type'=>'user_request', ... ), true ); return $request_id;",
+        "edges": [
+          "wp-includes/user.php:4822"
+        ]
+      },
+      "_binds": {
+        "action_name": "UserRequest.post_name",
+        "request_data": "UserRequest.post_content",
+        "status": "UserRequest.post_status",
+        "post_title": "UserRequest.post_title"
+      },
+      "_output_schema": "int request_id (post ID), or WP_Error (invalid_email/invalid_action/invalid_status/duplicate_request)",
+      "entity": "UserRequest"
+    },
+    {
+      "tool": "complete_privacy_request",
+      "op": "update",
+      "family": "update.field_set",
+      "description": "Mark a pending privacy request as completed, after the export has been generated or the account erased.",
+      "exec_spec": {
+        "entity": "UserRequest",
+        "row_key": {
+          "ID": {
+            "$arg": "request_id"
+          }
+        },
+        "set": {
+          "post_status": "request-completed"
+        }
+      },
+      "input_schema": {
+        "request_id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the privacy request to complete."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "request_id"
+        ],
+        "messages": {
+          "auth": "Sign in first — complete a privacy request needs a logged-in user.",
+          "precondition": "Only an administrator can complete privacy requests.",
+          "required": "Missing required attribute.",
+          "not_found": "No such privacy request.",
+          "fk": "The referenced parent does not exist.",
+          "fk_missing": "A required reference is missing — supply the missing id.",
+          "unique": "That value is already taken.",
+          "on_child": "This row still has children referencing it and cannot be deleted.",
+          "off_panel": "That attribute is not editable through this operation.",
+          "constraint": "The request violates a data rule."
+        }
+      },
+      "_evidence": {
+        "locator": "wp-admin/includes/privacy-tools.php:46",
+        "id_local": "UserRequest._wp_privacy_completed_request",
+        "entry": {
+          "kind": "http",
+          "route": "POST /wp-admin/export-personal-data.php | erase-personal-data.php (admin marks complete)",
+          "locator": "wp-admin/includes/privacy-tools.php:46"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "update_post_meta( $request_id, '_wp_user_request_completed_timestamp', time() ); $result = wp_update_post( array('ID'=>$request_id,'post_status'=>'request-completed') );"
+      },
+      "_binds": {
+        "request_id": "UserRequest.ID"
+      },
+      "_output_schema": "int request_id from wp_update_post, or WP_Error",
+      "entity": "UserRequest"
+    },
+    {
+      "tool": "confirm_privacy_request",
+      "op": "update",
+      "family": "update.field_set",
+      "description": "Confirm a pending data-export or erasure request — the step after the account owner follows the emailed confirmation link — moving it from pending to confirmed. Fails unless the request is currently pending or failed.",
+      "exec_spec": {
+        "entity": "UserRequest",
+        "row_key": {
+          "ID": {
+            "$arg": "request_id"
+          }
+        },
+        "set": {
+          "post_status": "request-confirmed"
+        }
+      },
+      "input_schema": {
+        "request_id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the privacy request to confirm."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "request_id"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "UserRequest",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "ID",
+                      "op": "eq",
+                      "value": {
+                        "arg": "request_id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "post_status",
+                      "op": "eq",
+                      "value": "request-pending"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "UserRequest",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "ID",
+                      "op": "eq",
+                      "value": {
+                        "arg": "request_id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "post_status",
+                      "op": "eq",
+                      "value": "request-failed"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in first — confirm a privacy request needs a logged-in user.",
+          "precondition": "This request is not pending or failed, so it cannot be confirmed.",
+          "required": "Missing required attribute.",
+          "not_found": "No such privacy request."
+        }
+      },
+      "_evidence": {
+        "locator": "wp-includes/user.php:4247",
+        "id_local": "UserRequest._wp_privacy_account_request_confirmed",
+        "entry": {
+          "kind": "http",
+          "route": "GET /wp-login.php?action=confirmaction",
+          "locator": "wp-includes/user.php:4247"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "if ( ! in_array( $request->status, array('request-pending','request-failed'), true ) ) return; update_post_meta( $request_id, '_wp_user_request_confirmed_timestamp', time() ); wp_update_post( array('ID'=>$request_id,'post_status'=>'request-confirmed') );",
+        "edges": [
+          "wp-includes/user.php:4247"
+        ]
+      },
+      "_binds": {
+        "request_id": "UserRequest.ID"
+      },
+      "_output_schema": {
+        "id": "void (noop if not pending/failed)"
+      },
+      "entity": "UserRequest"
+    },
+    {
+      "tool": "get_settings",
+      "op": "read",
+      "family": "search",
+      "description": "Read the site's registered settings (general, discussion, reading, etc.) as a set of option name/value pairs.",
+      "exec_spec": {
+        "entity": "Option",
+        "rank": {
+          "method": "exact"
+        }
+      },
+      "input_schema": {},
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Usermeta",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "meta_key",
+                      "op": "eq",
+                      "value": "wp_capabilities"
+                    },
+                    {
+                      "node": "field",
+                      "col": "meta_value",
+                      "op": "icontains",
+                      "value": "administrator"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in first — read settings needs a logged-in user.",
+          "precondition": "Only an administrator can read site settings.",
+          "required": "Missing required attribute.",
+          "not_found": "That row does not exist.",
+          "fk": "The referenced parent does not exist.",
+          "fk_missing": "A required reference is missing — supply the missing id.",
+          "unique": "That value is already taken.",
+          "on_child": "This row still has children referencing it and cannot be deleted.",
+          "off_panel": "That attribute is not editable through this operation.",
+          "constraint": "The request violates a data rule."
+        }
+      },
+      "_evidence": {
+        "locator": "wp-includes/rest-api/endpoints/class-wp-rest-settings-controller.php:79",
+        "id_local": "Option.rest_settings_get_item",
+        "entry": {
+          "kind": "http",
+          "route": "GET /wp-json/wp/v2/settings",
+          "locator": "wp-includes/rest-api/endpoints/class-wp-rest-settings-controller.php:38"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "foreach ( $options as $name => $args ) { $response[ $name ] = apply_filters( 'rest_pre_get_setting', null, $name, $args );\nif ( is_null( $response[ $name ] ) ) { $response[ $name ] = get_option( $args['option_name'], $args['schema']['default'] ); }\n$response[ $name ] = $this->prepare_value( $response[ $name ], $args['schema'] ); }",
+        "edges": [
+          "wp-includes/rest-api/endpoints/class-wp-rest-settings-controller.php:68"
+        ]
+      },
+      "_output_schema": {
+        "id": "object of all registered show_in_rest settings name => value"
+      },
+      "entity": "Option"
+    },
+    {
+      "tool": "update_option",
+      "op": "update",
+      "family": "update.field_set",
+      "description": "Update a single site option (a named setting) to a new value. Only administrators may change options.",
+      "exec_spec": {
+        "entity": "Option",
+        "row_key": {
+          "option_name": {
+            "$arg": "option_name"
+          }
+        },
+        "set": {
+          "option_value": {
+            "$arg": "option_value"
+          }
+        }
+      },
+      "input_schema": {
+        "option_name": {
+          "type": "text",
+          "required": true,
+          "description": "The option's name."
+        },
+        "option_value": {
+          "type": "text",
+          "required": true,
+          "description": "The new value."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "option_name",
+          "option_value"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Usermeta",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "meta_key",
+                      "op": "eq",
+                      "value": "wp_capabilities"
+                    },
+                    {
+                      "node": "field",
+                      "col": "meta_value",
+                      "op": "icontains",
+                      "value": "administrator"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in first — update an option needs a logged-in user.",
+          "precondition": "Only an administrator can change settings.",
+          "required": "Missing required attribute.",
+          "not_found": "No such option; create it to set a first value.",
+          "fk": "The referenced parent does not exist.",
+          "fk_missing": "A required reference is missing — supply the missing id.",
+          "unique": "That value is already taken.",
+          "on_child": "This row still has children referencing it and cannot be deleted.",
+          "off_panel": "That attribute is not editable through this operation.",
+          "constraint": "The request violates a data rule."
+        }
+      },
+      "_evidence": {
+        "locator": "wp-admin/options.php:240,345",
+        "id_local": "Option.admin_options_form_update",
+        "entry": {
+          "kind": "http",
+          "route": "POST /wp-admin/options.php (action=update)",
+          "locator": "wp-admin/options.php"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "check_admin_referer( $option_page . '-options' );\n... foreach ( $options as $option ) { ... if ( isset( $_POST[ $option ] ) ) { $value = $_POST[ $option ]; ... }\nupdate_option( $option, $value ); }",
+        "edges": [
+          "wp-admin/options.php:49",
+          "wp-admin/options.php:246"
+        ]
+      },
+      "_binds": {
+        "settings": "Option.option_name",
+        "option_value": "Option.option_value"
+      },
+      "_output_schema": {
+        "id": "redirect to referer; settings_saved/settings_save_failed"
+      },
+      "entity": "Option"
+    },
+    {
+      "tool": "create_network_site",
+      "op": "create",
+      "family": "crud.insert",
+      "description": "Create a new site in the multisite network under a domain and path. Fails if that address is already taken.",
+      "exec_spec": {
+        "entity": "Blog",
+        "fields": {
+          "domain": {
+            "$arg": "domain"
+          },
+          "path": {
+            "$arg": "path"
+          }
+        },
+        "set_on_create": {
+          "site_id": {
+            "$arg": "network_id"
+          },
+          "public": 0
+        },
+        "unique_on": [
+          "domain",
+          "path"
+        ]
+      },
+      "input_schema": {
+        "domain": {
+          "type": "text",
+          "required": true,
+          "description": "The site's domain."
+        },
+        "path": {
+          "type": "text",
+          "required": true,
+          "description": "The site's path on that domain."
+        },
+        "title": {
+          "type": "text",
+          "description": "Site title."
+        },
+        "user_id": {
+          "type": "int",
+          "description": "Id of the user who administers the new site."
+        },
+        "network_id": {
+          "type": "int",
+          "description": "Id of the network this site belongs to."
+        },
+        "options": {
+          "type": "json",
+          "description": "Initial site options."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "domain",
+          "path"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Usermeta",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "meta_key",
+                      "op": "eq",
+                      "value": "wp_capabilities"
+                    },
+                    {
+                      "node": "field",
+                      "col": "meta_value",
+                      "op": "icontains",
+                      "value": "administrator"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in first — create a network site needs a logged-in user.",
+          "precondition": "Only an administrator can create sites.",
+          "required": "Missing required attribute.",
+          "not_found": "That row does not exist.",
+          "fk": "The referenced parent does not exist.",
+          "fk_missing": "A required reference is missing — supply the missing id.",
+          "unique": "A site already exists at that domain and path.",
+          "on_child": "This row still has children referencing it and cannot be deleted.",
+          "off_panel": "That attribute is not editable through this operation.",
+          "constraint": "The request violates a data rule."
+        }
+      },
+      "_evidence": {
+        "locator": "wp-includes/ms-functions.php:1422",
+        "id_local": "Blog.wpmu_create_blog",
+        "entry": {
+          "kind": "http",
+          "route": "POST /wp-admin/network/site-new.php (action=add-site)",
+          "locator": "wp-admin/network/site-new.php:144"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "if ( domain_exists( $domain, $path, $network_id ) ) return new WP_Error('blog_taken'...);\n$blog_id = wp_insert_site( array_merge( $site_data, $site_initialization_data ) );\nreturn $blog_id;",
+        "edges": [
+          "wp-admin/network/site-new.php:16"
+        ]
+      },
+      "_binds": {
+        "domain": "Blog.domain",
+        "path": "Blog.path"
+      },
+      "_output_schema": {
+        "id": "int site id, or WP_Error('blog_taken')"
+      },
+      "entity": "Blog"
+    },
+    {
+      "tool": "signup_blog",
+      "op": "create",
+      "family": "crud.insert",
+      "description": "Register a pending blog+user signup on the network. The signup stays inactive until its activation link is used.",
+      "exec_spec": {
+        "entity": "Signup",
+        "fields": {
+          "domain": {
+            "$arg": "domain"
+          },
+          "path": {
+            "$arg": "path"
+          },
+          "title": {
+            "$arg": "title"
+          },
+          "user_login": {
+            "$arg": "user"
+          },
+          "user_email": {
+            "$arg": "user_email"
+          },
+          "meta": {
+            "$arg": "meta"
+          }
+        },
+        "set_on_create": {
+          "active": 0
+        }
+      },
+      "input_schema": {
+        "domain": {
+          "type": "text",
+          "required": true,
+          "description": "Requested domain."
+        },
+        "path": {
+          "type": "text",
+          "required": true,
+          "description": "Requested path."
+        },
+        "title": {
+          "type": "text",
+          "description": "Requested site title."
+        },
+        "user": {
+          "type": "text",
+          "required": true,
+          "description": "Requested username."
+        },
+        "user_email": {
+          "type": "text",
+          "description": "Requested email."
+        },
+        "meta": {
+          "type": "json",
+          "description": "Extra signup metadata."
+        }
+      },
+      "guards": {
+        "requires_auth": false,
+        "required": [
+          "domain",
+          "path",
+          "user"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Signup",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "domain",
+                      "op": "eq",
+                      "value": {
+                        "arg": "domain"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "path",
+                      "op": "eq",
+                      "value": {
+                        "arg": "path"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "eq",
+              "n": 0
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in first — register a blog signup needs a logged-in user.",
+          "precondition": "That domain is already taken by an active site or pending signup.",
+          "required": "Missing required attribute.",
+          "not_found": "That row does not exist.",
+          "fk": "The referenced parent does not exist.",
+          "fk_missing": "A required reference is missing — supply the missing id.",
+          "unique": "That activation address is already in use.",
+          "on_child": "This row still has children referencing it and cannot be deleted.",
+          "off_panel": "That attribute is not editable through this operation.",
+          "constraint": "The request violates a data rule."
+        }
+      },
+      "_evidence": {
+        "locator": "wp-includes/ms-functions.php:824",
+        "id_local": "Signup.wpmu_signup_blog",
+        "entry": {
+          "kind": "http",
+          "route": "POST /wp-signup.php",
+          "locator": "wp-includes/ms-functions.php:802"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "$key = substr( md5( time() . wp_rand() . $domain ), 0, 16 );\n$wpdb->insert( $wpdb->signups, array( 'domain'=>$domain,'path'=>$path,'title'=>$title,'user_login'=>$user,'user_email'=>$user_email,'registered'=>current_time('mysql',true),'activation_key'=>$key,'meta'=>serialize($meta) ) );",
+        "edges": [
+          "wp-includes/ms-default-filters.php:40"
+        ]
+      },
+      "_binds": {
+        "domain": "Signup.domain",
+        "path": "Signup.path",
+        "title": "Signup.title",
+        "user": "Signup.user_login",
+        "user_email": "Signup.user_email",
+        "meta": "Signup.meta"
+      },
+      "_output_schema": {
+        "type": "void"
+      },
+      "entity": "Signup"
+    },
+    {
+      "tool": "signup_user",
+      "op": "create",
+      "family": "crud.insert",
+      "description": "Register a pending user-only signup on the network, which stays inactive until the activation link is used.",
+      "exec_spec": {
+        "entity": "Signup",
+        "fields": {
+          "user_login": {
+            "$arg": "user"
+          },
+          "user_email": {
+            "$arg": "user_email"
+          },
+          "meta": {
+            "$arg": "meta"
+          }
+        },
+        "set_on_create": {
+          "active": 0
+        }
+      },
+      "input_schema": {
+        "user": {
+          "type": "text",
+          "required": true,
+          "description": "Requested username."
+        },
+        "user_email": {
+          "type": "text",
+          "required": true,
+          "description": "Requested email."
+        },
+        "meta": {
+          "type": "json",
+          "description": "Extra signup metadata."
+        }
+      },
+      "guards": {
+        "requires_auth": false,
+        "required": [
+          "user",
+          "user_email"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Signup",
+                "where": {
+                  "node": "field",
+                  "col": "user_login",
+                  "op": "eq",
+                  "value": {
+                    "arg": "user"
+                  }
+                }
+              },
+              "op": "eq",
+              "n": 0
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in first — register a user signup needs a logged-in user.",
+          "precondition": "That username is already taken.",
+          "required": "Missing required attribute.",
+          "not_found": "That row does not exist.",
+          "fk": "The referenced parent does not exist.",
+          "fk_missing": "A required reference is missing — supply the missing id.",
+          "unique": "That activation address is already in use.",
+          "on_child": "This row still has children referencing it and cannot be deleted.",
+          "off_panel": "That attribute is not editable through this operation.",
+          "constraint": "The request violates a data rule."
+        }
+      },
+      "_evidence": {
+        "locator": "wp-includes/ms-functions.php:890",
+        "id_local": "Signup.wpmu_signup_user",
+        "entry": {
+          "kind": "http",
+          "route": "POST /wp-signup.php",
+          "locator": "wp-includes/ms-functions.php:868"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "$key = substr( md5( time() . wp_rand() . $user_email ), 0, 16 );\n$wpdb->insert( $wpdb->signups, array( 'domain'=>'','path'=>'','title'=>'','user_login'=>$user,'user_email'=>$user_email,'registered'=>current_time('mysql',true),'activation_key'=>$key,'meta'=>serialize($meta) ) );",
+        "edges": [
+          "wp-includes/ms-default-filters.php:24"
+        ]
+      },
+      "_binds": {
+        "user": "Signup.user_login",
+        "user_email": "Signup.user_email",
+        "meta": "Signup.meta"
+      },
+      "_output_schema": {
+        "type": "void"
+      },
+      "entity": "Signup"
+    },
+    {
+      "tool": "activate_signup",
+      "op": "update",
+      "family": "update.field_set",
+      "description": "Activate a pending network signup by its activation key, which turns the reserved username/domain into a live account/site and stamps the activation time.",
+      "exec_spec": {
+        "entity": "Signup",
+        "row_key": {
+          "activation_key": {
+            "$arg": "key"
+          }
+        },
+        "set": {
+          "active": 1,
+          "activated": "2026-01-01T00:00:00"
+        }
+      },
+      "input_schema": {
+        "key": {
+          "type": "text",
+          "required": true,
+          "description": "The activation key emailed to the signup."
+        }
+      },
+      "guards": {
+        "requires_auth": false,
+        "required": [
+          "key"
+        ],
+        "messages": {
+          "auth": "Sign in first — activate a signup needs a logged-in user.",
+          "precondition": "No pending signup has that activation key.",
+          "required": "Missing required attribute.",
+          "not_found": "No signup matches that activation key.",
+          "fk": "The referenced parent does not exist.",
+          "fk_missing": "A required reference is missing — supply the missing id.",
+          "unique": "That value is already taken.",
+          "on_child": "This row still has children referencing it and cannot be deleted.",
+          "off_panel": "That attribute is not editable through this operation.",
+          "constraint": "The request violates a data rule."
+        }
+      },
+      "_evidence": {
+        "locator": "wp-includes/ms-functions.php:1212",
+        "id_local": "Signup.wpmu_activate_signup",
+        "entry": {
+          "kind": "http",
+          "route": "GET /wp-activate.php?key=...",
+          "locator": "wp-includes/ms-functions.php:1205"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "$signup = $wpdb->get_row( \"SELECT * FROM $wpdb->signups WHERE activation_key = %s\", $key );\n... $user_id = wpmu_create_user( $signup->user_login, $password, $signup->user_email );\n$wpdb->update( $wpdb->signups, array('active'=>1,'activated'=>$now), array('activation_key'=>$key) );",
+        "edges": [
+          "wp-includes/ms-functions.php:1212"
+        ]
+      },
+      "_binds": {
+        "key": "Signup.activation_key"
+      },
+      "_output_schema": {
+        "type": "array {id,password,meta} | WP_Error"
+      },
+      "entity": "Signup"
+    }
+  ],
+  "seed_state": {
+    "User": [
+      {
+        "ID": 1,
+        "user_login": "ops@wordpress.example",
+        "user_pass": "pw-operations",
+        "user_nicename": "admin",
+        "user_email": "admin@example.com",
+        "user_url": "",
+        "user_registered": "2025-01-01T00:00:00",
+        "user_activation_key": "",
+        "user_status": 0,
+        "display_name": "Site Admin",
+        "id": 1
+      },
+      {
+        "ID": 2,
+        "user_login": "member@wordpress.example",
+        "user_pass": "pw-member",
+        "user_nicename": "editor",
+        "user_email": "editor@example.com",
+        "user_url": "",
+        "user_registered": "2025-01-02T00:00:00",
+        "user_activation_key": "",
+        "user_status": 0,
+        "display_name": "The Editor",
+        "id": 2
+      },
+      {
+        "ID": 3,
+        "user_login": "subscriber@wordpress.example",
+        "user_pass": "pw-subscriber",
+        "user_nicename": "subscriber",
+        "user_email": "reader@example.com",
+        "user_url": "",
+        "user_registered": "2025-01-03T00:00:00",
+        "user_activation_key": "",
+        "user_status": 0,
+        "display_name": "A Reader",
+        "id": 3
+      }
+    ],
+    "Usermeta": [
+      {
+        "umeta_id": 1,
+        "user_id": 1,
+        "meta_key": "wp_capabilities",
+        "meta_value": "a:1:{s:13:\"administrator\";b:1;}",
+        "id": 1
+      },
+      {
+        "umeta_id": 2,
+        "user_id": 2,
+        "meta_key": "wp_capabilities",
+        "meta_value": "a:1:{s:6:\"editor\";b:1;}",
+        "id": 2
+      },
+      {
+        "umeta_id": 3,
+        "user_id": 3,
+        "meta_key": "wp_capabilities",
+        "meta_value": "a:1:{s:11:\"subscriber\";b:1;}",
+        "id": 3
+      }
+    ],
+    "Post": [
+      {
+        "ID": 1,
+        "post_author": 1,
+        "post_date": "2025-01-01T00:00:00",
+        "post_date_gmt": "2025-01-01T00:00:00",
+        "post_content": "Welcome to our site.",
+        "post_title": "Welcome",
+        "post_excerpt": "",
+        "post_status": "publish",
+        "comment_status": "open",
+        "ping_status": "open",
+        "post_password": "",
+        "post_name": "welcome",
+        "to_ping": "",
+        "pinged": "",
+        "post_modified": "2025-01-01T00:00:00",
+        "post_modified_gmt": "2025-01-01T00:00:00",
+        "post_content_filtered": "",
+        "post_parent": 0,
+        "guid": "https://example.com/?p=1",
+        "menu_order": 0,
+        "post_type": "post",
+        "post_mime_type": "",
+        "comment_count": 1,
+        "id": 1
+      },
+      {
+        "ID": 2,
+        "post_author": 2,
+        "post_date": "2025-01-05T00:00:00",
+        "post_date_gmt": "2025-01-05T00:00:00",
+        "post_content": "A draft in progress.",
+        "post_title": "Draft Post",
+        "post_excerpt": "",
+        "post_status": "draft",
+        "comment_status": "open",
+        "ping_status": "open",
+        "post_password": "",
+        "post_name": "draft-post",
+        "to_ping": "",
+        "pinged": "",
+        "post_modified": "2025-01-05T00:00:00",
+        "post_modified_gmt": "2025-01-05T00:00:00",
+        "post_content_filtered": "",
+        "post_parent": 0,
+        "guid": "https://example.com/?p=2",
+        "menu_order": 0,
+        "post_type": "post",
+        "post_mime_type": "",
+        "comment_count": 0,
+        "id": 2
+      }
+    ],
+    "Postmeta": [
+      {
+        "meta_id": 1,
+        "post_id": 1,
+        "meta_key": "_thumbnail_id",
+        "meta_value": "1",
+        "id": 1
+      }
+    ],
+    "Revision": [
+      {
+        "ID": 100,
+        "post_author": 1,
+        "post_date": "2025-01-01T01:00:00",
+        "post_date_gmt": "2025-01-01T01:00:00",
+        "post_content": "Welcome (draft).",
+        "post_title": "Welcome",
+        "post_excerpt": "",
+        "post_status": "inherit",
+        "post_name": "welcome",
+        "post_modified": "2025-01-01T01:00:00",
+        "post_modified_gmt": "2025-01-01T01:00:00",
+        "post_parent": 1,
+        "guid": "https://example.com/?p=100",
+        "menu_order": 0,
+        "post_type": "revision",
+        "id": 1
+      }
+    ],
+    "Attachment": [
+      {
+        "ID": 200,
+        "post_author": 1,
+        "post_date": "2025-01-01T00:30:00",
+        "post_date_gmt": "2025-01-01T00:30:00",
+        "post_content": "",
+        "post_title": "hero.jpg",
+        "post_excerpt": "",
+        "post_status": "inherit",
+        "post_name": "hero-jpg",
+        "post_parent": 1,
+        "guid": "https://example.com/wp-content/hero.jpg",
+        "menu_order": 0,
+        "post_type": "attachment",
+        "post_mime_type": "image/jpeg",
+        "id": 1
+      }
+    ],
+    "Term": [
+      {
+        "term_id": 1,
+        "name": "News",
+        "slug": "news",
+        "term_group": 0,
+        "id": 1
+      },
+      {
+        "term_id": 2,
+        "name": "Uncategorized",
+        "slug": "uncategorized",
+        "term_group": 0,
+        "id": 2
+      }
+    ],
+    "TermTaxonomy": [
+      {
+        "term_taxonomy_id": 1,
+        "term_id": 1,
+        "taxonomy": "category",
+        "description": "",
+        "parent": 0,
+        "count": 1,
+        "id": 1
+      },
+      {
+        "term_taxonomy_id": 2,
+        "term_id": 2,
+        "taxonomy": "category",
+        "description": "",
+        "parent": 0,
+        "count": 0,
+        "id": 2
+      }
+    ],
+    "TermRelationships": [
+      {
+        "object_id": 1,
+        "term_taxonomy_id": 1,
+        "term_order": 0,
+        "id": 1
+      }
+    ],
+    "Termmeta": [
+      {
+        "meta_id": 1,
+        "term_id": 1,
+        "meta_key": "custom",
+        "meta_value": "x",
+        "id": 1
+      }
+    ],
+    "Comment": [
+      {
+        "comment_ID": 1,
+        "comment_post_ID": 1,
+        "comment_author": "Reader",
+        "comment_author_email": "reader@example.com",
+        "comment_author_url": "",
+        "comment_author_IP": "127.0.0.1",
+        "comment_date": "2025-01-02T00:00:00",
+        "comment_date_gmt": "2025-01-02T00:00:00",
+        "comment_content": "Nice post!",
+        "comment_karma": 0,
+        "comment_approved": "1",
+        "comment_agent": "",
+        "comment_type": "comment",
+        "comment_parent": 0,
+        "user_id": 3,
+        "id": 1
+      },
+      {
+        "comment_ID": 2,
+        "comment_post_ID": 1,
+        "comment_author": "Another",
+        "comment_author_email": "a@example.com",
+        "comment_author_url": "",
+        "comment_author_IP": "127.0.0.2",
+        "comment_date": "2025-01-03T00:00:00",
+        "comment_date_gmt": "2025-01-03T00:00:00",
+        "comment_content": "Awaiting moderation.",
+        "comment_karma": 0,
+        "comment_approved": "0",
+        "comment_agent": "",
+        "comment_type": "comment",
+        "comment_parent": 0,
+        "user_id": 0,
+        "id": 2
+      }
+    ],
+    "Commentmeta": [
+      {
+        "meta_id": 1,
+        "comment_id": 1,
+        "meta_key": "rating",
+        "meta_value": "5",
+        "id": 1
+      }
+    ],
+    "Option": [
+      {
+        "option_id": 1,
+        "option_name": "blogname",
+        "option_value": "My WordPress",
+        "autoload": "yes",
+        "id": 1
+      },
+      {
+        "option_id": 2,
+        "option_name": "blogdescription",
+        "option_value": "Just another site",
+        "autoload": "yes",
+        "id": 2
+      },
+      {
+        "option_id": 3,
+        "option_name": "users_can_register",
+        "option_value": "0",
+        "autoload": "yes",
+        "id": 3
+      },
+      {
+        "option_id": 4,
+        "option_name": "comment_registration",
+        "option_value": "0",
+        "autoload": "no",
+        "id": 4
+      }
+    ],
+    "Site": [
+      {
+        "id": 1,
+        "domain": "example.com",
+        "path": "/"
+      }
+    ],
+    "Blog": [
+      {
+        "blog_id": 1,
+        "site_id": 1,
+        "domain": "example.com",
+        "path": "/",
+        "registered": "2025-01-01T00:00:00",
+        "last_updated": "2025-01-01T00:00:00",
+        "public": 1,
+        "archived": 0,
+        "mature": 0,
+        "spam": 0,
+        "deleted": 0,
+        "lang_id": 0,
+        "id": 1
+      }
+    ],
+    "Blogmeta": [
+      {
+        "meta_id": 1,
+        "blog_id": 1,
+        "meta_key": "description",
+        "meta_value": "Main site",
+        "id": 1
+      }
+    ],
+    "Sitemeta": [
+      {
+        "meta_id": 1,
+        "site_id": 1,
+        "meta_key": "site_name",
+        "meta_value": "Network",
+        "id": 1
+      }
+    ],
+    "Signup": [
+      {
+        "signup_id": 1,
+        "domain": "",
+        "path": "",
+        "title": "",
+        "user_login": "",
+        "user_email": "",
+        "registered": "2025-01-01T00:00:00",
+        "activated": "2025-01-01T00:00:00",
+        "active": 0,
+        "activation_key": "deadbeef",
+        "meta": "",
+        "id": 1
+      }
+    ],
+    "RegistrationLog": [
+      {
+        "ID": 1,
+        "email": "old@example.com",
+        "IP": "127.0.0.1",
+        "blog_id": 1,
+        "date_registered": "2025-01-01T00:00:00",
+        "id": 1
+      }
+    ],
+    "UserRequest": [
+      {
+        "ID": 1,
+        "post_author": 3,
+        "post_date": "2025-01-04T00:00:00",
+        "post_date_gmt": "2025-01-04T00:00:00",
+        "post_content": "{}",
+        "post_title": "reader@example.com",
+        "post_status": "request-pending",
+        "post_name": "export",
+        "post_modified": "2025-01-04T00:00:00",
+        "post_modified_gmt": "2025-01-04T00:00:00",
+        "post_parent": 3,
+        "guid": "https://example.com/?p=300",
+        "menu_order": 0,
+        "post_type": "user_request",
+        "post_password": "",
+        "post_mime_type": "",
+        "id": 1
+      }
+    ]
+  },
+  "summary": "WordPress core 7.2 (PHP/MySQL) content-management system: authors create and edit posts with revisions and media attachments; readers comment (with moderation); accounts can self-register; admins manage taxonomy, user accounts, site options/settings, and (in multisite) network sites and signups. Auth is the classic wp_users/wp_usermeta password model; roles live in the wp_capabilities usermeta row. Single-file roles: administrator + author/owner scoping. Privacy data-export/erasure requests follow a pending -> confirmed -> completed lifecycle.",
+  "_auth_candidates": [],
+  "_fk_gravity": {
+    "entity": "User",
+    "fk_count": 8
+  },
+  "_read_denied": "not_found",
+  "_no_edges": [
+    {
+      "id_local": "Post.wp_get_single_post",
+      "why": "pure read via WP_Post::get_instance; no mutations to chain"
+    },
+    {
+      "id_local": "Post.get_post",
+      "why": "pure read; same as wp_get_single_post"
+    },
+    {
+      "id_local": "Post.get_posts",
+      "why": "pure search via WP_Query"
+    },
+    {
+      "id_local": "Revision.wp_get_post_revisions",
+      "why": "pure read/search via get_children"
+    },
+    {
+      "id_local": "Postmeta.get_post_meta",
+      "why": "pure read via get_metadata"
+    },
+    {
+      "id_local": "Commentmeta.add_comment_meta",
+      "why": "mutating op with no cross-group edge beyond its own update-count/meta triggers (all captured above); listed as safety"
+    },
+    {
+      "id_local": "Commentmeta.update_comment_meta",
+      "why": "mutating op with no cross-group edge beyond its own update-count/meta triggers (all captured above); listed as safety"
+    },
+    {
+      "id_local": "Commentmeta.delete_comment_meta",
+      "why": "mutating op with no cross-group edge beyond its own update-count/meta triggers (all captured above); listed as safety"
+    },
+    {
+      "id_local": "Termmeta.add_term_meta",
+      "why": "No cross-op triggers; only row_insert on Termmeta. Its only behavior edge is ambiguous-id guard (not a trigger to another op)."
+    },
+    {
+      "id_local": "Termmeta.update_term_meta",
+      "why": "Standalone row_update, no cross-op trigger."
+    },
+    {
+      "id_local": "Termmeta.delete_term_meta",
+      "why": "Standalone row_delete, no cross-op trigger (edge captured from wp_delete_term -> Termmeta delete via delete_metadata_by_mid internally)."
+    },
+    {
+      "id_local": "Term.get_term",
+      "why": "Pure read, no triggers/guards."
+    },
+    {
+      "id_local": "Termmeta.get_term_meta",
+      "why": "Pure read."
+    },
+    {
+      "id_local": "Term.wp_get_object_terms",
+      "why": "Pure search via get_terms."
+    },
+    {
+      "id_local": "Term.wp_create_category",
+      "why": "Delegates to wp_insert_category (other group); edge to that op not owned here. No guard."
+    },
+    {
+      "id_local": "User.wp_set_password",
+      "why": "Only a User row_update. Old sessions/cookies invalidated implicitly because auth-cookie HMAC derives from user_pass (wp_validate_auth_cookie recomputes over current user_pass => auth_cookie_bad_hash); no explicit destroy op fired here."
+    },
+    {
+      "id_local": "User.wp_update_user_counts",
+      "why": "Pure count read + network option write; no cross-op trigger."
+    },
+    {
+      "id_local": "User.wp_set_auth_cookie",
+      "why": "Sets cookies + creates session token (covered as SessionToken.create); no DB entity owned beyond that."
+    },
+    {
+      "id_local": "User.wp_clear_auth_cookie",
+      "why": "Only clears HTTP cookies; no DB entity mutated."
+    },
+    {
+      "id_local": "UserRequest.wp_generate_user_request_key",
+      "why": "Self-contained post update used only to build the confirm key/URL; confirm/completed transitions are separate ops."
+    },
+    {
+      "id_local": "Option.add_option",
+      "why": "Direct INSERT with unique-guard; no cross-group op is triggered and no capability gate exists inside the function (guarding is done by callers at admin/REST layer). Its only coupling is to wp_determine_option_autoload_value which is not in another group."
+    },
+    {
+      "id_local": "Option.delete_option",
+      "why": "Direct DELETE keyed by option_name; fires only internal do_action hooks (delete_option/delete_option_{$option}), no cross-group op and no in-function capability gate. Guarding is at admin/REST caller layer."
+    },
+    {
+      "id_local": "Option.get_options",
+      "why": "read-only (search), no mutating edge required."
+    },
+    {
+      "id_local": "Option.wp_load_alloptions",
+      "why": "read-only, no edge required."
+    },
+    {
+      "id_local": "Option.get_site_option",
+      "why": "read-only, no edge required."
+    },
+    {
+      "id_local": "ApplicationPassword.update_application_password",
+      "why": "writes the user's _application_passwords usermeta (serialized array); calls nothing further, no in-function capability gate (permission enforced by REST application-passwords controller)"
+    },
+    {
+      "id_local": "ApplicationPassword.delete_application_password",
+      "why": "writes the user's _application_passwords usermeta; calls nothing further, no in-function gate (REST controller enforces edit_user)"
+    },
+    {
+      "id_local": "ApplicationPassword.delete_all_application_passwords",
+      "why": "writes the user's _application_passwords usermeta; calls nothing further, no in-function gate"
+    },
+    {
+      "id_local": "SessionToken.create",
+      "why": "writes the user's 'session_tokens' usermeta; calls nothing further, no in-function gate"
+    },
+    {
+      "id_local": "SessionToken.destroy",
+      "why": "writes the user's 'session_tokens' usermeta; calls nothing further, no in-function gate"
+    },
+    {
+      "id_local": "SessionToken.destroy_all",
+      "why": "writes the user's 'session_tokens' usermeta (empties it); calls nothing further, no in-function gate"
+    },
+    {
+      "id_local": "UserRequest._wp_privacy_account_request_confirmed",
+      "why": "database hook that updates user_request post status/meta on confirmation; calls nothing further"
+    },
+    {
+      "id_local": "UserRequest._wp_privacy_completed_request",
+      "why": "database hook that updates user_request post status/meta on completion; calls nothing further"
+    },
+    {
+      "id_local": "Comment.wp_update_comment_count_now",
+      "why": "direct DB write (wpdb->update) and cache cleanup; triggers only do_action hooks and apply_filters, no env-level ops to chain"
+    },
+    {
+      "id_local": "User.wp_set_current_user",
+      "why": "internal global-state setter: constructs WP_User object, calls setup_userdata, fires do_action('set_current_user'); no env ops to chain"
+    },
+    {
+      "id_local": "Post.wp_transition_post_status",
+      "why": "fires only do_action hooks (transition_post_status, {old}_to_{new}); no env ops to chain"
+    },
+    {
+      "id_local": "Post.wp_set_object_terms",
+      "why": "delegates to wp_add_object_terms/wp_remove_object_terms; calls nothing further at the api level"
+    },
+    {
+      "id_local": "Postmeta.add_post_meta",
+      "why": "DB write via add_metadata; no further op-level call"
+    },
+    {
+      "id_local": "Postmeta.update_post_meta",
+      "why": "DB write via update_metadata; no further op-level call"
+    },
+    {
+      "id_local": "Postmeta.delete_post_meta",
+      "why": "DB write via delete_metadata; no further op-level call"
+    },
+    {
+      "id_local": "Postmeta.delete_post_meta_by_key",
+      "why": "DB delete by meta_key via delete_metadata; no further op-level call"
+    },
+    {
+      "id_local": "Postmeta.WP_REST_Posts_Controller_update_meta",
+      "why": "REST meta update handler, calls update_post_meta; no further edge"
+    },
+    {
+      "id_local": "Usermeta.add_user_meta",
+      "why": "DB write via add_metadata; calls nothing further"
+    },
+    {
+      "id_local": "Usermeta.update_user_meta",
+      "why": "DB write via update_metadata; calls nothing further"
+    },
+    {
+      "id_local": "Usermeta.delete_user_meta",
+      "why": "DB write via delete_metadata; calls nothing further"
+    },
+    {
+      "id_local": "ApplicationPassword.create_new_application_password",
+      "why": "writes _application_passwords usermeta; calls nothing further; permission at REST controller"
+    }
+  ],
+  "auth": {
+    "account_entity": "User",
+    "username_col": "user_login",
+    "password_col": "user_pass"
+  }
+}

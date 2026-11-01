@@ -1,0 +1,144 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "capability card — one onboarded environment (spec) as the builder can use it",
+  "type": "object",
+  "required": [
+    "app",
+    "role",
+    "domains",
+    "kinds",
+    "check_kinds",
+    "carriers",
+    "login",
+    "content_entities",
+    "tool_families_to_keep",
+    "smoke"
+  ],
+  "properties": {
+    "app": {
+      "type": "string"
+    },
+    "role": {
+      "type": "string",
+      "description": "what software it stands in for, e.g. 'helpdesk (Zendesk-like)'"
+    },
+    "domains": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "kinds": {
+      "type": "object",
+      "description": "{kind: [write tool names that realize it]}; every kind must be in vocab.kind_tools or be proposed with 'other:' prefix",
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      }
+    },
+    "check_kinds": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "which vocab.check_kinds a contract can evaluate on this app's entities (row/record/mail/post…)"
+    },
+    "carriers": {
+      "type": "object",
+      "description": "{carrier: {entity, field}} — where a literal policy text can be seeded",
+      "additionalProperties": {
+        "type": "object"
+      }
+    },
+    "login": {
+      "anyOf": [
+        {
+          "type": "object",
+          "required": [
+            "tool",
+            "user_field"
+          ],
+          "properties": {
+            "tool": {
+              "type": "string"
+            },
+            "user_field": {
+              "type": "string"
+            },
+            "persona_entity": {
+              "type": "string"
+            },
+            "arguments": {
+              "type": "object",
+              "description": "Optional exact native login parameters. $password and $persona refer to the generated world credentials; literal selectors and numeric ids keep their source types."
+            }
+          }
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Explicit null means there is no login interface; use the app directly. Missing declarations are not inferred."
+    },
+    "content_entities": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "entities whose rows are task content (seeded per pack; listed in packlib CONTENT)"
+    },
+    "seed_helpers": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "helper function names the register file exposes for seeding (e.g. tracker_project)"
+    },
+    "tool_families_to_keep": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "tool-name prefixes a pack should keep when pruning the tool panel (<=350 tools per world)"
+    },
+    "obs_reads": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "the whole-list reads an agent makes (must stay under 12k chars) — the register's obs hook covers them"
+    },
+    "known_patches": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "smoke": {
+      "type": "object",
+      "required": [
+        "passed",
+        "date"
+      ],
+      "properties": {
+        "passed": {
+          "type": "boolean"
+        },
+        "date": {
+          "type": "string"
+        },
+        "report": {
+          "type": "string"
+        }
+      }
+    },
+    "register_file": {
+      "type": "string"
+    },
+    "base_spec": {
+      "type": "string"
+    }
+  }
+}

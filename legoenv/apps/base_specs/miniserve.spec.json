@@ -1,0 +1,533 @@
+{
+  "env_id": "miniserve",
+  "_prep_version": 3,
+  "auth": {
+    "account_entity": "AuthAccount",
+    "username_col": "username",
+    "password_col": "password"
+  },
+  "entities": [
+    {
+      "name": "File",
+      "columns": [
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "path",
+          "type": "text",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "kind",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "file",
+            "directory",
+            "symlink"
+          ]
+        },
+        {
+          "name": "size",
+          "type": "int",
+          "nullable": true
+        },
+        {
+          "name": "modified",
+          "type": "datetime",
+          "nullable": true,
+          "audit": true
+        },
+        {
+          "name": "symlink_dest",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "content",
+          "type": "text",
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "name": "AuthAccount",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": false
+        },
+        {
+          "name": "username",
+          "type": "text",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "password",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "password_format",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "plain",
+            "sha256",
+            "sha512"
+          ]
+        }
+      ]
+    }
+  ],
+  "tools": [
+    {
+      "tool": "sign_in",
+      "op": "login",
+      "family": "guard.auth",
+      "entity": "AuthAccount",
+      "description": "Sign in with the server's configured account. miniserve gates every file operation (list, read, upload, mkdir, rm) behind HTTP basic auth, so you must sign in before doing anything with files; the session it opens is what authorizes you. Note: miniserve has no self-registration — accounts are fixed in the server config.",
+      "input_schema": {
+        "username": {
+          "type": "text",
+          "required": true,
+          "description": "The configured account username."
+        },
+        "password": {
+          "type": "text",
+          "required": true,
+          "description": "The configured account password."
+        }
+      },
+      "exec_spec": {
+        "verify": {
+          "entity": "AuthAccount"
+        }
+      },
+      "_evidence": {
+        "entry": {
+          "kind": "http",
+          "route": "POST /__miniserve_internal/login (basic-auth handshake)",
+          "locator": "src/auth.rs:76 (handle_auth)"
+        },
+        "id_local": "AuthAccount.login",
+        "ref_code": "credentials matched against required_auth (auth.rs:76 handle_auth); requested via Basic auth challenge.",
+        "edges": []
+      }
+    },
+    {
+      "tool": "sign_out",
+      "op": "logout",
+      "family": "guard.logout",
+      "description": "End the current session so subsequent file operations are refused until you sign in again.",
+      "input_schema": {},
+      "exec_spec": {},
+      "_evidence": {
+        "id_local": "AuthAccount.logout",
+        "locator": "src/auth.rs:76",
+        "ref_code": "session teardown on the auth boundary.",
+        "edges": []
+      }
+    },
+    {
+      "tool": "file_upload",
+      "op": "create",
+      "family": "crud.insert",
+      "entity": "File",
+      "description": "Upload a file into the served tree so it can be listed and read back. Creates a File row at the given full path, carrying its content. Fails if an entry already exists at that path (delete it first), or if you are not signed in.",
+      "input_schema": {
+        "path": {
+          "type": "text",
+          "required": true,
+          "description": "Full destination path of the new file under the served root, e.g. '/docs/guide.txt'."
+        },
+        "filename": {
+          "type": "text",
+          "required": true,
+          "description": "Display name (basename) of the file, shown in directory listings, e.g. 'guide.txt'."
+        },
+        "content": {
+          "type": "text",
+          "required": true,
+          "description": "The file's text content/bytes."
+        },
+        "size": {
+          "type": "int",
+          "required": false,
+          "description": "Optional byte size of the file; recorded so directory-size reads can total it."
+        }
+      },
+      "exec_spec": {
+        "entity": "File",
+        "fields": {
+          "path": {
+            "$arg": "path"
+          },
+          "name": {
+            "$arg": "filename"
+          },
+          "content": {
+            "$arg": "content"
+          },
+          "size": {
+            "$arg": "size"
+          }
+        },
+        "set_on_create": {
+          "kind": {
+            "$const": "file"
+          }
+        },
+        "unique_on": [
+          "path"
+        ]
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "path",
+          "filename",
+          "content"
+        ],
+        "messages": {
+          "auth": "You must sign in before uploading a file.",
+          "unique": "An entry already exists at that path — delete it first.",
+          "off_panel": "That argument is not part of the upload panel."
+        }
+      },
+      "_evidence": {
+        "locator": "src/file_op.rs:452, src/file_op.rs:111",
+        "id_local": "File.upload",
+        "entry": {
+          "kind": "http",
+          "route": "POST /upload",
+          "locator": "src/main.rs:443"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "async fn upload_file(...) {\n  let upload_path = sanitize_path(&query.path, conf.show_hidden)?;\n  // disallow paths outside allowed dirs / outside served root\n  ... try_collect(handle_multipart) \n}\n// save_file writes bytes to a temp file then renames into place:\nwhile let Some(Ok(bytes)) = field.next().await { temp_file.write_all(&bytes).await? }\nlet _ = tokio::fs::rename(&temp_path, &file_path).await;\nOk(written_len)",
+        "edges": [
+          "Basic auth middleware wrapping the whole route scope when auth is configured (main.rs:253-259, auth.rs:76 handle_auth); credentials matched against required_auth"
+        ]
+      }
+    },
+    {
+      "tool": "file_mkdir",
+      "op": "create",
+      "family": "crud.insert",
+      "entity": "File",
+      "description": "Create a new empty directory at the given full path inside the served tree. Fails if a file or directory already exists at that path, or if you are not signed in.",
+      "input_schema": {
+        "path": {
+          "type": "text",
+          "required": true,
+          "description": "Full path of the directory to create, e.g. '/docs'."
+        }
+      },
+      "exec_spec": {
+        "entity": "File",
+        "fields": {
+          "path": {
+            "$arg": "path"
+          }
+        },
+        "set_on_create": {
+          "kind": {
+            "$const": "directory"
+          }
+        },
+        "unique_on": [
+          "path"
+        ]
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "path"
+        ],
+        "messages": {
+          "auth": "You must sign in before creating a directory.",
+          "unique": "An entry already exists at that path — delete it first.",
+          "off_panel": "That argument is not part of the mkdir panel."
+        }
+      },
+      "_evidence": {
+        "locator": "src/file_op.rs:308",
+        "id_local": "File.mkdir",
+        "entry": {
+          "kind": "http",
+          "route": "POST /upload",
+          "locator": "src/main.rs:443"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "if field_name == \"mkdir\" {\n  // disallow '..' and hidden paths, and symlinks unless allow_symlinks\n  return match tokio::fs::create_dir_all(&absolute_path).await {\n    Err(err) if PermissionDenied => Err(InsufficientPermissionsError),\n    Err(err) => Err(IoError(...)),\n    Ok(_) => Ok(0),\n  };\n}",
+        "edges": [
+          "same conditional basic-auth middleware gates POST /upload (main.rs:253-259)"
+        ]
+      }
+    },
+    {
+      "tool": "file_delete",
+      "op": "delete",
+      "family": "crud.delete",
+      "entity": "File",
+      "description": "Delete the file or directory entry at the given path. Deleting a directory removes only that entry, not its contents — delete the files inside it first. Fails if no entry exists at that path, or if you are not signed in.",
+      "input_schema": {
+        "path": {
+          "type": "text",
+          "required": true,
+          "description": "Full path of the entry to delete."
+        }
+      },
+      "exec_spec": {
+        "entity": "File",
+        "lookup_by": {
+          "path": {
+            "$arg": "path"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "path"
+        ],
+        "messages": {
+          "auth": "You must sign in before deleting.",
+          "not_found": "No entry exists at that path.",
+          "off_panel": "That argument is not part of the delete panel."
+        }
+      },
+      "_evidence": {
+        "locator": "src/file_op.rs:549",
+        "id_local": "File.delete",
+        "entry": {
+          "kind": "http",
+          "route": "POST /rm",
+          "locator": "src/main.rs:447"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "let rm_allowed = conf.allowed_rm_dir.is_empty() || allowed_rm_dir.iter().any(|s| rm_path.starts_with(s));\nif !rm_allowed { return Err(RmForbiddenError) }\nlet canonicalized = app_root_dir.join(&rm_path).canonicalize()?;\nif !canonicalized.exists() { return Err(RouteNotFoundError(...)) }\nlet rm_res = if canonicalized.is_dir() { fs::remove_dir_all(&canonicalized).await }\n  else { fs::remove_file(&canonicalized).await };",
+        "edges": [
+          "basic-auth middleware gates POST /rm (main.rs:253-259)"
+        ]
+      }
+    },
+    {
+      "tool": "file_get",
+      "op": "read",
+      "family": "crud.fetch",
+      "entity": "File",
+      "description": "Read one entry's metadata and content by its full path. Returns the File row including its content. Fails if no entry exists at that path, or if you are not signed in.",
+      "input_schema": {
+        "path": {
+          "type": "text",
+          "required": true,
+          "description": "Full path of the file to read, e.g. '/docs/readme.txt'."
+        }
+      },
+      "exec_spec": {
+        "entity": "File",
+        "lookup_by": {
+          "path": {
+            "$arg": "path"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "path"
+        ],
+        "messages": {
+          "auth": "You must sign in before reading a file.",
+          "not_found": "No entry exists at that path.",
+          "off_panel": "That argument is not part of the read panel."
+        }
+      },
+      "_evidence": {
+        "locator": "src/main.rs:361, src/listing.rs:161",
+        "id_local": "File.raw_get",
+        "entry": {
+          "kind": "http",
+          "route": "GET <file-path>",
+          "locator": "src/main.rs:361 (dir_service), src/main.rs:450"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "// actix_files::Files::new(\"\", &conf.path).guard(Get|Head) serves existing files directly;\n// directory_listing renderer is only reached for directories. Symlinks filtered when no_symlinks.",
+        "edges": [
+          "basic-auth middleware gates file downloads via the route scope (main.rs:253-259)"
+        ],
+        "renamed_from": "file_raw_get"
+      }
+    },
+    {
+      "tool": "file_list",
+      "op": "search",
+      "family": "search",
+      "entity": "File",
+      "description": "List the files and directories this miniserve is serving. Optionally narrow by a directory path (matched as a substring on the entry's path) and/or by a case-insensitive name substring. Returns the matching File rows.",
+      "input_schema": {
+        "path": {
+          "type": "text",
+          "required": false,
+          "description": "Optional directory path substring to narrow results to a part of the served tree, e.g. '/docs'."
+        },
+        "search": {
+          "type": "text",
+          "required": false,
+          "description": "Optional case-insensitive substring to match against entry names."
+        }
+      },
+      "exec_spec": {
+        "entity": "File",
+        "search_fields": [
+          "name"
+        ],
+        "rank": {
+          "method": "substring",
+          "fields": [
+            "name"
+          ]
+        },
+        "filter": {
+          "op": "and",
+          "clauses": [
+            {
+              "col": "path",
+              "mode": "substring",
+              "val": {
+                "$arg": "path"
+              },
+              "optional": true
+            },
+            {
+              "col": "name",
+              "mode": "substring",
+              "val": {
+                "$arg": "search"
+              },
+              "optional": true
+            }
+          ]
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in before listing files."
+        }
+      },
+      "_evidence": {
+        "locator": "src/listing.rs:171",
+        "id_local": "File.list",
+        "entry": {
+          "kind": "http",
+          "route": "GET <dir-path>",
+          "locator": "src/main.rs:413, src/main.rs:450"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "let search = query_params.search.as_ref().map(|s| s.to_lowercase());\nlet matches_search = |filename| match search { Some(s) => filename.to_lowercase().contains(s), None => True };\nfor entry in dir.path.read_dir()? { ... entries.push(Entry::new(file_name, entry_type, file_url, size, last_modification_date, symlink_dest)) }\n// then sort by query/default method+order, possibly dirs_first",
+        "edges": [
+          "basic-auth middleware gates the whole route scope incl. directory listing (main.rs:253-259)"
+        ]
+      }
+    },
+    {
+      "tool": "file_dir_size",
+      "op": "action",
+      "family": "search.aggregate",
+      "entity": "File",
+      "description": "Compute the total size of the files under a directory: the sum of the size column over every File row whose path contains the given directory. Returns the aggregate (total_size). Fails if you are not signed in.",
+      "input_schema": {
+        "path": {
+          "type": "text",
+          "required": true,
+          "description": "Directory path whose file sizes to total, e.g. '/docs'."
+        }
+      },
+      "exec_spec": {
+        "entity": "File",
+        "aggregate": [
+          {
+            "fn": "sum",
+            "col": "size",
+            "as": "total_size"
+          }
+        ],
+        "filter": {
+          "col": "path",
+          "mode": "substring",
+          "val": {
+            "$arg": "path"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "path"
+        ],
+        "messages": {
+          "auth": "You must sign in before computing directory sizes.",
+          "off_panel": "That argument is not part of the dir-size panel."
+        }
+      },
+      "_evidence": {
+        "locator": "src/main.rs:497, src/file_op.rs:61",
+        "id_local": "File.dir_size",
+        "entry": {
+          "kind": "http",
+          "route": "POST /__miniserve_internal/api",
+          "locator": "src/main.rs:256, src/main.rs:497"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "ApiCommand::DirSize(path) => {\n  if config.directory_size {\n    let decoded_path = percent_decode_str(&path).decode_utf8()?;\n    let sanitized_path = sanitize_path(&*decoded_path, True).expect(\"dir\");\n    let full_path = config.path.canonicalize()?.join(sanitized_path);\n    let dir_size = recursive_dir_size(&full_path).await?;\n    Ok(format!(\"{dir_size} B\"))\n  } else { Ok(\"-\".to_string()) }\n}",
+        "edges": []
+      }
+    }
+  ],
+  "seed_state": {
+    "AuthAccount": [
+      {
+        "username": "ops@miniserve.example",
+        "password": "pw-operations",
+        "password_format": "plain",
+        "id": 1
+      }
+    ],
+    "File": [
+      {
+        "path": "/",
+        "name": "/",
+        "kind": "directory",
+        "id": 1
+      },
+      {
+        "path": "/docs",
+        "name": "docs",
+        "kind": "directory",
+        "id": 2
+      },
+      {
+        "path": "/docs/readme.txt",
+        "name": "readme.txt",
+        "kind": "file",
+        "size": 22,
+        "content": "Welcome to miniserve.",
+        "id": 3
+      }
+    ]
+  },
+  "summary": "miniserve is a self-hosted static-file HTTP server (Rust, actix-web); the persisted state is the filesystem served under a root dir. It uploads/moves file and directory entries (POST /upload, POST /rm for delete) and reads them back via directory listing, raw file download, and archive/dir-size readops; optional HTTP basic auth checks a config-defined AuthAccount list.",
+  "_drops": [
+    "file_download_archive (GET <dir>?download=tar|tar.gz|zip): in reality a binary byte-stream archive of a whole subtree — it has no row-level semantics as a File search, so it was dropped rather than exposed as a meaningless global table read.",
+    "file_upload's file_hash / file_hash_function params: inert X-File-Hash integrity headers bound to no column; dropped to keep the upload panel to path/name/content.",
+    "file_list's sort / order / download / raw params: HTTP-UI listing modifiers that do not map to runtime table behavior; the panel keeps path + name search."
+  ]
+}

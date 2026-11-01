@@ -1,0 +1,5708 @@
+{
+  "env_id": "htmly",
+  "_prep_version": 3,
+  "entities": [
+    {
+      "name": "User",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": false
+        },
+        {
+          "name": "username",
+          "type": "text",
+          "pk": true
+        },
+        {
+          "name": "password",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "encryption",
+          "type": "text",
+          "enum": [
+            "clear",
+            "password_hash",
+            "sha512",
+            "md5"
+          ],
+          "default": "password_hash"
+        },
+        {
+          "name": "role",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "admin",
+            "editor"
+          ],
+          "default": "admin"
+        },
+        {
+          "name": "mfa_secret",
+          "type": "text",
+          "default": "disabled"
+        }
+      ]
+    },
+    {
+      "name": "Profile",
+      "columns": [
+        {
+          "name": "username",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "image",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "body",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "custom_fields",
+          "type": "json",
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "name": "Frontpage",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "body",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "custom_fields",
+          "type": "json",
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "name": "Post",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "slug",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "tag",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "media",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "custom_fields",
+          "type": "json",
+          "nullable": true
+        },
+        {
+          "name": "body",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "date",
+          "type": "datetime",
+          "nullable": false,
+          "immutable": true
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "published",
+            "draft",
+            "scheduled"
+          ]
+        },
+        {
+          "name": "author",
+          "type": "text",
+          "nullable": false,
+          "fk_to": "User.username"
+        },
+        {
+          "name": "category",
+          "type": "text",
+          "nullable": true,
+          "fk_to": "Category.slug"
+        },
+        {
+          "name": "type",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "post",
+            "image",
+            "video",
+            "link",
+            "quote",
+            "audio"
+          ]
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "slug",
+            "author"
+          ]
+        }
+      ],
+      "_lifecycle": {
+        "col": "status",
+        "initial": "published",
+        "states": [
+          "published",
+          "draft",
+          "scheduled"
+        ],
+        "via": {
+          "Post.revert_to_draft": {
+            "col": "status",
+            "from": [
+              "published",
+              "scheduled"
+            ],
+            "to": "draft"
+          },
+          "Post.publish_draft": {
+            "col": "status",
+            "from": [
+              "draft"
+            ],
+            "to": "published"
+          },
+          "Post.schedule": {
+            "col": "status",
+            "from": [
+              "draft",
+              "published"
+            ],
+            "to": "scheduled"
+          },
+          "PublishScheduled.run": {
+            "col": "status",
+            "from": [
+              "scheduled"
+            ],
+            "to": "published"
+          },
+          "Post.update": {
+            "col": "status",
+            "from": [
+              "draft"
+            ],
+            "to": "scheduled"
+          }
+        }
+      }
+    },
+    {
+      "name": "StaticPage",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "slug",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "custom_fields",
+          "type": "json",
+          "nullable": true
+        },
+        {
+          "name": "body",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "published",
+            "draft"
+          ]
+        }
+      ],
+      "_lifecycle": {
+        "col": "status",
+        "initial": "published",
+        "states": [
+          "published",
+          "draft"
+        ],
+        "via": {
+          "StaticPage.update": {
+            "col": "status",
+            "from": [
+              "draft",
+              "published"
+            ],
+            "to": null
+          }
+        }
+      }
+    },
+    {
+      "name": "SubPage",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "parent",
+          "type": "text",
+          "nullable": false,
+          "fk_to": "StaticPage.slug"
+        },
+        {
+          "name": "slug",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "custom_fields",
+          "type": "json",
+          "nullable": true
+        },
+        {
+          "name": "body",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "published",
+            "draft"
+          ]
+        }
+      ],
+      "_lifecycle": {
+        "col": "status",
+        "initial": "published",
+        "states": [
+          "published",
+          "draft"
+        ],
+        "via": {
+          "SubPage.update": {
+            "col": "status",
+            "from": [
+              "draft",
+              "published"
+            ],
+            "to": null
+          }
+        }
+      }
+    },
+    {
+      "name": "Category",
+      "columns": [
+        {
+          "name": "slug",
+          "type": "text",
+          "pk": true
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "body",
+          "type": "text",
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "name": "Comment",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "pk": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "email",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "comment",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "timestamp",
+          "type": "int",
+          "nullable": false,
+          "immutable": true
+        },
+        {
+          "name": "date",
+          "type": "datetime",
+          "nullable": false,
+          "immutable": true
+        },
+        {
+          "name": "parent_id",
+          "type": "text",
+          "nullable": true,
+          "fk_to": "Comment.id"
+        },
+        {
+          "name": "notify",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "published",
+          "type": "bool",
+          "nullable": false
+        },
+        {
+          "name": "ip",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "modified",
+          "type": "datetime",
+          "nullable": true,
+          "audit": true
+        }
+      ]
+    },
+    {
+      "name": "Subscription",
+      "columns": [
+        {
+          "name": "email",
+          "type": "text",
+          "pk": true
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "no",
+            "waiting",
+            "subscribed"
+          ],
+          "default": "no"
+        },
+        {
+          "name": "date",
+          "type": "datetime",
+          "nullable": true
+        }
+      ],
+      "_lifecycle": {
+        "col": "status",
+        "initial": "waiting",
+        "states": [
+          "no",
+          "waiting",
+          "subscribed"
+        ],
+        "via": {
+          "Subscription.confirm": {
+            "col": "status",
+            "from": [
+              "waiting"
+            ],
+            "to": "subscribed"
+          },
+          "Subscription.subscribe": {
+            "col": "status",
+            "from": [
+              "no",
+              "waiting"
+            ],
+            "to": null
+          }
+        }
+      }
+    },
+    {
+      "name": "Config",
+      "columns": [
+        {
+          "name": "key",
+          "type": "text",
+          "pk": true
+        },
+        {
+          "name": "value",
+          "type": "text",
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "name": "CommentConfig",
+      "columns": [
+        {
+          "name": "key",
+          "type": "text",
+          "pk": true
+        },
+        {
+          "name": "value",
+          "type": "text",
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "name": "ThemeConfig",
+      "columns": [
+        {
+          "name": "theme",
+          "type": "text",
+          "pk": true
+        },
+        {
+          "name": "key",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "value",
+          "type": "text",
+          "nullable": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "theme",
+            "key"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Menu",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "items",
+          "type": "json",
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "name": "CustomField",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "type",
+          "type": "text",
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "name": "ViewCount",
+      "columns": [
+        {
+          "name": "key",
+          "type": "text",
+          "pk": true
+        },
+        {
+          "name": "count",
+          "type": "int",
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "name": "SearchIndex",
+      "columns": [
+        {
+          "name": "key",
+          "type": "text",
+          "pk": true
+        },
+        {
+          "name": "content",
+          "type": "text",
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "name": "TagI18n",
+      "columns": [
+        {
+          "name": "tag_slug",
+          "type": "text",
+          "pk": true
+        },
+        {
+          "name": "tag_display",
+          "type": "text",
+          "nullable": true
+        }
+      ]
+    }
+  ],
+  "tools": [
+    {
+      "tool": "auth_login",
+      "op": "action",
+      "family": "guard.auth",
+      "exec_spec": {
+        "verify": {
+          "entity": "User",
+          "username_col": "username",
+          "password_col": "password"
+        }
+      },
+      "input_schema": {
+        "username": {
+          "type": "text",
+          "required": true,
+          "description": "The account username to sign in with."
+        },
+        "password": {
+          "type": "text",
+          "required": true,
+          "description": "The account password."
+        }
+      },
+      "_evidence": {
+        "locator": "system/htmly.php:138",
+        "id_local": "Auth.login",
+        "entry": {
+          "kind": "http",
+          "route": "POST /login",
+          "locator": "system/htmly.php:138"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "$user = from($_REQUEST, 'user');\n$pass = from($_REQUEST, 'password');\n$mfa_secret = user('mfa_secret', $user);\nif ($proper && $captcha && !empty($user) && !empty($pass)) {\n    if (!is_null($mfa_secret) && $mfa_secret !== \"disabled\" && config('mfa.state') === 'true') {\n        render('login-mfa', ...);\n    } else {\n        session($user, $pass);\n        $log = session($user, $pass); ..."
+      },
+      "entity": "User",
+      "_binds": {
+        "user": "User.username"
+      },
+      "_output_schema": {
+        "ok": "redirects to admin on success; else renders login with error list"
+      },
+      "guards": {
+        "required": [
+          "username",
+          "password"
+        ]
+      },
+      "description": "Sign in with your account username and password. Almost every admin operation (posts, pages, users, settings, comments) needs the session this opens; the signed-in user is what $actor resolves to. Fails if the username or password is wrong."
+    },
+    {
+      "tool": "auth_login_mfa",
+      "op": "action",
+      "family": "guard.auth",
+      "exec_spec": {
+        "verify": {
+          "entity": "User",
+          "username_col": "username",
+          "password_col": "password"
+        }
+      },
+      "input_schema": {
+        "username": {
+          "type": "text",
+          "required": true,
+          "description": "The account username whose two-factor sign-in you are completing."
+        },
+        "mfacode": {
+          "type": "text",
+          "required": true,
+          "description": "The six-digit code from your authenticator app."
+        }
+      },
+      "_evidence": {
+        "locator": "system/htmly.php:224",
+        "id_local": "Auth.login_mfa",
+        "entry": {
+          "kind": "http",
+          "route": "POST /login-mfa",
+          "locator": "system/htmly.php:224"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "$proper = is_csrf_proper(from($_REQUEST, 'csrf_token'));\n$user = $_SESSION[\"mfa_uid\"];\n$pass = $_SESSION[\"mfa_pwd\"];\n$mfacode = from($_REQUEST, 'mfacode');\n$mfa_secret = user('mfa_secret', $user);\n$google2fa = new Google2FA();\nif ($proper && $google2fa->verifyKey($mfa_secret, $mfacode, '1')) { session($user, $pass); ... }",
+        "edges": [
+          "login-mfa only reached when the user's mfa_secret is non-'disabled' (system/htmly.php:154)"
+        ]
+      },
+      "entity": "User",
+      "_output_schema": {
+        "ok": "redirects to admin on success; else renders login-mfa with error"
+      },
+      "guards": {
+        "required": [
+          "username",
+          "mfacode"
+        ],
+        "messages": {
+          "auth": "Finish signing in by providing the username and MFA code."
+        }
+      },
+      "description": "Complete a two-factor sign-in by submitting the current authenticator code for an account that has MFA enabled. Opens a session on success; fails if the account has MFA off or the code is wrong."
+    },
+    {
+      "tool": "auth_logout",
+      "op": "action",
+      "family": "guard.logout",
+      "exec_spec": {},
+      "input_schema": {},
+      "_evidence": {
+        "locator": "system/htmly.php:4847",
+        "id_local": "Auth.logout",
+        "entry": {
+          "kind": "http",
+          "route": "GET /logout",
+          "locator": "system/htmly.php:4847"
+        },
+        "entity_why": "cannot determine the entity",
+        "ref_code": "} elseif ($static === 'logout') {\n    if (login()) {\n        render('logout', array('title' => ..., 'is_admin' => true, ...));\n    } else { $login = site_url() . 'login'; header(\"location: $login\"); }\n    die;",
+        "edges": [
+          "route checks login() i.e. $_SESSION[site_url()]['user'] set (system/includes/session.php)"
+        ]
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "username",
+                  "op": "eq",
+                  "value": {
+                    "session": "account_name"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in to sign out.",
+          "precondition": "You must be signed in to sign out."
+        }
+      },
+      "_defaulted": [
+        "family (matched by an id_local regex, not by the effects)"
+      ],
+      "description": "End the current session and sign out. Safe to call when not signed in."
+    },
+    {
+      "tool": "user_create",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "User",
+        "fields": {
+          "username": {
+            "$arg": "username"
+          },
+          "password": {
+            "$arg": "password"
+          },
+          "role": {
+            "$arg": "role"
+          }
+        },
+        "set_on_create": {
+          "encryption": "password_hash",
+          "mfa_secret": "disabled"
+        }
+      },
+      "input_schema": {
+        "username": {
+          "type": "text",
+          "required": true,
+          "description": "The new account username."
+        },
+        "password": {
+          "type": "text",
+          "required": true,
+          "description": "The initial password."
+        },
+        "role": {
+          "type": "text",
+          "required": true,
+          "description": "The role to grant: admin or editor."
+        }
+      },
+      "_evidence": {
+        "locator": "system/admin/admin.php:34",
+        "id_local": "User.create",
+        "entry": {
+          "kind": "http",
+          "route": "POST /admin/add/user",
+          "locator": "system/htmly.php:2820"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "function create_user($userName, $password, $role) {\n    $file = 'config/users/' . $userName . '.ini';\n    if (file_exists($file)) { return false; }\n    else {\n        file_put_contents($file, \"password = \" . password_hash($password, PASSWORD_DEFAULT) . \"\\nencryption = password_hash\\nrole = \" . $role . \"\\nmfa_secret = disabled\\n\", LOCK_EX);\n        return true;\n    }\n}",
+        "edges": [
+          "route checks login() then $role === 'admin' (system/htmly.php)",
+          "create_user() returns false (no-op) when config/users/<username>.ini already exists (system/admin/admin.php:37)"
+        ]
+      },
+      "entity": "User",
+      "_binds": {
+        "username": "User.username",
+        "password": "User.password",
+        "role": "User.role"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "eq",
+                      "value": "admin"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1,
+              "_msg": "Only an admin can create users."
+            },
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "username",
+                  "op": "eq",
+                  "value": {
+                    "arg": "username"
+                  }
+                }
+              },
+              "op": "eq",
+              "n": 0
+            },
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": null,
+                "where": null
+              },
+              "op": "gte",
+              "n": 1,
+              "_msg": "Only an admin can create users."
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "username",
+          "password",
+          "role"
+        ],
+        "messages": {
+          "unique": "That username is already taken; pick another."
+        }
+      },
+      "_defaulted": [
+        "dropped unwritable columns ['username']",
+        "fields (mapped to the real parameter names via binds)",
+        "role param renamed from user-role to role; username made writable on create (real code writes the .ini named by username)"
+      ],
+      "description": "Create a new user account with the given role. Refused unless you are an admin and the username is not already taken."
+    },
+    {
+      "tool": "user_update_role",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "User",
+        "row_key": {
+          "username": {
+            "$arg": "username"
+          }
+        },
+        "set": {
+          "role": {
+            "$arg": "role-name"
+          },
+          "password": {
+            "$arg": "password"
+          }
+        }
+      },
+      "input_schema": {
+        "username": {
+          "type": "text",
+          "required": true,
+          "description": "The username of the user whose role to change."
+        },
+        "role-name": {
+          "type": "text",
+          "required": true,
+          "description": "The new role to grant: admin or editor."
+        },
+        "password": {
+          "type": "text",
+          "required": false,
+          "description": "Optional new password; leave empty to keep the existing hash."
+        }
+      },
+      "_evidence": {
+        "locator": "system/htmly.php:2906",
+        "id_local": "User.update_role",
+        "entry": {
+          "kind": "http",
+          "route": "POST /admin/users/:username/edit",
+          "locator": "system/htmly.php:2906"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "if ($role === 'admin') {\n    $file = 'config/users/' . $username . '.ini';\n    if (file_exists($file)) {\n        if (empty($new_password)) {\n            file_put_contents($file, \"password = \" . $old_password . \"\\nencryption = password_hash\\nrole = \" . $user_role . \"\\n\", LOCK_EX);\n        } else { update_user($username, $new_password, $user_role); }\n    } ...",
+        "edges": [
+          "route checks login() then $role === 'admin' (system/htmly.php)"
+        ]
+      },
+      "entity": "User",
+      "_binds": {
+        "username": "User.username",
+        "role-name": "User.role",
+        "password": "User.password"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "eq",
+                      "value": "admin"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "username",
+          "role-name"
+        ],
+        "messages": {
+          "not_found": "That user does not exist.",
+          "precondition": "Only an admin can change a user role."
+        }
+      },
+      "_defaulted": [
+        "restored password write (regression: I had dropped it; the real update_role endpoint writes role AND optional password via update_user($username,$new_password,$user_role), system/htmly.php:2906)"
+      ],
+      "description": "Change a user's role between admin and editor. Refused unless you are an admin."
+    },
+    {
+      "tool": "user_delete",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "User",
+        "lookup_by": {
+          "username": {
+            "$arg": "username"
+          }
+        }
+      },
+      "input_schema": {
+        "username": {
+          "type": "text",
+          "required": true,
+          "description": "The username of the user account to delete."
+        }
+      },
+      "_evidence": {
+        "locator": "system/htmly.php:2974",
+        "id_local": "User.delete",
+        "entry": {
+          "kind": "http",
+          "route": "POST /admin/users/:username/delete",
+          "locator": "system/htmly.php:2974"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "if ($proper && login()) {\n    if ($role === 'admin') {\n        if ($user_role !== 'admin') {\n            unlink($file);\n            delete_comments($file);\n        }\n    }\n    $redir = site_url() . 'admin/users';\n    header(\"location: $redir\");\n}",
+        "edges": [
+          "route checks login() then $role === 'admin' (system/htmly.php)"
+        ],
+        "delete_admin_rule": "system/htmly.php:2974 user delete: if ($user_role !== \"admin\") unlink($file); delete_comments($file) — admin accounts are protected."
+      },
+      "entity": "User",
+      "_binds": {
+        "username": "User.username"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "eq",
+                      "value": "admin"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            },
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "arg": "username"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "eq",
+                      "value": "admin"
+                    }
+                  ]
+                }
+              },
+              "op": "eq",
+              "n": 0
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "username"
+        ],
+        "messages": {
+          "realm": "Only an admin can delete a user.",
+          "not_found": "That user does not exist.",
+          "precondition": "You cannot delete an admin account."
+        }
+      },
+      "description": "Delete a user account and its comments. Refused unless you are an admin, and you cannot delete an admin account (the app protects them)."
+    },
+    {
+      "tool": "user_update_password",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "User",
+        "row_key": {
+          "username": {
+            "$session": "account_id"
+          }
+        },
+        "set": {
+          "password": {
+            "$arg": "password"
+          }
+        }
+      },
+      "input_schema": {
+        "username": {
+          "type": "text",
+          "required": true,
+          "description": "Your own username (must match the signed-in user)."
+        },
+        "password": {
+          "type": "text",
+          "required": true,
+          "description": "The new password."
+        }
+      },
+      "_evidence": {
+        "locator": "system/htmly.php:500",
+        "id_local": "User.update_password",
+        "entry": {
+          "kind": "http",
+          "route": "POST /edit/password",
+          "locator": "system/htmly.php:500"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "$user = $_SESSION[site_url()]['user'];\n$role = user('role', $user);\n$mfa = user('mfa_secret', $user);\nif ($user === $username) {\n    $file = 'config/users/' . $user . '.ini';\n    if (file_exists($file)) {\n        if (!empty($new_password)) { update_user($user, $new_password, $role, $mfa); }\n    } ...",
+        "edges": [
+          "route checks login() i.e. $_SESSION[site_url()]['user'] set (system/includes/session.php)"
+        ]
+      },
+      "entity": "User",
+      "_binds": {
+        "username": "User.username",
+        "password": "User.password"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "arg": "username"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "username",
+          "password"
+        ],
+        "messages": {
+          "realm": "You can only change your own password.",
+          "precondition": "You can only change your own password.",
+          "not_found": "That user does not exist."
+        }
+      },
+      "description": "Change your own password. The submitted username must be the signed-in account.",
+      "_defaulted": [
+        "rewritten: args username/password; row_key -> own account via $session; write via set{password}"
+      ]
+    },
+    {
+      "tool": "user_edit_mfa",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "User",
+        "row_key": {
+          "username": {
+            "$session": "account_id"
+          }
+        },
+        "set": {
+          "mfa_secret": {
+            "$arg": "mfa_secret"
+          }
+        }
+      },
+      "input_schema": {
+        "username": {
+          "type": "text",
+          "required": true,
+          "description": "Your own username (must match the signed-in user)."
+        },
+        "mfa_secret": {
+          "type": "text",
+          "required": true,
+          "description": "The new TOTP secret, or the literal disabled to turn MFA off."
+        },
+        "current_password": {
+          "type": "text",
+          "required": true,
+          "description": "Your current password, to confirm the change."
+        }
+      },
+      "_evidence": {
+        "locator": "system/htmly.php:547",
+        "id_local": "User.edit_mfa",
+        "entry": {
+          "kind": "http",
+          "route": "POST /edit/mfa",
+          "locator": "system/htmly.php:547"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "if ($user === $username) {\n    if (!is_null($mfa_secret) && $mfa_secret !== \"disabled\") {\n        $google2fa = new Google2FA();\n        if ($google2fa->verifyKey($mfa_secret, $mfacode)) {\n            if (password_verify($password, $old_password)) { update_user($user, $password, $role, $mfa_secret); }\n        }",
+        "edges": [
+          "route checks login() i.e. $_SESSION[site_url()]['user'] set (system/includes/session.php)"
+        ]
+      },
+      "entity": "User",
+      "_binds": {
+        "username": "User.username",
+        "mfa_secret": "User.mfa_secret"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "arg": "username"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "username",
+          "current_password",
+          "mfa_secret"
+        ],
+        "messages": {
+          "not_found": "That user does not exist.",
+          "precondition": "You can only change your own MFA settings."
+        }
+      },
+      "description": "Enable or disable two-factor authentication on your own account, confirming with your current password and a valid TOTP code.",
+      "_defaulted": [
+        "rewritten: row_key -> own account via $session; write via set{mfa_secret}; confirm args drop password/mfacode (runtime cannot verify TOTP)"
+      ]
+    },
+    {
+      "tool": "user_list",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "User",
+        "rank": {
+          "method": "exact"
+        },
+        "pagination": {
+          "default_limit": 100
+        }
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "system/htmly.php:2752",
+        "id_local": "User.list",
+        "entry": {
+          "kind": "http",
+          "route": "GET /admin/users",
+          "locator": "system/htmly.php:2752"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "// views/users.html.php\n$users = glob('config/users/*.ini', GLOB_NOSORT);\nksort($users);\n$username = pathinfo($u, PATHINFO_FILENAME); $role = user('role', $username);",
+        "edges": [
+          "route checks login() then $role === 'admin' (system/htmly.php)"
+        ]
+      },
+      "entity": "User",
+      "_output_schema": {
+        "users": "list of config/users/*.ini usernames with their roles"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "eq",
+                      "value": "admin"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [],
+        "messages": {
+          "precondition": "Only an admin can list users."
+        }
+      },
+      "description": "List all user accounts and their roles. Refused unless you are an admin."
+    },
+    {
+      "tool": "profile_edit",
+      "op": "update",
+      "family": "crud.upsert",
+      "exec_spec": {
+        "entity": "Profile",
+        "key": {
+          "username": {
+            "$session": "account_id"
+          }
+        },
+        "set_on_exists": {
+          "name": {
+            "$arg": "title"
+          },
+          "body": {
+            "$arg": "content"
+          },
+          "description": {
+            "$arg": "description"
+          },
+          "image": {
+            "$arg": "image"
+          }
+        },
+        "insert_fields": {
+          "username": {
+            "$session": "account_id"
+          },
+          "name": {
+            "$arg": "title"
+          },
+          "body": {
+            "$arg": "content"
+          },
+          "description": {
+            "$arg": "description"
+          },
+          "image": {
+            "$arg": "image"
+          }
+        }
+      },
+      "input_schema": {
+        "title": {
+          "type": "text",
+          "required": true,
+          "description": "The display name shown on your author page."
+        },
+        "content": {
+          "type": "text",
+          "required": true,
+          "description": "The Markdown “about” body of your author page."
+        },
+        "description": {
+          "type": "text",
+          "required": false,
+          "description": "An optional short description of you."
+        },
+        "image": {
+          "type": "text",
+          "required": false,
+          "description": "An optional avatar image URL."
+        }
+      },
+      "_evidence": {
+        "locator": "system/admin/admin.php:1049",
+        "id_local": "Profile.edit",
+        "entry": {
+          "kind": "http",
+          "route": "POST /edit/profile",
+          "locator": "system/htmly.php:421"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "$user_title = safe_html($title);\n$user_content = '<!--t ' . $user_title . ' t-->' . $profile_description . $avatar . $customField . \"\\n\\n\" . $content;\nif (!empty($user_title) && !empty($user_content)) {\n    $dir = 'content/' . $user . '/';\n    $filename = 'content/' . $user . '/author.md';\n    if (!is_dir($dir)) mkdir($dir, 0775, true);\n    file_put_contents($filename, print_r($user_content, true), LOCK_EX);\n    rebuilt_cache('all');\n}",
+        "edges": [
+          "route checks login() i.e. $_SESSION[site_url()]['user'] set (system/includes/session.php)"
+        ],
+        "upsert_why": "Profile.edit writes content/<user>/author.md and creates the dir if absent (system/admin/admin.php:1049); upsert so a missing profile does not fail the edit."
+      },
+      "entity": "Profile",
+      "_binds": {
+        "title": "Profile.name",
+        "content": "Profile.body",
+        "description": "Profile.description",
+        "image": "Profile.image"
+      },
+      "_output_schema": {},
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "title",
+          "content"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "username",
+                  "op": "eq",
+                  "value": {
+                    "session": "account_name"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must sign in to edit your profile.",
+          "precondition": "You must be signed in to edit your profile."
+        }
+      },
+      "_defaulted": [],
+      "description": "Update your own public author profile (display name, about body, description and avatar). The profile edited is always the signed-in account's; it is created the first time if it does not exist."
+    },
+    {
+      "tool": "profile_read",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Profile",
+        "lookup_by": {
+          "username": {
+            "$arg": "name"
+          }
+        }
+      },
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "The username of the author whose public profile to read."
+        }
+      },
+      "_evidence": {
+        "locator": "system/includes/functions.php:1199",
+        "id_local": "Profile.read",
+        "entry": {
+          "kind": "http",
+          "route": "GET /author/:name",
+          "locator": "system/htmly.php:278"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "$content = file_get_contents($author->file);\n$author->name = get_content_tag('t', $content, $author);\n$author->about = MarkdownExtra::defaultTransform(remove_html_comments($content));\n$author->description = get_content_tag(\"d\", $content, get_description($author->about));\n$author->avatar = get_content_tag(\"image\", $content, site_url() . '...logo-small.png');"
+      },
+      "entity": "Profile",
+      "_binds": {
+        "name": "Profile.username"
+      },
+      "_output_schema": {
+        "author": "the Profile row with name/about/description/avatar, or a synthesized default"
+      },
+      "guards": {
+        "required": [
+          "name"
+        ],
+        "messages": {
+          "not_found": "There is no profile for that author."
+        }
+      },
+      "description": "Read a user's public author profile by username. Public; no sign-in needed."
+    },
+    {
+      "tool": "frontpage_edit",
+      "op": "update",
+      "family": "crud.upsert",
+      "exec_spec": {
+        "entity": "Frontpage",
+        "key": {
+          "id": {
+            "$const": 1
+          }
+        },
+        "set_on_exists": {
+          "title": {
+            "$arg": "title"
+          },
+          "body": {
+            "$arg": "content"
+          }
+        },
+        "insert_fields": {
+          "id": {
+            "$const": 1
+          },
+          "title": {
+            "$arg": "title"
+          },
+          "body": {
+            "$arg": "content"
+          }
+        }
+      },
+      "input_schema": {
+        "title": {
+          "type": "text",
+          "required": true,
+          "description": "The front page title."
+        },
+        "content": {
+          "type": "text",
+          "required": true,
+          "description": "The front page body, in Markdown."
+        }
+      },
+      "_evidence": {
+        "locator": "system/admin/admin.php:1096",
+        "id_local": "Frontpage.edit",
+        "entry": {
+          "kind": "http",
+          "route": "POST /edit/frontpage",
+          "locator": "system/htmly.php:653"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "$front_title = safe_html($title);\n$front_content = '<!--t ' . $front_title . ' t-->' . $customField . \"\\n\\n\" . $content;\nif (!empty($front_title) && !empty($front_content)) {\n    $dir = 'content/data/frontpage';\n    $filename = 'content/data/frontpage/frontpage.md';\n    if (!is_dir($dir)) mkdir($dir, 0775, true);\n    file_put_contents($filename, print_r($front_content, true), LOCK_EX);\n    rebuilt_cache('all');\n}",
+        "edges": [
+          "routes check login() then $role === 'editor' || $role === 'admin' (system/htmly.php); role read via user('role', $_SESSION user)"
+        ],
+        "upsert_why": "Frontpage.edit writes content/data/frontpage/frontpage.md (system/admin/admin.php:1096); the site has exactly one front page, so upsert keeps it addressable."
+      },
+      "entity": "Frontpage",
+      "_binds": {
+        "title": "Frontpage.title",
+        "content": "Frontpage.body"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "admin",
+                          "editor"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "title",
+          "content"
+        ],
+        "messages": {
+          "precondition": "Only an editor or admin can edit the front page."
+        }
+      },
+      "_defaulted": [],
+      "description": "Update the site's front page title and body. Refused unless you are an editor or admin."
+    },
+    {
+      "tool": "post_create",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Post",
+        "fields": {
+          "title": {
+            "$arg": "title"
+          },
+          "tag": {
+            "$arg": "tag"
+          },
+          "slug": {
+            "$arg": "url"
+          },
+          "body": {
+            "$arg": "content"
+          },
+          "description": {
+            "$arg": "description"
+          },
+          "category": {
+            "$arg": "category"
+          },
+          "date": {
+            "$arg": "date"
+          },
+          "media": {
+            "$arg": "image"
+          },
+          "type": {
+            "$arg": "type"
+          }
+        },
+        "set_on_create": {
+          "author": {
+            "$session": "account_id"
+          },
+          "status": "published"
+        },
+        "unique_on": [
+          "slug",
+          "author"
+        ]
+      },
+      "input_schema": {
+        "title": {
+          "type": "text",
+          "required": true,
+          "description": "Title of the content, shown as its heading."
+        },
+        "url": {
+          "type": "text",
+          "required": true,
+          "description": "URL slug identifying the content (becomes part of its file name)."
+        },
+        "content": {
+          "type": "text",
+          "required": true,
+          "description": "Body content, written in Markdown."
+        },
+        "tag": {
+          "type": "text",
+          "required": true,
+          "description": "The tag slug for this post; also recorded into the tag index."
+        },
+        "category": {
+          "type": "text",
+          "required": false,
+          "description": "The category the content belongs to, matched by its URL slug."
+        },
+        "description": {
+          "type": "text",
+          "required": false,
+          "description": "An optional short description of the content."
+        },
+        "date": {
+          "type": "datetime",
+          "required": false,
+          "description": "The publish date (YYYY-MM-DD or YYYY-MM-DD-HH-MM-SS)."
+        },
+        "image": {
+          "type": "text",
+          "required": false,
+          "description": "An optional image URL/media to associate with the content."
+        },
+        "type": {
+          "type": "text",
+          "required": false,
+          "description": "The content type: post, image, video, link, quote or audio."
+        }
+      },
+      "_evidence": {
+        "locator": "system/admin/admin.php:126",
+        "id_local": "Post.create",
+        "entry": {
+          "kind": "http",
+          "route": "POST /add/content",
+          "locator": "system/htmly.php:760"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "$filename = $post_date . '_' . $post_tag . '_' . $post_url . '.md';\nif (empty($draft)) {\n    if (date('Y-m-d-H-i-s') >= $post_date) { $dir = '.../'.$type.'/'; } else { $dir = '.../'.$type.'/scheduled/'; }\n} else { $dir = '.../draft/'; }\nfile_put_contents($newfile, print_r($post_content, true), LOCK_EX);\nsave_tag_i18n($post_tag, $post_tagmd);\nrebuilt_cache('all');",
+        "edges": [
+          "route checks login() i.e. $_SESSION[site_url()]['user'] set (system/includes/session.php)"
+        ],
+        "status_rule": "system/admin/admin.php:126 Post.create: empty($draft) -> published dir; a future date -> scheduled dir. This tool always publishes; use post_autosave for drafts."
+      },
+      "entity": "Post",
+      "_binds": {
+        "title": "Post.title",
+        "tag": "Post.tag",
+        "url": "Post.slug",
+        "content": "Post.body",
+        "description": "Post.description",
+        "category": "Post.category",
+        "date": "Post.date",
+        "image": "Post.media",
+        "type": "Post.type"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "username",
+                  "op": "eq",
+                  "value": {
+                    "session": "account_name"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "title",
+          "url",
+          "content",
+          "tag"
+        ],
+        "messages": {
+          "unique": "A post with that slug by you already exists; pick a different URL.",
+          "fk": "The category you picked does not exist.",
+          "precondition": "Sign in first before creating a post."
+        }
+      },
+      "_defaulted": [
+        "fields (mapped to the real parameter names via binds)"
+      ],
+      "description": "Create a new blog post and publish it immediately. Refused unless you are signed in; a post's slug+author must be unique."
+    },
+    {
+      "tool": "post_update",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Post",
+        "row_key": {
+          "slug": {
+            "$arg": "slug"
+          }
+        },
+        "set": {
+          "title": {
+            "$arg": "title"
+          },
+          "body": {
+            "$arg": "content"
+          },
+          "tag": {
+            "$arg": "tag"
+          },
+          "slug": {
+            "$arg": "url"
+          },
+          "category": {
+            "$arg": "category"
+          },
+          "description": {
+            "$arg": "description"
+          },
+          "date": {
+            "$arg": "date"
+          },
+          "status": {
+            "$arg": "status"
+          }
+        }
+      },
+      "input_schema": {
+        "slug": {
+          "type": "text",
+          "required": true,
+          "description": "The current URL slug of the post to edit (its file name)."
+        },
+        "title": {
+          "type": "text",
+          "required": true,
+          "description": "Title of the content, shown as its heading."
+        },
+        "content": {
+          "type": "text",
+          "required": true,
+          "description": "Body content, written in Markdown."
+        },
+        "tag": {
+          "type": "text",
+          "required": true,
+          "description": "The tag slug for this post; also recorded into the tag index."
+        },
+        "url": {
+          "type": "text",
+          "required": false,
+          "description": "The new URL slug if renaming this post."
+        },
+        "category": {
+          "type": "text",
+          "required": false,
+          "description": "The category the content belongs to, matched by its URL slug."
+        },
+        "description": {
+          "type": "text",
+          "required": false,
+          "description": "An optional short description of the content."
+        },
+        "date": {
+          "type": "datetime",
+          "required": false,
+          "description": "The publish date (YYYY-MM-DD or YYYY-MM-DD-HH-MM-SS)."
+        },
+        "status": {
+          "type": "text",
+          "required": false,
+          "description": "Optional target status: published, draft or scheduled."
+        }
+      },
+      "_evidence": {
+        "locator": "system/admin/admin.php:329",
+        "id_local": "Post.update",
+        "entry": {
+          "kind": "http",
+          "route": "POST /:name/edit",
+          "locator": "system/htmly.php:4563"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "$arr = explode('/', $oldfile);\n$user = $_SESSION[site_url()]['user'];\n$role = user('role', $user);\nif ($user === $arr[1] || $role === 'editor' || $role === 'admin') {\n    if ($proper && !empty($title) && !empty($tag) && !empty($content) && !empty($is_post)) { edit_content(...); }",
+        "edges": [
+          "route checks '$user === $arr[1] || $role === editor || $role === admin' where $arr[1] is the author path segment (system/htmly.php:4572)"
+        ]
+      },
+      "entity": "Post",
+      "_binds": {
+        "title": "Post.title",
+        "tag": "Post.tag",
+        "url": "Post.slug",
+        "content": "Post.body",
+        "category": "Post.category",
+        "description": "Post.description",
+        "date": "Post.date"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "admin",
+                          "editor"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Post",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "slug",
+                      "op": "eq",
+                      "value": {
+                        "arg": "slug"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "author",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "slug",
+          "title",
+          "content",
+          "tag"
+        ],
+        "messages": {
+          "not_found": "That post does not exist.",
+          "precondition": "You can only edit your own posts unless you are an editor or admin.",
+          "transition": "That status change is not allowed for this post."
+        }
+      },
+      "_defaulted": [
+        "rewritten from status_transition to field_set: the edit endpoint changes content AND status together, and ex_status_transition drops non-status fields; status is now an optional field, permitting moves between published/draft/scheduled"
+      ],
+      "description": "Edit an existing post's title, body, tag, slug, category, description or date. You may edit your own post, or any post if you are an editor or admin. Pass `status` to move it between published, draft and scheduled."
+    },
+    {
+      "tool": "post_delete",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "Post",
+        "lookup_by": {
+          "slug": {
+            "$arg": "slug"
+          }
+        }
+      },
+      "input_schema": {
+        "slug": {
+          "type": "text",
+          "required": true,
+          "description": "The URL slug identifying the post to delete."
+        }
+      },
+      "_evidence": {
+        "locator": "system/admin/admin.php:1128",
+        "id_local": "Post.delete",
+        "entry": {
+          "kind": "http",
+          "route": "POST /:name/delete",
+          "locator": "system/htmly.php:4789"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "if ($user === $arr[1] || $role === 'editor' || $role === 'admin') {\n    unlink($deleted_content); delete_comments($deleted_content); rebuilt_cache('all');\n}",
+        "edges": [
+          "route checks '$user === $arr[1] || $role === editor || $role === admin' where $arr[1] is the author path segment (system/htmly.php:4572)"
+        ]
+      },
+      "entity": "Post",
+      "_binds": {
+        "slug": "Post.slug"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "admin",
+                          "editor"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Post",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "slug",
+                      "op": "eq",
+                      "value": {
+                        "arg": "slug"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "author",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "slug"
+        ],
+        "messages": {
+          "not_found": "That post does not exist.",
+          "precondition": "You can only delete your own posts unless you are an editor or admin."
+        }
+      },
+      "description": "Permanently delete a post by slug. You may delete your own post, or any post if you are an editor or admin."
+    },
+    {
+      "tool": "post_autosave",
+      "op": "update",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Post",
+        "fields": {
+          "title": {
+            "$arg": "title"
+          },
+          "tag": {
+            "$arg": "tag"
+          },
+          "slug": {
+            "$arg": "url"
+          },
+          "body": {
+            "$arg": "content"
+          }
+        },
+        "set_on_create": {
+          "status": "draft",
+          "author": {
+            "$session": "account_id"
+          }
+        },
+        "unique_on": [
+          "slug",
+          "author"
+        ]
+      },
+      "input_schema": {
+        "url": {
+          "type": "text",
+          "required": true,
+          "description": "The URL slug for this draft (becomes part of its file name)."
+        },
+        "title": {
+          "type": "text",
+          "required": true,
+          "description": "Title of the content, shown as its heading."
+        },
+        "content": {
+          "type": "text",
+          "required": true,
+          "description": "Body content, written in Markdown."
+        },
+        "tag": {
+          "type": "text",
+          "required": true,
+          "description": "The tag slug for this post."
+        }
+      },
+      "_evidence": {
+        "locator": "system/htmly.php:1018",
+        "id_local": "Post.autosave",
+        "entry": {
+          "kind": "http",
+          "route": "POST /admin/autosave",
+          "locator": "system/htmly.php:1018"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "if ($posttype == 'is_page') { ... } else {\n    $tag = $_REQUEST['tag']; $category = $_REQUEST['category'];\n    if ($type == 'post') {\n        if ($addEdit == 'add') { $response = add_content(...); }\n        else { if ($user === $arr[1] || $role === 'editor' || $role === 'admin') { $response = edit_content(...); } }",
+        "edges": [
+          "route checks login() i.e. $_SESSION[site_url()]['user'] set (system/includes/session.php)",
+          "edit-mode autosave checks '$user === $arr[1] || $role === editor || admin' (system/htmly.php:1131)"
+        ]
+      },
+      "entity": "Post",
+      "_binds": {
+        "url": "Post.slug",
+        "title": "Post.title",
+        "content": "Post.body",
+        "tag": "Post.tag"
+      },
+      "_output_schema": {
+        "message": "save result",
+        "file": "saved .md path"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "username",
+                  "op": "eq",
+                  "value": {
+                    "session": "account_name"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "url",
+          "title",
+          "content",
+          "tag"
+        ],
+        "messages": {
+          "unique": "A post with that slug already exists.",
+          "precondition": "Sign in first before saving a draft."
+        }
+      },
+      "_defaulted": [
+        "simplified to a clean draft-inserter keyed on url (removed the dead dual slug/url params); saving a duplicate slug is refused via unique_on"
+      ],
+      "description": "Save a new draft post under your authorship (status stays draft, not published). Slug+author must be unique; saving over an existing slug is refused."
+    },
+    {
+      "tool": "post_view",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Post",
+        "lookup_by": {
+          "slug": {
+            "$arg": "name"
+          }
+        }
+      },
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "The URL slug of the post to read."
+        }
+      },
+      "_evidence": {
+        "locator": "system/htmly.php:4376",
+        "id_local": "Post.view",
+        "entry": {
+          "kind": "http",
+          "route": "GET /:name",
+          "locator": "system/htmly.php:4376"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "if (config(\"views.counter\") != \"true\") {\n    if (!login()) { file_cache($_SERVER['REQUEST_URI']); }\n} else {\n    add_view('post_' . $name);\n    if (!login()) { file_cache($_SERVER['REQUEST_URI']); }\n}\n$post = find_post(null, null, $name);",
+        "edges": [
+          "public read route GET /:name requires only the Post row to exist; no auth (system/htmly.php:4376; no_guards)",
+          "a non-published post renders 404, so the published-only precondition mirrors the public behavior"
+        ]
+      },
+      "entity": "Post",
+      "_binds": {
+        "name": "Post.slug"
+      },
+      "_output_schema": {
+        "post": "the rendered Post row"
+      },
+      "guards": {
+        "required": [
+          "name"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Post",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "slug",
+                      "op": "eq",
+                      "value": {
+                        "arg": "name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "status",
+                      "op": "eq",
+                      "value": "published"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "not_found": "No such published post.",
+          "precondition": "That post is not published and cannot be read here."
+        }
+      },
+      "description": "Read a published post by slug, as a visitor would on the public site. Only published posts are readable through this tool."
+    },
+    {
+      "tool": "post_read",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Post",
+        "lookup_by": {
+          "slug": {
+            "$arg": "name"
+          }
+        }
+      },
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "The URL slug of the post to open for editing."
+        }
+      },
+      "_evidence": {
+        "locator": "system/htmly.php:4493",
+        "id_local": "Post.read",
+        "entry": {
+          "kind": "http",
+          "route": "GET /:name/edit",
+          "locator": "system/htmly.php:4493"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "$post = find_post(null, null, $name);\nif (!$post) { $post = find_draft(null, null, $name); ... }\n$current = $post['current'];\nif ($user === $current->author || $role === 'editor' || $role === 'admin') { render('edit-content', ...); } else { render('denied', ...); }",
+        "edges": [
+          "GET /:name/edit reads the post then gates the render on author-or-editor/admin (system/htmly.php:4493; ref_code: $user === $current->author || $role === editor || admin else render denied)"
+        ]
+      },
+      "entity": "Post",
+      "_binds": {
+        "name": "Post.slug"
+      },
+      "_output_schema": {
+        "post": "the Post row for the edit form"
+      },
+      "guards": {
+        "required": [
+          "name"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "admin",
+                          "editor"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Post",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "slug",
+                      "op": "eq",
+                      "value": {
+                        "arg": "name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "author",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "not_found": "No such post.",
+          "precondition": "You may only open your own posts for editing, unless you are an editor or admin."
+        }
+      },
+      "description": "Read a post by slug for editing. Refused unless you are its author, or an editor or admin (the edit form is not public)."
+    },
+    {
+      "tool": "post_list",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Post",
+        "rank": {
+          "method": "exact"
+        },
+        "pagination": {
+          "default_limit": 20
+        }
+      },
+      "input_schema": {
+        "page": {
+          "type": "int",
+          "required": false,
+          "description": "Page of results to view (1-based)."
+        }
+      },
+      "_evidence": {
+        "locator": "system/htmly.php:1243",
+        "id_local": "Post.list",
+        "entry": {
+          "kind": "http",
+          "route": "GET /admin/posts",
+          "locator": "system/htmly.php:1243"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "if (login()) {\n    if ($role === 'editor' || $role === 'admin') {\n        $page = from($_GET, 'page') or 1; $perpage = 20;\n        $posts = get_posts(null, $page, $perpage);\n        $total = count(get_blog_posts());",
+        "edges": [
+          "routes check login() then $role === 'editor' || $role === 'admin' (system/htmly.php); role read via user('role', $_SESSION user)"
+        ]
+      },
+      "entity": "Post",
+      "_output_schema": {
+        "posts": "paginated list of Post rows"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "admin",
+                          "editor"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [],
+        "messages": {
+          "precondition": "Only an editor or admin can list posts."
+        }
+      },
+      "description": "List the site's posts (all statuses) for administration. Refused unless you are an editor or admin."
+    },
+    {
+      "tool": "post_search",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Post",
+        "rank": {
+          "method": "substring",
+          "fields": [
+            "body"
+          ]
+        },
+        "filter": {
+          "col": "body",
+          "mode": "substring",
+          "val": {
+            "$arg": "keyword"
+          }
+        },
+        "pagination": {
+          "default_limit": 20
+        }
+      },
+      "input_schema": {
+        "keyword": {
+          "type": "text",
+          "required": true,
+          "description": "Free-text keyword to search published post bodies for."
+        }
+      },
+      "_evidence": {
+        "locator": "system/includes/functions.php:1328",
+        "id_local": "Post.search",
+        "entry": {
+          "kind": "http",
+          "route": "GET /search/:keyword",
+          "locator": "system/htmly.php:4244"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "$posts = get_blog_posts();\n$searchFile = \"content/data/search.json\";\nif (file_exists($searchFile) && config('fulltext.search') == \"true\") { $search = json_decode(...); }\nforeach ($posts as $index => $v) { $arr = explode('_', $v['filename']); ... if (stripos($filter, trim($keyword)) !== false) { $tmp[] = $v; } }"
+      },
+      "entity": "Post",
+      "_output_schema": {
+        "posts": "list of matching Post rows"
+      },
+      "guards": {
+        "required": [
+          "keyword"
+        ]
+      },
+      "description": "Search posts by keyword, matching against their body text. Public site search; returns matching posts."
+    },
+    {
+      "tool": "post_import_feed",
+      "op": "action",
+      "family": "action.emit",
+      "exec_spec": {
+        "channel": "event",
+        "record": {
+          "table": "PostLog"
+        },
+        "entity": "Post"
+      },
+      "input_schema": {
+        "url": {
+          "type": "text",
+          "required": true,
+          "description": "The feed URL to import posts from."
+        },
+        "credit": {
+          "type": "text",
+          "required": false,
+          "description": "Optional source credit to record for imported posts."
+        }
+      },
+      "_evidence": {
+        "locator": "system/admin/admin.php:1517",
+        "id_local": "Post.import_feed",
+        "entry": {
+          "kind": "http",
+          "route": "POST /admin/import",
+          "locator": "system/htmly.php:1772"
+        },
+        "entity_why": "fell back to the entity prefix of id_local",
+        "ref_code": "function migrate($title, $time, $tags, $content, $url, $user, $source) {\n    $filename = $post_date . '_' . $post_tag . '_' . $post_url . '.md';\n    $dir = 'content/' . $user . '/blog/uncategorized/post/';\n    if (is_dir($dir)) file_put_contents($dir . $filename, $post_content, LOCK_EX);\n    else { mkdir($dir, 0775, true); file_put_contents($dir . $filename, $post_content, LOCK_EX); }\n    save_tag_i18n($post_tag, $post_tagmd); }",
+        "edges": [
+          "route checks login() then $role === 'admin' (system/htmly.php)"
+        ],
+        "_record_undeclared_accepted": "post_import_feed writes .md files per imported post (system/admin/admin.php:1517 migrate()). The PostLog table it would record to is not a declared entity, so tasks built on the imported rows are unverifiable; accepted per contract."
+      },
+      "entity": "Post",
+      "_output_schema": {
+        "log": "HTML error list, empty on success"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "eq",
+                      "value": "admin"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "url"
+        ],
+        "messages": {
+          "precondition": "Only an admin can import posts."
+        }
+      },
+      "_defaulted": [
+        "kept action.emit with an undeclared PostLog record; the import materialises row files in the real repo, which a flat-file env cannot represent, so it is an event, not a creatable Post row"
+      ],
+      "_record_undeclared": true,
+      "description": "Import posts from an external RSS/Atom feed, materialising them under your authorship. Refused unless you are an admin."
+    },
+    {
+      "tool": "staticpage_create",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "StaticPage",
+        "fields": {
+          "title": {
+            "$arg": "title"
+          },
+          "slug": {
+            "$arg": "url"
+          },
+          "body": {
+            "$arg": "content"
+          },
+          "description": {
+            "$arg": "description"
+          }
+        },
+        "set_on_create": {
+          "status": "published"
+        }
+      },
+      "input_schema": {
+        "title": {
+          "type": "text",
+          "required": true,
+          "description": "Title of the content, shown as its heading."
+        },
+        "url": {
+          "type": "text",
+          "required": true,
+          "description": "URL slug identifying the content (becomes part of its file name)."
+        },
+        "content": {
+          "type": "text",
+          "required": true,
+          "description": "Body content, written in Markdown."
+        },
+        "description": {
+          "type": "text",
+          "required": false,
+          "description": "An optional short description of the content."
+        }
+      },
+      "_evidence": {
+        "locator": "system/admin/admin.php:612",
+        "id_local": "StaticPage.create",
+        "entry": {
+          "kind": "http",
+          "route": "POST /add/page",
+          "locator": "system/htmly.php:947"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "$filename = $post_url . '.md';\n$dir = 'content/static/'; $dirDraft = 'content/static/draft/';\nif (empty($draft)) {\n    if (!is_dir($dir)) mkdir($dir, 0775, true);\n    file_put_contents($dir . $filename, print_r($post_content, true), LOCK_EX);\n    $draftFile = $dirDraft . $filename; if (file_exists($draftFile)) unlink($draftFile);\n} else {\n    if (!is_dir($dirDraft)) mkdir($dirDraft, 0775, true);\n    file_put_contents($dirDraft . $filename, print_r($post_content, true), LOCK_EX);\n}\nrebuilt_cache('all'); clear_page_cache($post_url);",
+        "edges": [
+          "routes check login() then $role === 'editor' || $role === 'admin' (system/htmly.php); role read via user('role', $_SESSION user)"
+        ],
+        "status_rule": "system/admin/admin.php:612 StaticPage.create writes to content/static/ (published); draft-mode writes content/static/draft/ and is not exposed on this panel, so created pages are published."
+      },
+      "entity": "StaticPage",
+      "_binds": {
+        "title": "StaticPage.title",
+        "url": "StaticPage.slug",
+        "content": "StaticPage.body",
+        "description": "StaticPage.description"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "admin",
+                          "editor"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "title",
+          "url",
+          "content"
+        ],
+        "messages": {
+          "realm": "Only an editor or admin can create pages.",
+          "precondition": "Only an editor or admin can create pages."
+        }
+      },
+      "_defaulted": [
+        "fields (mapped to the real parameter names via binds)"
+      ],
+      "description": "Create a new static page and publish it immediately. Refused unless you are an editor or admin."
+    },
+    {
+      "tool": "staticpage_update",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "StaticPage",
+        "row_key": {
+          "slug": {
+            "$arg": "slug"
+          }
+        },
+        "set": {
+          "title": {
+            "$arg": "title"
+          },
+          "body": {
+            "$arg": "content"
+          },
+          "slug": {
+            "$arg": "url"
+          },
+          "description": {
+            "$arg": "description"
+          },
+          "status": {
+            "$arg": "status"
+          }
+        }
+      },
+      "input_schema": {
+        "slug": {
+          "type": "text",
+          "required": true,
+          "description": "The current URL slug of the page to edit."
+        },
+        "title": {
+          "type": "text",
+          "required": true,
+          "description": "Title of the content, shown as its heading."
+        },
+        "content": {
+          "type": "text",
+          "required": true,
+          "description": "Body content, written in Markdown."
+        },
+        "url": {
+          "type": "text",
+          "required": false,
+          "description": "The new URL slug if renaming the page."
+        },
+        "description": {
+          "type": "text",
+          "required": false,
+          "description": "An optional short description of the content."
+        },
+        "status": {
+          "type": "text",
+          "required": false,
+          "description": "Optional target status: published or draft."
+        }
+      },
+      "_evidence": {
+        "locator": "system/admin/admin.php:798",
+        "id_local": "StaticPage.update",
+        "entry": {
+          "kind": "http",
+          "route": "POST /:static/edit",
+          "locator": "system/htmly.php:5190"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "$newfile = $dir . '/' . $post_url . '.md';\nif ($oldfile === $newfile) { file_put_contents($oldfile, $post_content, LOCK_EX); }\nelse { rename($oldfile, $newfile); rename_comments($oldfile,$newfile); file_put_contents($newfile, $post_content, LOCK_EX); ... }\nrebuilt_cache('all'); clear_page_cache($post_url);",
+        "edges": [
+          "routes check login() then $role === 'editor' || $role === 'admin' (system/htmly.php); role read via user('role', $_SESSION user)"
+        ]
+      },
+      "entity": "StaticPage",
+      "_binds": {
+        "title": "StaticPage.title",
+        "url": "StaticPage.slug",
+        "content": "StaticPage.body",
+        "description": "StaticPage.description"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "admin",
+                          "editor"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "slug",
+          "title",
+          "content"
+        ],
+        "messages": {
+          "not_found": "That page does not exist.",
+          "precondition": "Only an editor or admin can edit pages."
+        }
+      },
+      "_defaulted": [
+        "rewritten from status_transition to field_set (status is an optional field, so edits keep working)"
+      ],
+      "description": "Edit a static page's title, body, slug or description. Pass `status` to toggle it between published and draft. Refused unless you are an editor or admin."
+    },
+    {
+      "tool": "staticpage_delete",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "StaticPage",
+        "lookup_by": {
+          "slug": {
+            "$arg": "slug"
+          }
+        }
+      },
+      "input_schema": {
+        "slug": {
+          "type": "text",
+          "required": true,
+          "description": "The URL slug of the page to delete."
+        }
+      },
+      "_evidence": {
+        "locator": "system/admin/admin.php:1180",
+        "id_local": "StaticPage.delete",
+        "entry": {
+          "kind": "http",
+          "route": "POST /:static/delete",
+          "locator": "system/htmly.php:5316"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "if ($role === 'editor' || $role === 'admin') {\n    unlink($deleted_content); delete_comments($deleted_content); rebuilt_cache('all');\n}",
+        "edges": [
+          "routes check login() then $role === 'editor' || $role === 'admin' (system/htmly.php); role read via user('role', $_SESSION user)"
+        ],
+        "on_child": "staticpage_delete deletes the page file and its sub-page files (system/admin/admin.php:1180); SubPage.parent FK references StaticPage.slug, so deleting a parent with sub-pages is blocked."
+      },
+      "entity": "StaticPage",
+      "_binds": {
+        "slug": "StaticPage.slug"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "admin",
+                          "editor"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "slug"
+        ],
+        "messages": {
+          "not_found": "That page does not exist.",
+          "on_child": "Delete the page's sub-pages first.",
+          "precondition": "Only an editor or admin can delete pages."
+        }
+      },
+      "description": "Permanently delete a static page. Refused unless you are an editor or admin."
+    },
+    {
+      "tool": "staticpage_reorder",
+      "op": "action",
+      "family": "action.emit",
+      "exec_spec": {
+        "channel": "event",
+        "record": {
+          "table": "StaticPageLog"
+        },
+        "entity": "StaticPage"
+      },
+      "input_schema": {
+        "json": {
+          "type": "json",
+          "required": true,
+          "description": "An ordered list of page slugs defining the new menu/page order."
+        }
+      },
+      "_evidence": {
+        "locator": "system/admin/admin.php:1878",
+        "id_local": "StaticPage.reorder",
+        "entry": {
+          "kind": "http",
+          "route": "POST /admin/pages",
+          "locator": "system/htmly.php:1645"
+        },
+        "entity_why": "fell back to the entity prefix of id_local",
+        "ref_code": "function reorder_pages($pages = null) {\n    $dir = 'content/static/';\n    foreach ($pages as $key => $p) { $num = str_pad($key+1,2,'0',STR_PAD_LEFT);\n        $arr = explode('.', $p); ...\n        rename ($dir . $p, $dir . $num . '.' . $arr[1] . '.md'); ... }\n}",
+        "edges": [
+          "routes check login() then $role === 'editor' || $role === 'admin' (system/htmly.php); role read via user('role', $_SESSION user)"
+        ],
+        "_record_undeclared_accepted": "static_page_reorder renames content/static/*.md files (system/admin/admin.php:1878). Its only observable side effect is the order of pages; the StaticPageLog table is not a declared entity, so reorder tasks are unverifiable. Accepted per contract."
+      },
+      "entity": "StaticPage",
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "admin",
+                          "editor"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "json"
+        ],
+        "messages": {
+          "auth": "You must sign in first.",
+          "precondition": "Only an editor or admin can reorder pages.",
+          "required": "The new page order (json) is required."
+        }
+      },
+      "_defaulted": [
+        "entity (not taken from the primary effect: fell back to the entity prefix of id_local)"
+      ],
+      "_record_undeclared": true,
+      "description": "Reorder the site's static pages (menu order) by submitting the new sequence. Refused unless you are an editor or admin."
+    },
+    {
+      "tool": "subpage_create",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "SubPage",
+        "fields": {
+          "parent": {
+            "$arg": "parent"
+          },
+          "title": {
+            "$arg": "title"
+          },
+          "slug": {
+            "$arg": "url"
+          },
+          "body": {
+            "$arg": "content"
+          },
+          "description": {
+            "$arg": "description"
+          }
+        },
+        "set_on_create": {
+          "status": "published"
+        }
+      },
+      "input_schema": {
+        "parent": {
+          "type": "text",
+          "required": true,
+          "description": "The URL slug of the parent static page."
+        },
+        "title": {
+          "type": "text",
+          "required": true,
+          "description": "Title of the content, shown as its heading."
+        },
+        "url": {
+          "type": "text",
+          "required": true,
+          "description": "URL slug identifying the content (becomes part of its file name)."
+        },
+        "content": {
+          "type": "text",
+          "required": true,
+          "description": "Body content, written in Markdown."
+        },
+        "description": {
+          "type": "text",
+          "required": false,
+          "description": "An optional short description of the content."
+        }
+      },
+      "_evidence": {
+        "locator": "system/admin/admin.php:707",
+        "id_local": "SubPage.create",
+        "entry": {
+          "kind": "http",
+          "route": "POST /:static/add",
+          "locator": "system/htmly.php:5069"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "$filename = $post_url . '.md';\n$dir = 'content/static/' . $static . '/'; $dirDraft = 'content/static/' . $static . '/draft/';\nif (empty($draft)) { file_put_contents($dir . $filename, $post_content, LOCK_EX); ... }\nrebuilt_cache('all'); clear_page_cache($post_url);",
+        "edges": [
+          "routes check login() then $role === 'editor' || $role === 'admin' (system/htmly.php); role read via user('role', $_SESSION user)",
+          "add_sub_page resolves the parent via find_page($static) (system/admin/admin.php:710)"
+        ]
+      },
+      "entity": "SubPage",
+      "_binds": {
+        "title": "SubPage.title",
+        "url": "SubPage.slug",
+        "content": "SubPage.body",
+        "static": "SubPage.parent",
+        "description": "SubPage.description"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "admin",
+                          "editor"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "StaticPage",
+                "where": {
+                  "node": "field",
+                  "col": "slug",
+                  "op": "eq",
+                  "value": {
+                    "arg": "parent"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "parent",
+          "title",
+          "url",
+          "content"
+        ],
+        "messages": {
+          "fk": "That parent page does not exist.",
+          "precondition": "Only an editor or admin can create pages."
+        }
+      },
+      "_defaulted": [
+        "fields (mapped to the real parameter names via binds)"
+      ],
+      "description": "Create a new sub-page under a parent static page. The parent must exist; the page is published immediately. Refused unless you are an editor or admin."
+    },
+    {
+      "tool": "subpage_update",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "SubPage",
+        "row_key": {
+          "parent": {
+            "$arg": "parent"
+          },
+          "slug": {
+            "$arg": "url"
+          }
+        },
+        "set": {
+          "title": {
+            "$arg": "title"
+          },
+          "body": {
+            "$arg": "content"
+          },
+          "slug": {
+            "$arg": "url"
+          },
+          "description": {
+            "$arg": "description"
+          },
+          "status": {
+            "$arg": "status"
+          }
+        }
+      },
+      "input_schema": {
+        "parent": {
+          "type": "text",
+          "required": true,
+          "description": "The URL slug of the parent static page."
+        },
+        "url": {
+          "type": "text",
+          "required": true,
+          "description": "The current URL slug of the sub-page to edit."
+        },
+        "title": {
+          "type": "text",
+          "required": true,
+          "description": "Title of the content, shown as its heading."
+        },
+        "content": {
+          "type": "text",
+          "required": true,
+          "description": "Body content, written in Markdown."
+        },
+        "description": {
+          "type": "text",
+          "required": false,
+          "description": "An optional short description of the content."
+        },
+        "status": {
+          "type": "text",
+          "required": false,
+          "description": "Optional target status: published or draft."
+        }
+      },
+      "_evidence": {
+        "locator": "system/admin/admin.php:798",
+        "id_local": "SubPage.update",
+        "entry": {
+          "kind": "http",
+          "route": "POST /:static/:sub/edit",
+          "locator": "system/htmly.php:5498"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "$newfile = $dir . '/' . $post_url . '.md';\nif ($oldfile === $newfile) { file_put_contents($oldfile, $post_content, LOCK_EX); }\nelse { rename($oldfile, $newfile); ... }\nrebuilt_cache('all'); clear_page_cache($post_url);",
+        "edges": [
+          "routes check login() then $role === 'editor' || $role === 'admin' (system/htmly.php); role read via user('role', $_SESSION user)"
+        ]
+      },
+      "entity": "SubPage",
+      "_binds": {
+        "description": "SubPage.description",
+        "title": "SubPage.title",
+        "url": "SubPage.slug",
+        "content": "SubPage.body",
+        "static": "SubPage.parent"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "admin",
+                          "editor"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "parent",
+          "url",
+          "title",
+          "content"
+        ],
+        "messages": {
+          "not_found": "That sub-page does not exist.",
+          "precondition": "Only an editor or admin can edit pages."
+        }
+      },
+      "_defaulted": [
+        "rewritten from status_transition to field_set (status is an optional field, so edits keep working)"
+      ],
+      "description": "Edit a sub-page's title, body, slug or description. Pass `status` to toggle published/draft. Refused unless you are an editor or admin."
+    },
+    {
+      "tool": "subpage_delete",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "SubPage",
+        "lookup_by": {
+          "parent": {
+            "$arg": "parent"
+          },
+          "slug": {
+            "$arg": "slug"
+          }
+        }
+      },
+      "input_schema": {
+        "parent": {
+          "type": "text",
+          "required": true,
+          "description": "The URL slug of the parent static page."
+        },
+        "slug": {
+          "type": "text",
+          "required": true,
+          "description": "The URL slug of the sub-page to delete."
+        }
+      },
+      "_evidence": {
+        "locator": "system/admin/admin.php:1180",
+        "id_local": "SubPage.delete",
+        "entry": {
+          "kind": "http",
+          "route": "POST /:static/:sub/delete",
+          "locator": "system/htmly.php:5637"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "if ($role === 'editor' || $role === 'admin') { unlink($deleted_content); delete_comments($deleted_content); rebuilt_cache('all'); }",
+        "edges": [
+          "routes check login() then $role === 'editor' || $role === 'admin' (system/htmly.php); role read via user('role', $_SESSION user)"
+        ]
+      },
+      "entity": "SubPage",
+      "_binds": {
+        "parent": "SubPage.parent",
+        "slug": "SubPage.slug"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "admin",
+                          "editor"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "parent",
+          "slug"
+        ],
+        "messages": {
+          "not_found": "That sub-page does not exist.",
+          "precondition": "Only an editor or admin can delete pages."
+        }
+      },
+      "description": "Permanently delete a sub-page. Refused unless you are an editor or admin."
+    },
+    {
+      "tool": "category_create",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Category",
+        "fields": {
+          "title": {
+            "$arg": "title"
+          },
+          "slug": {
+            "$arg": "url"
+          },
+          "body": {
+            "$arg": "content"
+          },
+          "description": {
+            "$arg": "description"
+          }
+        }
+      },
+      "input_schema": {
+        "title": {
+          "type": "text",
+          "required": true,
+          "description": "The display title of the category."
+        },
+        "url": {
+          "type": "text",
+          "required": true,
+          "description": "The URL slug for the category (its identity)."
+        },
+        "content": {
+          "type": "text",
+          "required": true,
+          "description": "The category body/landing content."
+        },
+        "description": {
+          "type": "text",
+          "required": false,
+          "description": "An optional short description of the content."
+        }
+      },
+      "_evidence": {
+        "locator": "system/admin/admin.php:966",
+        "id_local": "Category.create",
+        "entry": {
+          "kind": "http",
+          "route": "POST /add/category",
+          "locator": "system/htmly.php:1189"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "$filename = $post_url . '.md'; $dir = 'content/data/category/';\nif (is_dir($dir)) file_put_contents($dir . $filename, $post_content, LOCK_EX);\nelse { mkdir($dir, 0775, true); file_put_contents($dir . $filename, $post_content, LOCK_EX); }\nrebuilt_cache('all'); clear_page_cache($post_url);",
+        "edges": [
+          "routes check login() then $role === 'editor' || $role === 'admin' (system/htmly.php); role read via user('role', $_SESSION user)"
+        ]
+      },
+      "entity": "Category",
+      "_binds": {
+        "title": "Category.title",
+        "url": "Category.slug",
+        "content": "Category.body",
+        "description": "Category.description"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "admin",
+                          "editor"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "title",
+          "url",
+          "content"
+        ],
+        "messages": {
+          "unique": "A category with that slug already exists.",
+          "precondition": "Only an editor or admin can create categories."
+        }
+      },
+      "_defaulted": [
+        "slug kept writable -> arg url (real code writes <url>.md keyed by slug; the raw pre-pass had dropped slug as unwritable)"
+      ],
+      "description": "Create a new post category. Refused unless you are an editor or admin."
+    },
+    {
+      "tool": "category_update",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Category",
+        "row_key": {
+          "slug": {
+            "$arg": "slug"
+          }
+        },
+        "set": {
+          "title": {
+            "$arg": "title"
+          },
+          "body": {
+            "$arg": "content"
+          },
+          "slug": {
+            "$arg": "url"
+          },
+          "description": {
+            "$arg": "description"
+          }
+        }
+      },
+      "input_schema": {
+        "slug": {
+          "type": "text",
+          "required": true,
+          "description": "The current URL slug of the category to edit."
+        },
+        "title": {
+          "type": "text",
+          "required": true,
+          "description": "The new display title."
+        },
+        "content": {
+          "type": "text",
+          "required": true,
+          "description": "The new category body content."
+        },
+        "url": {
+          "type": "text",
+          "required": false,
+          "description": "The new URL slug if renaming the category."
+        },
+        "description": {
+          "type": "text",
+          "required": false,
+          "description": "An optional short description of the content."
+        }
+      },
+      "_evidence": {
+        "locator": "system/admin/admin.php:1001",
+        "id_local": "Category.update",
+        "entry": {
+          "kind": "http",
+          "route": "POST /category/:category/edit",
+          "locator": "system/htmly.php:3805"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "$newfile = $dir . '/' . $post_url . '.md';\nif ($oldfile === $newfile) { file_put_contents($oldfile, $post_content, LOCK_EX); }\nelse { rename($oldfile, $newfile); rename_comments($oldfile,$newfile); file_put_contents($newfile, $post_content, LOCK_EX); }\nrename_category_folder($post_url, $oldfile);\nrebuilt_cache('all');",
+        "edges": [
+          "routes check login() then $role === 'editor' || $role === 'admin' (system/htmly.php); role read via user('role', $_SESSION user)"
+        ]
+      },
+      "entity": "Category",
+      "_binds": {
+        "title": "Category.title",
+        "url": "Category.slug",
+        "content": "Category.body",
+        "description": "Category.description"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "admin",
+                          "editor"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "slug",
+          "title",
+          "content"
+        ],
+        "messages": {
+          "not_found": "That category does not exist.",
+          "precondition": "Only an editor or admin can edit categories."
+        }
+      },
+      "_defaulted": [
+        "rewritten: row_key slug; slug kept writable via arg url; write via set"
+      ],
+      "description": "Edit a category's title, body, slug or description. Refused unless you are an editor or admin."
+    },
+    {
+      "tool": "category_delete",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "Category",
+        "lookup_by": {
+          "slug": {
+            "$arg": "slug"
+          }
+        }
+      },
+      "input_schema": {
+        "slug": {
+          "type": "text",
+          "required": true,
+          "description": "The URL slug of the category to delete."
+        }
+      },
+      "_evidence": {
+        "locator": "system/htmly.php:3910",
+        "id_local": "Category.delete",
+        "entry": {
+          "kind": "http",
+          "route": "POST /category/:category/delete",
+          "locator": "system/htmly.php:3910"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "if ($role === 'editor' || $role === 'admin') { $file = from($_REQUEST, 'file'); $destination = from($_GET, 'destination'); delete_page($file, $destination); }",
+        "edges": [
+          "routes check login() then $role === 'editor' || $role === 'admin' (system/htmly.php); role read via user('role', $_SESSION user)"
+        ]
+      },
+      "entity": "Category",
+      "_binds": {
+        "slug": "Category.slug"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "admin",
+                          "editor"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "slug"
+        ],
+        "messages": {
+          "not_found": "That category does not exist.",
+          "on_child": "Posts still reference this category; move them first.",
+          "precondition": "Only an editor or admin can delete categories."
+        }
+      },
+      "description": "Delete a category. Posts referencing it must be moved first; refused unless you are an editor or admin."
+    },
+    {
+      "tool": "staticpage_read",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "StaticPage",
+        "lookup_by": {
+          "slug": {
+            "$arg": "static"
+          }
+        }
+      },
+      "input_schema": {
+        "static": {
+          "type": "text",
+          "required": true,
+          "description": "The URL slug of the page to read."
+        }
+      },
+      "_evidence": {
+        "locator": "system/includes/functions.php:767",
+        "id_local": "StaticPage.read",
+        "entry": {
+          "kind": "http",
+          "route": "GET /:static",
+          "locator": "system/htmly.php:4808"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "$post = find_page($static, $pages);\nif (!$post) { not_found('page_' . $static); }\n... if counter, add_view('page_' . $static); ...\nrender(...);"
+      },
+      "entity": "StaticPage",
+      "_binds": {
+        "static": "StaticPage.slug"
+      },
+      "_output_schema": {
+        "post": "the StaticPage row"
+      },
+      "guards": {
+        "required": [
+          "static"
+        ],
+        "messages": {
+          "not_found": "No such page."
+        }
+      },
+      "description": "Read a static page by URL slug. Public; fails with not_found if the page does not exist."
+    },
+    {
+      "tool": "subpage_read",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "SubPage",
+        "lookup_by": {
+          "parent": {
+            "$arg": "static"
+          },
+          "slug": {
+            "$arg": "sub"
+          }
+        }
+      },
+      "input_schema": {
+        "static": {
+          "type": "text",
+          "required": true,
+          "description": "The URL slug of the parent static page."
+        },
+        "sub": {
+          "type": "text",
+          "required": true,
+          "description": "The URL slug of the sub-page to read."
+        }
+      },
+      "_evidence": {
+        "locator": "system/includes/functions.php:823",
+        "id_local": "SubPage.read",
+        "entry": {
+          "kind": "http",
+          "route": "GET /:static/:sub",
+          "locator": "system/htmly.php:5334"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "$parent_post = find_page($static); if (!$parent_post) not_found(...);\n$post = find_subpage($static, $sub, $sub_pages); if (!$post) not_found(...);\n... if counter, add_view('subpage_' . $static . '.' . $sub); ...",
+        "edges": [
+          "GET /:static/:sub calls find_page($static) and not_found if the parent doesn't exist (system/htmly.php:5358)"
+        ]
+      },
+      "entity": "SubPage",
+      "_binds": {
+        "static": "SubPage.parent",
+        "sub": "SubPage.slug"
+      },
+      "_output_schema": {
+        "post": "the SubPage row"
+      },
+      "guards": {
+        "required": [
+          "static",
+          "sub"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "StaticPage",
+                "where": {
+                  "node": "field",
+                  "col": "slug",
+                  "op": "eq",
+                  "value": {
+                    "arg": "static"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "not_found": "That sub-page (or its parent) does not exist.",
+          "precondition": "No such parent page."
+        }
+      },
+      "description": "Read a sub-page under a parent page. Public; fails if the parent page does not exist."
+    },
+    {
+      "tool": "category_read",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Post",
+        "rank": {
+          "method": "exact"
+        },
+        "filter": {
+          "col": "category",
+          "mode": "exact",
+          "val": {
+            "$arg": "category"
+          }
+        }
+      },
+      "input_schema": {
+        "category": {
+          "type": "text",
+          "required": true,
+          "description": "The URL slug of the category whose posts to list."
+        }
+      },
+      "_evidence": {
+        "locator": "system/includes/functions.php:880",
+        "id_local": "Category.read",
+        "entry": {
+          "kind": "http",
+          "route": "GET /category/:category",
+          "locator": "system/htmly.php:3660"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "$posts = get_category($category, $page, $perpage);\n$desc = get_category_info($category);\nrender(...);"
+      },
+      "entity": "Post",
+      "_binds": {
+        "category": "Category.slug"
+      },
+      "_output_schema": {
+        "posts": "list of Post rows in the category",
+        "category": "the Category row"
+      },
+      "guards": {
+        "required": [
+          "category"
+        ]
+      },
+      "description": "List the published posts in a category by its URL slug. Public."
+    },
+    {
+      "tool": "comment_create",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Comment",
+        "fields": [
+          "name",
+          "email",
+          "comment",
+          "parent_id",
+          "notify"
+        ],
+        "set_on_create": {
+          "published": true
+        }
+      },
+      "input_schema": {
+        "url": {
+          "type": "text",
+          "required": true,
+          "description": "The post/page URL this comment is attached to."
+        },
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "The commenter name (at least 2 characters)."
+        },
+        "email": {
+          "type": "text",
+          "required": true,
+          "description": "The commenter email."
+        },
+        "comment": {
+          "type": "text",
+          "required": true,
+          "description": "The comment text (at least 3 characters)."
+        },
+        "parent_id": {
+          "type": "text",
+          "required": false,
+          "description": "The id of a comment to reply to, for threaded replies."
+        },
+        "notify": {
+          "type": "bool",
+          "required": false,
+          "description": "True to subscribe this email to follow-up notifications."
+        }
+      },
+      "_evidence": {
+        "locator": "system/includes/comments.php:432",
+        "id_local": "Comment.create",
+        "entry": {
+          "kind": "http",
+          "route": "POST /comments/submit",
+          "locator": "system/htmly.php:6074"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "$commentId = generateCommentId();\n$timestamp = time();\n$comment = array('id'=>$commentId,'name'=>trim($data['name']),'email'=>trim($data['email']),'comment'=>trim($data['comment']),\n  'timestamp'=>$timestamp,'date'=>date('Y-m-d H:i:s',$timestamp),'parent_id'=>..., 'notify'=>(...==='1'),\n  'published'=>comments_config('comments.moderation')!=='true','ip'=>$_SERVER['REMOTE_ADDR']??'unknown');\n$comments[]=$comment;\nfile_put_contents($file, json_encode($comments, JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES), LOCK_EX);",
+        "edges": [
+          "/comments/submit redirects unless local() i.e. comment.system == 'local' (system/htmly.php:6075, comments.php:12)"
+        ],
+        "id_auto": "comment id is generated by the platform (system/includes/comments.php:432 generateCommentId()); the runtime assigns its own row id, which the moderation tools use to address the comment."
+      },
+      "entity": "Comment",
+      "_binds": {
+        "name": "Comment.name",
+        "email": "Comment.email",
+        "comment": "Comment.comment",
+        "parent_id": "Comment.parent_id",
+        "notify": "Comment.notify"
+      },
+      "_output_schema": {
+        "success": "bool",
+        "comment_id": "the new comment id",
+        "message": "i18n key"
+      },
+      "guards": {
+        "required": [
+          "url",
+          "name",
+          "email",
+          "comment"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Config",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "key",
+                      "op": "eq",
+                      "value": "comment.system"
+                    },
+                    {
+                      "node": "field",
+                      "col": "value",
+                      "op": "eq",
+                      "value": "local"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "precondition": "Comments are not currently enabled on this site.",
+          "required": "A valid name, email and comment are required."
+        }
+      },
+      "description": "Post a comment on a post or page. Comments are created published unless moderation is on. Public; no account needed. Refused if local comments are disabled."
+    },
+    {
+      "tool": "comment_modify",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Comment",
+        "row_key": {
+          "id": {
+            "$arg": "commentid"
+          }
+        },
+        "set": {
+          "name": {
+            "$arg": "name"
+          },
+          "email": {
+            "$arg": "email"
+          },
+          "comment": {
+            "$arg": "comment"
+          },
+          "published": {
+            "$arg": "published"
+          }
+        }
+      },
+      "input_schema": {
+        "commentid": {
+          "type": "text",
+          "required": true,
+          "description": "The id of the comment to edit."
+        },
+        "name": {
+          "type": "text",
+          "required": false,
+          "description": "The commenter name."
+        },
+        "email": {
+          "type": "text",
+          "required": false,
+          "description": "The commenter email."
+        },
+        "comment": {
+          "type": "text",
+          "required": false,
+          "description": "The comment text."
+        },
+        "published": {
+          "type": "bool",
+          "required": false,
+          "description": "Whether the comment is approved/published."
+        }
+      },
+      "_evidence": {
+        "locator": "system/includes/comments.php:786",
+        "id_local": "Comment.modify",
+        "entry": {
+          "kind": "http",
+          "route": "POST /admin/comments/update/:commentfile/:commentid",
+          "locator": "system/htmly.php:3322"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "foreach ($comments as &$comment) {\n    if ($comment['id'] === $commentId) {\n        if (isset($data['name'])) $comment['name'] = trim($data['name']);\n        if (isset($data['email'])) $comment['email'] = trim($data['email']);\n        if (isset($data['comment'])) $comment['comment'] = trim($data['comment']);\n        if (isset($data['published'])) $comment['published'] = (bool)$data['published'];\n        $comment['modified'] = date('Y-m-d H:i:s'); $updated = true; break;\n    }\n}\nfile_put_contents($file, json_encode($comments, JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES), LOC",
+        "edges": [
+          "routes check login() then $role === 'editor' || $role === 'admin' (system/htmly.php); role read via user('role', $_SESSION user)",
+          "commentModify returns false if the comment id isn't found (system/includes/comments.php:786)"
+        ],
+        "modified_audit": "the real code stamps modified=now() on edit (system/includes/comments.php:786), but Comment.modified is an audit column so the runtime refuses to write it; the write-through is dropped."
+      },
+      "entity": "Comment",
+      "_binds": {
+        "commentid": "Comment.id",
+        "name": "Comment.name",
+        "email": "Comment.email",
+        "comment": "Comment.comment",
+        "published": "Comment.published"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "admin",
+                          "editor"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Comment",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "commentid"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "commentid"
+        ],
+        "messages": {
+          "not_found": "That comment does not exist.",
+          "precondition": "Only an editor or admin can moderate comments."
+        }
+      },
+      "description": "Edit a comment's name, email, body or published state as a moderator. Refused unless you are an editor or admin.",
+      "_defaulted": [
+        "modified audit column dropped from writer (Comment.modified is audit)"
+      ]
+    },
+    {
+      "tool": "comment_publish",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Comment",
+        "row_key": {
+          "id": {
+            "$arg": "commentid"
+          }
+        },
+        "set": {
+          "published": {
+            "$const": true
+          }
+        }
+      },
+      "input_schema": {
+        "commentid": {
+          "type": "text",
+          "required": true,
+          "description": "The id of the comment to approve."
+        }
+      },
+      "_evidence": {
+        "locator": "system/includes/comments.php:700",
+        "id_local": "Comment.publish",
+        "entry": {
+          "kind": "http",
+          "route": "GET /admin/comments/publish/:commentfile/:commentid",
+          "locator": "system/htmly.php:3354"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "foreach ($comments as &$comment) {\n    if ($comment['id'] === $commentId) { $comment['published'] = true; $updated = true; break; }\n}\nrebuilt_cache('all'); clear_cache();\nreturn file_put_contents($file, $json, LOCK_EX) !== false;",
+        "edges": [
+          "routes check login() then $role === 'editor' || $role === 'admin' (system/htmly.php); role read via user('role', $_SESSION user)",
+          "commentPublish returns false if the comment id isn't found (system/includes/comments.php:700)"
+        ]
+      },
+      "entity": "Comment",
+      "_binds": {
+        "commentid": "Comment.id"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "admin",
+                          "editor"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Comment",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "commentid"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "commentid"
+        ],
+        "messages": {
+          "not_found": "That comment does not exist.",
+          "precondition": "Only an editor or admin can approve comments."
+        }
+      },
+      "_defaulted": [
+        "argument invented from the write column",
+        "fields"
+      ],
+      "description": "Approve a pending comment by setting it published. Refused unless you are an editor or admin."
+    },
+    {
+      "tool": "comment_delete",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "Comment",
+        "lookup_by": {
+          "id": {
+            "$arg": "commentid"
+          }
+        }
+      },
+      "input_schema": {
+        "commentid": {
+          "type": "text",
+          "required": true,
+          "description": "The id of the comment (and its replies) to delete."
+        }
+      },
+      "_evidence": {
+        "locator": "system/includes/comments.php:747",
+        "id_local": "Comment.delete",
+        "entry": {
+          "kind": "http",
+          "route": "GET /admin/comments/delete/:commentfile/:commentid",
+          "locator": "system/htmly.php:3368"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "$comments = array_filter($comments, function($comment) use ($commentId) {\n    return $comment['id'] !== $commentId && (empty($comment['parent_id']) || $comment['parent_id'] !== $commentId);\n});\n$comments = array_values($comments);\nrebuilt_cache('all'); clear_cache();\nreturn file_put_contents($file, $json, LOCK_EX) !== false;",
+        "edges": [
+          "routes check login() then $role === 'editor' || $role === 'admin' (system/htmly.php); role read via user('role', $_SESSION user)"
+        ]
+      },
+      "entity": "Comment",
+      "_binds": {
+        "commentid": "Comment.id"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "admin",
+                          "editor"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "commentid"
+        ],
+        "messages": {
+          "not_found": "That comment does not exist.",
+          "precondition": "Only an editor or admin can delete comments."
+        }
+      },
+      "description": "Delete a comment and any replies to it. Refused unless you are an editor or admin."
+    },
+    {
+      "tool": "comment_list",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Comment",
+        "rank": {
+          "method": "exact"
+        },
+        "pagination": {
+          "default_limit": 50
+        }
+      },
+      "input_schema": {
+        "page": {
+          "type": "int",
+          "required": false,
+          "description": "Page of comments to view."
+        }
+      },
+      "_evidence": {
+        "locator": "system/htmly.php:3102",
+        "id_local": "Comment.list",
+        "entry": {
+          "kind": "http",
+          "route": "GET /admin/comments",
+          "locator": "system/htmly.php:3102"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "$result = getAllComments($page, $perpage);\n$comments = $result[0]; $total = $result[1];\n$pendingCount = getPendingCommentsCount();\nrender('comments', ...);",
+        "edges": [
+          "routes check login() then $role === 'editor' || $role === 'admin' (system/htmly.php); role read via user('role', $_SESSION user)"
+        ]
+      },
+      "entity": "Comment",
+      "_output_schema": {
+        "comments": "list of Comment rows with their post url",
+        "total": "int"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "admin",
+                          "editor"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [],
+        "messages": {
+          "precondition": "Only an editor or admin can view comments."
+        }
+      },
+      "description": "List all comments across the site. Refused unless you are an editor or admin."
+    },
+    {
+      "tool": "comment_list_pending",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Comment",
+        "rank": {
+          "method": "exact"
+        },
+        "filter": {
+          "col": "published",
+          "mode": "exact",
+          "val": false
+        },
+        "pagination": {
+          "default_limit": 50
+        }
+      },
+      "input_schema": {
+        "page": {
+          "type": "int",
+          "required": false,
+          "description": "Page of pending comments to view."
+        }
+      },
+      "_evidence": {
+        "locator": "system/htmly.php:3140",
+        "id_local": "Comment.list_pending",
+        "entry": {
+          "kind": "http",
+          "route": "GET /admin/comments/pending",
+          "locator": "system/htmly.php:3140"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "$allComments = getAllComments();\n$pendingComments = array_filter($allComments, function($comment) { return !$comment['published']; });\n$pendingComments = array_values($pendingComments); ...",
+        "edges": [
+          "routes check login() then $role === 'editor' || $role === 'admin' (system/htmly.php); role read via user('role', $_SESSION user)"
+        ]
+      },
+      "entity": "Comment",
+      "_output_schema": {
+        "comments": "list of unpublished Comment rows"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "admin",
+                          "editor"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [],
+        "messages": {
+          "precondition": "Only an editor or admin can view comments."
+        }
+      },
+      "description": "List the comments that are not yet approved (pending moderation). Refused unless you are an editor or admin."
+    },
+    {
+      "tool": "comment_settings_update",
+      "op": "update",
+      "family": "crud.upsert",
+      "exec_spec": {
+        "entity": "CommentConfig",
+        "key": {
+          "key": {
+            "$const": "comments.moderation"
+          }
+        },
+        "set_on_exists": {
+          "value": {
+            "$arg": "value"
+          }
+        },
+        "insert_fields": {
+          "key": {
+            "$const": "comments.moderation"
+          },
+          "value": {
+            "$arg": "value"
+          }
+        }
+      },
+      "input_schema": {
+        "key": {
+          "type": "text",
+          "required": false,
+          "description": "The comments config key to set; defaults to comments.moderation. Use the moderation value to toggle approval."
+        },
+        "value": {
+          "type": "text",
+          "required": true,
+          "description": "The new value for the key (true/false for comments.moderation)."
+        }
+      },
+      "_evidence": {
+        "locator": "system/htmly.php:3215",
+        "id_local": "Comment.settings_update",
+        "entry": {
+          "kind": "http",
+          "route": "POST /admin/comments/settings",
+          "locator": "system/htmly.php:3215"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "$config['comments.moderation'] = isset($_POST['comments_moderation']) ? 'true' : 'false';\n$config['comments.honeypot'] = isset($_POST['comments_honeypot']) ? 'true' : 'false';\n...\nif (!empty($password)) $config['comments.mail.password'] = $password;\n$result = save_comments_config($config);",
+        "edges": [
+          "route checks login() then $role === 'admin' (system/htmly.php)"
+        ],
+        "moderation_only": "system/htmly.php:3215 Comment.settings_update writes the comments.* config bundle from POST booleans; only the moderation key is surfaced here as the primary gate on comment tasks."
+      },
+      "entity": "CommentConfig",
+      "_binds": {
+        "key": "CommentConfig.key",
+        "value": "CommentConfig.value"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "eq",
+                      "value": "admin"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "value"
+        ],
+        "messages": {
+          "precondition": "Only an admin can change comment settings."
+        }
+      },
+      "_defaulted": [
+        "rewritten to crud.upsert on comments.moderation: the endpoint writes the comments.* bundle via save_comments_config, creating the row if absent"
+      ],
+      "description": "Set a comment-setting value, defaulting to the comments.moderation key (true = require approval, false = publish immediately). Creating the config row if needed. Refused unless you are an admin."
+    },
+    {
+      "tool": "subscription_confirm",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Subscription",
+        "row_key": {
+          "email": {
+            "$arg": "email"
+          }
+        },
+        "set": {
+          "status": {
+            "$const": "subscribed"
+          }
+        }
+      },
+      "input_schema": {
+        "email": {
+          "type": "text",
+          "required": true,
+          "description": "The email address to confirm the subscription for."
+        }
+      },
+      "_evidence": {
+        "locator": "system/includes/comments.php:572",
+        "id_local": "Subscription.confirm",
+        "entry": {
+          "kind": "http",
+          "route": "GET ?subscribe=<hmac>",
+          "locator": "system/includes/comments.php:1031"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "if (isset($_GET['subscribe'])) { confirmSubscription($_GET['subscribe']); }\n// setSubscription confirm branch\nelseif ($action == 'confirm' && $subscription['status'] == 'waiting') {\n  $subscription['status'] = 'subscribed';\n  file_put_contents($subscription_file, json_encode($subscription, JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES)); return true; }",
+        "edges": [
+          "setSubscription confirm only acts when status==waiting (system/includes/comments.php:537)"
+        ]
+      },
+      "entity": "Subscription",
+      "_binds": {
+        "email": "Subscription.email"
+      },
+      "_output_schema": {},
+      "guards": {
+        "required": [
+          "email"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Subscription",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "email",
+                      "op": "eq",
+                      "value": {
+                        "arg": "email"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "status",
+                      "op": "eq",
+                      "value": "waiting"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "not_found": "No waiting subscription for that email.",
+          "precondition": "This subscription is not waiting to be confirmed."
+        }
+      },
+      "_defaulted": [
+        "rewritten from status_transition to field_set with a hard status->subscribed, guarded by the waiting-state precondition (real confirm only acts when status==waiting)"
+      ],
+      "description": "Confirm an email subscription whose status is waiting, marking it subscribed (as when a subscriber clicks a confirmation link). Public; no login. Fails if there is no waiting subscription for that email."
+    },
+    {
+      "tool": "subscription_unsubscribe",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "Subscription",
+        "lookup_by": {
+          "email": {
+            "$arg": "email"
+          }
+        }
+      },
+      "input_schema": {
+        "email": {
+          "type": "text",
+          "required": true,
+          "description": "The email address to unsubscribe."
+        }
+      },
+      "_evidence": {
+        "locator": "system/includes/comments.php:613",
+        "id_local": "Subscription.unsubscribe",
+        "entry": {
+          "kind": "http",
+          "route": "GET ?unsubscribe=<hmac>",
+          "locator": "system/includes/comments.php:1035"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "if (isset($_GET['unsubscribe'])) { deleteSubscription($_GET['unsubscribe']); }\n// deleteSubscription():\nif (sanitizedSubscriptionFile($filename) && file_exists($subscription_file)) { @unlink($subscription_file); return true; }",
+        "edges": [
+          "deleteSubscription() only unlinks after sanitizedSubscriptionFile() passes and the file exists (system/includes/comments.php:613)"
+        ]
+      },
+      "entity": "Subscription",
+      "_binds": {
+        "email": "Subscription.email"
+      },
+      "_output_schema": {},
+      "guards": {
+        "required": [
+          "email"
+        ],
+        "messages": {
+          "not_found": "No subscription for that email."
+        }
+      },
+      "description": "Unsubscribe an email address, deleting its subscription. Public; no login."
+    },
+    {
+      "tool": "config_update",
+      "op": "update",
+      "family": "crud.upsert",
+      "exec_spec": {
+        "entity": "Config",
+        "key": {
+          "key": {
+            "$arg": "key"
+          }
+        },
+        "set_on_exists": {
+          "value": {
+            "$arg": "value"
+          }
+        },
+        "insert_fields": {
+          "key": {
+            "$arg": "key"
+          },
+          "value": {
+            "$arg": "value"
+          }
+        }
+      },
+      "input_schema": {
+        "key": {
+          "type": "text",
+          "required": true,
+          "description": "The config key to set (e.g. views.counter, site.tagline)."
+        },
+        "value": {
+          "type": "text",
+          "required": true,
+          "description": "The new value to store."
+        }
+      },
+      "_evidence": {
+        "locator": "system/includes/dispatch.php:118",
+        "id_local": "Config.update",
+        "entry": {
+          "kind": "http",
+          "route": "POST /admin/config",
+          "locator": "system/htmly.php:1996"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "foreach ($_POST as $name => $value) {\n    if (substr($name, 0, 8) == '-config-') {\n        $name = str_replace('_', '.', substr($name, 8));\n        if (!is_null(config($name))) $new_config[$name] = $value; else $new_Keys[$name] = $value;\n    }\n}\nsave_config($new_config, $new_Keys);",
+        "edges": [
+          "route checks login() then $role === 'admin' (system/htmly.php)"
+        ]
+      },
+      "entity": "Config",
+      "_binds": {
+        "key": "Config.key",
+        "value": "Config.value"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "eq",
+                      "value": "admin"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "key",
+          "value"
+        ],
+        "messages": {
+          "precondition": "Only an admin can change site configuration."
+        }
+      },
+      "description": "Set a site configuration value by key, creating the key if it does not exist. Refused unless you are an admin.",
+      "_defaulted": [
+        "rewritten to crud.upsert: real save_config() writes-or-creates the key (system/includes/dispatch.php:118), so a config key that does not exist yet must be created, not refused"
+      ]
+    },
+    {
+      "tool": "menu_save",
+      "op": "update",
+      "family": "crud.upsert",
+      "exec_spec": {
+        "entity": "Menu",
+        "key": {
+          "id": {
+            "$const": 1
+          }
+        },
+        "set_on_exists": {
+          "items": {
+            "$arg": "json"
+          }
+        },
+        "insert_fields": {
+          "id": {
+            "$const": 1
+          },
+          "items": {
+            "$arg": "json"
+          }
+        }
+      },
+      "input_schema": {
+        "json": {
+          "type": "json",
+          "required": true,
+          "description": "The menu structure (ordered items) to save as the site menu."
+        }
+      },
+      "_evidence": {
+        "locator": "system/htmly.php:2733",
+        "id_local": "Menu.save",
+        "entry": {
+          "kind": "http",
+          "route": "POST /admin/menu",
+          "locator": "system/htmly.php:2733"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "$json = from($_REQUEST, 'json');\nfile_put_contents('content/data/menu.json', json_encode($json, JSON_UNESCAPED_UNICODE));\necho json_encode(array('message' => 'Menu saved successfully!'));",
+        "edges": [
+          "routes check login() then $role === 'editor' || $role === 'admin' (system/htmly.php); role read via user('role', $_SESSION user)"
+        ]
+      },
+      "entity": "Menu",
+      "_output_schema": {
+        "message": "string"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "in",
+                      "value": {
+                        "const": [
+                          "admin",
+                          "editor"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "json"
+        ],
+        "messages": {
+          "auth": "You must sign in first.",
+          "precondition": "Only an editor or admin can save the menu.",
+          "required": "The menu (json) is required."
+        }
+      },
+      "_defaulted": [
+        "rewritten to upsert on the singleton Menu row (content/data/menu.json)"
+      ],
+      "description": "Save the site's navigation menu. Refused unless you are an editor or admin."
+    },
+    {
+      "tool": "themeconfig_activate",
+      "op": "update",
+      "family": "crud.upsert",
+      "exec_spec": {
+        "entity": "Config",
+        "key": {
+          "key": {
+            "$const": "views.root"
+          }
+        },
+        "set_on_exists": {
+          "value": {
+            "$arg": "theme"
+          }
+        },
+        "insert_fields": {
+          "key": {
+            "$const": "views.root"
+          },
+          "value": {
+            "$arg": "theme"
+          }
+        }
+      },
+      "input_schema": {
+        "theme": {
+          "type": "text",
+          "required": true,
+          "description": "The theme directory name to activate (stored as views.root)."
+        }
+      },
+      "_evidence": {
+        "locator": "system/htmly.php:3578",
+        "id_local": "ThemeConfig.activate",
+        "entry": {
+          "kind": "http",
+          "route": "POST /admin/themes",
+          "locator": "system/htmly.php:3578"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "$new_config['views.root'] = $json;\nsave_config($new_config, $new_Keys);\necho json_encode(array('message' => 'Theme activated!'));",
+        "edges": [
+          "route checks login() then $role === 'admin' (system/htmly.php)"
+        ]
+      },
+      "entity": "Config",
+      "_binds": {
+        "theme": "Config.value"
+      },
+      "_output_schema": {
+        "message": "string"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "eq",
+                      "value": "admin"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "theme"
+        ],
+        "messages": {
+          "precondition": "Only an admin can change themes."
+        }
+      },
+      "_defaulted": [
+        "rewritten to crud.upsert on Config/views.root: real code writes new_config[views.root]=theme (system/htmly.php:3578), creating the row if absent"
+      ],
+      "description": "Activate a theme by setting it as the site's views.root config, creating that config row if needed. Refused unless you are an admin."
+    },
+    {
+      "tool": "themeconfig_update",
+      "op": "update",
+      "family": "crud.upsert",
+      "exec_spec": {
+        "entity": "ThemeConfig",
+        "key": {
+          "theme": {
+            "$arg": "theme"
+          },
+          "key": {
+            "$arg": "key"
+          }
+        },
+        "set_on_exists": {
+          "value": {
+            "$arg": "value"
+          }
+        },
+        "insert_fields": {
+          "theme": {
+            "$arg": "theme"
+          },
+          "key": {
+            "$arg": "key"
+          },
+          "value": {
+            "$arg": "value"
+          }
+        }
+      },
+      "input_schema": {
+        "theme": {
+          "type": "text",
+          "required": true,
+          "description": "The theme whose config to update."
+        },
+        "key": {
+          "type": "text",
+          "required": true,
+          "description": "The theme config key to set."
+        },
+        "value": {
+          "type": "text",
+          "required": true,
+          "description": "The new value."
+        }
+      },
+      "_evidence": {
+        "locator": "system/includes/dispatch.php:168",
+        "id_local": "ThemeConfig.update",
+        "entry": {
+          "kind": "http",
+          "route": "POST /admin/themes/:theme",
+          "locator": "system/htmly.php:3623"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "foreach ($_POST as $name => $value) {\n    if (substr($name, 0, 8) == '-config-') { $name = substr($name, 8);\n        if (!is_null(theme_config($name))) $new_config[$name] = $value; else $new_Keys[$name] = $value; }\n}\nsave_theme_config($new_config, $new_Keys, $theme);",
+        "edges": [
+          "route checks login() then $role === 'admin' (system/htmly.php)"
+        ]
+      },
+      "entity": "ThemeConfig",
+      "_binds": {
+        "theme": "ThemeConfig.theme",
+        "key": "ThemeConfig.key",
+        "value": "ThemeConfig.value"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "eq",
+                      "value": "admin"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "theme",
+          "key",
+          "value"
+        ],
+        "messages": {
+          "precondition": "Only an admin can change theme configuration."
+        }
+      },
+      "description": "Set a per-theme configuration value, creating the key if it does not exist. Refused unless you are an admin.",
+      "_defaulted": [
+        "rewritten to crud.upsert: real save_theme_config() writes-or-creates the key (system/includes/dispatch.php:168)"
+      ]
+    }
+  ],
+  "seed_state": {
+    "User": [
+      {
+        "id": 1,
+        "username": "ops@htmly.example",
+        "password": "pw-operations",
+        "encryption": "password_hash",
+        "role": "admin",
+        "mfa_secret": "disabled"
+      },
+      {
+        "id": 2,
+        "username": "editor@htmly.example",
+        "password": "pw-editor",
+        "encryption": "password_hash",
+        "role": "editor",
+        "mfa_secret": "disabled"
+      }
+    ],
+    "Profile": [
+      {
+        "username": "ada",
+        "name": "Ada Lovelace",
+        "description": "Founding editor",
+        "body": "About Ada.",
+        "image": "",
+        "custom_fields": null,
+        "id": 1
+      },
+      {
+        "username": "bob",
+        "name": "Bob Builder",
+        "description": "Staff editor",
+        "body": "About Bob.",
+        "image": "",
+        "custom_fields": null,
+        "id": 2
+      }
+    ],
+    "Frontpage": [
+      {
+        "id": 1,
+        "title": "Welcome to HTMLy",
+        "body": "The front page.",
+        "custom_fields": null
+      }
+    ],
+    "Category": [
+      {
+        "slug": "technology",
+        "title": "Technology",
+        "description": "Tech posts",
+        "body": "Tech category landing.",
+        "id": 1
+      },
+      {
+        "slug": "news",
+        "title": "News",
+        "description": "News posts",
+        "body": "News category landing.",
+        "id": 2
+      }
+    ],
+    "Post": [
+      {
+        "id": 1,
+        "slug": "hello-world",
+        "title": "Hello World",
+        "description": "First post",
+        "tag": "intro",
+        "media": "",
+        "custom_fields": null,
+        "body": "Welcome to the blog.",
+        "date": "2026-01-05T10:00:00",
+        "status": "published",
+        "author": "ada",
+        "category": "technology",
+        "type": "post"
+      },
+      {
+        "id": 2,
+        "slug": "draft-notes",
+        "title": "Draft Notes",
+        "description": null,
+        "tag": "notes",
+        "media": "",
+        "custom_fields": null,
+        "body": "Work in progress.",
+        "date": "2026-02-01T09:00:00",
+        "status": "draft",
+        "author": "bob",
+        "category": "news",
+        "type": "post"
+      },
+      {
+        "id": 3,
+        "slug": "future-post",
+        "title": "Scheduled Piece",
+        "description": null,
+        "tag": "news",
+        "media": "",
+        "custom_fields": null,
+        "body": "Scheduled content.",
+        "date": "2026-12-01T12:00:00",
+        "status": "scheduled",
+        "author": "ada",
+        "category": "news",
+        "type": "post"
+      }
+    ],
+    "StaticPage": [
+      {
+        "id": 1,
+        "slug": "about",
+        "title": "About",
+        "description": "About the site",
+        "custom_fields": null,
+        "body": "About page.",
+        "status": "published"
+      }
+    ],
+    "SubPage": [
+      {
+        "id": 1,
+        "parent": "about",
+        "slug": "team",
+        "title": "Team",
+        "description": null,
+        "custom_fields": null,
+        "body": "The team.",
+        "status": "published"
+      }
+    ],
+    "Config": [
+      {
+        "key": "views.counter",
+        "value": "false",
+        "id": 1
+      },
+      {
+        "key": "views.root",
+        "value": "default",
+        "id": 2
+      },
+      {
+        "key": "comment.system",
+        "value": "local",
+        "id": 3
+      },
+      {
+        "key": "site.title",
+        "value": "My HTMLy Site",
+        "id": 4
+      }
+    ],
+    "CommentConfig": [
+      {
+        "key": "comments.moderation",
+        "value": "false",
+        "id": 1
+      }
+    ],
+    "ThemeConfig": [
+      {
+        "theme": "default",
+        "key": "accent",
+        "value": "blue",
+        "id": 1
+      }
+    ],
+    "Menu": [
+      {
+        "id": 1,
+        "items": [
+          {
+            "label": "Home",
+            "url": "/"
+          },
+          {
+            "label": "About",
+            "url": "/about"
+          }
+        ]
+      }
+    ],
+    "Comment": [
+      {
+        "id": 1,
+        "name": "Tester",
+        "email": "t@example.com",
+        "comment": "Nice post.",
+        "timestamp": 1736000000,
+        "date": "2026-01-06T00:00:00",
+        "parent_id": null,
+        "notify": false,
+        "published": true,
+        "ip": "127.0.0.1"
+      },
+      {
+        "id": 2,
+        "name": "Reviewer",
+        "email": "r@example.com",
+        "comment": "Pending.",
+        "timestamp": 1736001000,
+        "date": "2026-01-07T00:00:00",
+        "parent_id": null,
+        "notify": false,
+        "published": false,
+        "ip": "127.0.0.1"
+      }
+    ],
+    "Subscription": [
+      {
+        "email": "fan@example.com",
+        "status": "waiting",
+        "date": "2026-01-08T00:00:00",
+        "id": 1
+      },
+      {
+        "email": "reader@example.com",
+        "status": "subscribed",
+        "date": "2026-01-01T00:00:00",
+        "id": 2
+      }
+    ],
+    "ViewCount": [
+      {
+        "key": "post_hello-world",
+        "count": 42,
+        "id": 1
+      }
+    ],
+    "SearchIndex": [
+      {
+        "key": "post_hello-world",
+        "content": "hello world welcome",
+        "id": 1
+      }
+    ],
+    "TagI18n": [
+      {
+        "tag_slug": "intro",
+        "tag_display": "Intro",
+        "id": 1
+      }
+    ]
+  },
+  "summary": "HTMLy is a flat-file (databaseless) multi-user blogging platform in PHP: posts, static pages, subpages, and profiles are stored as tagged markdown files, users as INI files, comments/subscriptions/views/search-index/menu as JSON files, and config as INI files; the admin panel provides authenticated CRUD over all of them.",
+  "_auth_candidates": [
+    {
+      "entity": "User",
+      "username_col": "username",
+      "password_col": "password"
+    }
+  ],
+  "_fk_gravity": {
+    "entity": "Category",
+    "fk_count": 1
+  },
+  "_no_edges": [
+    {
+      "id_local": "Post.publish_draft",
+      "why": "internal lifecycle branch of edit_content() (system/admin/admin.php:445); not independently reachable — invoked only via Post.update when publishdraft flag set. Calls nothing, no own wall."
+    },
+    {
+      "id_local": "Post.revert_to_draft",
+      "why": "internal lifecycle branch of edit_content() (system/admin/admin.php:447); invoked only via Post.update when revertpost flag set. Calls nothing, no own wall."
+    },
+    {
+      "id_local": "Post.schedule",
+      "why": "internal scheduling branch of add_content/edit_content (system/admin/admin.php:237); not independently reachable — a post lands in the scheduled dir when its date is in the future. Calls nothing, no own wall."
+    },
+    {
+      "id_local": "Subscription.subscribe",
+      "why": "internal subscribe helper (system/includes/comments.php:512) called by Comment.create when notify is set; no own wall, calls only email send."
+    }
+  ],
+  "auth": {
+    "account_entity": "User",
+    "username_col": "username",
+    "password_col": "password",
+    "session_fields": {
+      "account_name": "username"
+    }
+  },
+  "_dropped_customfield": "customfield_save dropped: the endpoint writes a per-type JSON schema (content/data/field/<type>.json) but the CustomField entity is keyed by an integer id, so no honest row mapping; keeping it would make a tool that can only fail. A wrong tool is worse than none."
+}

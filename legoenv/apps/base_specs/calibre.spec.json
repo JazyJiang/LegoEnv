@@ -1,0 +1,3726 @@
+{
+  "env_id": "calibre",
+  "_prep_version": 3,
+  "auth": {
+    "account_entity": "User",
+    "username_col": "name",
+    "password_col": "pw",
+    "session_fields": {
+      "name": "name"
+    }
+  },
+  "entities": [
+    {
+      "name": "Book",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "nullable": false,
+          "default": "Unknown"
+        },
+        {
+          "name": "sort",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "timestamp",
+          "type": "datetime",
+          "nullable": true,
+          "audit": true,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        {
+          "name": "pubdate",
+          "type": "datetime",
+          "nullable": true,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        {
+          "name": "series_index",
+          "type": "float",
+          "nullable": false,
+          "default": 1.0
+        },
+        {
+          "name": "author_sort",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "path",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        },
+        {
+          "name": "has_cover",
+          "type": "bool",
+          "default": 0
+        },
+        {
+          "name": "uuid",
+          "type": "text",
+          "nullable": true,
+          "immutable": true
+        },
+        {
+          "name": "last_modified",
+          "type": "datetime",
+          "nullable": false,
+          "audit": true,
+          "default": "1601-01-01 00:00:00+00:00"
+        }
+      ]
+    },
+    {
+      "name": "Author",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "sort",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "link",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "name"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "BookAuthorLink",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "book",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Book.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "author",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Author.id",
+          "on_delete": "restrict"
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "book",
+            "author"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Publisher",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "sort",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "link",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "name"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "BookPublisherLink",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "book",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Book.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "publisher",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Publisher.id",
+          "on_delete": "restrict"
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "book"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Tag",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "link",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "name"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "BookTagLink",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "book",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Book.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "tag",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Tag.id",
+          "on_delete": "restrict"
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "book",
+            "tag"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Series",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "sort",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "link",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "name"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "BookSeriesLink",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "book",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Book.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "series",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Series.id",
+          "on_delete": "restrict"
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "book"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Rating",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "rating",
+          "type": "int",
+          "nullable": true,
+          "max": 10,
+          "min": 0
+        },
+        {
+          "name": "link",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "rating"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "BookRatingLink",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "book",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Book.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "rating",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Rating.id",
+          "on_delete": "restrict"
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "book",
+            "rating"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Format",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "book",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Book.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "format",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "uncompressed_size",
+          "type": "int",
+          "nullable": false
+        },
+        {
+          "name": "data",
+          "type": "json",
+          "nullable": false
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "book",
+            "format"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Cover",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "book",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Book.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "uncompressed_size",
+          "type": "int",
+          "nullable": false
+        },
+        {
+          "name": "data",
+          "type": "json",
+          "nullable": false
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "book"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Comment",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "book",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Book.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "text",
+          "type": "text",
+          "nullable": false
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "book"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Language",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "lang_code",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "link",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "lang_code"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "BookLanguageLink",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "book",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Book.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "lang_code",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Language.id",
+          "on_delete": "restrict"
+        },
+        {
+          "name": "item_order",
+          "type": "int",
+          "nullable": false,
+          "default": 0
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "book",
+            "lang_code"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "BookIdentifier",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "book",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Book.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "type",
+          "type": "text",
+          "nullable": false,
+          "default": "isbn"
+        },
+        {
+          "name": "val",
+          "type": "text",
+          "nullable": false
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "book",
+            "type"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "BookPagesLink",
+      "columns": [
+        {
+          "name": "book",
+          "type": "id",
+          "pk": true,
+          "fk_to": "Book.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "pages",
+          "type": "int",
+          "nullable": false,
+          "default": 0
+        },
+        {
+          "name": "algorithm",
+          "type": "int",
+          "nullable": false,
+          "default": 0
+        },
+        {
+          "name": "format",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        },
+        {
+          "name": "format_size",
+          "type": "int",
+          "nullable": false,
+          "default": 0
+        },
+        {
+          "name": "timestamp",
+          "type": "datetime",
+          "nullable": true,
+          "audit": true,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        {
+          "name": "needs_scan",
+          "type": "int",
+          "nullable": false,
+          "enum": [
+            0,
+            1
+          ],
+          "default": 0
+        }
+      ]
+    },
+    {
+      "name": "CustomColumn",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "label",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "datatype",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "rating",
+            "text",
+            "comments",
+            "datetime",
+            "int",
+            "float",
+            "bool",
+            "series",
+            "composite",
+            "enumeration"
+          ]
+        },
+        {
+          "name": "mark_for_delete",
+          "type": "bool",
+          "nullable": false,
+          "default": 0
+        },
+        {
+          "name": "editable",
+          "type": "bool",
+          "nullable": false,
+          "default": 1
+        },
+        {
+          "name": "display",
+          "type": "json",
+          "nullable": false,
+          "default": "{}"
+        },
+        {
+          "name": "is_multiple",
+          "type": "bool",
+          "nullable": false,
+          "default": 0
+        },
+        {
+          "name": "normalized",
+          "type": "bool",
+          "nullable": false
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "label"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "BookPluginData",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "book",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Book.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "val",
+          "type": "text",
+          "nullable": false
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "book",
+            "name"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ConversionOption",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "format",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "book",
+          "type": "id",
+          "nullable": true,
+          "fk_to": "Book.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "data",
+          "type": "json",
+          "nullable": false
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "format",
+            "book"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Preference",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "key",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "val",
+          "type": "text",
+          "nullable": false
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "key"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "User",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "pw",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "timestamp",
+          "type": "datetime",
+          "nullable": true,
+          "audit": true,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        {
+          "name": "session_data",
+          "type": "json",
+          "nullable": false,
+          "default": "{}"
+        },
+        {
+          "name": "restriction",
+          "type": "json",
+          "nullable": false,
+          "default": "{}"
+        },
+        {
+          "name": "readonly",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "y",
+            "n"
+          ],
+          "default": "n"
+        },
+        {
+          "name": "misc_data",
+          "type": "json",
+          "nullable": false,
+          "default": "{}"
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "name"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "LastReadPosition",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "book",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Book.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "format",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "user",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "device",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "cfi",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "epoch",
+          "type": "float",
+          "nullable": false
+        },
+        {
+          "name": "pos_frac",
+          "type": "float",
+          "nullable": false,
+          "default": 0
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "user",
+            "device",
+            "book",
+            "format"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Annotation",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "book",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Book.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "format",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "user_type",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "user",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "timestamp",
+          "type": "float",
+          "nullable": false,
+          "audit": true
+        },
+        {
+          "name": "annot_id",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "annot_type",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "annot_data",
+          "type": "json",
+          "nullable": false
+        },
+        {
+          "name": "searchable_text",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "book",
+            "user_type",
+            "user",
+            "format",
+            "annot_type",
+            "annot_id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "AnnotationDirtied",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "book",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Book.id",
+          "on_delete": "cascade"
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "book"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "MetadataDirtied",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "book",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Book.id",
+          "on_delete": "cascade"
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "book"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Note",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "item",
+          "type": "int",
+          "nullable": false
+        },
+        {
+          "name": "colname",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "doc",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        },
+        {
+          "name": "searchable_text",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        },
+        {
+          "name": "ctime",
+          "type": "float",
+          "nullable": true,
+          "audit": true
+        },
+        {
+          "name": "mtime",
+          "type": "float",
+          "nullable": true,
+          "audit": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "item",
+            "colname"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "NoteResource",
+      "columns": [
+        {
+          "name": "hash",
+          "type": "text",
+          "pk": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "name"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "NoteResourceLink",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "note",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Note.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "resource",
+          "type": "text",
+          "nullable": false,
+          "fk_to": "NoteResource.hash",
+          "on_delete": "cascade"
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "note",
+            "resource"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "LibraryId",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "uuid",
+          "type": "text",
+          "nullable": false
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "uuid"
+          ]
+        }
+      ]
+    }
+  ],
+  "tools": [
+    {
+      "_evidence": {
+        "locator": "src/calibre/srv/code.py:577",
+        "id_local": "set_session_data",
+        "entry": {
+          "kind": "http",
+          "route": "POST /interface-data/set-session-data",
+          "locator": "src/calibre/srv/code.py:577"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "@endpoint('/interface-data/set-session-data', postprocess=json, methods=POSTABLE)\ndef set_session_data(ctx, rd):\n    if rd.username:\n        new_data = load_json_file(rd.request_body_file)\n        ud = ctx.user_manager.get_session_data(rd.username)\n        ud.update(new_data)\n        ctx.user_manager.set_session_data(rd.username, ud)",
+        "edges": [
+          "code.py:583 if rd.username: else silently no-op (no auth -> does nothing)"
+        ]
+      },
+      "_binds": {
+        "data": "User.session_data"
+      },
+      "tool": "set_session_data",
+      "op": "update",
+      "family": "update.field_set",
+      "entity": "User",
+      "description": "Persist per-user session state (UI panel position, filter choices, etc.) by merging the given JSON into the signed-in user's stored session data. Requires an account; no-op otherwise.",
+      "input_schema": {
+        "data": {
+          "type": "json",
+          "required": true,
+          "description": "JSON dict to merge into your stored session data."
+        }
+      },
+      "exec_spec": {
+        "entity": "User",
+        "row_key": {
+          "name": {
+            "$session": "name"
+          }
+        },
+        "set": {
+          "session_data": {
+            "$arg": "data"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "name",
+                      "op": "eq",
+                      "value": {
+                        "session": "name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "readonly",
+                      "op": "eq",
+                      "value": "n"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must sign in before saving session data.",
+          "realm": "Read-only accounts cannot save session data.",
+          "precondition": "Sign in to save session data."
+        }
+      }
+    },
+    {
+      "_evidence": {
+        "locator": "src/calibre/srv/users_api.py:13",
+        "id_local": "change_pw",
+        "entry": {
+          "kind": "http",
+          "route": "POST /users/change-pw",
+          "locator": "src/calibre/srv/users_api.py:13"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "@endpoint('/users/change-pw', methods={'POST'})\ndef change_pw(ctx, rd):\n    user = rd.username or None\n    if user is None: raise HTTPForbidden('Anonymous users are not allowed to change passwords')\n    if not ctx.user_manager.is_allowed_to_change_password_via_http(user): raise HTTPForbidden()\n    pw = json.loads(rd.request_body_file.read()); oldpw, newpw = pw['oldpw'], pw['newpw']\n    if oldpw != ctx.user_manager.get(user): raise HTTPBadRequest('Existing password is incorrect')\n    err = validate_password(newpw); \n    ctx.user_manager.change_password(user, newpw)",
+        "edges": [
+          "users_api.py:18 is_allowed_to_change_password_via_http; oldpw check users_api.py:25",
+          "users_api.py:25 if oldpw != ctx.user_manager.get(user) -> HTTPBadRequest"
+        ]
+      },
+      "_binds": {
+        "newpw": "User.pw"
+      },
+      "tool": "change_password",
+      "op": "update",
+      "family": "update.field_set",
+      "entity": "User",
+      "description": "Change the signed-in user's own account password. Fails if the account may not change its password over HTTP, if the current password is wrong, or if the new password is invalid.",
+      "input_schema": {
+        "oldpw": {
+          "type": "text",
+          "required": true,
+          "description": "The user's current password."
+        },
+        "newpw": {
+          "type": "text",
+          "required": true,
+          "description": "The new password to set."
+        }
+      },
+      "exec_spec": {
+        "entity": "User",
+        "row_key": {
+          "name": {
+            "$session": "name"
+          }
+        },
+        "set": {
+          "pw": {
+            "$arg": "newpw"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "name",
+                      "op": "eq",
+                      "value": {
+                        "session": "name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "pw",
+                      "op": "eq",
+                      "value": {
+                        "arg": "oldpw"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must sign in before changing your password.",
+          "precondition": "The current password is incorrect."
+        }
+      }
+    },
+    {
+      "_evidence": {
+        "locator": "src/calibre/srv/cdb.py:80",
+        "id_local": "cdb_add_book",
+        "entry": {
+          "kind": "http",
+          "route": "POST /cdb/add-book/{job_id}/{add_duplicates}/{filename}/{library_id}",
+          "locator": "src/calibre/srv/cdb.py:73"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "ids, duplicates = db.add_books([(mi, {fmt: f})], add_duplicates=add_duplicates)\nans = {'title': mi.title, 'authors': mi.authors, 'languages': mi.languages, 'filename': filename, 'id': job_id}\nif ids:\n    ans['book_id'] = ids[0]\n    ctx.notify_changes(db.backend.library_path, books_added(ids))",
+        "edges": [
+          "write endpoints carry needs_db_write=True -> router check_for_write_access (routes.py:369-371) + ctx.restriction_for check in cdb.py:93 (handler.py:120)"
+        ]
+      },
+      "_binds": {
+        "title": "Book.title"
+      },
+      "tool": "add_book",
+      "op": "create",
+      "family": "crud.insert",
+      "entity": "Book",
+      "description": "Add a new book to the library from an uploaded file. Returns the new book's id. If a duplicate is found and add_duplicates is false, no book is inserted.",
+      "input_schema": {
+        "filename": {
+          "type": "text",
+          "required": true,
+          "description": "Name of the uploaded book file; its extension determines the format."
+        },
+        "add_duplicates": {
+          "type": "bool",
+          "required": true,
+          "description": "True to force-add a book that would otherwise be treated as a duplicate."
+        },
+        "title": {
+          "type": "text",
+          "required": true,
+          "description": "Title for the new book."
+        },
+        "body": {
+          "type": "json",
+          "required": true,
+          "description": "Book metadata (authors, languages, etc.) supplied by the upload."
+        }
+      },
+      "exec_spec": {
+        "entity": "Book",
+        "fields": [
+          "title"
+        ],
+        "set_on_create": {
+          "series_index": 1.0
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "name",
+                      "op": "eq",
+                      "value": {
+                        "session": "name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "readonly",
+                      "op": "eq",
+                      "value": "n"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must sign in before modifying the library.",
+          "realm": "This account is read-only; signed-in users may not modify the library.",
+          "precondition": "This action requires an account that is not marked read-only.",
+          "not_found": "No such book exists in the library.",
+          "fk": "That reference does not exist in the library.",
+          "fk_missing": "A required reference is missing.",
+          "unique": "This would collide with an existing library record.",
+          "constraint": "The value is not allowed by the library's rules.",
+          "off_panel": "That field cannot be set through this action.",
+          "multi": "One of the items in the batch failed."
+        },
+        "required": [
+          "filename",
+          "add_duplicates",
+          "title",
+          "body"
+        ]
+      }
+    },
+    {
+      "_evidence": {
+        "locator": "src/calibre/srv/cdb.py:136",
+        "id_local": "cdb_delete_book",
+        "entry": {
+          "kind": "http",
+          "route": "GET /cdb/delete-books/{book_ids}/{library_id}",
+          "locator": "src/calibre/srv/cdb.py:129"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "try: ids = {int(x) for x in book_ids.split(',')}\nexcept: raise HTTPBadRequest(f'invalid book_ids: {book_ids}')\ndb.remove_books(ids)\nctx.notify_changes(db.backend.library_path, books_deleted(ids))",
+        "edges": [
+          "needs_db_write=True -> check_for_write_access + restriction_for (cdb.py:138, handler.py:120)"
+        ]
+      },
+      "_binds": {
+        "book_ids": "Book.id"
+      },
+      "tool": "delete_book",
+      "op": "delete",
+      "family": "crud.delete",
+      "entity": "Book",
+      "description": "Delete one or more books (and their linked formats, covers, comments, links and annotations) from the library by id. This runtime supports one integer id per call; batch/CSV values are not implemented.",
+      "input_schema": {
+        "book_ids": {
+          "type": "int",
+          "required": true,
+          "description": "One integer book id. This runtime does not parse comma-separated batches."
+        }
+      },
+      "exec_spec": {
+        "entity": "Book",
+        "lookup_by": {
+          "id": {
+            "$arg": "book_ids"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "name",
+                      "op": "eq",
+                      "value": {
+                        "session": "name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "readonly",
+                      "op": "eq",
+                      "value": "n"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must sign in before modifying the library.",
+          "realm": "This account is read-only; signed-in users may not modify the library.",
+          "precondition": "This action requires an account that is not marked read-only.",
+          "not_found": "No such book exists in the library.",
+          "fk": "That reference does not exist in the library.",
+          "fk_missing": "A required reference is missing.",
+          "unique": "This would collide with an existing library record.",
+          "constraint": "The value is not allowed by the library's rules.",
+          "off_panel": "That field cannot be set through this action.",
+          "multi": "One of the items in the batch failed."
+        },
+        "required": [
+          "book_ids"
+        ]
+      }
+    },
+    {
+      "_evidence": {
+        "locator": "src/calibre/srv/cdb.py:157",
+        "id_local": "cdb_set_cover",
+        "entry": {
+          "kind": "http",
+          "route": "GET /cdb/set-cover/{book_id}/{library_id}",
+          "locator": "src/calibre/srv/cdb.py:149"
+        },
+        "entity_why": "primary effect row_upsert lands on this table",
+        "ref_code": "dirtied = db.set_cover({book_id: rd.request_body_file})\nctx.notify_changes(db.backend.library_path, metadata(dirtied))",
+        "edges": [
+          "needs_db_write=True -> check_for_write_access + restriction_for (cdb.py:159)"
+        ]
+      },
+      "_binds": {
+        "book_id": "Book.id",
+        "cover_data": "Cover.data"
+      },
+      "tool": "set_book_cover",
+      "op": "update",
+      "family": "crud.upsert",
+      "entity": "Cover",
+      "description": "Set (create or replace) the cover image for a book. The book is flagged as having a cover.",
+      "input_schema": {
+        "book_id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the book whose cover to set."
+        },
+        "cover_data": {
+          "type": "json",
+          "required": true,
+          "description": "The cover image bytes."
+        }
+      },
+      "exec_spec": {
+        "entity": "Cover",
+        "key": {
+          "book": {
+            "$arg": "book_id"
+          }
+        },
+        "insert_fields": {
+          "data": {
+            "$arg": "cover_data"
+          }
+        },
+        "set_on_exists": {
+          "data": {
+            "$arg": "cover_data"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "name",
+                      "op": "eq",
+                      "value": {
+                        "session": "name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "readonly",
+                      "op": "eq",
+                      "value": "n"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must sign in before modifying the library.",
+          "realm": "This account is read-only; signed-in users may not modify the library.",
+          "precondition": "This action requires an account that is not marked read-only.",
+          "not_found": "No such book exists in the library.",
+          "fk": "That reference does not exist in the library.",
+          "fk_missing": "A required reference is missing.",
+          "unique": "This would collide with an existing library record.",
+          "constraint": "The value is not allowed by the library's rules.",
+          "off_panel": "That field cannot be set through this action.",
+          "multi": "One of the items in the batch failed."
+        },
+        "required": [
+          "book_id",
+          "cover_data"
+        ]
+      }
+    },
+    {
+      "_evidence": {
+        "locator": "src/calibre/srv/cdb.py:190",
+        "id_local": "cdb_set_fields",
+        "entry": {
+          "kind": "http",
+          "route": "GET /cdb/set-fields/{book_id}/{library_id}",
+          "locator": "src/calibre/srv/cdb.py:182"
+        },
+        "entity_why": "primary effect row_upsert lands on this table",
+        "ref_code": "cdata = changes.pop('cover', False)\nif cdata is not False:\n    dirtied |= db.set_cover({book_id: cdata})\nadded_formats = changes.pop('added_formats', False)\n...\nremoved_formats = changes.pop('removed_formats', False)\nif removed_formats: db.remove_formats({book_id: list(removed_formats)}); dirtied.add(book_id)\nfor field, value in changes.items():\n    dirtied |= db.set_field(field, {book_id: value})",
+        "edges": [
+          "needs_db_write=True -> check_for_write_access + restriction_for (cdb.py:192)"
+        ]
+      },
+      "_binds": {
+        "book_id": "Book.id",
+        "title": "Book.title",
+        "author_sort": "Book.author_sort",
+        "series_index": "Book.series_index",
+        "text": "Comment.text",
+        "format": "Format.format",
+        "format_data": "Format.data",
+        "identifier_type": "BookIdentifier.type",
+        "identifier_val": "BookIdentifier.val"
+      },
+      "tool": "set_book_fields",
+      "op": "update",
+      "family": "update.field_set",
+      "entity": "Book",
+      "description": "Update the core metadata fields (title, author sort, series index) of an existing book in place.",
+      "input_schema": {
+        "book_id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the book to update."
+        },
+        "title": {
+          "type": "text",
+          "required": false,
+          "description": "New title for the book."
+        },
+        "author_sort": {
+          "type": "text",
+          "required": false,
+          "description": "New author sort key (e.g. 'Lastname, Firstname')."
+        },
+        "series_index": {
+          "type": "float",
+          "required": false,
+          "description": "New position of the book within its series."
+        }
+      },
+      "exec_spec": {
+        "entity": "Book",
+        "row_key": {
+          "id": {
+            "$arg": "book_id"
+          }
+        },
+        "fields": {
+          "title": {
+            "$arg": "title"
+          },
+          "author_sort": {
+            "$arg": "author_sort"
+          },
+          "series_index": {
+            "$arg": "series_index"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "name",
+                      "op": "eq",
+                      "value": {
+                        "session": "name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "readonly",
+                      "op": "eq",
+                      "value": "n"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must sign in before modifying the library.",
+          "realm": "This account is read-only; signed-in users may not modify the library.",
+          "precondition": "This action requires an account that is not marked read-only.",
+          "not_found": "No such book exists in the library.",
+          "fk": "That reference does not exist in the library.",
+          "fk_missing": "A required reference is missing.",
+          "unique": "This would collide with an existing library record.",
+          "constraint": "The value is not allowed by the library's rules.",
+          "off_panel": "That field cannot be set through this action.",
+          "multi": "One of the items in the batch failed."
+        },
+        "required": [
+          "book_id"
+        ]
+      }
+    },
+    {
+      "_evidence": {
+        "locator": "src/calibre/srv/cdb.py:264",
+        "id_local": "cdb_copy_to_library",
+        "entry": {
+          "kind": "http",
+          "route": "GET /cdb/copy-to-library/{target_library_id}/{library_id}",
+          "locator": "src/calibre/srv/cdb.py:257"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "rdata = copy_one_book(book_id, db_src, db_dest, duplicate_action=duplicate_action, automerge_action=automerge_action, preserve_uuid=move_books, preserve_date=preserve_date)\nif move_books and rdata['action'] in source_removal_actions:\n    to_remove.add(book_id)\n...\nif to_remove: db_src.remove_books(to_remove, permanent=True)",
+        "edges": [
+          "needs_db_write=True -> check_for_write_access + restriction_for (cdb.py:267)"
+        ]
+      },
+      "_binds": {
+        "book_ids": "Book.id"
+      },
+      "tool": "copy_book_to_library",
+      "op": "create",
+      "family": "crud.insert",
+      "entity": "Book",
+      "description": "Copy the given books into another library of the same server, returning per-book results. With move set, the source copies are removed.",
+      "input_schema": {
+        "book_ids": {
+          "type": "json",
+          "required": true,
+          "description": "List of book ids to copy."
+        },
+        "target_library_id": {
+          "type": "text",
+          "required": true,
+          "description": "Id of the destination library."
+        },
+        "move": {
+          "type": "bool",
+          "required": false,
+          "description": "Move (delete from source) instead of copy."
+        },
+        "duplicate_action": {
+          "type": "text",
+          "required": false,
+          "description": "How to handle duplicates in the target library."
+        }
+      },
+      "exec_spec": {
+        "entity": "Book",
+        "fields": [
+          "title",
+          "sort",
+          "pubdate",
+          "series_index",
+          "author_sort",
+          "path",
+          "has_cover",
+          "uuid"
+        ],
+        "set_on_create": {
+          "timestamp": "2026-01-01T00:00:00"
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "name",
+                      "op": "eq",
+                      "value": {
+                        "session": "name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "readonly",
+                      "op": "eq",
+                      "value": "n"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must sign in before modifying the library.",
+          "realm": "This account is read-only; signed-in users may not modify the library.",
+          "precondition": "This action requires an account that is not marked read-only.",
+          "not_found": "No such book exists in the library.",
+          "fk": "That reference does not exist in the library.",
+          "fk_missing": "A required reference is missing.",
+          "unique": "This would collide with an existing library record.",
+          "constraint": "The value is not allowed by the library's rules.",
+          "off_panel": "That field cannot be set through this action.",
+          "multi": "One of the items in the batch failed."
+        },
+        "required": [
+          "book_ids",
+          "target_library_id"
+        ]
+      }
+    },
+    {
+      "_evidence": {
+        "locator": "src/calibre/srv/books.py:234",
+        "id_local": "set_last_read_position",
+        "entry": {
+          "kind": "http",
+          "route": "POST /book-set-last-read-position/{library_id}/{book_id}/{+fmt}",
+          "locator": "src/calibre/srv/books.py:233"
+        },
+        "entity_why": "primary effect row_upsert lands on this table",
+        "ref_code": "if not ctx.has_id(rd, db, book_id): raise BookNotFound(book_id, db)\ndevice, cfi, pos_frac = data['device'], data['cfi'], data['pos_frac']\ncfi = cfi or None\ndb.set_last_read_position(book_id, fmt, user=user, device=device, cfi=cfi, pos_frac=pos_frac)",
+        "edges": [
+          "books.py:237 ctx.has_id -> BookNotFound; user = rd.username or None"
+        ]
+      },
+      "_binds": {
+        "book_id": "Book.id",
+        "fmt": "LastReadPosition.format",
+        "device": "LastReadPosition.device",
+        "cfi": "LastReadPosition.cfi",
+        "pos_frac": "LastReadPosition.pos_frac"
+      },
+      "tool": "set_last_read_position",
+      "op": "update",
+      "family": "crud.upsert",
+      "entity": "LastReadPosition",
+      "description": "Record or update where the signed-in user last stopped reading a given book format on a given device. Fails if the book does not exist.",
+      "input_schema": {
+        "book_id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the book being read."
+        },
+        "fmt": {
+          "type": "text",
+          "required": true,
+          "description": "Book format (e.g. epub, pdf) being read."
+        },
+        "device": {
+          "type": "text",
+          "required": true,
+          "description": "Reader device identifier."
+        },
+        "cfi": {
+          "type": "text",
+          "required": false,
+          "description": "Fragment locator of the reading position."
+        },
+        "pos_frac": {
+          "type": "float",
+          "required": false,
+          "description": "Fraction of the book completed (0 to 1)."
+        }
+      },
+      "exec_spec": {
+        "entity": "LastReadPosition",
+        "key": {
+          "book": {
+            "$arg": "book_id"
+          },
+          "format": {
+            "$arg": "fmt"
+          },
+          "user": {
+            "$session": "name"
+          },
+          "device": {
+            "$arg": "device"
+          }
+        },
+        "insert_fields": [
+          "device",
+          "cfi",
+          "pos_frac"
+        ],
+        "set_on_exists": {
+          "book": {
+            "$arg": "book_id"
+          },
+          "format": {
+            "$arg": "fmt"
+          },
+          "user": {
+            "$session": "name"
+          },
+          "cfi": {
+            "$arg": "cfi"
+          },
+          "pos_frac": {
+            "$arg": "pos_frac"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "name",
+                  "op": "eq",
+                  "value": {
+                    "session": "name"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must sign in to save your reading position.",
+          "not_found": "No such book exists in the library.",
+          "precondition": "Sign in with a valid account before saving your reading position."
+        },
+        "required": [
+          "book_id",
+          "fmt",
+          "device"
+        ]
+      }
+    },
+    {
+      "_evidence": {
+        "locator": "src/calibre/srv/books.py:287",
+        "id_local": "update_annotations",
+        "entry": {
+          "kind": "http",
+          "route": "POST /book-update-annotations/{library_id}/{book_id}/{+fmt}",
+          "locator": "src/calibre/srv/books.py:281"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "amap = jsonlib.load(rd.request_body_file)\nfor val in amap.values():\n    if val: alist.extend(val)\ndb.merge_annotations_for_book(book_id, fmt, alist, user_type='web', user=user)",
+        "edges": [
+          "needs_db_write=True + has_id BookNotFound (books.py:285-290)"
+        ]
+      },
+      "_binds": {
+        "book_id": "Book.id",
+        "fmt": "Annotation.format"
+      },
+      "tool": "update_annotations",
+      "op": "update",
+      "family": "crud.insert",
+      "entity": "Annotation",
+      "description": "Merge the signed-in user's highlights and notes for a book format into the annotations store, replacing that user's prior annotations for it.",
+      "input_schema": {
+        "book_id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the book the annotations belong to."
+        },
+        "fmt": {
+          "type": "text",
+          "required": true,
+          "description": "Book format the annotations are for."
+        },
+        "annot_type": {
+          "type": "text",
+          "required": false,
+          "description": "Kind of annotation (e.g. highlight, note)."
+        },
+        "annot_data": {
+          "type": "json",
+          "required": false,
+          "description": "Annotation payload."
+        },
+        "annotations": {
+          "type": "json",
+          "required": false,
+          "description": "Map of full annotation payloads to merge."
+        }
+      },
+      "exec_spec": {
+        "entity": "Annotation",
+        "fields": {
+          "annot_type": {
+            "$arg": "annot_type"
+          },
+          "annot_data": {
+            "$arg": "annot_data"
+          }
+        },
+        "set_on_create": {
+          "book": {
+            "$arg": "book_id"
+          },
+          "format": {
+            "$arg": "fmt"
+          },
+          "user_type": "web",
+          "user": {
+            "$session": "name"
+          }
+        },
+        "unique_on": [
+          "book",
+          "user_type",
+          "user",
+          "format",
+          "annot_type",
+          "annot_id"
+        ]
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "name",
+                      "op": "eq",
+                      "value": {
+                        "session": "name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "readonly",
+                      "op": "eq",
+                      "value": "n"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must sign in before modifying the library.",
+          "realm": "This account is read-only; signed-in users may not modify the library.",
+          "precondition": "This action requires an account that is not marked read-only.",
+          "not_found": "No such book exists in the library.",
+          "fk": "That reference does not exist in the library.",
+          "fk_missing": "A required reference is missing.",
+          "unique": "This would collide with an existing library record.",
+          "constraint": "The value is not allowed by the library's rules.",
+          "off_panel": "That field cannot be set through this action.",
+          "multi": "One of the items in the batch failed."
+        },
+        "required": [
+          "book_id",
+          "fmt"
+        ]
+      }
+    },
+    {
+      "_evidence": {
+        "locator": "src/calibre/srv/content.py:500",
+        "id_local": "set_note",
+        "entry": {
+          "kind": "http",
+          "route": "POST /set-note/{field}/{item_id}/{library_id}",
+          "locator": "src/calibre/srv/content.py:500"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "db.set_notes_for(field, item_id, db_html, searchable_text, resources)\nreturn srv_html",
+        "edges": [
+          "needs_db_write=True + get_db HTTPNotFound if library missing (content.py:500-506)"
+        ]
+      },
+      "_binds": {
+        "field": "Note.colname",
+        "item_id": "Note.item",
+        "html": "Note.doc",
+        "searchable_text": "Note.searchable_text"
+      },
+      "tool": "set_note",
+      "op": "update",
+      "family": "crud.upsert",
+      "entity": "Note",
+      "description": "Create or replace the HTML note attached to a library item's given field (detail pages, series, etc.), with full-text searchable text.",
+      "input_schema": {
+        "field": {
+          "type": "text",
+          "required": true,
+          "description": "Field/column the note is attached to."
+        },
+        "item_id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the library item the note belongs to."
+        },
+        "html": {
+          "type": "text",
+          "required": true,
+          "description": "The note's HTML content."
+        },
+        "searchable_text": {
+          "type": "text",
+          "required": false,
+          "description": "Plain-text version of the note used for full-text search."
+        }
+      },
+      "exec_spec": {
+        "entity": "Note",
+        "key": {
+          "item": {
+            "$arg": "item_id"
+          },
+          "colname": {
+            "$arg": "field"
+          }
+        },
+        "insert_fields": {
+          "doc": {
+            "$arg": "html"
+          },
+          "searchable_text": {
+            "$arg": "searchable_text"
+          }
+        },
+        "set_on_exists": {
+          "doc": {
+            "$arg": "html"
+          },
+          "searchable_text": {
+            "$arg": "searchable_text"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "name",
+                      "op": "eq",
+                      "value": {
+                        "session": "name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "readonly",
+                      "op": "eq",
+                      "value": "n"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must sign in before modifying the library.",
+          "realm": "This account is read-only; signed-in users may not modify the library.",
+          "precondition": "This action requires an account that is not marked read-only.",
+          "not_found": "No such book exists in the library.",
+          "fk": "That reference does not exist in the library.",
+          "fk_missing": "A required reference is missing.",
+          "unique": "This would collide with an existing library record.",
+          "constraint": "The value is not allowed by the library's rules.",
+          "off_panel": "That field cannot be set through this action.",
+          "multi": "One of the items in the batch failed."
+        },
+        "required": [
+          "field",
+          "item_id",
+          "html"
+        ]
+      }
+    },
+    {
+      "_evidence": {
+        "locator": "src/calibre/srv/content.py:595",
+        "id_local": "upload_data_files",
+        "entry": {
+          "kind": "http",
+          "route": "POST /data-files/upload/{book_id}/{library_id}",
+          "locator": "src/calibre/srv/content.py:588"
+        },
+        "entity_why": "primary effect external lands on this table",
+        "ref_code": "recvd = load_json_file(rd.request_body_file)\nfor x in recvd:\n    data = from_base64_bytes(x['data_url'].split(',',1)[-1]); relpath = f'{DATA_DIR_NAME}/{x[\"name\"]}'\n    files[relpath] = ReadOnlyFileBuffer(data, x['name'])\ndb.add_extra_files(book_id, files)",
+        "edges": [
+          "needs_db_write=True + get_db_for_data_file has_id BookNotFound (content.py:588-595)"
+        ]
+      },
+      "_binds": {
+        "book_id": "Book.id"
+      },
+      "tool": "upload_data_files",
+      "op": "action",
+      "family": "action.emit",
+      "entity": "Book",
+      "description": "Upload extra data files (e.g. fonts, resources) into a book's on-disk data directory. Fails if the book does not exist.",
+      "input_schema": {
+        "book_id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the book to attach files to."
+        },
+        "files": {
+          "type": "json",
+          "required": true,
+          "description": "Map of file name to base64 file data to store."
+        }
+      },
+      "exec_spec": {
+        "channel": "writes extra data files into the book's on-disk data directory",
+        "record": {
+          "table": "Book"
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "name",
+                      "op": "eq",
+                      "value": {
+                        "session": "name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "readonly",
+                      "op": "eq",
+                      "value": "n"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must sign in before modifying the library.",
+          "realm": "This account is read-only; signed-in users may not modify the library.",
+          "precondition": "This action requires an account that is not marked read-only.",
+          "not_found": "No such book exists in the library.",
+          "fk": "That reference does not exist in the library.",
+          "fk_missing": "A required reference is missing.",
+          "unique": "This would collide with an existing library record.",
+          "constraint": "The value is not allowed by the library's rules.",
+          "off_panel": "That field cannot be set through this action.",
+          "multi": "One of the items in the batch failed."
+        },
+        "required": [
+          "book_id",
+          "files"
+        ]
+      }
+    },
+    {
+      "_evidence": {
+        "locator": "src/calibre/srv/content.py:622",
+        "id_local": "remove_data_files",
+        "entry": {
+          "kind": "http",
+          "route": "POST /data-files/remove/{book_id}/{library_id}",
+          "locator": "src/calibre/srv/content.py:615"
+        },
+        "entity_why": "primary effect external lands on this table",
+        "ref_code": "relpaths = load_json_file(rd.request_body_file)\nerrors = db.remove_extra_files(book_id, relpaths, permanent=True)\ndata_files = db.list_extra_files(book_id, use_cache=False, pattern=DATA_FILE_PATTERN)",
+        "edges": [
+          "needs_db_write=True + get_db_for_data_file has_id BookNotFound (content.py:615-622)"
+        ]
+      },
+      "_binds": {
+        "book_id": "Book.id"
+      },
+      "tool": "remove_data_files",
+      "op": "action",
+      "family": "action.emit",
+      "entity": "Book",
+      "description": "Permanently delete extra data files from a book's on-disk data directory.",
+      "input_schema": {
+        "book_id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the book whose files to remove."
+        },
+        "relpaths": {
+          "type": "json",
+          "required": true,
+          "description": "List of relative data-file paths to delete."
+        }
+      },
+      "exec_spec": {
+        "channel": "deletes extra data files from the book's on-disk data directory",
+        "record": {
+          "table": "Book"
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "name",
+                      "op": "eq",
+                      "value": {
+                        "session": "name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "readonly",
+                      "op": "eq",
+                      "value": "n"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must sign in before modifying the library.",
+          "realm": "This account is read-only; signed-in users may not modify the library.",
+          "precondition": "This action requires an account that is not marked read-only.",
+          "not_found": "No such book exists in the library.",
+          "fk": "That reference does not exist in the library.",
+          "fk_missing": "A required reference is missing.",
+          "unique": "This would collide with an existing library record.",
+          "constraint": "The value is not allowed by the library's rules.",
+          "off_panel": "That field cannot be set through this action.",
+          "multi": "One of the items in the batch failed."
+        },
+        "required": [
+          "book_id",
+          "relpaths"
+        ]
+      }
+    },
+    {
+      "_evidence": {
+        "locator": "src/calibre/srv/fts.py:78",
+        "id_local": "fts_disable",
+        "entry": {
+          "kind": "http",
+          "route": "GET /fts/disable",
+          "locator": "src/calibre/srv/fts.py:77"
+        },
+        "entity_why": "primary effect external lands on this table",
+        "ref_code": "db = get_library_data(ctx, rd)[0]\nif db.is_fts_enabled(): db.enable_fts(enabled=False)\nreturn ''",
+        "edges": [
+          "needs_db_write=True -> check_for_write_access (fts.py:77)"
+        ]
+      },
+      "tool": "fts_disable",
+      "op": "action",
+      "family": "action.emit",
+      "entity": "Preference",
+      "description": "Disable full-text search for the library (no-op if it is already disabled).",
+      "input_schema": {},
+      "exec_spec": {
+        "channel": "event",
+        "record": {
+          "table": "Preference"
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "name",
+                      "op": "eq",
+                      "value": {
+                        "session": "name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "readonly",
+                      "op": "eq",
+                      "value": "n"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must sign in to change full-text search settings.",
+          "realm": "Read-only accounts cannot change full-text search settings.",
+          "precondition": "Only an account that is not read-only can disable full-text search."
+        }
+      }
+    },
+    {
+      "_evidence": {
+        "locator": "src/calibre/srv/fts.py:104",
+        "id_local": "fts_indexing",
+        "entry": {
+          "kind": "http",
+          "route": "POST /fts/indexing",
+          "locator": "src/calibre/srv/fts.py:103"
+        },
+        "entity_why": "primary effect external lands on this table",
+        "ref_code": "enable = stdlib_json.loads(data)\nif not isinstance(enable, bool): raise HTTPBadRequest('Invalid boolean')\ndb = get_library_data(ctx, rd)[0]; db.enable_fts(enable)",
+        "edges": [
+          "needs_db_write=True -> check_for_write_access (fts.py:103)"
+        ]
+      },
+      "tool": "fts_indexing",
+      "op": "action",
+      "family": "action.emit",
+      "entity": "Preference",
+      "description": "Enable or disable full-text indexing for the library.",
+      "input_schema": {
+        "enable": {
+          "type": "bool",
+          "required": true,
+          "description": "True to enable full-text indexing, false to disable."
+        }
+      },
+      "exec_spec": {
+        "channel": "event",
+        "record": {
+          "table": "Preference"
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "name",
+                      "op": "eq",
+                      "value": {
+                        "session": "name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "readonly",
+                      "op": "eq",
+                      "value": "n"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must sign in to change full-text search settings.",
+          "realm": "Read-only accounts cannot change full-text search settings.",
+          "precondition": "Only an account that is not read-only can change indexing."
+        },
+        "required": [
+          "enable"
+        ]
+      }
+    },
+    {
+      "_evidence": {
+        "locator": "src/calibre/srv/fts.py:86",
+        "id_local": "fts_reindex",
+        "entry": {
+          "kind": "http",
+          "route": "POST /fts/reindex",
+          "locator": "src/calibre/srv/fts.py:85"
+        },
+        "entity_why": "primary effect external lands on this table",
+        "ref_code": "if book_ids == 'all': db.reindex_fts()\nelse:\n    for book_id, fmts in book_ids.items(): db.reindex_fts_book(int(book_id), *fmts)",
+        "edges": [
+          "needs_db_write=True -> check_for_write_access (fts.py:85)"
+        ]
+      },
+      "tool": "fts_reindex",
+      "op": "action",
+      "family": "action.emit",
+      "entity": "Preference",
+      "description": "Rebuild the full-text search index, either for all books or for a chosen set of book/format pairs.",
+      "input_schema": {
+        "book_ids": {
+          "type": "json",
+          "required": true,
+          "description": "'all' to reindex the whole library, or a map of book_id to list of formats to reindex."
+        }
+      },
+      "exec_spec": {
+        "channel": "rebuilds full-text-search.db by re-reading book format files",
+        "record": {
+          "table": "Preference"
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "name",
+                      "op": "eq",
+                      "value": {
+                        "session": "name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "readonly",
+                      "op": "eq",
+                      "value": "n"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must sign in to rebuild the search index.",
+          "realm": "Read-only accounts cannot rebuild the search index.",
+          "precondition": "Only an account that is not read-only can rebuild the index."
+        },
+        "required": [
+          "book_ids"
+        ]
+      }
+    },
+    {
+      "_evidence": {
+        "locator": "src/calibre/srv/ajax.py:139",
+        "id_local": "ajax.book",
+        "entry": {
+          "kind": "http",
+          "route": "GET /ajax/book/{book_id}/{library_id}",
+          "locator": "src/calibre/srv/ajax.py:139"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "@endpoint('/ajax/book/{book_id}/{library_id=None}', postprocess=json)\ndef book(ctx, rd, book_id, library_id):\n    db = get_db(ctx, rd, library_id)\n    with db.safe_read_lock:\n        if book_id is None or not ctx.has_id(rd, db, book_id): raise BookNotFound(oid, db)\n        data, last_modified = book_to_json(ctx, rd, db, book_id)",
+        "merged": "code.book_metadata (same operation, tool 22 in pool)"
+      },
+      "_binds": {
+        "book_id": "Book.id"
+      },
+      "tool": "get_book",
+      "op": "read",
+      "family": "crud.fetch",
+      "entity": "Book",
+      "description": "Fetch the full metadata of a single book by id (or by uuid).",
+      "input_schema": {
+        "book_id": {
+          "type": "int",
+          "required": true,
+          "description": "Id (or uuid when id_is_uuid is set) of the book."
+        },
+        "id_is_uuid": {
+          "type": "bool",
+          "required": false,
+          "description": "Treat book_id as a uuid instead of a numeric id."
+        }
+      },
+      "exec_spec": {
+        "entity": "Book",
+        "lookup_by": {
+          "id": {
+            "$arg": "book_id"
+          }
+        }
+      },
+      "guards": {
+        "messages": {
+          "not_found": "No such book exists in the library.",
+          "fk": "That reference does not exist.",
+          "off_panel": "That field is not available on this listing."
+        },
+        "required": [
+          "book_id"
+        ]
+      }
+    },
+    {
+      "_evidence": {
+        "locator": "src/calibre/srv/ajax.py:184",
+        "id_local": "ajax.books",
+        "entry": {
+          "kind": "http",
+          "route": "GET /ajax/books/{library_id}",
+          "locator": "src/calibre/srv/ajax.py:184"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "@endpoint('/ajax/books/{library_id=None}', postprocess=json)\ndef books(ctx, rd, library_id):\n    ids = rd.query.get('ids')\n    if ids is None or ids == 'all': ids = db.all_book_ids()\n    allowed_book_ids = ctx.allowed_book_ids(rd, db)\n    for book_id in ids:\n        if book_id not in allowed_book_ids: ans[book_id] = None; continue"
+      },
+      "_binds": {
+        "ids": "Book.id"
+      },
+      "tool": "get_books_by_ids",
+      "op": "read",
+      "family": "crud.fetch",
+      "entity": "Book",
+      "description": "Fetch metadata for several books by their ids in one call. This runtime supports one integer id per call; batch/CSV values are not implemented.",
+      "input_schema": {
+        "ids": {
+          "type": "int",
+          "required": true,
+          "description": "One integer book id. This runtime does not parse comma-separated batches."
+        }
+      },
+      "exec_spec": {
+        "entity": "Book",
+        "lookup_by": {
+          "id": {
+            "$arg": "ids"
+          }
+        }
+      },
+      "guards": {
+        "messages": {
+          "not_found": "No such book exists in the library.",
+          "fk": "That reference does not exist.",
+          "off_panel": "That field is not available on this listing."
+        },
+        "required": [
+          "ids"
+        ]
+      }
+    },
+    {
+      "_evidence": {
+        "locator": "src/calibre/srv/ajax.py:466",
+        "id_local": "ajax.books_in",
+        "entry": {
+          "kind": "http",
+          "route": "GET /ajax/books_in/{encoded_category}/{encoded_item}/{library_id}",
+          "locator": "src/calibre/srv/ajax.py:466"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "ids = db.get_books_for_category(dname, cid) & ctx.allowed_book_ids(rd, db)\nids = db.multisort(fields=[(sfield, sort_order=='asc')], ids_to_sort=ids)\ntotal_num = len(ids); ids = ids[offset:offset+num]"
+      },
+      "tool": "books_in_category",
+      "op": "search",
+      "family": "search",
+      "entity": "Book",
+      "description": "List books that belong to a given category item (e.g. all books by a specific author or tagged with a specific tag).",
+      "input_schema": {
+        "encoded_category": {
+          "type": "text",
+          "required": true,
+          "description": "Category key (authors, tags, series, ...)."
+        },
+        "encoded_item": {
+          "type": "text",
+          "required": true,
+          "description": "The specific category value to match."
+        },
+        "num": {
+          "type": "int",
+          "required": false,
+          "description": "Page size (default 20)."
+        },
+        "offset": {
+          "type": "int",
+          "required": false,
+          "description": "Result offset for pagination."
+        }
+      },
+      "exec_spec": {
+        "entity": "Book",
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "title",
+            "series_index",
+            "author_sort"
+          ]
+        },
+        "pagination": {
+          "default_limit": 20
+        }
+      },
+      "guards": {
+        "messages": {
+          "not_found": "No such book exists in the library.",
+          "fk": "That reference does not exist.",
+          "off_panel": "That field is not available on this listing."
+        },
+        "required": [
+          "encoded_category",
+          "encoded_item"
+        ]
+      }
+    },
+    {
+      "_evidence": {
+        "locator": "src/calibre/srv/ajax.py:573",
+        "id_local": "ajax.search",
+        "entry": {
+          "kind": "http",
+          "route": "GET /ajax/search/{library_id}",
+          "locator": "src/calibre/srv/ajax.py:573"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "ids, parse_error = ctx.search(rd, db, query, vl=vl, report_restriction_errors=True)\nids = db.multisort(fields=multisort, ids_to_sort=ids)\ntotal_num = len(ids); ids = ids[offset:offset+num]"
+      },
+      "tool": "search_books",
+      "op": "search",
+      "family": "search",
+      "entity": "Book",
+      "description": "List Book scalar rows, optionally restricted by a case-insensitive title/author_sort substring. Omitted search/query lists every book; source category, full-text, OPDS rendering and virtual-library semantics are not implemented.",
+      "input_schema": {
+        "query": {
+          "type": "text",
+          "required": false,
+          "description": "Optional case-insensitive substring of title or author_sort. Omit to list all books."
+        },
+        "num": {
+          "type": "int",
+          "required": false,
+          "description": "Page size (default 20)."
+        },
+        "offset": {
+          "type": "int",
+          "required": false,
+          "description": "Result offset for pagination."
+        },
+        "sort": {
+          "type": "text",
+          "required": false,
+          "description": "Sort key (e.g. title, timestamp)."
+        },
+        "vl": {
+          "type": "text",
+          "required": false,
+          "description": "Virtual-library restriction, if any."
+        }
+      },
+      "exec_spec": {
+        "entity": "Book",
+        "rank": {
+          "method": "substring",
+          "fields": [
+            "title",
+            "author_sort"
+          ]
+        },
+        "filter": {
+          "op": "or",
+          "clauses": [
+            {
+              "col": "title",
+              "mode": "substring",
+              "val": {
+                "$arg": "query"
+              },
+              "optional": true
+            },
+            {
+              "col": "author_sort",
+              "mode": "substring",
+              "val": {
+                "$arg": "query"
+              },
+              "optional": true
+            }
+          ]
+        }
+      },
+      "guards": {
+        "messages": {
+          "not_found": "No such book exists in the library.",
+          "fk": "That reference does not exist.",
+          "off_panel": "That field is not available on this listing."
+        },
+        "required": []
+      }
+    },
+    {
+      "_evidence": {
+        "locator": "src/calibre/srv/code.py:595",
+        "id_local": "code.get_books",
+        "entry": {
+          "kind": "http",
+          "route": "GET /interface-data/get-books",
+          "locator": "src/calibre/srv/code.py:595"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "ans['search_result'] = search_result(ctx, rd, db, searchq, num, 0, ','.join(sorts), ','.join(orders), vl)"
+      },
+      "tool": "list_books",
+      "op": "search",
+      "family": "search",
+      "entity": "Book",
+      "description": "List Book scalar rows, optionally restricted by a case-insensitive title/author_sort substring. Omitted search/query lists every book; source category, full-text, OPDS rendering and virtual-library semantics are not implemented.",
+      "input_schema": {
+        "search": {
+          "type": "text",
+          "required": false,
+          "description": "Optional case-insensitive substring of title or author_sort. Omit to list all books."
+        },
+        "num": {
+          "type": "int",
+          "required": false,
+          "description": "Page size (default 20)."
+        }
+      },
+      "exec_spec": {
+        "entity": "Book",
+        "rank": {
+          "method": "substring",
+          "fields": [
+            "title",
+            "author_sort"
+          ]
+        },
+        "filter": {
+          "op": "or",
+          "clauses": [
+            {
+              "col": "title",
+              "mode": "substring",
+              "val": {
+                "$arg": "search"
+              },
+              "optional": true
+            },
+            {
+              "col": "author_sort",
+              "mode": "substring",
+              "val": {
+                "$arg": "search"
+              },
+              "optional": true
+            }
+          ]
+        }
+      },
+      "guards": {
+        "messages": {
+          "not_found": "No such book exists in the library.",
+          "fk": "That reference does not exist.",
+          "off_panel": "That field is not available on this listing."
+        },
+        "required": []
+      }
+    },
+    {
+      "_evidence": {
+        "locator": "src/calibre/srv/content.py:362",
+        "id_local": "content.get",
+        "entry": {
+          "kind": "http",
+          "route": "GET /get/{what}/{book_id}/{library_id}",
+          "locator": "src/calibre/srv/content.py:362"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "with db.safe_read_lock:\n    if not ctx.has_id(rd, db, book_id): raise BookNotFound(book_id, db)\n    if what=='cover': return cover(...)\n    elif what=='opf': return metadata_to_opf(mi)\n    else: return book_fmt(ctx, rd, library_id, db, book_id, what.lower())"
+      },
+      "_binds": {
+        "book_id": "Book.id"
+      },
+      "tool": "get_book_content",
+      "op": "read",
+      "family": "crud.fetch",
+      "entity": "Book",
+      "description": "Fetch a book's cover image, full metadata (opf), or one of its format files.",
+      "input_schema": {
+        "what": {
+          "type": "text",
+          "required": true,
+          "description": "What to fetch: 'cover', 'opf', or a format extension (e.g. 'epub', 'pdf')."
+        },
+        "book_id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the book."
+        }
+      },
+      "exec_spec": {
+        "entity": "Book",
+        "lookup_by": {
+          "id": {
+            "$arg": "book_id"
+          }
+        }
+      },
+      "guards": {
+        "messages": {
+          "not_found": "No such book exists in the library.",
+          "fk": "That reference does not exist.",
+          "off_panel": "That field is not available on this listing."
+        },
+        "required": [
+          "what",
+          "book_id"
+        ]
+      }
+    },
+    {
+      "_evidence": {
+        "locator": "src/calibre/srv/opds.py:616",
+        "id_local": "opds.opds",
+        "entry": {
+          "kind": "http",
+          "route": "GET /opds",
+          "locator": "src/calibre/srv/opds.py:616"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "rc = RequestContext(ctx, rd)\ncategories = rc.get_categories(report_parse_errors=True)\nreturn TopLevel(last_modified, cats, rc).root"
+      },
+      "tool": "opds_catalog",
+      "op": "read",
+      "family": "search",
+      "entity": "Book",
+      "description": "List Book scalar rows, optionally restricted by a case-insensitive title/author_sort substring. Omitted search/query lists every book; source category, full-text, OPDS rendering and virtual-library semantics are not implemented.",
+      "input_schema": {
+        "search": {
+          "type": "text",
+          "required": false,
+          "description": "Optional case-insensitive substring of title or author_sort. Omit to list all books."
+        }
+      },
+      "exec_spec": {
+        "entity": "Book",
+        "rank": {
+          "method": "substring",
+          "fields": [
+            "title",
+            "author_sort"
+          ]
+        },
+        "filter": {
+          "op": "or",
+          "clauses": [
+            {
+              "col": "title",
+              "mode": "substring",
+              "val": {
+                "$arg": "search"
+              },
+              "optional": true
+            },
+            {
+              "col": "author_sort",
+              "mode": "substring",
+              "val": {
+                "$arg": "search"
+              },
+              "optional": true
+            }
+          ]
+        }
+      },
+      "guards": {
+        "messages": {
+          "not_found": "No such book exists in the library.",
+          "fk": "That reference does not exist.",
+          "off_panel": "That field is not available on this listing."
+        },
+        "required": []
+      }
+    },
+    {
+      "_evidence": {
+        "locator": "src/calibre/srv/fts.py:21",
+        "id_local": "fts.fts_search",
+        "entry": {
+          "kind": "http",
+          "route": "GET /fts/search",
+          "locator": "src/calibre/srv/fts.py:21"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "book_ids = book_ids_from_user_restriction(ctx, rd, db)\nans['results'] = tuple(db.fts_search(query, use_stemming=use_stemming, return_text=False, process_each_result=add_metadata, restrict_to_book_ids=book_ids))"
+      },
+      "tool": "fulltext_search",
+      "op": "search",
+      "family": "search",
+      "entity": "Book",
+      "description": "Full-text search over the books' indexed contents (the full text of their formats), returning matching book ids. Shows indexing status when still building.",
+      "input_schema": {
+        "query": {
+          "type": "text",
+          "required": true,
+          "description": "Full-text search query over book contents."
+        }
+      },
+      "exec_spec": {
+        "entity": "Book",
+        "rank": {
+          "method": "keyword",
+          "fields": [
+            "title",
+            "series_index",
+            "author_sort"
+          ]
+        },
+        "pagination": {
+          "default_limit": 20
+        }
+      },
+      "guards": {
+        "messages": {
+          "not_found": "No such book exists in the library.",
+          "fk": "That reference does not exist.",
+          "off_panel": "That field is not available on this listing."
+        },
+        "required": [
+          "query"
+        ]
+      }
+    },
+    {
+      "_evidence": {
+        "locator": "src/calibre/srv/code.py:522",
+        "id_local": "code.newly_added",
+        "entry": {
+          "kind": "http",
+          "route": "GET /interface-data/newly-added",
+          "locator": "src/calibre/srv/code.py:522"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "nbids = ctx.newest_book_ids(rd, db, count=count)\ntitles = db._all_field_for('title', nbids)"
+      },
+      "tool": "recently_added_books",
+      "op": "read",
+      "family": "search",
+      "entity": "Book",
+      "description": "List Book scalar rows, optionally restricted by a case-insensitive title/author_sort substring. Omitted search/query lists every book; source category, full-text, OPDS rendering and virtual-library semantics are not implemented.",
+      "input_schema": {
+        "num": {
+          "type": "int",
+          "required": false,
+          "description": "How many recent books to return."
+        },
+        "search": {
+          "type": "text",
+          "required": false,
+          "description": "Optional case-insensitive substring of title or author_sort. Omit to list all books."
+        }
+      },
+      "exec_spec": {
+        "entity": "Book",
+        "rank": {
+          "method": "substring",
+          "fields": [
+            "title",
+            "author_sort"
+          ]
+        },
+        "filter": {
+          "op": "or",
+          "clauses": [
+            {
+              "col": "title",
+              "mode": "substring",
+              "val": {
+                "$arg": "search"
+              },
+              "optional": true
+            },
+            {
+              "col": "author_sort",
+              "mode": "substring",
+              "val": {
+                "$arg": "search"
+              },
+              "optional": true
+            }
+          ]
+        }
+      },
+      "guards": {
+        "messages": {
+          "not_found": "No such book exists in the library.",
+          "fk": "That reference does not exist.",
+          "off_panel": "That field is not available on this listing."
+        },
+        "required": []
+      }
+    },
+    {
+      "_evidence": {
+        "locator": "src/calibre/srv/code.py:733",
+        "id_local": "code.field_id_map",
+        "entry": {
+          "kind": "http",
+          "route": "GET /interface-data/field-id-map/{field}",
+          "locator": "src/calibre/srv/code.py:733"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "return db.get_id_map(field)"
+      },
+      "tool": "field_id_map",
+      "op": "read",
+      "family": "search",
+      "entity": "Book",
+      "description": "Return the id-to-name map for library fields (categories like authors, tags, series), used to resolve category ids.",
+      "input_schema": {
+        "field": {
+          "type": "text",
+          "required": true,
+          "description": "The field whose id map to return (e.g. authors, tags)."
+        }
+      },
+      "exec_spec": {
+        "entity": "Book",
+        "rank": {
+          "method": "exact"
+        }
+      },
+      "guards": {
+        "messages": {
+          "not_found": "No such book exists in the library.",
+          "fk": "That reference does not exist.",
+          "off_panel": "That field is not available on this listing."
+        },
+        "required": [
+          "field"
+        ]
+      }
+    },
+    {
+      "_evidence": {
+        "locator": "src/calibre/srv/content.py:453",
+        "id_local": "get_note",
+        "entry": {
+          "kind": "http",
+          "route": "GET /get-note/{field}/{item_id}/{library_id}",
+          "locator": "src/calibre/srv/content.py:453"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "note_data = db.notes_data_for(field, item_id)\nif not note_data:\n    if db.get_item_name(field, item_id): return ''\n    raise HTTPNotFound(...)\nreturn html"
+      },
+      "_binds": {
+        "field": "Note.colname",
+        "item_id": "Note.item"
+      },
+      "tool": "get_note",
+      "op": "read",
+      "family": "crud.fetch",
+      "entity": "Note",
+      "description": "Fetch the HTML note attached to a library item's given field.",
+      "input_schema": {
+        "field": {
+          "type": "text",
+          "required": true,
+          "description": "Field/column the note is attached to."
+        },
+        "item_id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the library item."
+        }
+      },
+      "exec_spec": {
+        "entity": "Note",
+        "lookup_by": {
+          "item": {
+            "$arg": "item_id"
+          },
+          "colname": {
+            "$arg": "field"
+          }
+        }
+      },
+      "guards": {
+        "messages": {
+          "not_found": "No such note exists."
+        },
+        "required": [
+          "field",
+          "item_id"
+        ]
+      }
+    },
+    {
+      "_evidence": {
+        "locator": "src/calibre/srv/content.py:480",
+        "id_local": "get_note_resource",
+        "entry": {
+          "kind": "http",
+          "route": "GET /get-note-resource/{scheme}/{digest}/{library_id}",
+          "locator": "src/calibre/srv/content.py:480"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "d = db.get_notes_resource(f'{scheme}:{digest}')\nif not d: raise HTTPNotFound(...)\nreturn d['data']"
+      },
+      "_binds": {
+        "digest": "NoteResource.hash"
+      },
+      "tool": "get_note_resource",
+      "op": "read",
+      "family": "crud.fetch",
+      "entity": "NoteResource",
+      "description": "Fetch a binary resource (image, file) embedded in a note by its content digest.",
+      "input_schema": {
+        "scheme": {
+          "type": "text",
+          "required": true,
+          "description": "Resource URI scheme."
+        },
+        "digest": {
+          "type": "text",
+          "required": true,
+          "description": "Content digest identifying the resource."
+        }
+      },
+      "exec_spec": {
+        "entity": "NoteResource",
+        "lookup_by": {
+          "hash": {
+            "$arg": "digest"
+          }
+        }
+      },
+      "guards": {
+        "messages": {
+          "not_found": "No such note resource exists."
+        },
+        "required": [
+          "scheme",
+          "digest"
+        ]
+      }
+    },
+    {
+      "_evidence": {
+        "locator": "src/calibre/srv/books.py:209",
+        "id_local": "get_last_read_position",
+        "entry": {
+          "kind": "http",
+          "route": "GET /book-get-last-read-position/{library_id}/{+which}",
+          "locator": "src/calibre/srv/books.py:208"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "for item in which.split('_'):\n    book_id, fmt = item.partition('-')[::2]\n    if book_id not in allowed_book_ids: continue\n    key = f'{book_id}:{fmt}'\n    ans[key] = db.get_last_read_positions(book_id, fmt, user)"
+      },
+      "tool": "get_last_read_position",
+      "op": "read",
+      "family": "search",
+      "entity": "LastReadPosition",
+      "description": "Read rows for the signed-in account name, optionally restricted by book_id and fmt. Legacy encoded which selectors are not parsed.",
+      "input_schema": {
+        "which": {
+          "type": "text",
+          "required": false,
+          "description": "Legacy hint not parsed by this runtime; use book_id and fmt filters."
+        },
+        "book_id": {
+          "type": "int",
+          "required": false,
+          "description": "Optional integer book id filter."
+        },
+        "fmt": {
+          "type": "text",
+          "required": false,
+          "description": "Optional format filter, e.g. epub."
+        }
+      },
+      "exec_spec": {
+        "entity": "LastReadPosition",
+        "scope": {
+          "where": {
+            "user": "$session.name"
+          }
+        },
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "book",
+            "format",
+            "user",
+            "device",
+            "cfi",
+            "epoch",
+            "pos_frac"
+          ]
+        },
+        "filter": {
+          "op": "and",
+          "clauses": [
+            {
+              "col": "book",
+              "mode": "exact",
+              "val": {
+                "$arg": "book_id"
+              },
+              "optional": true
+            },
+            {
+              "col": "format",
+              "mode": "exact",
+              "val": {
+                "$arg": "fmt"
+              },
+              "optional": true
+            }
+          ]
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in to read your reading positions.",
+          "not_found": "No reading position exists for that book:format."
+        },
+        "required": []
+      }
+    },
+    {
+      "_evidence": {
+        "locator": "src/calibre/srv/books.py:256",
+        "id_local": "get_annotations",
+        "entry": {
+          "kind": "http",
+          "route": "GET /book-get-annotations/{library_id}/{+which}",
+          "locator": "src/calibre/srv/books.py:255"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "ans[key] = {'last_read_positions': db.get_last_read_positions(book_id, fmt, user),\n            'annotations_map': db.annotations_map_for_book(book_id, fmt, user_type='web', user=user)}"
+      },
+      "tool": "get_annotations",
+      "op": "read",
+      "family": "search",
+      "entity": "Annotation",
+      "description": "Read rows for the signed-in account name, optionally restricted by book_id and fmt. Legacy encoded which selectors are not parsed.",
+      "input_schema": {
+        "which": {
+          "type": "text",
+          "required": false,
+          "description": "Legacy hint not parsed by this runtime; use book_id and fmt filters."
+        },
+        "book_id": {
+          "type": "int",
+          "required": false,
+          "description": "Optional integer book id filter."
+        },
+        "fmt": {
+          "type": "text",
+          "required": false,
+          "description": "Optional format filter, e.g. epub."
+        }
+      },
+      "exec_spec": {
+        "entity": "Annotation",
+        "scope": {
+          "where": {
+            "user": "$session.name"
+          }
+        },
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "book",
+            "format",
+            "user_type",
+            "user",
+            "annot_data"
+          ]
+        },
+        "filter": {
+          "op": "and",
+          "clauses": [
+            {
+              "col": "book",
+              "mode": "exact",
+              "val": {
+                "$arg": "book_id"
+              },
+              "optional": true
+            },
+            {
+              "col": "format",
+              "mode": "exact",
+              "val": {
+                "$arg": "fmt"
+              },
+              "optional": true
+            }
+          ]
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in to read your annotations.",
+          "not_found": "No annotations exist for that book:format."
+        },
+        "required": []
+      }
+    },
+    {
+      "tool": "sign_in",
+      "family": "guard.auth",
+      "entity": "User",
+      "description": "Sign in to the content server with an account name and password. Most write actions and all per-user reads (reading positions, annotations) require a session first; the session opened is what $actor resolves to. Use name and password; pw is retained as a legacy runtime alias.",
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "The account login name."
+        },
+        "pw": {
+          "type": "text",
+          "required": false,
+          "description": "Legacy password alias. Builder callers use password."
+        },
+        "password": {
+          "type": "text",
+          "required": true,
+          "description": "Account password (the packlib login argument)."
+        }
+      },
+      "exec_spec": {
+        "verify": {
+          "entity": "User"
+        }
+      },
+      "_evidence": {
+        "id_local": "sign_in",
+        "locator": "src/calibre/srv/auth.py:279",
+        "ref_code": "AuthController.do_http_auth verifies name/pw against users table (name, pw)"
+      }
+    }
+  ],
+  "summary": "calibre is a self-hosted e-book library manager: a SQLite metadata database (books, authors, series, tags, publishers, ratings, formats, covers, comments, languages, identifiers, annotations, notes, custom columns, preferences, users) with a web content server exposing read/search/OPDS endpoints plus authenticated write endpoints (add/delete books, set fields, set cover, copy-to-library, upload/add formats, set notes, update annotations, full-text indexing, user management) that mutate the library DB and its on-disk book files.",
+  "_auth_candidates": [
+    {
+      "entity": "User",
+      "username_col": "name",
+      "password_col": "pw"
+    }
+  ],
+  "_session_fields": [
+    "name"
+  ],
+  "_fk_gravity": {
+    "entity": "Book",
+    "fk_count": 17
+  },
+  "seed_state": {
+    "User": [
+      {
+        "id": 1,
+        "name": "ops@calibre.example",
+        "pw": "pw-operations",
+        "readonly": "n",
+        "restriction": "{}",
+        "session_data": "{}",
+        "misc_data": "{}"
+      },
+      {
+        "id": 2,
+        "name": "readonly@calibre.example",
+        "pw": "pw-readonly",
+        "readonly": "y",
+        "restriction": "{}",
+        "session_data": "{}",
+        "misc_data": "{}"
+      }
+    ],
+    "Book": [
+      {
+        "id": 1,
+        "title": "Dune"
+      },
+      {
+        "id": 2,
+        "title": "Neuromancer"
+      }
+    ],
+    "Author": [
+      {
+        "id": 1,
+        "name": "Frank Herbert"
+      },
+      {
+        "id": 2,
+        "name": "William Gibson"
+      }
+    ],
+    "BookAuthorLink": [
+      {
+        "id": 1,
+        "book": 1,
+        "author": 1
+      },
+      {
+        "id": 2,
+        "book": 2,
+        "author": 2
+      }
+    ],
+    "Format": [
+      {
+        "id": 1,
+        "book": 1,
+        "format": "epub",
+        "uncompressed_size": 1000,
+        "data": "{}"
+      }
+    ],
+    "Tag": [
+      {
+        "id": 1,
+        "name": "scifi"
+      }
+    ],
+    "BookTagLink": [
+      {
+        "id": 1,
+        "book": 1,
+        "tag": 1
+      }
+    ]
+  }
+}

@@ -1,0 +1,132 @@
+{
+  "app": "anything_llm",
+  "role": "AI workspace administration and stored chat-turn management (AnythingLLM-style)",
+  "domains": [
+    "knowledge_management",
+    "assistant_operations"
+  ],
+  "kinds": {
+    "other:record_chat_turn": [
+      "workspacechat_new"
+    ],
+    "create_record": [
+      "workspacethread_new",
+      "workspacesuggestedmessages_saveall",
+      "systempromptvariable_create",
+      "slashcommandpreset_create"
+    ],
+    "update_record": [
+      "workspace_update",
+      "workspacechat_updatefeedbackscore",
+      "document_update",
+      "memory_update",
+      "systempromptvariable_update",
+      "slashcommandpreset_update"
+    ],
+    "delete_or_archive_row": [
+      "memory_delete",
+      "systempromptvariable_delete",
+      "slashcommandpreset_delete"
+    ]
+  },
+  "check_kinds": [
+    "record_exists",
+    "record_not_exists",
+    "record_field_equals",
+    "record_field_contains",
+    "record_field_unchanged",
+    "membership_exists",
+    "membership_not_exists",
+    "action_done",
+    "action_not_done"
+  ],
+  "carriers": {
+    "notes_field": {
+      "entity": "Workspace",
+      "field": "openAiPrompt"
+    }
+  },
+  "login": {
+    "tool": "user_login",
+    "user_field": "username",
+    "persona_entity": "User"
+  },
+  "content_entities": [
+    "ApiKey",
+    "WorkspaceDocument",
+    "Invite",
+    "DocumentVector",
+    "Workspace",
+    "WorkspaceThread",
+    "WorkspaceSuggestedMessage",
+    "WorkspaceChat",
+    "WorkspaceAgentInvocation",
+    "WorkspaceUser",
+    "CacheData",
+    "EmbedConfig",
+    "EmbedChat",
+    "EventLog",
+    "SlashCommandPreset",
+    "DocumentSyncQueue",
+    "DocumentSyncExecution",
+    "BrowserExtensionApiKey",
+    "SystemPromptVariable",
+    "PromptHistory",
+    "DesktopMobileDevice",
+    "WorkspaceParsedFile",
+    "ExternalCommunicationConnector",
+    "ScheduledJob",
+    "ScheduledJobRun",
+    "Memory",
+    "ModelRouter",
+    "ModelRouterRule",
+    "Document"
+  ],
+  "seed_helpers": [
+    "add_users",
+    "workspace",
+    "chat_history",
+    "documents",
+    "memories"
+  ],
+  "tool_families_to_keep": [
+    "user_login",
+    "workspace_",
+    "workspacechat_",
+    "workspacethread_",
+    "workspacesuggestedmessages_",
+    "document_update",
+    "memory_",
+    "systempromptvariable_",
+    "slashcommandpreset_"
+  ],
+  "obs_reads": [
+    "workspace_wherewithuser",
+    "systempromptvariable_get",
+    "slashcommandpreset_get"
+  ],
+  "known_patches": [
+    "Raw filename anything-llm.spec.json mapped to app anything_llm; env_id changed to anything_llm",
+    "Integer admin persona User.id=1 and multi_user_mode config; remove compiler domain demo seeds",
+    "Add search and limit to 3 existing list tools: workspace_wherewithuser,systempromptvariable_get,slashcommandpreset_get",
+    "Normalize :id/:code parameter names and all tool-local references in 4 tools"
+  ],
+  "known_limitations": [
+    "No external LLM inference tool: workspacechat_new records caller-supplied prompt/response; other:record_chat_turn proposes this limited capability and is not llm_call.",
+    "document_adddocuments and workspaceparsedfile_movetodocumentsandembed create placeholder doc-seed/file/path rows, do not ingest pageContent or embed vectors; no document content read/search tool exists.",
+    "workspace_new does not derive slug and therefore is not advertised as complete workspace creation. Seed workspace ids and slugs with workspace().",
+    "workspacechat_new has an undeclared user mapping; recorded chat user_id can remain absent. Do not claim chat authorship attribution.",
+    "memory_search lacks a query argument in the raw panel and returns no keyword results; memory_create ignores workspace slug and sets workspaceId null; memory_demote contains a placeholder and cannot repoint an id-typed FK. Those operations are not advertised.",
+    "workspace_update resets chatProvider/chatModel to null in its original exec_spec; router_id is id-typed and its set is not writable. No configuration-preservation claim is made.",
+    "Some raw tools lack the authentication guards implied by their descriptions; onboarding preserves those guards and does not certify global authorization behavior.",
+    "document_update has no authentication guard and can update flags while signed out; this original behavior is preserved.",
+    "workspacesuggestedmessages_getmessages scopes workspaceId to the actor id rather than resolving workspaceSlug. Raw tools also lack full chat/thread history read/list APIs."
+  ],
+  "smoke": {
+    "passed": true,
+    "date": "2026-10-24",
+    "report": "ok"
+  },
+  "register_file": "pack/newspecs3/anything_llm/register.py",
+  "base_spec": "pack/base_specs/anything_llm.spec.json"
+}

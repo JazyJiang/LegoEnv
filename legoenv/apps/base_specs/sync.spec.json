@@ -1,0 +1,5321 @@
+{
+  "env_id": "sync",
+  "_prep_version": 3,
+  "auth": {
+    "account_entity": "User",
+    "username_col": "name",
+    "password_col": "password",
+    "session_fields": {
+      "name": "name",
+      "global_rank": "global_rank",
+      "email": "email",
+      "ip": "ip"
+    }
+  },
+  "entities": [
+    {
+      "name": "Alias",
+      "columns": [
+        {
+          "name": "visit_id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "ip",
+          "type": "text",
+          "nullable": false,
+          "max": 39
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false,
+          "max": 20
+        },
+        {
+          "name": "time",
+          "type": "int",
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "name": "BannedChannel",
+      "columns": [
+        {
+          "name": "channel_name",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "max": 30
+        },
+        {
+          "name": "external_reason",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "internal_reason",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "banned_by",
+          "type": "text",
+          "nullable": false,
+          "max": 20
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "nullable": true,
+          "audit": true
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "nullable": true,
+          "audit": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "channel_name"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Channel",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false,
+          "max": 30
+        },
+        {
+          "name": "owner",
+          "type": "text",
+          "nullable": false,
+          "max": 20
+        },
+        {
+          "name": "time",
+          "type": "int",
+          "nullable": false
+        },
+        {
+          "name": "last_loaded",
+          "type": "datetime",
+          "nullable": false,
+          "default": "0"
+        },
+        {
+          "name": "owner_last_seen",
+          "type": "datetime",
+          "nullable": false,
+          "default": "0"
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "name"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ChannelBan",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "ip",
+          "type": "text",
+          "nullable": false,
+          "max": 39
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false,
+          "max": 20
+        },
+        {
+          "name": "bannedby",
+          "type": "text",
+          "nullable": false,
+          "max": 20
+        },
+        {
+          "name": "reason",
+          "type": "text",
+          "nullable": false,
+          "max": 255
+        },
+        {
+          "name": "channel",
+          "type": "text",
+          "nullable": false,
+          "max": 30
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "name",
+            "ip",
+            "channel"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ChannelChat",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "channel_name",
+          "type": "text",
+          "fk_to": "Channel.name"
+        },
+        {
+          "name": "chatbuffer",
+          "type": "json"
+        },
+        {
+          "name": "chatmuted",
+          "type": "json"
+        }
+      ]
+    },
+    {
+      "name": "ChannelCustomization",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "channel_name",
+          "type": "text",
+          "fk_to": "Channel.name"
+        },
+        {
+          "name": "css",
+          "type": "text",
+          "max": 20000
+        },
+        {
+          "name": "cssHash",
+          "type": "text"
+        },
+        {
+          "name": "js",
+          "type": "text",
+          "max": 20000
+        },
+        {
+          "name": "jsHash",
+          "type": "text"
+        },
+        {
+          "name": "motd",
+          "type": "text",
+          "max": 20000
+        }
+      ]
+    },
+    {
+      "name": "ChannelData",
+      "columns": [
+        {
+          "name": "channel_id",
+          "type": "id",
+          "pk": true,
+          "nullable": false,
+          "fk_to": "Channel.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "key",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "max": 20
+        },
+        {
+          "name": "value",
+          "type": "json",
+          "nullable": false
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "channel_id",
+            "key"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ChannelLibrary",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "max": 255
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "nullable": false,
+          "max": 255
+        },
+        {
+          "name": "seconds",
+          "type": "int",
+          "nullable": false
+        },
+        {
+          "name": "type",
+          "type": "text",
+          "nullable": false,
+          "max": 2
+        },
+        {
+          "name": "meta",
+          "type": "json",
+          "nullable": false
+        },
+        {
+          "name": "channel",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "max": 30
+        }
+      ]
+    },
+    {
+      "name": "ChannelOptions",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "channel_name",
+          "type": "text",
+          "fk_to": "Channel.name"
+        },
+        {
+          "name": "allow_voteskip",
+          "type": "bool",
+          "default": true
+        },
+        {
+          "name": "voteskip_ratio",
+          "type": "float",
+          "default": 0.5
+        },
+        {
+          "name": "afk_timeout",
+          "type": "int",
+          "default": 600
+        },
+        {
+          "name": "pagetitle",
+          "type": "text",
+          "default": "channel.name"
+        },
+        {
+          "name": "maxlength",
+          "type": "int",
+          "default": 0
+        },
+        {
+          "name": "externalcss",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "externaljs",
+          "type": "text",
+          "default": ""
+        },
+        {
+          "name": "chat_antiflood",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "chat_antiflood_params",
+          "type": "json"
+        },
+        {
+          "name": "show_public",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "enable_link_regex",
+          "type": "bool",
+          "default": true
+        },
+        {
+          "name": "password",
+          "type": "text",
+          "default": false
+        },
+        {
+          "name": "allow_dupes",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "torbanned",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "block_anonymous_users",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "allow_ascii_control",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "playlist_max_per_user",
+          "type": "int",
+          "default": 0
+        },
+        {
+          "name": "new_user_chat_delay",
+          "type": "int",
+          "default": 0
+        },
+        {
+          "name": "new_user_chat_link_delay",
+          "type": "int",
+          "default": 0
+        },
+        {
+          "name": "playlist_max_duration_per_user",
+          "type": "int",
+          "default": 0
+        }
+      ]
+    },
+    {
+      "name": "ChannelPermissions",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "channel_name",
+          "type": "text",
+          "fk_to": "Channel.name"
+        },
+        {
+          "name": "permissions",
+          "type": "json"
+        },
+        {
+          "name": "openPlaylist",
+          "type": "bool",
+          "default": false
+        }
+      ]
+    },
+    {
+      "name": "ChannelRank",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "max": 20
+        },
+        {
+          "name": "rank",
+          "type": "int",
+          "nullable": false
+        },
+        {
+          "name": "channel_name",
+          "type": "text",
+          "nullable": false,
+          "max": 30,
+          "fk_to": "Channel.name"
+        }
+      ]
+    },
+    {
+      "name": "ChatFilter",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "channel_name",
+          "type": "text",
+          "fk_to": "Channel.name"
+        },
+        {
+          "name": "name",
+          "type": "text"
+        },
+        {
+          "name": "source",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "replace",
+          "type": "text",
+          "nullable": false,
+          "max": 1000
+        },
+        {
+          "name": "flags",
+          "type": "text",
+          "nullable": false,
+          "max": 4
+        },
+        {
+          "name": "active",
+          "type": "bool",
+          "nullable": false
+        },
+        {
+          "name": "filterlinks",
+          "type": "bool",
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "name": "Emote",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "channel_name",
+          "type": "text",
+          "fk_to": "Channel.name"
+        },
+        {
+          "name": "name",
+          "type": "text"
+        },
+        {
+          "name": "image",
+          "type": "text",
+          "nullable": false,
+          "max": 1000
+        },
+        {
+          "name": "source",
+          "type": "text"
+        }
+      ]
+    },
+    {
+      "name": "GlobalBan",
+      "columns": [
+        {
+          "name": "ip",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "max": 39
+        },
+        {
+          "name": "reason",
+          "type": "text",
+          "nullable": false,
+          "max": 255
+        }
+      ]
+    },
+    {
+      "name": "MediaMetadataCache",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "max": 255
+        },
+        {
+          "name": "type",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "max": 2
+        },
+        {
+          "name": "metadata",
+          "type": "json",
+          "nullable": false
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "nullable": true,
+          "audit": true
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "nullable": true,
+          "audit": true
+        }
+      ]
+    },
+    {
+      "name": "Meta",
+      "columns": [
+        {
+          "name": "key",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "max": 255
+        },
+        {
+          "name": "value",
+          "type": "text",
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "name": "PasswordReset",
+      "columns": [
+        {
+          "name": "ip",
+          "type": "text",
+          "nullable": false,
+          "max": 39
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "max": 20
+        },
+        {
+          "name": "hash",
+          "type": "text",
+          "nullable": false,
+          "max": 64
+        },
+        {
+          "name": "email",
+          "type": "text",
+          "nullable": false,
+          "max": 255
+        },
+        {
+          "name": "expire",
+          "type": "int",
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "name": "Playlist",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "channel_name",
+          "type": "text",
+          "fk_to": "Channel.name"
+        },
+        {
+          "name": "id",
+          "type": "text"
+        },
+        {
+          "name": "title",
+          "type": "text"
+        },
+        {
+          "name": "seconds",
+          "type": "int"
+        },
+        {
+          "name": "type",
+          "type": "text"
+        },
+        {
+          "name": "meta",
+          "type": "json"
+        },
+        {
+          "name": "uid",
+          "type": "int"
+        },
+        {
+          "name": "temp",
+          "type": "bool"
+        },
+        {
+          "name": "queueby",
+          "type": "text"
+        },
+        {
+          "name": "currentTime",
+          "type": "float"
+        },
+        {
+          "name": "paused",
+          "type": "bool"
+        },
+        {
+          "name": "position",
+          "type": "int"
+        },
+        {
+          "name": "time",
+          "type": "float"
+        },
+        {
+          "name": "leader",
+          "type": "text"
+        }
+      ]
+    },
+    {
+      "name": "Poll",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "channel_name",
+          "type": "text",
+          "fk_to": "Channel.name"
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "max": 255
+        },
+        {
+          "name": "initiator",
+          "type": "text"
+        },
+        {
+          "name": "options",
+          "type": "json"
+        },
+        {
+          "name": "votes",
+          "type": "json"
+        },
+        {
+          "name": "obscured",
+          "type": "bool"
+        },
+        {
+          "name": "retainVotes",
+          "type": "bool"
+        },
+        {
+          "name": "timestamp",
+          "type": "int"
+        }
+      ]
+    },
+    {
+      "name": "User",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false,
+          "max": 20
+        },
+        {
+          "name": "password",
+          "type": "text",
+          "nullable": false,
+          "max": 60
+        },
+        {
+          "name": "global_rank",
+          "type": "int",
+          "nullable": false,
+          "default": 1
+        },
+        {
+          "name": "email",
+          "type": "text",
+          "nullable": true,
+          "max": 255
+        },
+        {
+          "name": "profile",
+          "type": "json",
+          "nullable": false,
+          "default": "{\"image\":\"\",\"text\":\"\"}"
+        },
+        {
+          "name": "ip",
+          "type": "text",
+          "nullable": false,
+          "max": 39
+        },
+        {
+          "name": "time",
+          "type": "int",
+          "nullable": false
+        },
+        {
+          "name": "name_dedupe",
+          "type": "text",
+          "nullable": true,
+          "max": 20
+        },
+        {
+          "name": "inactive",
+          "type": "bool",
+          "nullable": true,
+          "default": false
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "name"
+          ]
+        },
+        {
+          "kind": "unique",
+          "cols": [
+            "name_dedupe"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "UserDeletionRequest",
+      "columns": [
+        {
+          "name": "request_id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "user_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "User.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "nullable": true,
+          "audit": true
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "nullable": true,
+          "audit": true
+        }
+      ]
+    },
+    {
+      "name": "UserPlaylist",
+      "columns": [
+        {
+          "name": "user",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "max": 20
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "max": 255
+        },
+        {
+          "name": "contents",
+          "type": "json",
+          "nullable": false
+        },
+        {
+          "name": "count",
+          "type": "int",
+          "nullable": false
+        },
+        {
+          "name": "duration",
+          "type": "int",
+          "nullable": false
+        }
+      ]
+    }
+  ],
+  "tools": [
+    {
+      "tool": "user_register",
+      "family": "auth.register",
+      "entity": "User",
+      "description": "Register a new account with a username and password, which starts as a normal user (global rank 1) and can then sign in. Fails if the username is already taken.",
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "The username to register."
+        },
+        "password": {
+          "type": "text",
+          "required": true,
+          "description": "The account password, stored hashed."
+        },
+        "email": {
+          "type": "text",
+          "required": false,
+          "description": "Optional contact email for the account."
+        }
+      },
+      "exec_spec": {
+        "entity": "User",
+        "fields": [
+          "global_rank",
+          "email",
+          "profile",
+          "ip",
+          "time",
+          "name_dedupe"
+        ],
+        "set_on_create": {
+          "global_rank": {
+            "lit": 1
+          },
+          "profile": {
+            "lit": {
+              "image": "",
+              "text": ""
+            }
+          },
+          "ip": {
+            "lit": "0.0.0.0"
+          }
+        },
+        "prechecks": [
+          {
+            "entity": "User",
+            "where": {
+              "name": {
+                "$arg": "name"
+              }
+            },
+            "negate": true,
+            "message": "That username is already registered."
+          }
+        ]
+      },
+      "guards": {
+        "requires_auth": false,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "name",
+                  "op": "eq",
+                  "value": {
+                    "arg": "name"
+                  }
+                }
+              },
+              "op": "eq",
+              "n": 0
+            }
+          ]
+        ],
+        "required": [
+          "name",
+          "password"
+        ],
+        "messages": {
+          "precondition": "That username is already registered. Pick a different one.",
+          "unique": "That username is already registered.",
+          "not_found": "Registration could not create the account."
+        }
+      },
+      "_evidence": {
+        "locator": "src/database/accounts.js:113",
+        "id_local": "User.register",
+        "entry": {
+          "kind": "http",
+          "route": "POST /register",
+          "locator": "src/web/auth.js:293"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "db.users.register(name, pw, email, ip, cb):\\n  if (!isValidUserName(name)) cb('Invalid username...')\\n  this.getAccounts(ip, (err,accts)=> {\\n    if (accts.length >= Config.get('max-accounts-per-ip')) cb('You have registered too many accounts from this computer.')\\n    isUsernameTaken(name, (err,taken,matched)=> { if (taken) cb('... already registered...')\\n      bcrypt.hash(pw,10,(err,hash)=> {\\n        db.query(\"INSERT INTO users (name,password,global_rank,email,profile,ip,time,name_dedupe) VALUES (?,?,?,?, '', ?, ?, ?)\",[name,hash,1,email,ip,Date.now(),dedupeUsername(name)], cb) } ) }) });",
+        "edges": [
+          "src/web/auth.js:180-220"
+        ]
+      },
+      "_binds": {
+        "name": "User.name",
+        "email": "User.email",
+        "password": "User.password"
+      },
+      "_output_schema": {
+        "name": "registered username"
+      }
+    },
+    {
+      "tool": "user_login",
+      "family": "guard.auth",
+      "entity": "User",
+      "description": "Sign in with your username and password to open a session. Everything that touches a channel, your account, bans, filters or the admin console requires this first; the session it opens is what $actor resolves to.",
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "The account username."
+        },
+        "password": {
+          "type": "text",
+          "required": true,
+          "description": "The account password."
+        }
+      },
+      "exec_spec": {
+        "verify": {
+          "entity": "User",
+          "username_col": "name",
+          "password_col": "password"
+        }
+      },
+      "guards": {
+        "required": [
+          "name",
+          "password"
+        ],
+        "messages": {
+          "required": "Sign in needs your username and password."
+        }
+      },
+      "_evidence": {
+        "locator": "src/database/accounts.js:224",
+        "id_local": "User.login",
+        "ref_code": "verifyLogin: SELECT * FROM users WHERE name=? AND inactive=FALSE; bcrypt.compare(pw, rows[0].password)"
+      },
+      "_binds": {
+        "name": "User.name"
+      }
+    },
+    {
+      "tool": "user_logout",
+      "family": "guard.logout",
+      "entity": "User",
+      "description": "End the current session and clear the auth cookie.",
+      "input_schema": {},
+      "exec_spec": {
+        "entity": "User"
+      },
+      "_evidence": {
+        "locator": "src/web/auth.js:130",
+        "id_local": "User.logout",
+        "ref_code": "handleLogout: res.clearCookie('auth'); res.redirect('/')"
+      }
+    },
+    {
+      "tool": "user_changeemail",
+      "family": "update.field_set",
+      "entity": "User",
+      "description": "Change the email address on your own account. Fails unless the username matches the signed-in session.",
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "Your username (must match the signed-in account)."
+        },
+        "email": {
+          "type": "text",
+          "required": true,
+          "description": "The new email address."
+        }
+      },
+      "exec_spec": {
+        "entity": "User",
+        "row_key": {
+          "name": {
+            "$arg": "name"
+          }
+        },
+        "fields": [
+          "email"
+        ],
+        "set": {
+          "email": {
+            "$arg": "email"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "name",
+                  "op": "eq",
+                  "value": {
+                    "session": "name"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "name",
+          "email"
+        ],
+        "messages": {
+          "auth": "Sign in before changing your email.",
+          "precondition": "You can only change the email of the account you are signed in as.",
+          "not_found": "No such account."
+        }
+      },
+      "_evidence": {
+        "locator": "src/web/account.js:161",
+        "id_local": "User.changeEmail",
+        "entry": {
+          "kind": "http",
+          "route": "POST /account/edit",
+          "locator": "src/web/account.js:745"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "handleChangeEmail: if(!isValidEmail(email) && email!=='') 'Invalid email address'; db.users.verifyLogin(name,password,)=> db.users.setEmail(name,email)=> 'Email address changed.'; setEmail: UPDATE users SET email=? WHERE name=?",
+        "edges": [
+          "src/web/account.js:180"
+        ]
+      },
+      "_binds": {
+        "name": "User.name",
+        "email": "User.email"
+      }
+    },
+    {
+      "tool": "user_changepassword",
+      "family": "update.field_set",
+      "entity": "User",
+      "description": "Change the password on your own account (stored hashed). Fails unless the username matches the signed-in session.",
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "Your username (must match the signed-in account)."
+        },
+        "password": {
+          "type": "text",
+          "required": true,
+          "description": "The new password."
+        }
+      },
+      "exec_spec": {
+        "entity": "User",
+        "row_key": {
+          "name": {
+            "$arg": "name"
+          }
+        },
+        "fields": [
+          "password"
+        ],
+        "set": {
+          "password": {
+            "$arg": "password"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "name",
+                  "op": "eq",
+                  "value": {
+                    "session": "name"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "name",
+          "password"
+        ],
+        "messages": {
+          "auth": "Sign in before changing your password.",
+          "precondition": "You can only change the password of the account you are signed in as.",
+          "not_found": "No such account."
+        }
+      },
+      "_evidence": {
+        "locator": "src/web/account.js:84",
+        "id_local": "User.changePassword",
+        "entry": {
+          "kind": "http",
+          "route": "POST /account/edit",
+          "locator": "src/web/account.js:745"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "handleChangePassword: name/oldpassword/newpassword from body; if (!reqUser) 'You must be logged in'; newpassword=newpassword.substring(0,100); db.users.verifyLogin(name,oldpassword,)=> db.users.setPassword(name,newpassword)=> session.genSession(user,expiration)=> setAuthCookie; setPassword does bcrypt.hash(pw,10) then UPDATE users SET password=? WHERE name=?",
+        "edges": [
+          "src/web/account.js:103,113"
+        ]
+      },
+      "_binds": {
+        "name": "User.name"
+      }
+    },
+    {
+      "tool": "user_setprofile",
+      "family": "update.field_set",
+      "entity": "User",
+      "description": "Update your own account profile (an image url and a short blurb). Acts on the signed-in account.",
+      "input_schema": {
+        "image": {
+          "type": "text",
+          "required": true,
+          "description": "The new profile image url."
+        },
+        "text": {
+          "type": "text",
+          "required": true,
+          "description": "The new profile blurb text."
+        }
+      },
+      "exec_spec": {
+        "entity": "User",
+        "row_key": {
+          "name": {
+            "$session": "name"
+          }
+        },
+        "fields": [
+          "profile"
+        ],
+        "set": {
+          "profile": {
+            "$arg": "image"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "name",
+                  "op": "eq",
+                  "value": {
+                    "session": "name"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "image",
+          "text"
+        ],
+        "messages": {
+          "auth": "Sign in before editing your profile.",
+          "precondition": "You can only edit the profile of the account you are signed in as.",
+          "not_found": "No such account."
+        }
+      },
+      "_evidence": {
+        "locator": "src/web/account.js:440",
+        "id_local": "User.setProfile",
+        "entry": {
+          "kind": "http",
+          "route": "POST /account/profile",
+          "locator": "src/web/account.js:749"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "handleAccountProfile: csrf.verify; if(!user) 'You must be logged in to edit your profile'; rawImage=String(req.body.image).substring(0,255); text=String(req.body.text).substring(0,255); validateProfileImage(rawImage, (error,image)=>{ if(error) err; db.users.setProfile(user.name,{image,text},()=> globalMessageBus.emit('UserProfileChanged',{user:user.name}); }); setProfile: profile.image=profile.image.substring(0,255); profile.text=profile.text.substring(0,255); var profilejson=JSON.stringify({image:profile.image,text:profile.text}); UPDATE users SET profile=? WHERE name=?",
+        "edges": [
+          "src/web/account.js:448,461"
+        ]
+      },
+      "_binds": {
+        "image": "User.profile"
+      }
+    },
+    {
+      "tool": "user_requestdeleteaccount",
+      "family": "action.trigger",
+      "entity": "User",
+      "description": "Request deletion of your own account: marks it inactive (can no longer sign in) and records a deletion request. Fails if you still own any channel or do not confirm.",
+      "input_schema": {
+        "confirmed": {
+          "type": "bool",
+          "required": true,
+          "description": "Must be true to confirm account deletion."
+        }
+      },
+      "exec_spec": {
+        "entity": "User",
+        "target": {
+          "entity": "User",
+          "lookup_by": {
+            "name": {
+              "$session": "name"
+            }
+          }
+        },
+        "set": {
+          "inactive": {
+            "lit": true
+          }
+        },
+        "dispatch_events": [
+          "AccountDeletionRequested"
+        ]
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Channel",
+                "where": {
+                  "node": "field",
+                  "col": "owner",
+                  "op": "eq",
+                  "value": {
+                    "session": "name"
+                  }
+                }
+              },
+              "op": "eq",
+              "n": 0
+            }
+          ]
+        ],
+        "required": [
+          "confirmed"
+        ],
+        "messages": {
+          "auth": "Sign in before deleting your account.",
+          "precondition": "You must delete or transfer every channel you own before you can delete your account.",
+          "not_found": "No such account."
+        }
+      },
+      "_evidence": {
+        "locator": "src/web/routes/account/delete-account.js:26",
+        "id_local": "User.requestDeleteAccount",
+        "entry": {
+          "kind": "http",
+          "route": "POST /account/delete",
+          "locator": "src/web/routes/account/delete-account.js:26"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "delete-account POST: if(!req.body.confirmed) showDeletePage(missingConfirmation); user=verifyLoginAsync(loginName,req.body.password); channels=listUserChannelsAsync(user.name); if(channels.length>0) showDeletePage(channelCount); await requestAccountDeletion(user.id); if(email enabled && user.email) sendEmail(user); res.clearCookie('auth'); requestAccountDeletion: runTransaction: user=users where id; insert user_deletion_requests {user_id:id}; update users set password='',inactive=true where id; delete password_reset where name=user.name (ignore ER_DUP_ENTRY)",
+        "edges": [
+          "src/web/routes/account/delete-account.js:27,44,53"
+        ]
+      }
+    },
+    {
+      "tool": "user_acpresetpassword",
+      "family": "update.field_set",
+      "entity": "User",
+      "description": "Admin: reset any user's password without knowing the old one. Only a global admin can do this.",
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "Username of the account to reset."
+        },
+        "password": {
+          "type": "text",
+          "required": true,
+          "description": "The new password."
+        }
+      },
+      "exec_spec": {
+        "entity": "User",
+        "row_key": {
+          "name": {
+            "$arg": "name"
+          }
+        },
+        "fields": [
+          "password"
+        ],
+        "set": {
+          "password": {
+            "$arg": "password"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "global_rank",
+                  "op": "gte",
+                  "value": 255
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "name",
+          "password"
+        ],
+        "messages": {
+          "auth": "Sign in before resetting passwords.",
+          "precondition": "Only a global admin can reset another user's password.",
+          "not_found": "No such account."
+        }
+      },
+      "_evidence": {
+        "locator": "src/acp.js:140",
+        "id_local": "User.acpResetPassword",
+        "entry": {
+          "kind": "rpc",
+          "event": "acp-reset-password",
+          "locator": "src/acp.js:263",
+          "route": "acp-reset-password"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "handleResetPassword(user,data,ack): db.users.getGlobalRank(name,(err,rank)=>{ if(rank>user.global_rank) fail; if(rank>=user.global_rank && user.global_rank<255) fail; bcrypt.hash(data.password,10,...); db.users.setPassword(name,data.password,ack) })",
+        "edges": [
+          "src/acp.js:147-160"
+        ]
+      },
+      "_binds": {
+        "name": "User.name"
+      }
+    },
+    {
+      "tool": "user_acpsearchusers",
+      "family": "search",
+      "entity": "User",
+      "description": "Admin: search the account directory by a field (name or email) and value, returning matching accounts with their id, name, global rank, email, ip and signup time.",
+      "input_schema": {
+        "field": {
+          "type": "text",
+          "required": true,
+          "description": "Which field to search: name or email."
+        },
+        "value": {
+          "type": "text",
+          "required": true,
+          "description": "The substring to match."
+        }
+      },
+      "exec_spec": {
+        "entity": "User",
+        "search_fields": [
+          "name",
+          "email"
+        ],
+        "rank": {
+          "method": "substring",
+          "fields": [
+            "name",
+            "email"
+          ]
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "global_rank",
+                  "op": "gte",
+                  "value": 255
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "field",
+          "value"
+        ],
+        "messages": {
+          "auth": "Sign in before searching the account directory.",
+          "precondition": "Only a global admin can search the account directory."
+        }
+      },
+      "_evidence": {
+        "locator": "src/acp.js:69",
+        "id_local": "User.acpSearchUsers",
+        "entry": {
+          "kind": "rpc",
+          "event": "acp-list-users",
+          "locator": "src/acp.js:261",
+          "route": "acp-list-users"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "handleListUsers(user,data): fields=[id,name,global_rank,email,ip,time]; if(!fields.includes(field)) err; db.users.search(field,value,fields,(err,users)=>{ emit acp-list-users users }); search: if(fields.indexOf('password')!==-1) fields.splice; SELECT fields FROM users WHERE where LIKE ?",
+        "edges": [
+          "src/acp.js checkAdmin gate"
+        ]
+      }
+    },
+    {
+      "tool": "user_setglobalrank",
+      "family": "update.field_set",
+      "entity": "User",
+      "description": "Admin: change a user's global rank (0-255; 255 = global admin). You cannot promote anyone to a rank equal to or higher than your own.",
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "Username of the account whose rank to change."
+        },
+        "rank": {
+          "type": "int",
+          "required": true,
+          "description": "The new global rank."
+        }
+      },
+      "exec_spec": {
+        "entity": "User",
+        "row_key": {
+          "name": {
+            "$arg": "name"
+          }
+        },
+        "fields": [
+          "global_rank"
+        ],
+        "set": {
+          "global_rank": {
+            "$arg": "rank"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "global_rank",
+                  "op": "gte",
+                  "value": 255
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "name",
+          "rank"
+        ],
+        "messages": {
+          "auth": "Sign in before changing ranks.",
+          "precondition": "Only a global admin can change ranks.",
+          "not_found": "No such account."
+        }
+      },
+      "_evidence": {
+        "locator": "src/acp.js:95",
+        "id_local": "User.setGlobalRank",
+        "entry": {
+          "kind": "rpc",
+          "event": "acp-set-rank",
+          "locator": "src/acp.js:262",
+          "route": "acp-set-rank"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "handleSetRank(user,data): if(rank>=user.global_rank) 'not permitted to promote to equal or higher'; db.users.getGlobalRank(name,(err,oldrank)=>{ if(oldrank>=user.global_rank) 'not permitted to change rank of higher'; db.users.setGlobalRank(name,rank) }); setGlobalRank: UPDATE users SET global_rank=? WHERE name=?",
+        "edges": [
+          "src/acp.js:113-124"
+        ]
+      },
+      "_binds": {
+        "name": "User.name",
+        "rank": "User.global_rank"
+      }
+    },
+    {
+      "tool": "user_requestpasswordreset",
+      "family": "crud.upsert",
+      "entity": "PasswordReset",
+      "description": "Request a password-reset token for an account. The account must be active and have a non-empty email matching the one you supply.",
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "The account username."
+        },
+        "email": {
+          "type": "text",
+          "required": true,
+          "description": "The account's email (must match what is on file)."
+        }
+      },
+      "exec_spec": {
+        "entity": "PasswordReset",
+        "key": {
+          "name": {
+            "$arg": "name"
+          }
+        },
+        "insert_fields": {
+          "email": {
+            "$arg": "email"
+          },
+          "hash": {
+            "lit": "pending-hash"
+          },
+          "expire": {
+            "lit": 2147483647
+          }
+        },
+        "set_on_exists": {
+          "email": {
+            "$arg": "email"
+          },
+          "hash": {
+            "lit": "pending-hash"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": false,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "name",
+                      "op": "eq",
+                      "value": {
+                        "arg": "name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "email",
+                      "op": "ne",
+                      "value": ""
+                    },
+                    {
+                      "node": "field",
+                      "col": "inactive",
+                      "op": "eq",
+                      "value": false
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "name",
+          "email"
+        ],
+        "messages": {
+          "precondition": "That account has no matching non-empty email, so password reset cannot proceed.",
+          "not_found": "No such account."
+        }
+      },
+      "_evidence": {
+        "locator": "src/web/account.js:515",
+        "id_local": "User.requestPasswordReset",
+        "entry": {
+          "kind": "http",
+          "route": "POST /account/passwordreset",
+          "locator": "src/web/account.js:751"
+        },
+        "entity_why": "primary effect row_upsert lands on this table",
+        "ref_code": "handlePasswordReset: csrf.verify; db.users.getEmail(name,(err,actualEmail)=>{ if(actualEmail==='') '...doesn't have an email'; else if(actualEmail.toLowerCase()!==email.trim().toLowerCase()) 'Provided email does not match'; crypto.randomBytes(20,...); var hash=bytes.toString('hex'); var expire=Date.now()+86400000; db.addPasswordReset({ip,name,email:actualEmail,hash,expire}); emailController.sendPasswordReset({username:name,address:email,url:baseUrl+'/account/passwordrecover/'+hash}); }); addPasswordReset: INSERT INTO password_reset (ip,name,email,hash,expire) VALUES (?,?,?,?,?) ON DUPLICATE KE",
+        "edges": [
+          "src/web/account.js:540,550,558"
+        ]
+      },
+      "_binds": {
+        "name": "User.name",
+        "email": "User.email"
+      }
+    },
+    {
+      "tool": "passwordreset_recover",
+      "family": "crud.delete",
+      "entity": "PasswordReset",
+      "description": "Redeem a password-reset token by its hash. Consumes the token (deletes it) so it can only be used once, and only before it expires.",
+      "input_schema": {
+        "hash": {
+          "type": "text",
+          "required": true,
+          "description": "The reset token hash from the reset email."
+        }
+      },
+      "exec_spec": {
+        "entity": "PasswordReset",
+        "lookup_by": {
+          "hash": {
+            "$arg": "hash"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": false,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "PasswordReset",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "hash",
+                      "op": "eq",
+                      "value": {
+                        "arg": "hash"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "expire",
+                      "op": "gt",
+                      "value": {
+                        "now": true
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "hash"
+        ],
+        "messages": {
+          "precondition": "That reset token does not exist or has expired.",
+          "not_found": "That reset token does not exist or has expired."
+        }
+      },
+      "_evidence": {
+        "locator": "src/web/account.js:680",
+        "id_local": "PasswordReset.recover",
+        "entry": {
+          "kind": "http",
+          "route": "POST /account/passwordrecover/:hash",
+          "locator": "src/web/account.js:753"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "handlePostPasswordRecover: db.lookupPasswordReset(hash,(err,row)=>{ if(Date.now()>=row.expire) 'expired'; var newpw=10-char random; db.users.setPassword(row.name,newpw,()=> db.deletePasswordReset(hash); 'recovered' })",
+        "edges": [
+          "src/web/account.js:689-698"
+        ]
+      },
+      "_binds": {
+        "hash": "PasswordReset.hash"
+      }
+    },
+    {
+      "tool": "channel_create",
+      "family": "crud.upsert",
+      "entity": "Channel",
+      "description": "Register a new channel under your account; you become its owner. Fails if the channel name is banned, already taken, or reserved.",
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "The channel name to register."
+        }
+      },
+      "exec_spec": {
+        "entity": "Channel",
+        "key": {
+          "name": {
+            "$arg": "name"
+          }
+        },
+        "insert_fields": {
+          "owner": {
+            "$session": "name"
+          },
+          "time": {
+            "lit": 0
+          },
+          "last_loaded": {
+            "lit": "2026-01-01T00:00:00Z"
+          },
+          "owner_last_seen": {
+            "lit": "2026-01-01T00:00:00Z"
+          }
+        },
+        "set_on_exists": {
+          "owner": {
+            "$session": "name"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "BannedChannel",
+                "where": {
+                  "node": "field",
+                  "col": "channel_name",
+                  "op": "eq",
+                  "value": {
+                    "arg": "name"
+                  }
+                }
+              },
+              "op": "eq",
+              "n": 0
+            }
+          ]
+        ],
+        "required": [
+          "name"
+        ],
+        "messages": {
+          "auth": "Sign in before registering a channel.",
+          "precondition": "That channel name is banned, taken or reserved and cannot be registered.",
+          "unique": "That channel name is already registered."
+        }
+      },
+      "_evidence": {
+        "locator": "src/web/account.js:252",
+        "id_local": "Channel.registerChannel",
+        "entry": {
+          "kind": "http",
+          "route": "POST /account/channels",
+          "locator": "src/web/account.js:747"
+        },
+        "entity_why": "primary effect row_upsert lands on this table",
+        "ref_code": "handleNewChannel: user=authorize(req); banInfo=getBannedChannel(name); if(banInfo) 'this channel is banned'; if(name.match(reserved)) 'That channel name is reserved'; if(channels.length>=max && user.global_rank<255) 'not allowed to register more'; db.channels.register(name,user.name,()=> globalMessageBus.emit('ChannelRegistered',{channel:name})); register: isChannelTaken(name)=> INSERT INTO channels (name,owner,time,last_loaded) VALUES (?,?,?,?); then getGlobalRank(owner)=> rank=max(rank,5); setRank(name,owner,rank)",
+        "edges": [
+          "src/web/account.js:260,268,279,287,295"
+        ]
+      },
+      "_binds": {
+        "name": "Channel.name"
+      }
+    },
+    {
+      "tool": "channel_delete",
+      "family": "crud.delete",
+      "entity": "Channel",
+      "description": "Delete one of your own channels (or any channel, if you are a global admin), removing it and its bans, library and ranks.",
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "The channel name to delete."
+        }
+      },
+      "exec_spec": {
+        "entity": "Channel",
+        "lookup_by": {
+          "name": {
+            "$arg": "name"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Channel",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "name",
+                      "op": "eq",
+                      "value": {
+                        "arg": "name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "owner",
+                      "op": "eq",
+                      "value": {
+                        "session": "name"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "global_rank",
+                  "op": "gte",
+                  "value": 255
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "name"
+        ],
+        "messages": {
+          "auth": "Sign in before deleting a channel.",
+          "precondition": "You can only delete a channel you own, unless you are a global admin.",
+          "not_found": "That channel does not exist."
+        }
+      },
+      "_evidence": {
+        "locator": "src/web/account.js:331",
+        "id_local": "Channel.deleteChannel",
+        "entry": {
+          "kind": "http",
+          "route": "POST /account/channels",
+          "locator": "src/web/account.js:747"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "handleDeleteChannel: db.channels.lookup(name,(err,channel)=>{ if((!channel.owner || channel.owner.toLowerCase()!==user.name.toLowerCase()) && user.global_rank<255) 'You do not have permission'; db.channels.drop(name,()=> globalMessageBus.emit('ChannelDeleted',{channel:name}) ); }); drop: DELETE FROM channels WHERE name=?; then deleteBans(name), deleteLibrary(name), deleteAllRanks(name)",
+        "edges": [
+          "src/web/account.js:356"
+        ]
+      },
+      "_binds": {
+        "name": "Channel.name"
+      }
+    },
+    {
+      "tool": "channel_list_mine",
+      "family": "search",
+      "entity": "Channel",
+      "description": "List the channels you own, each with its ban status.",
+      "input_schema": {},
+      "exec_spec": {
+        "entity": "Channel",
+        "scope": {
+          "owner_col": "owner"
+        },
+        "search_fields": [
+          "name"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "name"
+          ]
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "name",
+                  "op": "eq",
+                  "value": {
+                    "session": "name"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in to list your channels.",
+          "precondition": "You must be signed in to list your channels."
+        }
+      },
+      "_evidence": {
+        "locator": "src/web/account.js:208",
+        "id_local": "Channel.listMyChannels",
+        "entry": {
+          "kind": "http",
+          "route": "GET /account/channels",
+          "locator": "src/web/account.js:746"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "db.channels.listUserChannels(owner,cb): SELECT c.*, bc.external_reason as banReason FROM channels c LEFT OUTER JOIN banned_channels bc ON bc.channel_name = c.name WHERE c.owner=?",
+        "edges": [
+          "src/web/account.js:208"
+        ]
+      }
+    },
+    {
+      "tool": "channel_acp_delete",
+      "family": "crud.delete",
+      "entity": "Channel",
+      "description": "Admin console: force-delete any channel, kicking everyone currently in it.",
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "The channel name to force-delete."
+        }
+      },
+      "exec_spec": {
+        "entity": "Channel",
+        "lookup_by": {
+          "name": {
+            "$arg": "name"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "global_rank",
+                  "op": "gte",
+                  "value": 255
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "name"
+        ],
+        "messages": {
+          "auth": "Sign in before using the admin console.",
+          "precondition": "Only a global admin can force-delete a channel.",
+          "not_found": "That channel does not exist."
+        }
+      },
+      "_evidence": {
+        "locator": "src/acp.js:203",
+        "id_local": "Channel.acpDeleteChannel",
+        "entry": {
+          "kind": "rpc",
+          "event": "acp-delete-channel",
+          "locator": "src/acp.js:265",
+          "route": "acp-delete-channel"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "handleDeleteChannel(user,data): sv.getChannel(name).users.forEach(u=>u.kick('Channel deleted')); db.channels.drop(name,(err)=> emit acp-list-channels)",
+        "edges": [
+          "src/web/acp.js:34 (checkAdmin)"
+        ]
+      }
+    },
+    {
+      "tool": "channelban_list_bans",
+      "family": "search",
+      "entity": "ChannelBan",
+      "description": "List the IP and username bans on a channel (IPs shown cloaked unless you are a global admin).",
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "The channel to list bans for."
+        }
+      },
+      "exec_spec": {
+        "entity": "ChannelBan",
+        "scope": {
+          "where": {
+            "channel": {
+              "$arg": "name"
+            }
+          }
+        },
+        "search_fields": [
+          "channel"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "channel"
+          ]
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Channel",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "name",
+                      "op": "eq",
+                      "value": {
+                        "arg": "name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "owner",
+                      "op": "eq",
+                      "value": {
+                        "session": "name"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "global_rank",
+                  "op": "gte",
+                  "value": 255
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "name"
+        ],
+        "messages": {
+          "auth": "Sign in to view the ban list.",
+          "precondition": "Only the channel owner (or a global admin) can view the ban list.",
+          "not_found": "That channel does not exist."
+        }
+      },
+      "_evidence": {
+        "locator": "src/channel/kickban.js:101",
+        "id_local": "ChannelBan.listBans",
+        "entry": {
+          "kind": "rpc",
+          "event": "requestBanlist",
+          "locator": "src/channel/kickban.js:97",
+          "route": "requestBanlist"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "requestBanlist: db.channels.listBans(chan,(err,rows)=>{ rows.forEach(ban=>{ ban.ip=util.cloakIP(bans,ban.ip); }); user.socket.emit('banlist', bans) if canBan(user) }); listBans: SELECT * FROM channel_bans WHERE channel=?",
+        "edges": [
+          "src/channel/kickban.js:133"
+        ]
+      }
+    },
+    {
+      "tool": "channelban_unban",
+      "family": "crud.delete",
+      "entity": "ChannelBan",
+      "description": "Remove a ban (by its id) from a channel. Only the channel owner, staff, or a global admin can unban.",
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "The channel the ban belongs to."
+        },
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "The id of the ban to remove."
+        }
+      },
+      "exec_spec": {
+        "entity": "ChannelBan",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          },
+          "channel": {
+            "$arg": "name"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Channel",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "name",
+                      "op": "eq",
+                      "value": {
+                        "arg": "name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "owner",
+                      "op": "eq",
+                      "value": {
+                        "session": "name"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "global_rank",
+                  "op": "gte",
+                  "value": 255
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "name",
+          "id"
+        ],
+        "messages": {
+          "auth": "Sign in to unban.",
+          "precondition": "Only the channel owner (or a global admin) can unban.",
+          "not_found": "That ban does not exist."
+        }
+      },
+      "_evidence": {
+        "locator": "src/channel/kickban.js:436",
+        "id_local": "ChannelBan.unban",
+        "entry": {
+          "kind": "rpc",
+          "event": "unban",
+          "locator": "src/channel/kickban.js:98",
+          "route": "unban"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "user.socket.on('unban',(data)=>{ if(!perms.canBan(user)) return; db.channels.unbanId(chan,data.id,()=> sendUnban(data.id)); }); unbanId: DELETE FROM channel_bans WHERE id=? AND channel=?",
+        "edges": [
+          "src/channel/kickban.js:437"
+        ]
+      },
+      "_binds": {
+        "name": "ChannelBan.channel",
+        "id": "ChannelBan.id"
+      }
+    },
+    {
+      "tool": "channelrank_list_ranks",
+      "family": "search",
+      "entity": "ChannelRank",
+      "description": "List the custom ranks granted on a channel (who is moderator, admin or co-owner).",
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "The channel to list ranks for."
+        }
+      },
+      "exec_spec": {
+        "entity": "ChannelRank",
+        "scope": {
+          "where": {
+            "channel_name": {
+              "$arg": "name"
+            }
+          }
+        },
+        "search_fields": [
+          "channel_name"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "channel_name"
+          ]
+        }
+      },
+      "guards": {
+        "required": [
+          "name"
+        ]
+      },
+      "_evidence": {
+        "locator": "src/channel/ranks.js:32",
+        "id_local": "ChannelRank.listRanks",
+        "ref_code": "allRanks(chan); if(user.account.effectiveRank>=3) emit channelRanks"
+      }
+    },
+    {
+      "tool": "channelrank_set_rank",
+      "family": "crud.upsert",
+      "entity": "ChannelRank",
+      "description": "Grant or change a user's rank on your channel (2=moderator, 3=admin, 4=co-owner; rank 1 or below removes the rank).",
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "The channel to grant the rank on."
+        },
+        "username": {
+          "type": "text",
+          "required": true,
+          "description": "The user to rank."
+        },
+        "rank": {
+          "type": "int",
+          "required": true,
+          "description": "The rank to grant (1-4)."
+        }
+      },
+      "exec_spec": {
+        "entity": "ChannelRank",
+        "key": {
+          "name": {
+            "$arg": "username"
+          },
+          "channel": {
+            "$arg": "name"
+          }
+        },
+        "insert_fields": {
+          "rank": {
+            "$arg": "rank"
+          }
+        },
+        "set_on_exists": {
+          "rank": {
+            "$arg": "rank"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Channel",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "name",
+                      "op": "eq",
+                      "value": {
+                        "arg": "name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "owner",
+                      "op": "eq",
+                      "value": {
+                        "session": "name"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "global_rank",
+                  "op": "gte",
+                  "value": 255
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "name",
+          "username",
+          "rank"
+        ],
+        "messages": {
+          "auth": "Sign in to change ranks.",
+          "precondition": "Only the channel owner (or a global admin) can change ranks.",
+          "not_found": "That channel does not exist."
+        }
+      },
+      "_evidence": {
+        "locator": "src/channel/ranks.js:67",
+        "id_local": "ChannelRank.setChannelRank",
+        "entry": {
+          "kind": "rpc",
+          "event": "setChannelRank",
+          "locator": "src/channel/ranks.js:25",
+          "route": "setChannelRank"
+        },
+        "entity_why": "primary effect row_upsert lands on this table",
+        "ref_code": "handleRankChange: if(user.account.effectiveRank<3) return; name=data.name.substring(0,20).toLowerCase(); if(!name.match(/^[a-zA-Z0-9_-]{1,20}$/)) fail; if(isNaN(rank)||rank<1||(rank>=userrank&&!(userrank===4&&rank===4))) 'can't promote... equal or higher'; db.channels.setRank(chan,name,rank)=> setRank: if(rank<2) deleteRank(chan,name); INSERT INTO channel_ranks VALUES (?,?,?) ON DUPLICATE KEY UPDATE rank=?",
+        "edges": [
+          "src/channel/ranks.js:68,76-89"
+        ]
+      },
+      "_binds": {
+        "name": "ChannelRank.channel_name",
+        "username": "ChannelRank.name",
+        "rank": "ChannelRank.rank"
+      }
+    },
+    {
+      "tool": "channeloptions_set",
+      "family": "update.field_set",
+      "entity": "ChannelOptions",
+      "description": "Update the host-named settings of one of your channels: voteskip, AFK timeout, page title, external css/js, public listing, chat antiflood, password, tor ban and playlist limits.",
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "The channel to update."
+        },
+        "allow_voteskip": {
+          "type": "bool",
+          "required": false,
+          "description": "Whether viewers may vote to skip."
+        },
+        "voteskip_ratio": {
+          "type": "float",
+          "required": false,
+          "description": "Fraction of viewers needed to force a voteskip."
+        },
+        "afk_timeout": {
+          "type": "int",
+          "required": false,
+          "description": "Seconds before an idle user is marked away."
+        },
+        "pagetitle": {
+          "type": "text",
+          "required": false,
+          "description": "Custom channel page title."
+        },
+        "maxlength": {
+          "type": "int",
+          "required": false,
+          "description": "Max playlist length in seconds (0 = unlimited)."
+        },
+        "externalcss": {
+          "type": "text",
+          "required": false,
+          "description": "External CSS url for the channel page."
+        },
+        "externaljs": {
+          "type": "text",
+          "required": false,
+          "description": "External JS url for the channel page."
+        },
+        "chat_antiflood": {
+          "type": "bool",
+          "required": false,
+          "description": "Whether chat antiflood is on."
+        },
+        "show_public": {
+          "type": "bool",
+          "required": false,
+          "description": "Show the channel in the public channel list."
+        },
+        "enable_link_regex": {
+          "type": "bool",
+          "required": false,
+          "description": "Auto-linkify links in chat."
+        },
+        "password": {
+          "type": "text",
+          "required": false,
+          "description": "Channel entry password (empty disables)."
+        },
+        "allow_dupes": {
+          "type": "bool",
+          "required": false,
+          "description": "Allow duplicate media in the playlist."
+        },
+        "torbanned": {
+          "type": "bool",
+          "required": false,
+          "description": "Block connections from Tor."
+        },
+        "block_anonymous_users": {
+          "type": "bool",
+          "required": false,
+          "description": "Block anonymous (not signed-in) users."
+        },
+        "allow_ascii_control": {
+          "type": "bool",
+          "required": false,
+          "description": "Allow ASCII control characters in chat."
+        },
+        "playlist_max_per_user": {
+          "type": "int",
+          "required": false,
+          "description": "Max playlist items per user."
+        },
+        "new_user_chat_delay": {
+          "type": "int",
+          "required": false,
+          "description": "Chat delay in ms for new users."
+        },
+        "new_user_chat_link_delay": {
+          "type": "int",
+          "required": false,
+          "description": "Chat link delay in ms for new users."
+        },
+        "playlist_max_duration_per_user": {
+          "type": "int",
+          "required": false,
+          "description": "Max playlist duration per user."
+        }
+      },
+      "exec_spec": {
+        "entity": "ChannelOptions",
+        "row_key": {
+          "channel_name": {
+            "$arg": "name"
+          }
+        },
+        "fields": [
+          "allow_voteskip",
+          "voteskip_ratio",
+          "afk_timeout",
+          "pagetitle",
+          "maxlength",
+          "externalcss",
+          "externaljs",
+          "chat_antiflood",
+          "show_public",
+          "enable_link_regex",
+          "password",
+          "allow_dupes",
+          "torbanned",
+          "block_anonymous_users",
+          "allow_ascii_control",
+          "playlist_max_per_user",
+          "new_user_chat_delay",
+          "new_user_chat_link_delay",
+          "playlist_max_duration_per_user"
+        ]
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Channel",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "name",
+                      "op": "eq",
+                      "value": {
+                        "arg": "name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "owner",
+                      "op": "eq",
+                      "value": {
+                        "session": "name"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "global_rank",
+                  "op": "gte",
+                  "value": 255
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "name"
+        ],
+        "messages": {
+          "auth": "Sign in to change channel settings.",
+          "precondition": "Only the channel owner (or a global admin) can change channel settings.",
+          "not_found": "That channel does not exist."
+        }
+      },
+      "_evidence": {
+        "locator": "src/channel/opts.js:108",
+        "id_local": "ChannelOptions.setOptions",
+        "entry": {
+          "kind": "rpc",
+          "event": "setOptions",
+          "locator": "src/channel/opts.js:87",
+          "route": "setOptions"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "opts.js handleSetOptions(user, data): if(!this.canSetOptions(user)) return user.kick('...'); loop over allowed opts; sensitive fields require effectiveRank>=3 else kick; opts[key]=value; if password: ''->false else substring(0,100); this.dirty=true; channel.broadcastAll('channelOpts', opts)",
+        "edges": [
+          "src/channel/opts.js:113,165,205,244,319,329,341,346,351,356"
+        ]
+      },
+      "_binds": {
+        "name": "ChannelOptions.channel_name"
+      }
+    },
+    {
+      "tool": "channeloptions_get",
+      "family": "crud.fetch",
+      "entity": "ChannelOptions",
+      "description": "Read the current host settings of a channel.",
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "The channel to read settings for."
+        }
+      },
+      "exec_spec": {
+        "entity": "ChannelOptions",
+        "lookup_by": {
+          "channel_name": {
+            "$arg": "name"
+          }
+        }
+      },
+      "guards": {
+        "required": [
+          "name"
+        ],
+        "messages": {
+          "not_found": "That channel has no settings row."
+        }
+      },
+      "_evidence": {
+        "locator": "src/channel/opts.js:108",
+        "id_local": "ChannelOptions.setOptions",
+        "ref_code": "opts persisted per channel"
+      }
+    },
+    {
+      "tool": "channelpermissions_set",
+      "family": "update.field_set",
+      "entity": "ChannelPermissions",
+      "description": "Set a channel's permission map (which channel rank lets a user do what) and whether its playlist is open.",
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "The channel to update."
+        },
+        "permissions": {
+          "type": "json",
+          "required": true,
+          "description": "The permission map to store."
+        },
+        "openPlaylist": {
+          "type": "bool",
+          "required": false,
+          "description": "Whether the playlist is open to all."
+        }
+      },
+      "exec_spec": {
+        "entity": "ChannelPermissions",
+        "row_key": {
+          "channel_name": {
+            "$arg": "name"
+          }
+        },
+        "fields": [
+          "permissions",
+          "openPlaylist"
+        ]
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Channel",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "name",
+                      "op": "eq",
+                      "value": {
+                        "arg": "name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "owner",
+                      "op": "eq",
+                      "value": {
+                        "session": "name"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "global_rank",
+                  "op": "gte",
+                  "value": 255
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "name",
+          "permissions"
+        ],
+        "messages": {
+          "auth": "Sign in to change channel permissions.",
+          "precondition": "Only the channel owner (or a global admin) can change channel permissions.",
+          "not_found": "That channel does not exist."
+        }
+      },
+      "_evidence": {
+        "locator": "src/channel/permissions.js:141",
+        "id_local": "ChannelPermissions.setPermissions",
+        "entry": {
+          "kind": "rpc",
+          "event": "setPermissions",
+          "locator": "src/channel/permissions.js:119",
+          "route": "setPermissions"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "permissions.js handleSetPermissions: if(!canSetPermissions(user)) return user.kick('setPermissions as a non-admin'); for k in data: this.permissions[k]=...; this.dirty=true; broadcastAll('setPermissions',...); re-send playlist if seeplaylist changed",
+        "edges": [
+          "src/channel/permissions.js:146"
+        ]
+      },
+      "_binds": {
+        "name": "ChannelPermissions.channel_name"
+      }
+    },
+    {
+      "tool": "channelpermissions_toggle_lock",
+      "family": "update.field_set",
+      "entity": "ChannelPermissions",
+      "description": "Toggle a channel's playlist lock (open <-> locked). Only the channel owner or a global admin can do this.",
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "The channel to toggle the playlist lock for."
+        }
+      },
+      "exec_spec": {
+        "entity": "ChannelPermissions",
+        "row_key": {
+          "channel_name": {
+            "$arg": "name"
+          }
+        },
+        "fields": [
+          "openPlaylist"
+        ],
+        "set": {
+          "openPlaylist": {
+            "lit": true
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Channel",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "name",
+                      "op": "eq",
+                      "value": {
+                        "arg": "name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "owner",
+                      "op": "eq",
+                      "value": {
+                        "session": "name"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "global_rank",
+                  "op": "gte",
+                  "value": 255
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "name"
+        ],
+        "messages": {
+          "auth": "Sign in to toggle the playlist lock.",
+          "precondition": "Only the channel owner (or a global admin) can toggle the playlist lock.",
+          "not_found": "That channel does not exist."
+        }
+      },
+      "_evidence": {
+        "locator": "src/channel/permissions.js:125",
+        "id_local": "ChannelPermissions.togglePlaylistLock",
+        "entry": {
+          "kind": "rpc",
+          "event": "togglePlaylistLock",
+          "locator": "src/channel/permissions.js:120",
+          "route": "togglePlaylistLock"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "permissions.js handleTogglePlaylistLock: if(!this.hasPermission(user,'playlistlock')) return; this.openPlaylist=!this.openPlaylist; this.dirty=true; sendPlaylistLock(this.openPlaylist)",
+        "edges": [
+          "src/channel/permissions.js:126"
+        ]
+      },
+      "_binds": {
+        "name": "ChannelPermissions.channel_name"
+      }
+    },
+    {
+      "tool": "channelcustomization_set_css_js",
+      "family": "update.field_set",
+      "entity": "ChannelCustomization",
+      "description": "Set a channel's custom CSS, JavaScript and message-of-the-day, each capped at 20000 characters.",
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "The channel to customize."
+        },
+        "css": {
+          "type": "text",
+          "required": false,
+          "description": "Custom CSS."
+        },
+        "js": {
+          "type": "text",
+          "required": false,
+          "description": "Custom JavaScript."
+        },
+        "motd": {
+          "type": "text",
+          "required": false,
+          "description": "The message-of-the-day."
+        }
+      },
+      "exec_spec": {
+        "entity": "ChannelCustomization",
+        "row_key": {
+          "channel_name": {
+            "$arg": "name"
+          }
+        },
+        "fields": [
+          "css",
+          "cssHash",
+          "js",
+          "jsHash",
+          "motd"
+        ]
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Channel",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "name",
+                      "op": "eq",
+                      "value": {
+                        "arg": "name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "owner",
+                      "op": "eq",
+                      "value": {
+                        "session": "name"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "global_rank",
+                  "op": "gte",
+                  "value": 255
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "name"
+        ],
+        "messages": {
+          "auth": "Sign in to customize a channel.",
+          "precondition": "Only the channel owner (or a global admin) can change channel styling.",
+          "not_found": "That channel does not exist."
+        }
+      },
+      "_evidence": {
+        "locator": "src/channel/customization.js:111",
+        "id_local": "ChannelCustomization.setCSSJS",
+        "entry": {
+          "kind": "rpc",
+          "event": "setChannelCSS|setChannelJS|setMotd",
+          "locator": "src/channel/customization.js:111",
+          "route": "setChannelCSS|setChannelJS|setMotd"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "customization.js handleSetCSS: if(!this.canSetCSS(user)) return user.kick(); css=String(data.css).substring(0,20000); ... dirty=true; broadcastAll('channelCSSJS',...). handleSetMotd: if(!canEditMotd(user)) return user.kick(); motd cap 20000; this.setMotd(motd); this.dirty=true;",
+        "edges": [
+          "src/channel/customization.js:112,129,145"
+        ]
+      },
+      "_binds": {
+        "name": "ChannelCustomization.channel_name",
+        "css": "ChannelCustomization.css",
+        "js": "ChannelCustomization.js",
+        "motd": "ChannelCustomization.motd"
+      }
+    },
+    {
+      "tool": "chatfilter_add",
+      "family": "crud.insert",
+      "entity": "ChatFilter",
+      "description": "Add a chat filter (regex source, replacement text, flags) to a channel. The regex must be valid.",
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "The channel to add the filter to."
+        },
+        "filtername": {
+          "type": "text",
+          "required": false,
+          "description": "A name for the filter."
+        },
+        "source": {
+          "type": "text",
+          "required": true,
+          "description": "The regex source to match."
+        },
+        "replace": {
+          "type": "text",
+          "required": true,
+          "description": "The replacement text."
+        },
+        "flags": {
+          "type": "text",
+          "required": true,
+          "description": "Regex flags."
+        },
+        "active": {
+          "type": "bool",
+          "required": true,
+          "description": "Whether the filter is active."
+        },
+        "filterlinks": {
+          "type": "bool",
+          "required": true,
+          "description": "Whether the filter applies to links."
+        }
+      },
+      "exec_spec": {
+        "entity": "ChatFilter",
+        "fields": [
+          "name",
+          "source",
+          "replace",
+          "flags",
+          "active",
+          "filterlinks"
+        ],
+        "set_on_create": {
+          "channel_name": {
+            "$arg": "name"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Channel",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "name",
+                      "op": "eq",
+                      "value": {
+                        "arg": "name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "owner",
+                      "op": "eq",
+                      "value": {
+                        "session": "name"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "global_rank",
+                  "op": "gte",
+                  "value": 255
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "name",
+          "source",
+          "replace",
+          "flags",
+          "active",
+          "filterlinks"
+        ],
+        "messages": {
+          "auth": "Sign in to add a filter.",
+          "precondition": "Only the channel owner (or a global admin) can manage chat filters.",
+          "not_found": "That channel does not exist."
+        }
+      },
+      "_evidence": {
+        "locator": "src/channel/filters.js:121",
+        "id_local": "ChatFilter.addFilter",
+        "entry": {
+          "kind": "rpc",
+          "event": "addFilter",
+          "locator": "src/channel/filters.js:121",
+          "route": "addFilter"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "ChatFilterModule.prototype.handleAddFilter = function(user,data){ if(!this.canEditFilters(user)) return; checkValidRegex; validateFilter; this.filters.addFilter(data); this.dirty=true; broadcastAll('updateChatFilter',...); }",
+        "edges": [
+          "src/channel/filters.js:126"
+        ]
+      },
+      "_binds": {
+        "name": "ChatFilter.channel_name",
+        "source": "ChatFilter.source",
+        "replace": "ChatFilter.replace",
+        "flags": "ChatFilter.flags",
+        "active": "ChatFilter.active",
+        "filterlinks": "ChatFilter.filterlinks"
+      }
+    },
+    {
+      "tool": "chatfilter_update",
+      "family": "update.field_set",
+      "entity": "ChatFilter",
+      "description": "Update an existing chat filter on a channel. The regex must remain valid.",
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "The channel the filter belongs to."
+        },
+        "filtername": {
+          "type": "text",
+          "required": true,
+          "description": "The name of the filter to update."
+        },
+        "source": {
+          "type": "text",
+          "required": true,
+          "description": "The regex source to match."
+        },
+        "replace": {
+          "type": "text",
+          "required": true,
+          "description": "The replacement text."
+        },
+        "flags": {
+          "type": "text",
+          "required": true,
+          "description": "Regex flags."
+        },
+        "active": {
+          "type": "bool",
+          "required": true,
+          "description": "Whether the filter is active."
+        },
+        "filterlinks": {
+          "type": "bool",
+          "required": true,
+          "description": "Whether the filter applies to links."
+        }
+      },
+      "exec_spec": {
+        "entity": "ChatFilter",
+        "row_key": {
+          "channel_name": {
+            "$arg": "name"
+          }
+        },
+        "fields": [
+          "source",
+          "replace",
+          "flags",
+          "active",
+          "filterlinks"
+        ]
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Channel",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "name",
+                      "op": "eq",
+                      "value": {
+                        "arg": "name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "owner",
+                      "op": "eq",
+                      "value": {
+                        "session": "name"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "global_rank",
+                  "op": "gte",
+                  "value": 255
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "name",
+          "filtername",
+          "source",
+          "replace",
+          "flags",
+          "active",
+          "filterlinks"
+        ],
+        "messages": {
+          "auth": "Sign in to update a filter.",
+          "precondition": "Only the channel owner (or a global admin) can manage chat filters.",
+          "not_found": "That filter does not exist."
+        }
+      },
+      "_evidence": {
+        "locator": "src/channel/filters.js:171",
+        "id_local": "ChatFilter.updateFilter",
+        "entry": {
+          "kind": "rpc",
+          "event": "updateFilter",
+          "locator": "src/channel/filters.js:171",
+          "route": "updateFilter"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "ChatFilterModule.prototype.handleUpdateFilter = function(user,data){ if(!this.canEditFilters(user)) return; validate; this.filters.update...; this.dirty=true; broadcastAll('updateChatFilter',...); }",
+        "edges": [
+          "src/channel/filters.js:176"
+        ]
+      },
+      "_binds": {
+        "name": "ChatFilter.channel_name",
+        "source": "ChatFilter.source",
+        "replace": "ChatFilter.replace",
+        "flags": "ChatFilter.flags",
+        "active": "ChatFilter.active",
+        "filterlinks": "ChatFilter.filterlinks"
+      }
+    },
+    {
+      "tool": "chatfilter_remove",
+      "family": "crud.delete",
+      "entity": "ChatFilter",
+      "description": "Remove a chat filter from a channel.",
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "The channel the filter belongs to."
+        },
+        "filtername": {
+          "type": "text",
+          "required": true,
+          "description": "The name of the filter to remove."
+        }
+      },
+      "exec_spec": {
+        "entity": "ChatFilter",
+        "lookup_by": {
+          "channel_name": {
+            "$arg": "name"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Channel",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "name",
+                      "op": "eq",
+                      "value": {
+                        "arg": "name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "owner",
+                      "op": "eq",
+                      "value": {
+                        "session": "name"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "global_rank",
+                  "op": "gte",
+                  "value": 255
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "name",
+          "filtername"
+        ],
+        "messages": {
+          "auth": "Sign in to remove a filter.",
+          "precondition": "Only the channel owner (or a global admin) can manage chat filters.",
+          "not_found": "That filter does not exist."
+        }
+      },
+      "_evidence": {
+        "locator": "src/channel/filters.js:248",
+        "id_local": "ChatFilter.removeFilter",
+        "entry": {
+          "kind": "rpc",
+          "event": "removeFilter",
+          "locator": "src/channel/filters.js:248",
+          "route": "removeFilter"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "ChatFilterModule.prototype.handleRemoveFilter = function(user,data){ if(!this.canEditFilters(user)) return; this.filters.remove(data.name); this.dirty=true; broadcastAll('deleteChatFilter',data); }",
+        "edges": [
+          "src/channel/filters.js:253"
+        ]
+      },
+      "_binds": {
+        "name": "ChatFilter.channel_name"
+      }
+    },
+    {
+      "tool": "chatfilter_request",
+      "family": "crud.fetch",
+      "entity": "ChatFilter",
+      "description": "Fetch the current list of chat filters installed on a channel.",
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "The channel to read filters for."
+        }
+      },
+      "exec_spec": {
+        "entity": "ChatFilter",
+        "lookup_by": {
+          "channel_name": {
+            "$arg": "name"
+          }
+        }
+      },
+      "guards": {
+        "required": [
+          "name"
+        ],
+        "messages": {
+          "not_found": "That channel has no chat filters."
+        }
+      },
+      "_evidence": {
+        "locator": "src/channel/filters.js:309",
+        "id_local": "ChatFilter.requestChatFilters",
+        "ref_code": "sendChatFilters gates on canEditFilters"
+      }
+    },
+    {
+      "tool": "emote_add",
+      "family": "crud.upsert",
+      "entity": "Emote",
+      "description": "Add or update an emote (its image url) on a channel, keyed by channel plus emote name.",
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "The channel to add the emote to."
+        },
+        "emotename": {
+          "type": "text",
+          "required": true,
+          "description": "The emote name (e.g. kappa)."
+        },
+        "image": {
+          "type": "text",
+          "required": true,
+          "description": "The image url for the emote."
+        }
+      },
+      "exec_spec": {
+        "entity": "Emote",
+        "key": {
+          "name": {
+            "$arg": "emotename"
+          }
+        },
+        "insert_fields": {
+          "channel_name": {
+            "$arg": "name"
+          },
+          "image": {
+            "$arg": "image"
+          }
+        },
+        "set_on_exists": {
+          "image": {
+            "$arg": "image"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Channel",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "name",
+                      "op": "eq",
+                      "value": {
+                        "arg": "name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "owner",
+                      "op": "eq",
+                      "value": {
+                        "session": "name"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "global_rank",
+                  "op": "gte",
+                  "value": 255
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "name",
+          "emotename",
+          "image"
+        ],
+        "messages": {
+          "auth": "Sign in to add an emote.",
+          "precondition": "Only the channel owner (or a global admin) can manage emotes.",
+          "not_found": "That channel does not exist."
+        }
+      },
+      "_evidence": {
+        "locator": "src/channel/emotes.js:210",
+        "id_local": "Emote.updateEmote",
+        "entry": {
+          "kind": "rpc",
+          "event": "updateEmote",
+          "locator": "src/channel/emotes.js:210",
+          "route": "updateEmote"
+        },
+        "entity_why": "primary effect row_upsert lands on this table",
+        "ref_code": "EmoteModule.prototype.handleUpdateEmote = function(user,data){ if(!this.canEditEmotes(user)) return; validateEmote; this.emotes.update... ; this.dirty=true; this.channel.broadcastAll('updateEmote',data); }",
+        "edges": [
+          "src/channel/emotes.js:215"
+        ]
+      },
+      "_binds": {
+        "name": "Emote.channel_name",
+        "emotename": "Emote.name",
+        "image": "Emote.image"
+      }
+    },
+    {
+      "tool": "emote_remove",
+      "family": "crud.delete",
+      "entity": "Emote",
+      "description": "Remove an emote from a channel, keyed by emote name.",
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "The channel the emote belongs to."
+        },
+        "emotename": {
+          "type": "text",
+          "required": true,
+          "description": "The emote name to remove."
+        }
+      },
+      "exec_spec": {
+        "entity": "Emote",
+        "lookup_by": {
+          "name": {
+            "$arg": "emotename"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Channel",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "name",
+                      "op": "eq",
+                      "value": {
+                        "arg": "name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "owner",
+                      "op": "eq",
+                      "value": {
+                        "session": "name"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "global_rank",
+                  "op": "gte",
+                  "value": 255
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "name",
+          "emotename"
+        ],
+        "messages": {
+          "auth": "Sign in to remove an emote.",
+          "precondition": "Only the channel owner (or a global admin) can manage emotes.",
+          "not_found": "That emote does not exist."
+        }
+      },
+      "_evidence": {
+        "locator": "src/channel/emotes.js:265",
+        "id_local": "Emote.removeEmote",
+        "entry": {
+          "kind": "rpc",
+          "event": "removeEmote",
+          "locator": "src/channel/emotes.js:265",
+          "route": "removeEmote"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "EmoteModule.prototype.handleRemoveEmote = function(user,data){ if(!this.canEditEmotes(user)) return; if(typeof data.name!=='string') return; this.emotes.remove...; this.dirty=true; broadcastAll('removeEmote',data); }",
+        "edges": [
+          "src/channel/emotes.js:270"
+        ]
+      },
+      "_binds": {
+        "name": "Emote.channel_name",
+        "emotename": "Emote.name"
+      }
+    },
+    {
+      "tool": "emote_rename",
+      "family": "update.field_set",
+      "entity": "Emote",
+      "description": "Change the image on an emote of a channel. The new name must not already be taken.",
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "The channel the emote belongs to."
+        },
+        "emotename": {
+          "type": "text",
+          "required": true,
+          "description": "The current emote name."
+        },
+        "image": {
+          "type": "text",
+          "required": true,
+          "description": "The new image url."
+        }
+      },
+      "exec_spec": {
+        "entity": "Emote",
+        "row_key": {
+          "name": {
+            "$arg": "emotename"
+          }
+        },
+        "fields": [
+          "image"
+        ],
+        "set": {
+          "image": {
+            "$arg": "image"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Channel",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "name",
+                      "op": "eq",
+                      "value": {
+                        "arg": "name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "owner",
+                      "op": "eq",
+                      "value": {
+                        "session": "name"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "global_rank",
+                  "op": "gte",
+                  "value": 255
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "name",
+          "emotename",
+          "image"
+        ],
+        "messages": {
+          "auth": "Sign in to rename an emote.",
+          "precondition": "Only the channel owner (or a global admin) can manage emotes.",
+          "not_found": "That emote does not exist."
+        }
+      },
+      "_evidence": {
+        "locator": "src/channel/emotes.js:163",
+        "id_local": "Emote.renameEmote",
+        "entry": {
+          "kind": "rpc",
+          "event": "renameEmote",
+          "locator": "src/channel/emotes.js:163",
+          "route": "renameEmote"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "EmoteModule.prototype.handleRenameEmote = function(user,data){ if(!this.canEditEmotes(user)) return; if(emoteExists(data)) return; validateEmote; this.emotes.rename(old,name,image); this.dirty=true; broadcastAll('renameEmote',data); }",
+        "edges": [
+          "src/channel/emotes.js:176,180"
+        ]
+      },
+      "_binds": {
+        "name": "Emote.channel_name",
+        "emotename": "Emote.name",
+        "image": "Emote.image"
+      }
+    },
+    {
+      "tool": "channellibrary_search",
+      "family": "search",
+      "entity": "ChannelLibrary",
+      "description": "Search a channel's curated library of media by title and return matching items.",
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "The channel whose library to search."
+        },
+        "query": {
+          "type": "text",
+          "required": true,
+          "description": "The substring to match against item titles."
+        }
+      },
+      "exec_spec": {
+        "entity": "ChannelLibrary",
+        "scope": {
+          "where": {
+            "channel": {
+              "$arg": "name"
+            }
+          }
+        },
+        "search_fields": [
+          "title"
+        ],
+        "rank": {
+          "method": "substring",
+          "fields": [
+            "title"
+          ]
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "name",
+                  "op": "eq",
+                  "value": {
+                    "session": "name"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "name",
+          "query"
+        ],
+        "messages": {
+          "auth": "Sign in to search a channel library.",
+          "precondition": "You must be signed in to search a channel library.",
+          "not_found": "That library has no matching items."
+        }
+      },
+      "_evidence": {
+        "locator": "src/channel/library.js:83",
+        "id_local": "ChannelLibrary.searchLibrary",
+        "entry": {
+          "kind": "rpc",
+          "event": "searchMedia",
+          "locator": "src/channel/library.js:26",
+          "route": "searchMedia"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "library.js handleSearchMedia: query=query.substring(0,100); if(data.source==='yt'||!C_REGISTERED||!canSeePlaylist(user)) return ytSearch; db.channels.searchLibrary(chan,query,(err,rows)=>{ sort by title; emit searchResults {source:'library',results} })",
+        "edges": [
+          "src/channel/library.js:99-100"
+        ]
+      }
+    },
+    {
+      "tool": "channellibrary_delete_item",
+      "family": "crud.delete",
+      "entity": "ChannelLibrary",
+      "description": "Remove a media item from a channel's library (uncache). Channel staff only.",
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "The channel whose library item to remove."
+        },
+        "id": {
+          "type": "text",
+          "required": true,
+          "description": "The library item id to remove."
+        }
+      },
+      "exec_spec": {
+        "entity": "ChannelLibrary",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          },
+          "channel": {
+            "$arg": "name"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Channel",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "name",
+                      "op": "eq",
+                      "value": {
+                        "arg": "name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "owner",
+                      "op": "eq",
+                      "value": {
+                        "session": "name"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "global_rank",
+                  "op": "gte",
+                  "value": 255
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "name",
+          "id"
+        ],
+        "messages": {
+          "auth": "Sign in to remove a library item.",
+          "precondition": "Only the channel owner (or a global admin) can remove library items.",
+          "not_found": "That library item does not exist."
+        }
+      },
+      "_evidence": {
+        "locator": "src/channel/library.js:48",
+        "id_local": "ChannelLibrary.deleteLibraryItem",
+        "entry": {
+          "kind": "rpc",
+          "event": "uncache",
+          "locator": "src/channel/library.js:25",
+          "route": "uncache"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "library.js: user.socket.on('uncache',...); handleUncache: if(!channel.is(C_REGISTERED)||!perms.canUncache(user)) return; db.channels.deleteFromLibrary(chan,data.id); deleteFromLibrary: DELETE FROM channel_libraries WHERE id=? AND channel=?",
+        "edges": [
+          "src/channel/library.js:49,53"
+        ]
+      },
+      "_binds": {
+        "name": "ChannelLibrary.channel",
+        "id": "ChannelLibrary.id"
+      }
+    },
+    {
+      "tool": "playlist_list",
+      "family": "search",
+      "entity": "UserPlaylist",
+      "description": "List your saved playlists (name, item count, total duration).",
+      "input_schema": {},
+      "exec_spec": {
+        "entity": "UserPlaylist",
+        "scope": {
+          "where": {
+            "user": {
+              "$session": "name"
+            }
+          }
+        },
+        "search_fields": [
+          "user"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "user"
+          ]
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "name",
+                  "op": "eq",
+                  "value": {
+                    "session": "name"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in to list your playlists.",
+          "precondition": "You must be signed in to list your playlists."
+        }
+      },
+      "_evidence": {
+        "locator": "src/channel/playlist.js:1271",
+        "id_local": "Playlist.listPlaylists",
+        "entry": {
+          "kind": "rpc",
+          "event": "listPlaylists",
+          "locator": "src/channel/playlist.js:290",
+          "route": "listPlaylists"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "PlaylistModule.prototype.handleListPlaylists = function (user) {\n  if (!user.is(Flags.U_REGISTERED)) { return errorMsg; }\n  db.listUserPlaylists(user.getName(), function (err, rows) { user.socket.emit(\"listPlaylists\", rows); });\n}",
+        "edges": [
+          "src/channel/playlist.js:1271"
+        ]
+      }
+    },
+    {
+      "tool": "playlist_save",
+      "family": "crud.upsert",
+      "entity": "UserPlaylist",
+      "description": "Save the current playlist to a named saved playlist on your account, overwriting if the name exists.",
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "The name to save the playlist under."
+        },
+        "contents": {
+          "type": "json",
+          "required": true,
+          "description": "The saved media items."
+        },
+        "count": {
+          "type": "int",
+          "required": true,
+          "description": "The number of items."
+        },
+        "duration": {
+          "type": "int",
+          "required": true,
+          "description": "The total duration in seconds."
+        }
+      },
+      "exec_spec": {
+        "entity": "UserPlaylist",
+        "key": {
+          "user": {
+            "$session": "name"
+          },
+          "name": {
+            "$arg": "name"
+          }
+        },
+        "insert_fields": {
+          "contents": {
+            "$arg": "contents"
+          },
+          "count": {
+            "$arg": "count"
+          },
+          "duration": {
+            "$arg": "duration"
+          }
+        },
+        "set_on_exists": {
+          "contents": {
+            "$arg": "contents"
+          },
+          "count": {
+            "$arg": "count"
+          },
+          "duration": {
+            "$arg": "duration"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "name",
+          "contents",
+          "count",
+          "duration"
+        ],
+        "messages": {
+          "auth": "Sign in to save a playlist.",
+          "not_found": "That playlist row could not be saved."
+        }
+      },
+      "_evidence": {
+        "locator": "src/channel/playlist.js:1290",
+        "id_local": "Playlist.savePlaylist",
+        "ref_code": "saveUserPlaylist(pl, user.getName(), data.name)"
+      },
+      "_binds": {
+        "name": "UserPlaylist.name"
+      }
+    },
+    {
+      "tool": "playlist_delete",
+      "family": "crud.delete",
+      "entity": "UserPlaylist",
+      "description": "Delete one of your saved playlists by name.",
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "The name of the saved playlist to delete."
+        }
+      },
+      "exec_spec": {
+        "entity": "UserPlaylist",
+        "lookup_by": {
+          "user": {
+            "$session": "name"
+          },
+          "name": {
+            "$arg": "name"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "name"
+        ],
+        "messages": {
+          "auth": "Sign in to delete a playlist.",
+          "not_found": "That playlist does not exist."
+        }
+      },
+      "_evidence": {
+        "locator": "src/channel/playlist.js:1320",
+        "id_local": "Playlist.deletePlaylist",
+        "ref_code": "if(!user.is(U_REGISTERED)) error; deleteUserPlaylist(user.getName(), data.name)"
+      },
+      "_binds": {
+        "name": "UserPlaylist.name"
+      }
+    },
+    {
+      "tool": "poll_create",
+      "family": "crud.upsert",
+      "entity": "Poll",
+      "description": "Start a poll in a channel; the initiator becomes its owner. Any poll already running in the channel is closed.",
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "The channel to start the poll in."
+        },
+        "title": {
+          "type": "text",
+          "required": true,
+          "description": "The poll question."
+        },
+        "opts": {
+          "type": "json",
+          "required": true,
+          "description": "The poll options array."
+        },
+        "obscured": {
+          "type": "bool",
+          "required": false,
+          "description": "Hide results until the poll closes."
+        },
+        "retainVotes": {
+          "type": "bool",
+          "required": false,
+          "description": "Retain votes if the poll is re-run."
+        }
+      },
+      "exec_spec": {
+        "entity": "Poll",
+        "key": {
+          "channel_name": {
+            "$arg": "name"
+          }
+        },
+        "insert_fields": {
+          "title": {
+            "$arg": "title"
+          },
+          "options": {
+            "$arg": "opts"
+          },
+          "obscured": {
+            "$arg": "obscured"
+          },
+          "retainVotes": {
+            "$arg": "retainVotes"
+          },
+          "initiator": {
+            "$session": "name"
+          }
+        },
+        "set_on_exists": {
+          "title": {
+            "$arg": "title"
+          },
+          "options": {
+            "$arg": "opts"
+          },
+          "obscured": {
+            "$arg": "obscured"
+          },
+          "retainVotes": {
+            "$arg": "retainVotes"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Channel",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "name",
+                      "op": "eq",
+                      "value": {
+                        "arg": "name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "owner",
+                      "op": "eq",
+                      "value": {
+                        "session": "name"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "global_rank",
+                  "op": "gte",
+                  "value": 255
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "name",
+          "title",
+          "opts"
+        ],
+        "messages": {
+          "auth": "Sign in to start a poll.",
+          "precondition": "Only the channel owner (or a global admin) can start a poll.",
+          "not_found": "That channel does not exist."
+        }
+      },
+      "_evidence": {
+        "locator": "src/channel/poll.js:146",
+        "id_local": "Poll.createPoll",
+        "entry": {
+          "kind": "rpc",
+          "event": "newPoll",
+          "locator": "src/channel/poll.js:64",
+          "route": "newPoll"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "poll.js handleNewPoll: if(!perms.canControlPoll(user)) return; ...close existing; validatePollInput; var poll=Poll.create(user.getName(), data.title, data.opts, {obscured:!!data.obscured, retainVotes:...}); poll.timer=setTimeout(...); this.poll=poll; this.dirty=true; broadcast",
+        "edges": [
+          "src/channel/poll.js:147"
+        ]
+      },
+      "_binds": {
+        "name": "Poll.channel_name",
+        "opts": "Poll.options"
+      }
+    },
+    {
+      "tool": "poll_vote",
+      "family": "update.field_set",
+      "entity": "Poll",
+      "description": "Cast one vote on the currently running poll in a channel, recording it in the poll's vote tally. One vote per viewer; the tally is stored on the poll.",
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "The channel whose poll to vote on."
+        },
+        "option": {
+          "type": "int",
+          "required": true,
+          "description": "The index of the option to vote for."
+        }
+      },
+      "exec_spec": {
+        "entity": "Poll",
+        "row_key": {
+          "channel_name": {
+            "$arg": "name"
+          }
+        },
+        "fields": {
+          "votes": {
+            "$arg": "option"
+          }
+        },
+        "set": {
+          "votes": {
+            "$arg": "option"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Poll",
+                "where": {
+                  "node": "field",
+                  "col": "channel_name",
+                  "op": "eq",
+                  "value": {
+                    "arg": "name"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "name",
+          "option"
+        ],
+        "messages": {
+          "auth": "Sign in to vote.",
+          "precondition": "There is no poll running in that channel to vote on.",
+          "not_found": "That channel has no running poll."
+        }
+      },
+      "_evidence": {
+        "locator": "src/channel/poll.js:214",
+        "id_local": "Poll.vote",
+        "entry": {
+          "kind": "rpc",
+          "event": "vote",
+          "locator": "src/channel/poll.js:65",
+          "route": "vote"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "poll.js handleVote: if(!perms.canVote(user)) return; if(!this.poll||data.option<0||data.option>=this.poll.opts.length) return; this.poll.countVote(user.realip,data.option); this.dirty=true; broadcast updatePoll",
+        "edges": [
+          "src/channel/poll.js:215,219"
+        ]
+      },
+      "_binds": {
+        "name": "Poll.channel_name",
+        "option": "Poll.votes"
+      }
+    },
+    {
+      "tool": "poll_close",
+      "family": "crud.delete",
+      "entity": "Poll",
+      "description": "Close the currently running poll in a channel and reveal its tally. Channel staff only.",
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "The channel whose poll to close."
+        }
+      },
+      "exec_spec": {
+        "entity": "Poll",
+        "lookup_by": {
+          "channel_name": {
+            "$arg": "name"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Channel",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "name",
+                      "op": "eq",
+                      "value": {
+                        "arg": "name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "owner",
+                      "op": "eq",
+                      "value": {
+                        "session": "name"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "global_rank",
+                  "op": "gte",
+                  "value": 255
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "name"
+        ],
+        "messages": {
+          "auth": "Sign in to close a poll.",
+          "precondition": "Only the channel owner (or a global admin) can close a poll.",
+          "not_found": "That poll does not exist."
+        }
+      },
+      "_evidence": {
+        "locator": "src/channel/poll.js:227",
+        "id_local": "Poll.closePoll",
+        "entry": {
+          "kind": "rpc",
+          "event": "closePoll",
+          "locator": "src/channel/poll.js:66",
+          "route": "closePoll"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "poll.js handleClosePoll: if(!perms.canControlPoll(user)) return; clearTimeout; broadcastAll('closePoll',...); this.poll=null; this.dirty=true",
+        "edges": [
+          "src/channel/poll.js:228"
+        ]
+      },
+      "_binds": {
+        "name": "Poll.channel_name"
+      }
+    },
+    {
+      "tool": "globalban_add",
+      "family": "crud.upsert",
+      "entity": "GlobalBan",
+      "description": "Admin: globally ban an IP, or update the reason for an already-banned IP.",
+      "input_schema": {
+        "ip": {
+          "type": "text",
+          "required": true,
+          "description": "The IP address to ban."
+        },
+        "note": {
+          "type": "text",
+          "required": true,
+          "description": "The reason for the ban."
+        }
+      },
+      "exec_spec": {
+        "entity": "GlobalBan",
+        "key": {
+          "ip": {
+            "$arg": "ip"
+          }
+        },
+        "insert_fields": {
+          "reason": {
+            "$arg": "note"
+          }
+        },
+        "set_on_exists": {
+          "reason": {
+            "$arg": "note"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "global_rank",
+                  "op": "gte",
+                  "value": 255
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "ip",
+          "note"
+        ],
+        "messages": {
+          "auth": "Sign in before banning.",
+          "precondition": "Only a global admin can add a global IP ban."
+        }
+      },
+      "_evidence": {
+        "locator": "src/acp.js:30",
+        "id_local": "GlobalBan.addGlobalBan",
+        "entry": {
+          "kind": "rpc",
+          "event": "acp-gban",
+          "locator": "src/acp.js:259",
+          "route": "acp-gban"
+        },
+        "entity_why": "primary effect row_upsert lands on this table",
+        "ref_code": "handleGlobalBan(user,data): const globalBanDB=db.getGlobalBanDB(); globalBanDB.addGlobalIPBan(data.ip,data.note).then(()=> emit acp-gbanlist); addGlobalIPBan: tx.table('global_bans').insert({ip,reason}).catch(err=>{ if(err.code==='ER_DUP_ENTRY') return tx.table('global_bans').where({ip}).update({reason}) })",
+        "edges": [
+          "src/acp.js checkAdmin gate"
+        ]
+      },
+      "_binds": {
+        "ip": "GlobalBan.ip",
+        "note": "GlobalBan.reason"
+      }
+    },
+    {
+      "tool": "globalban_remove",
+      "family": "crud.delete",
+      "entity": "GlobalBan",
+      "description": "Admin: lift a global IP ban.",
+      "input_schema": {
+        "ip": {
+          "type": "text",
+          "required": true,
+          "description": "The IP address to unban."
+        }
+      },
+      "exec_spec": {
+        "entity": "GlobalBan",
+        "lookup_by": {
+          "ip": {
+            "$arg": "ip"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "global_rank",
+                  "op": "gte",
+                  "value": 255
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "ip"
+        ],
+        "messages": {
+          "auth": "Sign in before unbanning.",
+          "precondition": "Only a global admin can remove a global IP ban.",
+          "not_found": "That IP is not globally banned."
+        }
+      },
+      "_evidence": {
+        "locator": "src/acp.js:49",
+        "id_local": "GlobalBan.removeGlobalBan",
+        "entry": {
+          "kind": "rpc",
+          "event": "acp-gban-delete",
+          "locator": "src/acp.js:260",
+          "route": "acp-gban-delete"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "handleGlobalBanDelete(user,data): globalBanDB.removeGlobalIPBan(data.ip).then(()=> emit acp-gbanlist); removeGlobalIPBan: tx.table('global_bans').where({ip}).del()",
+        "edges": [
+          "src/acp.js checkAdmin gate"
+        ]
+      },
+      "_binds": {
+        "ip": "GlobalBan.ip"
+      }
+    },
+    {
+      "tool": "meta_set_announcement",
+      "family": "crud.upsert",
+      "entity": "Meta",
+      "description": "Admin: publish a global announcement shown to everyone, overwriting any previous announcement.",
+      "input_schema": {
+        "title": {
+          "type": "text",
+          "required": true,
+          "description": "The announcement title."
+        },
+        "content": {
+          "type": "text",
+          "required": true,
+          "description": "The announcement body."
+        }
+      },
+      "exec_spec": {
+        "entity": "Meta",
+        "key": {
+          "key": {
+            "lit": "announcement"
+          }
+        },
+        "insert_fields": {
+          "value": {
+            "$arg": "content"
+          }
+        },
+        "set_on_exists": {
+          "value": {
+            "$arg": "content"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "global_rank",
+                  "op": "gte",
+                  "value": 255
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "title",
+          "content"
+        ],
+        "messages": {
+          "auth": "Sign in before announcing.",
+          "precondition": "Only a global admin can set the announcement."
+        }
+      },
+      "_evidence": {
+        "locator": "src/acp.js:11",
+        "id_local": "Meta.setAnnouncement",
+        "entry": {
+          "kind": "rpc",
+          "event": "acp-announce",
+          "locator": "src/acp.js:257",
+          "route": "acp-announce"
+        },
+        "entity_why": "primary effect row_upsert lands on this table",
+        "ref_code": "handleAnnounce(user,data): sv.announce({id:uuidv4(),title:data.title,text:data.content,from:user.getName()}); setAnnouncement(data): INSERT INTO meta (key,value) VALUES ('announcement',?) ON DUPLICATE KEY UPDATE value=?",
+        "edges": [
+          "src/acp.js via checkAdmin"
+        ]
+      }
+    },
+    {
+      "tool": "channel_chat_message",
+      "family": "update.field_set",
+      "entity": "ChannelChat",
+      "description": "Post a chat message into a channel's chat buffer. Everyone in the channel sees it.",
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "The channel to post into."
+        },
+        "msg": {
+          "type": "text",
+          "required": true,
+          "description": "The message text."
+        }
+      },
+      "exec_spec": {
+        "entity": "ChannelChat",
+        "row_key": {
+          "channel_name": {
+            "$arg": "name"
+          }
+        },
+        "fields": [
+          "chatbuffer"
+        ],
+        "set": {
+          "chatbuffer": {
+            "$arg": "msg"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "name",
+                  "op": "eq",
+                  "value": {
+                    "session": "name"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "name",
+          "msg"
+        ],
+        "messages": {
+          "auth": "Sign in to chat.",
+          "precondition": "You must be signed in to chat.",
+          "not_found": "That channel has no chat row yet."
+        }
+      },
+      "_evidence": {
+        "locator": "src/channel/chat.js:161",
+        "id_local": "ChannelChat.chatMsg",
+        "entry": {
+          "kind": "rpc",
+          "event": "chatMsg",
+          "locator": "src/channel/chat.js:157",
+          "route": "chatMsg"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "ChatModule.prototype.handleChatMsg = function(user, data){\n  if(!this.canChat(user)) return; ... strip control chars; if(blank) return;\n  ... modflair if user.account.effectiveRank>=2; this.processChatMsg(data, user);\n} sendMessage: buffer.push({username,msg,meta,time}); if(buffer.length>15) buffer.shift(); this.dirty=true; channel.broadcastAll(\"chatMsg\", msg)",
+        "edges": [
+          "src/channel/chat.js:161"
+        ]
+      },
+      "_binds": {
+        "name": "ChannelChat.channel_name",
+        "msg": "ChannelChat.chatbuffer"
+      }
+    },
+    {
+      "tool": "channel_chat_clear",
+      "family": "update.field_set",
+      "entity": "ChannelChat",
+      "description": "Clear a channel's entire chat buffer. Channel staff only.",
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "The channel to clear."
+        }
+      },
+      "exec_spec": {
+        "entity": "ChannelChat",
+        "row_key": {
+          "channel_name": {
+            "$arg": "name"
+          }
+        },
+        "fields": [
+          "chatbuffer"
+        ],
+        "set": {
+          "chatbuffer": {
+            "lit": []
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Channel",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "name",
+                      "op": "eq",
+                      "value": {
+                        "arg": "name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "owner",
+                      "op": "eq",
+                      "value": {
+                        "session": "name"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "global_rank",
+                  "op": "gte",
+                  "value": 255
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "name"
+        ],
+        "messages": {
+          "auth": "Sign in to clear chat.",
+          "precondition": "Only the channel owner (or a global admin) can clear the chat.",
+          "not_found": "That channel has no chat row yet."
+        }
+      },
+      "_evidence": {
+        "locator": "src/channel/chat.js:488",
+        "id_local": "ChannelChat.clear",
+        "entry": {
+          "kind": "rpc",
+          "event": "/clear command",
+          "locator": "src/channel/chat.js:488",
+          "route": "/clear command"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "ChatModule.prototype.handleCmdClear = function(user){ if(!this.canClearChat(user)) return; this.buffer=[]; this.dirty=true; this.channel.broadcastAll('clearchat',{clearedBy:...}); }",
+        "edges": [
+          "src/channel/chat.js:489"
+        ]
+      },
+      "_binds": {
+        "name": "ChannelChat.channel_name"
+      }
+    }
+  ],
+  "seed_state": {
+    "User": [
+      {
+        "id": 1,
+        "name": "ops@sync.example",
+        "password": "pw-operations",
+        "global_rank": 255,
+        "email": "ada@example.com",
+        "profile": {
+          "image": "",
+          "text": "Policy: save review playlist with count2 duration120 and approved playlist count1 duration60. Keep Reference unchanged."
+        },
+        "ip": "10.0.0.1",
+        "time": 1,
+        "name_dedupe": "ada",
+        "inactive": false
+      },
+      {
+        "id": 2,
+        "name": "member@sync.example",
+        "password": "pw-member",
+        "global_rank": 1,
+        "email": "bob@example.com",
+        "profile": {
+          "image": "",
+          "text": ""
+        },
+        "ip": "10.0.0.2",
+        "time": 2,
+        "name_dedupe": "bob",
+        "inactive": false
+      },
+      {
+        "id": 3,
+        "name": "other@sync.example",
+        "password": "pw-other",
+        "global_rank": 1,
+        "email": "carol@example.com",
+        "profile": {
+          "image": "",
+          "text": ""
+        },
+        "ip": "10.0.0.3",
+        "time": 3,
+        "name_dedupe": "carol",
+        "inactive": false
+      }
+    ],
+    "Channel": [
+      {
+        "id": 1,
+        "name": "roadmap",
+        "owner": "ada",
+        "time": 1,
+        "last_loaded": "2026-01-01T00:00:00Z",
+        "owner_last_seen": "2026-01-01T00:00:00Z"
+      },
+      {
+        "id": 2,
+        "name": "gaming",
+        "owner": "bob",
+        "time": 2,
+        "last_loaded": "2026-01-01T00:00:00Z",
+        "owner_last_seen": "2026-01-01T00:00:00Z"
+      }
+    ],
+    "ChannelOptions": [
+      {
+        "channel_name": "roadmap",
+        "id": 1
+      }
+    ],
+    "ChannelPermissions": [
+      {
+        "channel_name": "roadmap",
+        "id": 1
+      }
+    ],
+    "ChannelCustomization": [
+      {
+        "channel_name": "roadmap",
+        "id": 1
+      }
+    ],
+    "ChannelChat": [
+      {
+        "channel_name": "roadmap",
+        "chatbuffer": [],
+        "chatmuted": [],
+        "id": 1
+      }
+    ],
+    "ChannelBan": [
+      {
+        "id": 1,
+        "ip": "10.0.0.9",
+        "name": "spammer",
+        "bannedby": "ada",
+        "reason": "spam",
+        "channel": "roadmap"
+      }
+    ],
+    "ChannelRank": [
+      {
+        "name": "rahul",
+        "rank": 2,
+        "channel": "roadmap",
+        "id": 1
+      }
+    ],
+    "ChatFilter": [
+      {
+        "channel_name": "roadmap",
+        "name": "f1",
+        "source": "foo",
+        "replace": "bar",
+        "flags": "gi",
+        "active": true,
+        "filterlinks": false,
+        "id": 1
+      }
+    ],
+    "Emote": [
+      {
+        "channel_name": "roadmap",
+        "name": "kappa",
+        "image": "https://example.test/k.png",
+        "id": 1
+      }
+    ],
+    "ChannelLibrary": [
+      {
+        "id": "yt-abc",
+        "title": "Tutorial",
+        "seconds": 120,
+        "type": "yt",
+        "meta": {},
+        "channel": "roadmap"
+      }
+    ],
+    "GlobalBan": [
+      {
+        "ip": "8.8.8.8",
+        "reason": "abuse",
+        "id": 1
+      }
+    ],
+    "Meta": [
+      {
+        "key": "announcement",
+        "value": "welcome",
+        "id": 1
+      }
+    ],
+    "UserPlaylist": [
+      {
+        "user": "ada",
+        "name": "roadtrip",
+        "contents": [],
+        "count": 0,
+        "duration": 0,
+        "id": 1
+      }
+    ],
+    "Poll": [
+      {
+        "channel_name": "roadmap",
+        "title": "Pick",
+        "initiator": "ada",
+        "options": [
+          "a",
+          "b"
+        ],
+        "votes": {},
+        "obscured": false,
+        "retainVotes": false,
+        "timestamp": 1,
+        "id": 1
+      }
+    ]
+  },
+  "summary": "CyTube is a MySQL+Redis-backed self-hosted synchronized video-watching and chat server: registered users own channels with a synchronized playlist, chat, emotes, filters, polls, bans and moderation ranks; per-channel state persists as JSON rows in channel_data plus direct tables (users, channels, channel_ranks, channel_bans, channel_libraries, user_playlists, aliases, global_bans, password_reset, media_metadata_cache, user_deletion_requests, banned_channels, meta)."
+}

@@ -1,0 +1,108 @@
+{
+  "app": "ever_gauzy",
+  "role": "full ERP/HCM suite — HR/employees, candidate recruiting, time tracking, projects/tasks/sprints, invoicing/payments, goals/OKRs, integrations (ever-gauzy style; stand-in for Xero / QuickBooks / sage-like HR+finance ops)",
+  "domains": [
+    "operations",
+    "finance",
+    "hr"
+  ],
+  "kinds": {
+    "create_or_update_issue": [
+      "goal_create",
+      "goal_update"
+    ],
+    "update_record": [
+      "broadcast_update",
+      "organization_update",
+      "organizationdepartment_update",
+      "organizationposition_update",
+      "user_update"
+    ],
+    "create_record": [
+      "broadcast_create",
+      "organization_create",
+      "organizationcontact_create",
+      "user_create",
+      "tag_create",
+      "employee_create"
+    ],
+    "other:create_or_update_doc": [
+      "broadcast_create",
+      "broadcast_update"
+    ]
+  },
+  "check_kinds": [
+    "record_exists",
+    "record_not_exists",
+    "record_field_equals",
+    "record_field_contains",
+    "record_field_unchanged",
+    "note_or_task_exists",
+    "note_or_task_not_exists",
+    "row_count",
+    "action_done",
+    "action_not_done"
+  ],
+  "carriers": {
+    "notes_field": {
+      "entity": "Goal",
+      "field": "description"
+    }
+  },
+  "login": {
+    "tool": "sign_in",
+    "user_field": "email",
+    "persona_entity": "User"
+  },
+  "content_entities": [
+    "Goal",
+    "Broadcast",
+    "OrganizationProject",
+    "OrganizationTeam",
+    "Comment",
+    "Tag"
+  ],
+  "seed_helpers": [
+    "ever_goals",
+    "broadcasts",
+    "ever_projects",
+    "ever_users"
+  ],
+  "tool_families_to_keep": [
+    "goal",
+    "broadcast",
+    "organization",
+    "user",
+    "tag",
+    "employee",
+    "comment",
+    "timesheet",
+    "timelog",
+    "invoice",
+    "payment",
+    "candidate",
+    "auth_signin",
+    "auth_login"
+  ],
+  "obs_reads": [
+    "ever_gauzy goal_findall",
+    "ever_gauzy broadcast_findall",
+    "ever_gauzy broadcast_search",
+    "ever_gauzy user_findall",
+    "ever_gauzy organization_findall"
+  ],
+  "known_patches": [
+    "persona account is User id 1 (SUPER_ADMIN); email operations@evergauzy.example / hash pw-operations / username ops, plus lastOrganizationId=1 added to the row so auth session_fields populate it (goal_create/invoice_create/payment_create write organizationId from $session.lastOrganizationId, which was missing -> every create failed with fk_missing)",
+    "env_id set to ever_gauzy_ab (was ever-gauzy) so the merged prefix matches PFX; added a sign_in tool (email, password) for the login",
+    "whole-list reads kept under 12k: goal_findall/broadcast_findall gained an optional q keyword filter; broadcast_search(q) added as a keyword search tool",
+    "content domain restricted to standalone rows (goals, broadcasts) that need no FK parents: candidate/invoice/payment sub-tools require FK parents the empty seed lacks (see PATCHES.md)",
+    "id-typed create/update args (goal_update id, invoice toContactId, etc.) already accept integers; runtime auto-ids new rows as ints"
+  ],
+  "smoke": {
+    "passed": true,
+    "date": "2026-10-24",
+    "report": "ok"
+  },
+  "register_file": "pack/newspecs3/ever_gauzy/register.py",
+  "base_spec": "pack/base_specs/ever_gauzy.spec.json"
+}

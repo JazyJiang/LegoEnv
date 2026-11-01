@@ -1,0 +1,65 @@
+{
+ "skeleton_id": "mine_operations_003",
+ "domain": "operations",
+ "apps": [
+  "directus",
+  "mantisbt",
+  "zulip"
+ ],
+ "standin_apps": {
+  "Airtable": "directus",
+  "Jira": "mantisbt",
+  "Slack": "zulip"
+ },
+ "needs_newspecs": true,
+ "deliverable_atoms": [
+  {
+   "app": "mantisbt",
+   "kind": "create_or_update_issue",
+   "pos": 5,
+   "neg": 3,
+   "check_kinds": [
+    "issue_exists_with"
+   ]
+  },
+  {
+   "app": "directus",
+   "kind": "update_cell",
+   "pos": 5,
+   "neg": 3,
+   "check_kinds": [
+    "row_cell_equals",
+    "row_cell_unchanged"
+   ]
+  },
+  {
+   "app": "zulip",
+   "kind": "post_channel",
+   "pos": 1,
+   "neg": 0,
+   "check_kinds": [
+    "channel_post_with_terms"
+   ]
+  }
+ ],
+ "rule_atoms": [
+  {
+   "archetype": "threshold_routing",
+   "carrier": "policy_sheet",
+   "has_exception": true,
+   "rule_shape": "Invoice lines whose variance against the matching order exceeds the tolerance for their spend band are opened as exceptions and put on payment hold, except lines carrying an authorised variance approval note."
+  }
+ ],
+ "n_intents": 3,
+ "n_distractors_min": 4,
+ "predicate_budget": 17,
+ "delivery_shape": "per-record actions + one summary message",
+ "chain": [
+  "read the policy worksheet to learn the business rule",
+  "scan the invoice lines (purchase order reference, invoiced amount, received quantity, ordered quantity, tolerance band) and select the ones the rule applies to; at least 3 look-alike records must be skipped",
+  "for each selected record: create_or_update_issue in mantisbt, update_cell in directus",
+  "finish with one summary: post_channel in zulip"
+ ],
+ "dataset_hint": [],
+ "source": "web:https://precoro.com/blog/why-implementing-3-way-matching-is-important/"
+}

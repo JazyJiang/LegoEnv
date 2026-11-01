@@ -1,0 +1,3489 @@
+{
+  "env_id": "pigallery2",
+  "_prep_version": 3,
+  "entities": [
+    {
+      "name": "User",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "password",
+          "type": "text",
+          "nullable": false,
+          "immutable": false
+        },
+        {
+          "name": "role",
+          "type": "int",
+          "nullable": false,
+          "enum": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        {
+          "name": "overrideAllowBlockList",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "allowQuery",
+          "type": "json",
+          "nullable": true
+        },
+        {
+          "name": "blockQuery",
+          "type": "json",
+          "nullable": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "name"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Directory",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "path",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "lastModified",
+          "type": "int",
+          "nullable": false
+        },
+        {
+          "name": "lastScanned",
+          "type": "int",
+          "nullable": true
+        },
+        {
+          "name": "parent_id",
+          "type": "id",
+          "nullable": true,
+          "fk_to": "Directory.id",
+          "on_delete": "cascade"
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "name",
+            "path"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Media",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "type",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "photo",
+            "video"
+          ]
+        },
+        {
+          "name": "directory_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Directory.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "metadataCaption",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "metadataTitle",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "metadataCreationDate",
+          "type": "int",
+          "nullable": true
+        },
+        {
+          "name": "metadataCreationDateOffset",
+          "type": "int",
+          "nullable": true
+        },
+        {
+          "name": "metadataFileSize",
+          "type": "int",
+          "nullable": true,
+          "immutable": false
+        },
+        {
+          "name": "metadataKeywords",
+          "type": "json",
+          "nullable": true
+        },
+        {
+          "name": "metadataRating",
+          "type": "int",
+          "nullable": true,
+          "enum": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        {
+          "name": "metadataBitRate",
+          "type": "int",
+          "nullable": true
+        },
+        {
+          "name": "metadataDuration",
+          "type": "int",
+          "nullable": true
+        },
+        {
+          "name": "metadataFps",
+          "type": "int",
+          "nullable": true
+        },
+        {
+          "name": "metadataSizeWidth",
+          "type": "int",
+          "nullable": true
+        },
+        {
+          "name": "metadataSizeHeight",
+          "type": "int",
+          "nullable": true
+        },
+        {
+          "name": "metadataCameraDataISO",
+          "type": "int",
+          "nullable": true
+        },
+        {
+          "name": "metadataCameraDataModel",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "metadataCameraDataMake",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "metadataCameraDataFStop",
+          "type": "float",
+          "nullable": true
+        },
+        {
+          "name": "metadataCameraDataExposure",
+          "type": "float",
+          "nullable": true
+        },
+        {
+          "name": "metadataCameraDataFocalLength",
+          "type": "float",
+          "nullable": true
+        },
+        {
+          "name": "metadataCameraDataLens",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "metadataPositionDataGPSDataLatitude",
+          "type": "float",
+          "nullable": true
+        },
+        {
+          "name": "metadataPositionDataGPSDataLongitude",
+          "type": "float",
+          "nullable": true
+        },
+        {
+          "name": "metadataPositionDataCountry",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "metadataPositionDataState",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "metadataPositionDataCity",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "metadataFaces",
+          "type": "json",
+          "nullable": true
+        },
+        {
+          "name": "metadataPersons",
+          "type": "json",
+          "nullable": true
+        },
+        {
+          "name": "metadataPersonsLength",
+          "type": "int",
+          "nullable": false,
+          "default": 0
+        },
+        {
+          "name": "metadataContentIdentifier",
+          "type": "text",
+          "nullable": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "name",
+            "directory_id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "File",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "type",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "metaFile",
+            "mdFile"
+          ]
+        },
+        {
+          "name": "directory_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Directory.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "date",
+          "type": "int",
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "name": "Sharing",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "sharingKey",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "searchQuery",
+          "type": "json",
+          "nullable": false
+        },
+        {
+          "name": "defaultDirectoryView",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "defaultSearchView",
+          "type": "json",
+          "nullable": true
+        },
+        {
+          "name": "password",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "expires",
+          "type": "int",
+          "nullable": false
+        },
+        {
+          "name": "timeStamp",
+          "type": "int",
+          "nullable": false
+        },
+        {
+          "name": "creator_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "User.id",
+          "on_delete": "cascade"
+        }
+      ]
+    },
+    {
+      "name": "Album",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "type",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "savedSearch"
+          ]
+        },
+        {
+          "name": "locked",
+          "type": "bool",
+          "nullable": false,
+          "default": false
+        },
+        {
+          "name": "searchQuery",
+          "type": "json",
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "name": "Person",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "isFavourite",
+          "type": "bool",
+          "nullable": false,
+          "default": false
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "name"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "PersonJunction",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "media_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Media.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "person_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Person.id",
+          "on_delete": "cascade"
+        }
+      ]
+    },
+    {
+      "name": "ProjectedDirectoryCache",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "projectionKey",
+          "type": "text",
+          "nullable": false,
+          "max": 32
+        },
+        {
+          "name": "directory_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Directory.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "mediaCount",
+          "type": "int",
+          "nullable": false,
+          "default": 0
+        },
+        {
+          "name": "recursiveMediaCount",
+          "type": "int",
+          "nullable": false,
+          "default": 0
+        },
+        {
+          "name": "oldestMedia",
+          "type": "int",
+          "nullable": true
+        },
+        {
+          "name": "youngestMedia",
+          "type": "int",
+          "nullable": true
+        },
+        {
+          "name": "cover_id",
+          "type": "id",
+          "nullable": true,
+          "fk_to": "Media.id",
+          "on_delete": "set_null"
+        },
+        {
+          "name": "valid",
+          "type": "bool",
+          "nullable": false,
+          "default": false
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "projectionKey",
+            "directory_id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ProjectedAlbumCache",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "projectionKey",
+          "type": "text",
+          "nullable": false,
+          "max": 32
+        },
+        {
+          "name": "album_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Album.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "itemCount",
+          "type": "int",
+          "nullable": false,
+          "default": 0
+        },
+        {
+          "name": "oldestMedia",
+          "type": "int",
+          "nullable": true
+        },
+        {
+          "name": "youngestMedia",
+          "type": "int",
+          "nullable": true
+        },
+        {
+          "name": "cover_id",
+          "type": "id",
+          "nullable": true,
+          "fk_to": "Media.id",
+          "on_delete": "set_null"
+        },
+        {
+          "name": "valid",
+          "type": "bool",
+          "nullable": false,
+          "default": false
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "projectionKey",
+            "album_id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ProjectedPersonCache",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "projectionKey",
+          "type": "text",
+          "nullable": false,
+          "max": 32
+        },
+        {
+          "name": "person_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Person.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "count",
+          "type": "int",
+          "nullable": false,
+          "default": 0
+        },
+        {
+          "name": "sampleRegion_id",
+          "type": "id",
+          "nullable": true,
+          "fk_to": "PersonJunction.id",
+          "on_delete": "set_null"
+        },
+        {
+          "name": "valid",
+          "type": "bool",
+          "nullable": false,
+          "default": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "projectionKey",
+            "person_id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Version",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "version",
+          "type": "int",
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "name": "JobProgress",
+      "columns": [
+        {
+          "name": "HashName",
+          "type": "text",
+          "pk": true
+        },
+        {
+          "name": "jobName",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "state",
+          "type": "int",
+          "nullable": false,
+          "enum": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ]
+        },
+        {
+          "name": "steps_all",
+          "type": "int",
+          "nullable": false
+        },
+        {
+          "name": "steps_processed",
+          "type": "int",
+          "nullable": false
+        },
+        {
+          "name": "steps_skipped",
+          "type": "int",
+          "nullable": false
+        },
+        {
+          "name": "time_start",
+          "type": "int",
+          "nullable": false
+        },
+        {
+          "name": "time_end",
+          "type": "int",
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "name": "DispatchLog",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nullable": false,
+          "default": "sent"
+        },
+        {
+          "name": "detail",
+          "type": "json",
+          "nullable": true
+        }
+      ],
+      "constraints": [],
+      "_note": "declared so the verifier can observe action.emit side effects (upload/settings/extensions persist no business DB row)"
+    }
+  ],
+  "tools": [
+    {
+      "tool": "sign_in",
+      "op": "action",
+      "family": "guard.auth",
+      "exec_spec": {
+        "verify": {
+          "entity": "User",
+          "username_col": "name",
+          "password_col": "password"
+        }
+      },
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "The account login name (unique)."
+        },
+        "password": {
+          "type": "text",
+          "required": true,
+          "description": "The account password, compared against the stored hash."
+        }
+      },
+      "_evidence": {
+        "locator": "src/backend/routes/UserRouter.ts:24",
+        "id_local": "User.login",
+        "entry": {
+          "kind": "http",
+          "route": "POST /pgapi/user/login",
+          "locator": "src/backend/routes/UserRouter.ts:31"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "const user = Utils.clone(await ObjectManagers.getInstance().UserManager.findOne({name: req.body.loginCredential.username, password: req.body.loginCredential.password}));\ndelete user.password;\nreq.session.context = await ObjectManagers.getInstance().SessionManager.buildContext(user);\nreq.session.rememberMe = req.body.loginCredential.rememberMe;\nif (req.session.rememberMe) { req.sessionOptions.expires = new Date(Date.now() + Config.Server.sessionTimeout); }",
+        "edges": [
+          "login -> UserManager.findOne({name}) then bcrypt compare; bad user/password -> CREDENTIAL_NOT_FOUND (AuthenticationMWs.ts:216)",
+          "inverseAuthenticate rejects login when already authenticated (UserRouter.ts:24-25, AuthenticationMWs.ts:201)"
+        ]
+      },
+      "entity": "User",
+      "_binds": {
+        "username": "User.name"
+      },
+      "_output_schema": {
+        "user": "the authenticated session User (id,name,role,usedSharingKey,projectionKey)"
+      },
+      "guards": {
+        "requires_auth": false,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "name",
+                  "op": "eq",
+                  "value": {
+                    "arg": "name"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You are already signed in; sign out first.",
+          "precondition": "That account does not exist."
+        },
+        "required": [
+          "name",
+          "password"
+        ]
+      },
+      "description": "Sign in with an account name and password. Opens the gallery session every other read and write requires; the session user is $actor afterwards."
+    },
+    {
+      "tool": "sign_out",
+      "op": "action",
+      "family": "guard.logout",
+      "exec_spec": {
+        "entity": "User"
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "src/backend/routes/UserRouter.ts:34",
+        "id_local": "User.logout",
+        "entry": {
+          "kind": "http",
+          "route": "POST /pgapi/user/logout",
+          "locator": "src/backend/routes/UserRouter.ts:38"
+        },
+        "entity_why": "fell back to the entity prefix of id_local",
+        "ref_code": "public static logout(req: Request, res: Response, next: NextFunction): void { delete req.session.context; return next(); }",
+        "edges": [
+          "logout clears the session; requires an active session to end one (UserRouter.ts:34, AuthenticationMWs.ts:277)"
+        ]
+      },
+      "entity": "User",
+      "_output_schema": {},
+      "description": "Sign out of the current session. Requires an active session; the world returns to anonymous afterwards.",
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in to sign out."
+        }
+      }
+    },
+    {
+      "tool": "user_create",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "User",
+        "fields": [
+          "name",
+          "password",
+          "role"
+        ],
+        "set_on_create": {
+          "overrideAllowBlockList": false,
+          "allowQuery": null,
+          "blockQuery": null
+        },
+        "unique_on": [
+          "name"
+        ]
+      },
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "Unique login name for the new account."
+        },
+        "password": {
+          "type": "text",
+          "required": true,
+          "description": "Plaintext password; stored bcrypt-hashed."
+        },
+        "role": {
+          "type": "int",
+          "required": true,
+          "description": "Role to assign, 1..5 (1 limited guest .. 5 developer)."
+        }
+      },
+      "_evidence": {
+        "locator": "src/backend/routes/UserRouter.ts:52",
+        "id_local": "User.create",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /pgapi/user",
+          "locator": "src/backend/routes/UserRouter.ts:52"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "if (user.allowQuery) { SearchQueryUtils.validateSearchQuery(user.allowQuery, 'User allowQuery'); }\nif (user.blockQuery) { SearchQueryUtils.validateSearchQuery(user.blockQuery, 'User blockQuery'); }\nuser.password = PasswordHelper.cryptPassword(user.password);\nreturn connection.getRepository(UserEntity).save(user);",
+        "edges": [
+          "UserRouter.addCreateUser attaches AuthenticationMWs.authenticate + authorise(Admin) before UserMWs.createUser (src/backend/routes/UserRouter.ts:52-58)"
+        ]
+      },
+      "entity": "User",
+      "_binds": {
+        "name": "User.name",
+        "password": "User.password",
+        "role": "User.role",
+        "overrideAllowBlockList": "User.overrideAllowBlockList",
+        "allowQuery": "User.allowQuery",
+        "blockQuery": "User.blockQuery"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "gte",
+                      "value": 4
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "name",
+          "password",
+          "role"
+        ],
+        "messages": {
+          "auth": "You must be signed in as an admin to create users.",
+          "realm": "Only an admin (role >= 4) can create users.",
+          "precondition": "Only an admin (role >= 4) can create users.",
+          "unique": "That login name is already taken."
+        }
+      },
+      "description": "Create a user account with a login name, password and role. Admin-only. The password is stored hashed; fails if the login name is already taken."
+    },
+    {
+      "tool": "user_delete",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "User",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the user to delete."
+        }
+      },
+      "_evidence": {
+        "locator": "src/backend/routes/UserRouter.ts:63",
+        "id_local": "User.delete",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /pgapi/user/:id",
+          "locator": "src/backend/routes/UserRouter.ts:60"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "public async deleteUser(id: number): Promise<UserEntity> {\n  const user = await connection.getRepository(UserEntity).findOneBy({id});\n  return await connection.getRepository(UserEntity).remove(user);\n}",
+        "edges": [
+          "authorise(Admin) + UserRequestConstrainsMWs.notSelfRequest guard admin from deleting themselves (UserRouter.ts:60-66, UserRequestConstrainsMWs.ts)"
+        ]
+      },
+      "entity": "User",
+      "_binds": {
+        "id": "User.id"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "gte",
+                      "value": 4
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            },
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "ne",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must be signed in as an admin to delete users.",
+          "realm": "Only an admin (role >= 4) can delete users.",
+          "precondition": "Only an admin (role >= 4) can delete users, and not your own account.",
+          "not_found": "No user with that id exists.",
+          "constraint": "An admin cannot delete their own account."
+        }
+      },
+      "description": "Delete a user account by id. Admin-only. Fails if you target your own account, if the user does not exist, or if it would remove the last admin. Their share links cascade away."
+    },
+    {
+      "tool": "user_list",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "User",
+        "rank": {
+          "method": "exact"
+        }
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "src/backend/routes/UserRouter.ts:75",
+        "id_local": "User.list",
+        "entry": {
+          "kind": "http",
+          "route": "GET /pgapi/user/list",
+          "locator": "src/backend/routes/UserRouter.ts:68"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "let result = await ObjectManagers.getInstance().UserManager.find({});\nresult = Utils.clone(result);\nfor (const item of result) { item.password = ''; }\nreq.resultPipe = result;",
+        "edges": [
+          "authorise(UserRoles.Admin) before UserMWs.listUsers (UserRouter.ts:72-74)"
+        ]
+      },
+      "entity": "User",
+      "_output_schema": {
+        "result": "list of User rows (password blanked)"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "gte",
+                      "value": 4
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in as an admin to list users.",
+          "realm": "Only an admin (role >= 4) can list users.",
+          "precondition": "Only an admin (role >= 4) can list users."
+        }
+      },
+      "description": "List all user accounts. Admin-only. Passwords are never returned."
+    },
+    {
+      "tool": "user_change_role",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "User",
+        "row_key": {
+          "id": {
+            "$arg": "id"
+          }
+        },
+        "set": {
+          "role": {
+            "$arg": "newRole"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the user whose role changes."
+        },
+        "newRole": {
+          "type": "int",
+          "required": true,
+          "description": "New role 1..5 to assign."
+        }
+      },
+      "_evidence": {
+        "locator": "src/backend/routes/UserRouter.ts:86",
+        "id_local": "User.changeRole",
+        "entry": {
+          "kind": "http",
+          "route": "POST /pgapi/user/:id/role",
+          "locator": "src/backend/routes/UserRouter.ts:76"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "const user = await userRepository.findOneBy({id});\nuser.role = newRole;\nreturn userRepository.save(user);",
+        "edges": [
+          "authorise(Admin) + notSelfRequestOr2Admins (UserRouter.ts:82-84)"
+        ]
+      },
+      "entity": "User",
+      "_binds": {
+        "id": "User.id",
+        "newRole": "User.role"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "gte",
+                      "value": 4
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "id",
+          "newRole"
+        ],
+        "messages": {
+          "auth": "You must be signed in as an admin to change roles.",
+          "realm": "Only an admin (role >= 4) can change roles.",
+          "precondition": "Only an admin (role >= 4) can change roles, and not your own role.",
+          "constraint": "Admins cannot change their own role, and you cannot leave only one admin."
+        }
+      },
+      "description": "Change a user's role. Admin-only. Fails if you target your own account, if the user is missing, or if it would leave fewer than two admins."
+    },
+    {
+      "tool": "user_update_settings",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "User",
+        "row_key": {
+          "id": {
+            "$arg": "id"
+          }
+        },
+        "set": {
+          "overrideAllowBlockList": {
+            "$arg": "overrideAllowBlockList"
+          },
+          "allowQuery": {
+            "$arg": "allowQuery"
+          },
+          "blockQuery": {
+            "$arg": "blockQuery"
+          },
+          "password": {
+            "$arg": "newPassword"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the user whose settings change."
+        },
+        "newPassword": {
+          "type": "text",
+          "description": "Optional new plaintext password; stored hashed."
+        },
+        "overrideAllowBlockList": {
+          "type": "bool",
+          "description": "Whether this user bypasses the shared allow/block list."
+        },
+        "allowQuery": {
+          "type": "json",
+          "description": "Additional search query this user is allowed to see."
+        },
+        "blockQuery": {
+          "type": "json",
+          "description": "Search query hiding content from this user."
+        }
+      },
+      "_evidence": {
+        "locator": "src/backend/routes/UserRouter.ts:98",
+        "id_local": "User.updateSettings",
+        "entry": {
+          "kind": "http",
+          "route": "POST /pgapi/user/:id/settings",
+          "locator": "src/backend/routes/UserRouter.ts:86"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "if (typeof settings.overrideAllowBlockList !== 'undefined') { user.overrideAllowBlockList = settings.overrideAllowBlockList; }\nif (typeof settings.allowQuery !== 'undefined') { ... user.allowQuery = settings.allowQuery ?? null; }\nif (typeof settings.blockQuery !== 'undefined') { ... user.blockQuery = settings.blockQuery ?? null; }\nif (settings.newPassword && settings.newPassword.length > 0) { user.password = PasswordHelper.cryptPassword(settings.newPassword); }\nreturn userRepository.save(user);",
+        "edges": [
+          "authorise(Admin) before UserMWs.updateSettings (UserRouter.ts:92-94)"
+        ]
+      },
+      "entity": "User",
+      "_binds": {
+        "id": "User.id",
+        "newPassword": "User.password",
+        "overrideAllowBlockList": "User.overrideAllowBlockList",
+        "allowQuery": "User.allowQuery",
+        "blockQuery": "User.blockQuery"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "gte",
+                      "value": 4
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must be signed in as an admin to update settings.",
+          "realm": "Only an admin (role >= 4) can change a user's settings.",
+          "precondition": "Only an admin (role >= 4) can update user settings."
+        }
+      },
+      "description": "Update a user's allow/block query filters, the override flag, and optionally reset the password. Admin-only."
+    },
+    {
+      "tool": "sharing_create",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Sharing",
+        "fields": [
+          "searchQuery",
+          "password"
+        ],
+        "set_on_create": {
+          "sharingKey": "generated base64url key (crypto.randomBytes)",
+          "timeStamp": "2026-01-01T00:00:00",
+          "expires": "Date.now()+valid ms, or year 9999 if valid==-1",
+          "creator_id": {
+            "$session": "account_id"
+          },
+          "defaultDirectoryView": null,
+          "defaultSearchView": null
+        }
+      },
+      "input_schema": {
+        "password": {
+          "type": "text",
+          "description": "Optional password gate for the share link."
+        },
+        "valid": {
+          "type": "int",
+          "required": true,
+          "description": "Validity of the link in milliseconds; -1 means it never expires."
+        },
+        "searchQuery": {
+          "type": "json",
+          "description": "Search query defining the media this share exposes."
+        },
+        "defaultDirectoryView": {
+          "type": "text",
+          "description": "Default directory view path for the share."
+        },
+        "defaultSearchView": {
+          "type": "json",
+          "description": "Default search view for the share."
+        }
+      },
+      "_evidence": {
+        "locator": "src/backend/routes/SharingRouter.ts:60",
+        "id_local": "Sharing.create",
+        "entry": {
+          "kind": "http",
+          "route": "POST /pgapi/share/:directory(*)",
+          "locator": "src/backend/routes/SharingRouter.ts:54"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "let sharingKey = SharingMWs.generateKey(Config.Sharing.sharingKeyLength);\nwhile (true) { try { await SharingManager.findOne(sharingKey); sharingKey = generateKey(...); } catch (err) { break; } }\nconst sharing = { sharingKey, searchQuery, password: createSharing.password, creator: req.session.context?.user, expires: createSharing.valid >= 0 ? Date.now() + createSharing.valid : new Date(9999,0,1).getTime(), timeStamp: Date.now() };\nreq.resultPipe = await SharingManager.createSharing(sharing);",
+        "edges": [
+          "SharingMWs.createSharing input validation: if passwordRequired && !password -> INPUT_ERROR (SharingMWs.ts:118-124)"
+        ]
+      },
+      "entity": "Sharing",
+      "_binds": {
+        "password": "Sharing.password",
+        "valid": "Sharing.expires",
+        "searchQuery": "Sharing.searchQuery"
+      },
+      "_output_schema": {
+        "sharing": "the created Sharing row (password stripped)"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "gte",
+                      "value": 3
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "valid"
+        ],
+        "messages": {
+          "auth": "You must be signed in to create a share link.",
+          "realm": "Your role is too low to create share links.",
+          "precondition": "Only users with role >= 3 can create share links."
+        }
+      },
+      "description": "Create a share link exposing a set of media (defined by a search query) to anyone holding the generated key. The link is owned by the current user and valid for the given window."
+    },
+    {
+      "tool": "sharing_update",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Sharing",
+        "row_key": {
+          "id": {
+            "$arg": "id"
+          }
+        },
+        "fields": [
+          "searchQuery",
+          "password",
+          "defaultDirectoryView",
+          "defaultSearchView"
+        ],
+        "set": {
+          "expires": "recomputed from valid: Date.now()+valid ms, or year 9999 if valid==-1"
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the share link to update."
+        },
+        "searchQuery": {
+          "type": "json",
+          "description": "New search query defining the exposed media."
+        },
+        "password": {
+          "type": "text",
+          "description": "New password; empty string clears it."
+        },
+        "valid": {
+          "type": "int",
+          "required": true,
+          "description": "New validity in milliseconds; -1 means never expire."
+        },
+        "defaultDirectoryView": {
+          "type": "text",
+          "description": "New default directory view path."
+        },
+        "defaultSearchView": {
+          "type": "json",
+          "description": "New default search view."
+        }
+      },
+      "_evidence": {
+        "locator": "src/backend/routes/SharingRouter.ts:71",
+        "id_local": "Sharing.update",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /pgapi/share/:directory(*)",
+          "locator": "src/backend/routes/SharingRouter.ts:59"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "const sharing = await connection.getRepository(SharingEntity).findOneBy({id: inSharing.id, creator: inSharing.creator.id});\nif (sharing.timeStamp < Date.now() - Config.Sharing.updateTimeout && forceUpdate !== true) { throw new Error('Sharing is locked, can\\'t update anymore'); }\nsharing.password = inSharing.password == null ? null : PasswordHelper.cryptPassword(inSharing.password);\nsharing.searchQuery = SearchQueryUtils.sortQuery(inSharing.searchQuery);\nsharing.expires = inSharing.expires;\nreturn connection.getRepository(SharingEntity).save(sharing);",
+        "edges": [
+          "updateSharing throws when locked; findOneBy({id, creator: inSharing.creator.id}) (SharingManager.ts:79-100)"
+        ]
+      },
+      "entity": "Sharing",
+      "_binds": {
+        "id": "Sharing.id",
+        "searchQuery": "Sharing.searchQuery",
+        "password": "Sharing.password",
+        "defaultDirectoryView": "Sharing.defaultDirectoryView",
+        "defaultSearchView": "Sharing.defaultSearchView"
+      },
+      "_output_schema": {
+        "sharing": "the updated Sharing row"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Sharing",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "creator_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "id",
+          "valid"
+        ],
+        "messages": {
+          "auth": "You must be signed in to update a share link.",
+          "precondition": "Only the link's creator can update it.",
+          "not_found": "No such share link, or you are not its creator."
+        }
+      },
+      "description": "Update a share link: exposed search query, password, default views or validity. Only the link's creator may update it, and only within its update lock window."
+    },
+    {
+      "tool": "sharing_delete",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "Sharing",
+        "lookup_by": {
+          "sharingKey": {
+            "$arg": "sharingKey"
+          }
+        }
+      },
+      "input_schema": {
+        "sharingKey": {
+          "type": "text",
+          "required": true,
+          "description": "The sharing key of the link to delete."
+        }
+      },
+      "_evidence": {
+        "locator": "src/backend/routes/SharingRouter.ts:82",
+        "id_local": "Sharing.delete",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /pgapi/share/:sharingKey",
+          "locator": "src/backend/routes/SharingRouter.ts:64"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "public async deleteSharing(sharingKey: string): Promise<void> {\n  const sharing = await connection.getRepository(SharingEntity).findOneBy({sharingKey});\n  await connection.getRepository(SharingEntity).remove(sharing);\n}",
+        "edges": [
+          "SharingMWs.deleteSharing checks creator.id or admin before deleting (SharingMWs.ts:251-265)"
+        ]
+      },
+      "entity": "Sharing",
+      "_binds": {
+        "sharingKey": "Sharing.sharingKey"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Sharing",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "sharingKey",
+                      "op": "eq",
+                      "value": {
+                        "arg": "sharingKey"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "creator_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "gte",
+                      "value": 4
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "sharingKey"
+        ],
+        "messages": {
+          "auth": "You must be signed in to delete a share link.",
+          "precondition": "Only the link's creator or an admin can delete it.",
+          "not_found": "No share link with that key exists."
+        }
+      },
+      "description": "Delete a share link by its sharing key. Only the link's creator or an admin may delete it."
+    },
+    {
+      "tool": "sharing_list",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Sharing",
+        "rank": {
+          "method": "exact"
+        }
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "src/backend/routes/SharingRouter.ts:93",
+        "id_local": "Sharing.listAll",
+        "entry": {
+          "kind": "http",
+          "route": "GET /pgapi/share/listAll",
+          "locator": "src/backend/routes/SharingRouter.ts:70"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "private static async removeExpiredLink(): Promise<void> {\n  await connection.getRepository(SharingEntity).createQueryBuilder('share').where('expires < :now', {now: Date.now()}).delete().execute();\n}\nasync listAll(): Promise<SharingEntity[]> {\n  await SharingManager.removeExpiredLink();\n  return await connection.getRepository(SharingEntity).createQueryBuilder('share').leftJoinAndSelect('share.creator', 'creator').getMany();\n}",
+        "edges": [
+          "authorise(UserRoles.Admin) before SharingMWs.listSharing (SharingRouter.ts:67-69)"
+        ]
+      },
+      "entity": "Sharing",
+      "_output_schema": {
+        "result": "list of Sharing rows (password stripped)"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "gte",
+                      "value": 4
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in as an admin to list share links.",
+          "realm": "Only an admin (role >= 4) can list share links.",
+          "precondition": "Only an admin (role >= 4) can list share links."
+        }
+      },
+      "description": "List all share links. Admin-only. Expired links are pruned first. Passwords are never returned."
+    },
+    {
+      "tool": "gallery_search",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Media",
+        "search_fields": [
+          "name",
+          "metadataCaption",
+          "metadataPositionDataCountry",
+          "metadataPositionDataState",
+          "metadataPositionDataCity",
+          "metadataPersons",
+          "metadataKeywords",
+          "metadataCreationDate",
+          "metadataRating",
+          "metadataPersonsLength"
+        ],
+        "rank": {
+          "method": "substring",
+          "fields": [
+            "name",
+            "metadataCaption",
+            "metadataPositionDataCountry",
+            "metadataPositionDataState",
+            "metadataPositionDataCity",
+            "metadataPersons",
+            "metadataKeywords",
+            "metadataCreationDate",
+            "metadataRating",
+            "metadataPersonsLength"
+          ]
+        },
+        "pagination": {
+          "default_limit": 20
+        }
+      },
+      "input_schema": {
+        "searchQueryDTO": {
+          "type": "json",
+          "required": true,
+          "description": "The structured search query (text/AND/OR/rating/date/person filters) selecting media."
+        }
+      },
+      "_evidence": {
+        "locator": "src/backend/routes/GalleryRouter.ts:257",
+        "id_local": "Gallery.search",
+        "entry": {
+          "kind": "http",
+          "route": "GET /pgapi/search/:searchQueryDTO(*)",
+          "locator": "src/backend/routes/GalleryRouter.ts:256"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "const q = connection.getRepository(MediaEntity).createQueryBuilder('media').select(['media', ...]).where(this.buildWhereQuery(query)).leftJoin('media.directory', 'directory').limit(Config.Search.maxMediaResult + 1);\nif (session.projectionQuery) { q.andWhere(session.projectionQuery); }\nresult.media = await q.getMany();\nif (Config.Search.listDirectories === true) { ... DirectoryEntity where buildWhereQuery(dirQuery, true) leftJoin directory.cache (cache.projectionKey = :pk AND cache.valid = 1) ... }",
+        "edges": [
+          "anonymous sessions served via tryAuthenticate/getSharingUser only when a valid non-expired non-password share key is presented (AuthenticationMWs.ts:52-120); authenticate() 401s otherwise"
+        ]
+      },
+      "entity": "Media",
+      "_output_schema": {
+        "searchResult": "{searchQuery, media:[Media], directories:[Directory], metaFile:[File], resultOverflow:bool}"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Sharing",
+                "where": {
+                  "node": "field",
+                  "col": "expires",
+                  "op": "gt",
+                  "value": {
+                    "now": true
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "searchQueryDTO"
+        ],
+        "messages": {
+          "auth": "You must be signed in (or present a valid share key) to search the gallery.",
+          "precondition": "Search needs a signed-in user, or a non-expired share link."
+        }
+      },
+      "description": "Search media with a structured query (text, rating, date, person, resolution, keywords). Returns matching photos and videos. Requires an active session, or a valid non-expired share key when anonymous."
+    },
+    {
+      "tool": "gallery_autocomplete",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Media",
+        "search_fields": [
+          "metadataKeywords",
+          "name",
+          "metadataPositionDataCountry",
+          "metadataPositionDataState",
+          "metadataPositionDataCity",
+          "metadataCaption"
+        ],
+        "rank": {
+          "method": "substring",
+          "fields": [
+            "metadataKeywords",
+            "name",
+            "metadataPositionDataCountry",
+            "metadataPositionDataState",
+            "metadataPositionDataCity",
+            "metadataCaption"
+          ]
+        }
+      },
+      "input_schema": {
+        "value": {
+          "type": "text",
+          "required": true,
+          "description": "The prefix to complete."
+        },
+        "type": {
+          "type": "int",
+          "description": "Optional search-query type filter."
+        }
+      },
+      "_evidence": {
+        "locator": "src/backend/routes/GalleryRouter.ts:275",
+        "id_local": "Gallery.autocomplete",
+        "entry": {
+          "kind": "http",
+          "route": "GET /pgapi/autocomplete/:value(*)",
+          "locator": "src/backend/routes/GalleryRouter.ts:274"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "const q = photoRepository.createQueryBuilder('media').select('DISTINCT(media.metadata.keywords)').where('media.metadata.keywords LIKE :valueKW COLLATE ' + SQL_COLLATE, {valueKW: '%' + value + '%'});\nif (session.projectionQuery) { if (session.hasDirectoryProjection) { q.leftJoin('media.directory', 'directory'); } q.andWhere(session.projectionQuery); }"
+      },
+      "entity": "Media",
+      "_output_schema": {
+        "result": "list of autocomplete items (value+type)"
+      },
+      "guards": {
+        "required": [
+          "value"
+        ],
+        "messages": {
+          "required": "You must supply a search prefix (value) to autocomplete."
+        }
+      },
+      "description": "Autocomplete a search term against known keywords, names, places and captions. Returns matching autocomplete values."
+    },
+    {
+      "tool": "gallery_list_directory",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Directory",
+        "lookup_by": {
+          "path": {
+            "$arg": "directory"
+          }
+        }
+      },
+      "input_schema": {
+        "directory": {
+          "type": "text",
+          "required": true,
+          "description": "Relative path of the directory to list (e.g. a/b/c)."
+        }
+      },
+      "_evidence": {
+        "locator": "src/backend/routes/GalleryRouter.ts:34",
+        "id_local": "Gallery.listDirectory",
+        "entry": {
+          "kind": "http",
+          "route": "GET /pgapi/gallery/content/:directory(*)",
+          "locator": "src/backend/routes/GalleryRouter.ts:35"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "const dir = await this.getDirIdAndTime(connection, directoryPath.name, directoryPath.parent);\nif (dir && dir.lastScanned != null) { const lastModified = ...; if (dir.lastModified !== lastModified) { await IndexingManager.indexDirectory(relativeDirectoryName, true); } return await this.getParentDirFromId(connection, session, dir.id); }\nif (session?.projectionQuery) { await IndexingManager.indexDirectory(relativeDirectoryName, true); }\nreturn IndexingManager.indexDirectory(relativeDirectoryName);",
+        "edges": [
+          "gallery browse routes sit behind AuthenticationMWs.authenticate; anonymous sessions served only via tryAuthenticate/getSharingUser with a valid share key (AuthenticationMWs.ts:52-120)"
+        ]
+      },
+      "entity": "Directory",
+      "_binds": {
+        "directory": "Directory.path"
+      },
+      "_output_schema": {
+        "result": "ContentWrapper {directory:{...subdirs,media,metaFile}, notModified:bool}"
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in to browse the gallery.",
+          "not_found": "No such directory."
+        },
+        "required": [
+          "directory"
+        ]
+      },
+      "description": "List the contents of a directory: its subdirectories, media and meta files. Requires an active session."
+    },
+    {
+      "tool": "gallery_get_media",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Media",
+        "lookup_by": {
+          "name": {
+            "$arg": "mediaPath"
+          }
+        }
+      },
+      "input_schema": {
+        "mediaPath": {
+          "type": "text",
+          "required": true,
+          "description": "Relative media path (dir/name.ext) locating the media row."
+        }
+      },
+      "_evidence": {
+        "locator": "src/backend/routes/GalleryRouter.ts:66",
+        "id_local": "Gallery.getMedia",
+        "entry": {
+          "kind": "http",
+          "route": "GET /pgapi/gallery/content/:mediaPath(*)",
+          "locator": "src/backend/routes/GalleryRouter.ts:82"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "const qb = connection.getRepository(MediaEntity).createQueryBuilder('media').innerJoinAndSelect('media.directory','directory').where('media.name = :name',{name:fileName}).andWhere('directory.name = :dname AND directory.path = :dpath',{dname:directoryName,dpath:directoryParent});\nif (session.projectionQuery) { qb.andWhere(session.projectionQuery); }\nreturn await qb.getOne();",
+        "edges": [
+          "routes attach AuthenticationMWs.authoriseMedia('mediaPath') for media serve routes (GalleryRouter.ts:82-100); authoriseMedia 403s otherwise (GalleryManager.ts:326)"
+        ]
+      },
+      "entity": "Media",
+      "_binds": {
+        "mediaPath": "Media.name"
+      },
+      "_output_schema": {
+        "result": "the Media row"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Media",
+                "where": {
+                  "node": "field",
+                  "col": "name",
+                  "op": "eq",
+                  "value": {
+                    "arg": "mediaPath"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "mediaPath"
+        ],
+        "messages": {
+          "auth": "You must be signed in (or hold a valid share key) to view media.",
+          "precondition": "That media is not visible to you.",
+          "not_found": "No such media."
+        },
+        "requires_auth": true
+      },
+      "description": "Fetch a single media row by its path. Requires an active session or a valid share key granting access to that media."
+    },
+    {
+      "tool": "gallery_list_media",
+      "op": "action",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Media",
+        "search_fields": [
+          "name",
+          "metadataCaption",
+          "metadataKeywords",
+          "metadataPositionDataCountry",
+          "metadataPositionDataState",
+          "metadataPositionDataCity"
+        ],
+        "rank": {
+          "method": "substring",
+          "fields": [
+            "name",
+            "metadataCaption",
+            "metadataKeywords",
+            "metadataPositionDataCountry",
+            "metadataPositionDataState",
+            "metadataPositionDataCity"
+          ]
+        },
+        "pagination": {
+          "default_limit": 50
+        }
+      },
+      "input_schema": {
+        "searchQueryDTO": {
+          "type": "json",
+          "required": true,
+          "description": "Search query selecting which media to return."
+        }
+      },
+      "_evidence": {
+        "locator": "src/backend/routes/GalleryRouter.ts:52",
+        "id_local": "Gallery.zipDirectory",
+        "entry": {
+          "kind": "http",
+          "route": "GET /pgapi/gallery/zip/:searchQueryDTO(*)",
+          "locator": "src/backend/routes/GalleryRouter.ts:47"
+        },
+        "entity_why": "cannot determine the entity",
+        "ref_code": "const searchResult = await SearchManager.search(req.session.context, query);\nif (!searchResult.media || searchResult.media.length === 0) { return next(new ErrorDTO(ErrorCodes.INPUT_ERROR, 'No media found for zip')); }\n... archive.file(mediaPath, {name: uniqueName}); ... await archive.finalize();",
+        "edges": [
+          "GalleryRouter attaches authenticate authoriseMedia for gallery/data routes; 401 for anonymous without a valid share key (GalleryRouter.ts:82-100, AuthenticationMWs.ts:52-120)"
+        ]
+      },
+      "_output_schema": {
+        "*": "binary zip stream of matching media files"
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in to list media.",
+          "precondition": "Listing media needs a signed-in user, or a valid share link."
+        },
+        "required": [
+          "searchQueryDTO"
+        ]
+      },
+      "description": "List the media selected by a search query. A read that returns the matching photo/video rows; use it to enumerate what a filter or saved search exposes."
+    },
+    {
+      "tool": "gallery_random_image",
+      "op": "action",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Media",
+        "search_fields": [
+          "name",
+          "metadataCaption",
+          "metadataKeywords"
+        ],
+        "rank": {
+          "method": "exact"
+        },
+        "pagination": {
+          "default_limit": 1
+        }
+      },
+      "input_schema": {
+        "searchQueryDTO": {
+          "type": "json",
+          "required": true,
+          "description": "Search query restricting the pool the random pick is drawn from."
+        }
+      },
+      "_evidence": {
+        "locator": "src/backend/routes/GalleryRouter.ts:163",
+        "id_local": "Gallery.getRandomImage",
+        "entry": {
+          "kind": "http",
+          "route": "GET /pgapi/gallery/random/:searchQueryDTO",
+          "locator": "src/backend/routes/GalleryRouter.ts:164"
+        },
+        "entity_why": "cannot determine the entity",
+        "ref_code": "const photos = await ObjectManagers.getInstance().SearchManager.getNMedia(req.session.context, query, [{method: SortByTypes.Random, ascending: null}], 1, true);\nif (!photos || photos.length !== 1) { return next(new ErrorDTO(ErrorCodes.INPUT_ERROR, 'No photo found')); }\nreq.params['mediaPath'] = path.join(photos[0].directory.path, photos[0].directory.name, photos[0].name);",
+        "edges": [
+          "gallery route authorise(LimitedGuest) + authenticate; anonymous refused without a valid share key (GalleryMWs.ts:449, AuthenticationMWs.ts:52-120)"
+        ]
+      },
+      "_output_schema": {
+        "*": "file bytes of one random photo"
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in to use random media.",
+          "precondition": "Random media needs a signed-in user, or a valid share link."
+        },
+        "required": [
+          "searchQueryDTO"
+        ]
+      },
+      "description": "Return at most one random photo/video row matching a search query. A read; use it to pick a surprise media item."
+    },
+    {
+      "tool": "album_create_saved_search",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Album",
+        "fields": [
+          "name",
+          "searchQuery"
+        ],
+        "set_on_create": {
+          "locked": false,
+          "type": "savedSearch"
+        }
+      },
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "Name of the new saved-search album."
+        },
+        "searchQuery": {
+          "type": "json",
+          "required": true,
+          "description": "Search query the album saves."
+        }
+      },
+      "_evidence": {
+        "locator": "src/backend/routes/AlbumRouter.ts:48",
+        "id_local": "Album.createSavedSearch",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /pgapi/albums/saved-searches",
+          "locator": "src/backend/routes/AlbumRouter.ts:57"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "await connection.getRepository(SavedSearchEntity).save({name, searchQuery, locked: lockedAlbum});",
+        "edges": [
+          "authorise(Admin) before AlbumMWs.createSavedSearch (AlbumRouter.ts:48-50)"
+        ]
+      },
+      "entity": "Album",
+      "_binds": {
+        "name": "Album.name",
+        "searchQuery": "Album.searchQuery"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "gte",
+                      "value": 4
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "name",
+          "searchQuery"
+        ],
+        "messages": {
+          "auth": "You must be signed in as an admin to create albums.",
+          "realm": "Only an admin (role >= 4) can create saved searches.",
+          "precondition": "Only an admin (role >= 4) can create saved searches.",
+          "unique": "An album with that name already exists."
+        }
+      },
+      "description": "Create a saved-search album from a name and search query. Admin-only. The album is created unlocked, of type savedSearch."
+    },
+    {
+      "tool": "album_delete",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "Album",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the saved-search album to delete."
+        }
+      },
+      "_evidence": {
+        "locator": "src/backend/routes/AlbumRouter.ts:33",
+        "id_local": "Album.delete",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /pgapi/albums/:id",
+          "locator": "src/backend/routes/AlbumRouter.ts:46"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "const albumCount = await connection.getRepository(AlbumBaseEntity).countBy({id, locked: false});\nif (albumCount == 0) { throw new Error('Could not delete album... locked'); }\nawait connection.getRepository(AlbumBaseEntity).delete({id, locked: false});",
+        "edges": [
+          "authorise(Admin) before AlbumMWs.deleteAlbum (AlbumRouter.ts:33-35)",
+          "deleteAlbum throws when albumCount==0 (missing or locked) (AlbumManager.ts:47)"
+        ]
+      },
+      "entity": "Album",
+      "_binds": {
+        "id": "Album.id"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "gte",
+                      "value": 4
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Album",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "locked",
+                      "op": "eq",
+                      "value": "false"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must be signed in as an admin to delete albums.",
+          "realm": "Only an admin (role >= 4) can delete albums.",
+          "precondition": "Only an admin (role >= 4) can delete albums, and only unlocked ones.",
+          "constraint": "Locked albums cannot be deleted.",
+          "not_found": "No such unlocked album."
+        }
+      },
+      "description": "Delete a saved-search album by id. Admin-only. Fails if the album is locked or does not exist."
+    },
+    {
+      "tool": "album_list",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Album",
+        "rank": {
+          "method": "exact"
+        }
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "src/backend/routes/AlbumRouter.ts:18",
+        "id_local": "Album.list",
+        "entry": {
+          "kind": "http",
+          "route": "GET /pgapi/albums",
+          "locator": "src/backend/routes/AlbumRouter.ts:31"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "const result = await connection.getRepository(AlbumBaseEntity).createQueryBuilder('album').leftJoin('album.cache', 'cache', 'cache.projectionKey = :pk AND cache.valid = 1', {pk: session.user.projectionKey}).leftJoin('cache.cover', 'cover').select(['album', 'cache', 'cover.name', 'directory.name', 'directory.path']).getMany();",
+        "edges": [
+          "album routes behind AuthenticationMWs.authenticate; album listing is session-scoped (AlbumRouter.ts:31)"
+        ]
+      },
+      "entity": "Album",
+      "_output_schema": {
+        "result": "list of Album rows with projected cache"
+      },
+      "description": "List saved-search albums. Requires an active session; each album carries its projected cache (item count, cover).",
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in to list albums."
+        }
+      }
+    },
+    {
+      "tool": "person_list",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Person",
+        "search_fields": [
+          "name",
+          "isFavourite"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "name",
+            "isFavourite"
+          ]
+        }
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "src/backend/routes/PersonRouter.ts:34",
+        "id_local": "Person.list",
+        "entry": {
+          "kind": "http",
+          "route": "GET /pgapi/person",
+          "locator": "src/backend/routes/PersonRouter.ts:38"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "return await personRepository.createQueryBuilder('person').leftJoin('person.cache', 'cache', 'cache.projectionKey = :pk').leftJoin('cache.sampleRegion', 'sampleRegion').select([...]).where('cache.valid = 1 AND cache.count > 0').getMany();",
+        "edges": [
+          "person routes behind AuthenticationMWs.authenticate; person listing is session-scoped (PersonRouter.ts:38)"
+        ]
+      },
+      "entity": "Person",
+      "_output_schema": {
+        "result": "list of Person rows with face count + sample region"
+      },
+      "description": "List detected people with at least one visible face, ordered by face count. Requires an active session; only people whose faces fall inside your shared projection pool are shown.",
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in to list people."
+        }
+      }
+    },
+    {
+      "tool": "person_update",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Person",
+        "row_key": {
+          "name": {
+            "$arg": "name"
+          }
+        },
+        "fields": [
+          "name",
+          "isFavourite"
+        ]
+      },
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "Current name of the person to edit, matched case-insensitively."
+        },
+        "isFavourite": {
+          "type": "bool",
+          "description": "Mark/unmark this person as a favourite."
+        }
+      },
+      "_evidence": {
+        "locator": "src/backend/routes/PersonRouter.ts:19",
+        "id_local": "Person.update",
+        "entry": {
+          "kind": "http",
+          "route": "POST /pgapi/person/:name",
+          "locator": "src/backend/routes/PersonRouter.ts:25"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "const person = await repository.createQueryBuilder('person').limit(1).where('person.name LIKE :name COLLATE ' + SQL_COLLATE, {name}).getOne();\nif (typeof partialPerson.name !== 'undefined') { person.name = partialPerson.name; }\nif (typeof partialPerson.isFavourite !== 'undefined') { person.isFavourite = partialPerson.isFavourite; }\nawait repository.save(person);",
+        "edges": [
+          "updatePerson getOne() then saves; missing -> TypeError (PersonManager.ts:12-35)"
+        ]
+      },
+      "entity": "Person",
+      "_binds": {
+        "name": "Person.name",
+        "isFavourite": "Person.isFavourite"
+      },
+      "_output_schema": {
+        "result": "the updated Person"
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Person",
+                "where": {
+                  "node": "field",
+                  "col": "name",
+                  "op": "eq",
+                  "value": {
+                    "arg": "name"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must be signed in to edit a person.",
+          "precondition": "No person with that name exists.",
+          "not_found": "No person with that name exists."
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "description": "Rename a person or mark them as a favourite. Fails if no person with that name exists."
+    },
+    {
+      "tool": "admin_load_statistic",
+      "op": "action",
+      "family": "search.aggregate",
+      "exec_spec": {
+        "entity": "Media",
+        "aggregate": [
+          {
+            "fn": "count",
+            "as": "photos"
+          }
+        ],
+        "group_by": []
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "src/backend/routes/admin/AdminRouter.ts:17",
+        "id_local": "Admin.loadStatistic",
+        "entry": {
+          "kind": "http",
+          "route": "GET /pgapi/admin/statistic",
+          "locator": "src/backend/routes/admin/AdminRouter.ts:46"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "req.resultPipe = { directories: await galleryManager.countDirectories(), photos: await galleryManager.countPhotos(), videos: await galleryManager.countVideos(), diskUsage: await galleryManager.countMediaSize(), persons: await personManager.countFaces() };",
+        "edges": [
+          "authorise(Admin) before the handler (AdminRouter.ts:17-20)"
+        ]
+      },
+      "entity": "Directory",
+      "_output_schema": {
+        "result": "{directories,photos,videos,diskUsage,persons}"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "gte",
+                      "value": 4
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in as an admin to view statistics.",
+          "realm": "Only an admin (role >= 4) can view statistics.",
+          "precondition": "Only an admin (role >= 4) can view statistics."
+        }
+      },
+      "description": "Return gallery statistics: total photos, videos, directories, disk usage and faces. Admin-only."
+    },
+    {
+      "tool": "admin_get_duplicates",
+      "op": "action",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Media",
+        "search_fields": [
+          "metadataContentIdentifier",
+          "metadataCreationDate",
+          "metadataFileSize",
+          "name"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "metadataContentIdentifier",
+            "metadataCreationDate",
+            "metadataFileSize",
+            "name"
+          ]
+        }
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "src/backend/routes/admin/AdminRouter.ts:27",
+        "id_local": "Admin.getDuplicates",
+        "entry": {
+          "kind": "http",
+          "route": "GET /pgapi/admin/duplicates",
+          "locator": "src/backend/routes/admin/AdminRouter.ts:52"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "public async getPossibleDuplicates(): Promise<DuplicatesDTO[]> { ... contentIdentifier / creationDate based grouping over MediaEntity ... }",
+        "edges": [
+          "authorise(Admin) before the handler (AdminRouter.ts:27-30)"
+        ]
+      },
+      "entity": "Media",
+      "_output_schema": {
+        "result": "list of duplicate media groups"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "gte",
+                      "value": 4
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in as an admin to scan for duplicates.",
+          "realm": "Only an admin (role >= 4) can scan for duplicates.",
+          "precondition": "Only an admin (role >= 4) can scan for duplicates."
+        }
+      },
+      "description": "Find possible duplicate media: rows sharing a content identifier or creation date. Admin-only; scans the whole media table."
+    },
+    {
+      "tool": "job_start",
+      "op": "action",
+      "family": "crud.upsert",
+      "exec_spec": {
+        "entity": "JobProgress",
+        "key": {
+          "HashName": "(derived hash of jobName + config via JobDTOUtils.getHashName)"
+        },
+        "insert_fields": [
+          "jobName",
+          "state",
+          "steps_all",
+          "steps_processed",
+          "steps_skipped",
+          "time_start",
+          "time_end"
+        ],
+        "set_on_exists": {
+          "state": 1,
+          "time_start": "2026-01-01T00:00:00"
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "text",
+          "required": true,
+          "description": "Name of the scheduled job to start (e.g. IndexingJob)."
+        },
+        "config": {
+          "type": "json",
+          "description": "Optional job-specific config (e.g. indexChangesOnly)."
+        }
+      },
+      "_evidence": {
+        "locator": "src/backend/routes/admin/AdminRouter.ts:60",
+        "id_local": "Job.start",
+        "entry": {
+          "kind": "http",
+          "route": "POST /pgapi/admin/jobs/scheduled/:id/start",
+          "locator": "src/backend/routes/admin/AdminRouter.ts:61"
+        },
+        "entity_why": "primary effect row_upsert lands on this table",
+        "ref_code": "public async run<T>(jobName, config, soloRun, allowParallelRun): Promise<void> {\n  if ((allowParallelRun === false && this.JobRunning === true) || this.JobNoParallelRunning === true) { throw new Error('Can\\'t start this job while another is running'); }\n  const t = this.findJob(jobName);\n  if (t) { t.JobListener = this; await t.start(config, soloRun, allowParallelRun); }",
+        "edges": [
+          "JobManager.run throws if JobRunning && !allowParallelRun or any JobNoParallelRunning (JobManager.ts:53-62)"
+        ]
+      },
+      "entity": "JobProgress",
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "JobProgress",
+                "where": {
+                  "node": "field",
+                  "col": "state",
+                  "op": "in",
+                  "value": {
+                    "const": [
+                      1,
+                      2
+                    ]
+                  }
+                }
+              },
+              "op": "eq",
+              "n": 0
+            },
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "gte",
+                      "value": 4
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must be signed in as an admin to start jobs.",
+          "realm": "Only an admin (role >= 4) can start jobs.",
+          "precondition": "Only an admin (role >= 4) can start jobs, and no conflicting job may be running."
+        }
+      },
+      "_defaulted": [
+        "argument invented from the write column",
+        "fields"
+      ],
+      "description": "Start a scheduled background job (e.g. IndexingJob) by job name. Admin-only. Fails if a non-parallel job is already running."
+    },
+    {
+      "tool": "job_stop",
+      "op": "action",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "JobProgress",
+        "row_key": {
+          "HashName": {
+            "$arg": "id"
+          }
+        },
+        "fields": [
+          "jobName",
+          "state",
+          "steps_all",
+          "steps_processed",
+          "steps_skipped",
+          "time_start",
+          "time_end"
+        ],
+        "set": {
+          "state": 2
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "text",
+          "required": true,
+          "description": "Name of the running job to stop."
+        }
+      },
+      "_evidence": {
+        "locator": "src/backend/routes/admin/AdminRouter.ts:67",
+        "id_local": "Job.stop",
+        "entry": {
+          "kind": "http",
+          "route": "POST /pgapi/admin/jobs/scheduled/:id/stop",
+          "locator": "src/backend/routes/admin/AdminRouter.ts:68"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "public stop(jobName: string): void {\n  const t = this.findJob(jobName);\n  if (t) { t.cancel(); } else { Logger.warn(LOG_TAG, 'cannot find job to stop:' + jobName); }\n}",
+        "edges": [
+          "authorise(Admin) before AdminMWs.stopJob (AdminRouter.ts:67-69)"
+        ]
+      },
+      "entity": "JobProgress",
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "gte",
+                      "value": 4
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must be signed in as an admin to stop jobs.",
+          "realm": "Only an admin (role >= 4) can stop jobs.",
+          "precondition": "Only an admin (role >= 4) can stop jobs.",
+          "not_found": "No running job with that name."
+        }
+      },
+      "_defaulted": [
+        "argument invented from the write column",
+        "fields"
+      ],
+      "description": "Request cancellation of a running scheduled job by job name. Admin-only."
+    },
+    {
+      "tool": "admin_job_progress",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "JobProgress",
+        "rank": {
+          "method": "exact"
+        }
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "src/backend/routes/admin/AdminRouter.ts:53",
+        "id_local": "Admin.jobProgress",
+        "entry": {
+          "kind": "http",
+          "route": "GET /pgapi/admin/jobs/scheduled/progress",
+          "locator": "src/backend/routes/admin/AdminRouter.ts:65"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "public getProgresses(): { [id: string]: OnTimerJobProgressDTO } {\n  const prg = Utils.clone(this.progressManager.Progresses);\n  this.timers.forEach(t => { ...prg[...].onTimer = true; });\n  return prg;\n}",
+        "edges": [
+          "authorise(Admin) before admin job-progress route (GET /pgapi/admin/jobs/scheduled/progress, AdminRouter.ts:65); sibling admin routes carry authorise(Admin) at AdminRouter.ts:17-30"
+        ]
+      },
+      "entity": "JobProgress",
+      "_output_schema": {
+        "result": "map of job HashName to {state,steps{all,processed,skipped},time}"
+      },
+      "description": "Report the progress of scheduled background jobs (state, steps done, timestamps). Admin-only.",
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "gte",
+                      "value": 4
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must be signed in as an admin to view job progress.",
+          "realm": "Only an admin (role >= 4) can view job progress.",
+          "precondition": "Only an admin (role >= 4) can view job progress."
+        }
+      }
+    },
+    {
+      "tool": "upload_media",
+      "op": "create",
+      "family": "action.emit",
+      "exec_spec": {
+        "channel": "event",
+        "record": {
+          "table": "DispatchLog"
+        }
+      },
+      "input_schema": {
+        "directory": {
+          "type": "text",
+          "description": "Target directory path for the upload."
+        },
+        "files": {
+          "type": "json",
+          "required": true,
+          "description": "The files to upload."
+        }
+      },
+      "_evidence": {
+        "locator": "src/backend/routes/UploadRouter.ts:16",
+        "id_local": "Upload.upload",
+        "entry": {
+          "kind": "http",
+          "route": "POST /pgapi/upload/:directory(*)",
+          "locator": "src/backend/routes/UploadRouter.ts:27"
+        },
+        "entity_why": "cannot determine the entity",
+        "ref_code": "await ObjectManagers.getInstance().UploadManager.saveFiles(directory, files);\n// saveFiles -> for each: this.saveFile(directory, file) writes buffer to fs; then onDataChange(dto)",
+        "edges": [
+          "authorise(Config.Upload.minimumRole) before UploadMWs.upload (UploadRouter.ts:16-18)"
+        ]
+      },
+      "_output_schema": {
+        "result": "list of per-file upload errors (empty on full success)"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "gte",
+                      "value": 3
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "files"
+        ],
+        "messages": {
+          "auth": "You must be signed in to upload.",
+          "realm": "Your role does not allow uploading.",
+          "precondition": "Your role does not allow uploading."
+        }
+      },
+      "description": "Upload one or more files into a directory. Writes the file bytes to the image folder and triggers a re-index that creates/updates the media rows. Requires a signed-in user with upload rights."
+    },
+    {
+      "tool": "settings_update",
+      "op": "action",
+      "family": "action.emit",
+      "exec_spec": {
+        "channel": "event",
+        "record": {
+          "table": "DispatchLog"
+        }
+      },
+      "input_schema": {
+        "settings": {
+          "type": "json",
+          "required": true,
+          "description": "The top-level settings object to apply."
+        },
+        "settingsPath": {
+          "type": "text",
+          "required": true,
+          "description": "Name of the top-level settings group being updated."
+        }
+      },
+      "_evidence": {
+        "locator": "src/backend/routes/admin/SettingsRouter.ts:21",
+        "id_local": "Settings.update",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /pgapi/settings",
+          "locator": "src/backend/routes/admin/SettingsRouter.ts:26"
+        },
+        "entity_why": "cannot determine the entity",
+        "ref_code": "const transformer = await ExtensionConfigWrapper.original();\ntransformer[settingsPath] = settings;\n... original[settingsPath] = settings;\nawait ConfigDiagnostics.testConfig(original);\nConfig[settingsPath] = settings;\nawait original.save();\nawait ConfigDiagnostics.runDiagnostics();\nObjectManagers.getInstance().JobManager.runSchedules();",
+        "edges": [
+          "authorise(Admin) before the settings/extension handler"
+        ]
+      },
+      "_output_schema": {
+        "*": "ok"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "gte",
+                      "value": 4
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "settings",
+          "settingsPath"
+        ],
+        "messages": {
+          "auth": "You must be signed in as an admin to change settings.",
+          "realm": "Only an admin (role >= 4) can change settings.",
+          "precondition": "Only an admin (role >= 4) can change settings."
+        }
+      },
+      "description": "Update a top-level settings group, then validate the new configuration and reschedule jobs. Admin-only. Fails if diagnostics reject the new settings."
+    },
+    {
+      "tool": "extension_install",
+      "op": "action",
+      "family": "action.emit",
+      "exec_spec": {
+        "channel": "event",
+        "record": {
+          "table": "DispatchLog"
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "text",
+          "required": true,
+          "description": "Id of the extension to install."
+        }
+      },
+      "_evidence": {
+        "locator": "src/backend/routes/admin/ExtensionRouter.ts:29",
+        "id_local": "Extension.install",
+        "entry": {
+          "kind": "http",
+          "route": "POST /pgapi/extensions/install",
+          "locator": "src/backend/routes/admin/ExtensionRouter.ts:36"
+        },
+        "entity_why": "cannot determine the entity",
+        "ref_code": "public async installExtension(extensionId: string): Promise<void> {\n  if (!Config.Extensions.enabled) throw new Error('Extensions are disabled');\n  ... download file, unzip, init; config.extensions[...] = {...}; ...\n}",
+        "edges": [
+          "authorise(Admin) before the settings/extension handler"
+        ]
+      },
+      "_output_schema": {
+        "result": "{success:true}"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "gte",
+                      "value": 4
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must be signed in as an admin to install extensions.",
+          "realm": "Only an admin (role >= 4) can install extensions.",
+          "precondition": "Only an admin (role >= 4) can install extensions."
+        }
+      },
+      "description": "Download and install an extension by id, registering it in the configuration. Admin-only. Fails if extensions are disabled."
+    },
+    {
+      "tool": "extension_delete",
+      "op": "action",
+      "family": "action.emit",
+      "exec_spec": {
+        "channel": "event",
+        "record": {
+          "table": "DispatchLog"
+        }
+      },
+      "input_schema": {
+        "path": {
+          "type": "text",
+          "required": true,
+          "description": "Config key of the extension to delete."
+        }
+      },
+      "_evidence": {
+        "locator": "src/backend/routes/admin/ExtensionRouter.ts:51",
+        "id_local": "Extension.delete",
+        "entry": {
+          "kind": "http",
+          "route": "POST /pgapi/extensions/delete",
+          "locator": "src/backend/routes/admin/ExtensionRouter.ts:40"
+        },
+        "entity_why": "cannot determine the entity",
+        "ref_code": "public async deleteExtension(configKey: string): Promise<void> {\n  ... remove folder; delete config.extensions[...]; save; ...\n}",
+        "edges": [
+          "authorise(Admin) before the settings/extension handler"
+        ]
+      },
+      "_output_schema": {
+        "result": "{success:true}"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "role",
+                      "op": "gte",
+                      "value": 4
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "path"
+        ],
+        "messages": {
+          "auth": "You must be signed in as an admin to delete extensions.",
+          "realm": "Only an admin (role >= 4) can delete extensions.",
+          "precondition": "Only an admin (role >= 4) can delete extensions."
+        }
+      },
+      "description": "Remove an installed extension by its config key, deleting its folder. Admin-only."
+    }
+  ],
+  "seed_state": {
+    "User": [
+      {
+        "id": 1,
+        "name": "ops@pigallery2.example",
+        "password": "pw-operations",
+        "role": 4,
+        "overrideAllowBlockList": false
+      },
+      {
+        "id": 2,
+        "name": "curator@pigallery2.example",
+        "password": "pw-curator",
+        "role": 3,
+        "overrideAllowBlockList": false
+      },
+      {
+        "id": 3,
+        "name": "colleague@pigallery2.example",
+        "password": "pw-colleague",
+        "role": 3,
+        "overrideAllowBlockList": false
+      },
+      {
+        "id": 4,
+        "name": "viewer@pigallery2.example",
+        "password": "pw-viewer",
+        "role": 1,
+        "overrideAllowBlockList": false
+      }
+    ],
+    "Directory": [
+      {
+        "id": 10,
+        "name": "Holiday",
+        "path": "/holiday",
+        "lastModified": 1757000000000,
+        "lastScanned": 1757000000000,
+        "parent_id": null
+      },
+      {
+        "id": 11,
+        "name": "Beach",
+        "path": "/holiday/beach",
+        "lastModified": 1757002000000,
+        "lastScanned": 1757002000000,
+        "parent_id": 10
+      }
+    ],
+    "Media": [
+      {
+        "id": 100,
+        "name": "sunset.jpg",
+        "type": "photo",
+        "directory_id": 10,
+        "metadataCaption": "Sunset over the pier",
+        "metadataRating": 4,
+        "metadataPersonsLength": 0,
+        "metadataCreationDate": 1757000000000
+      },
+      {
+        "id": 101,
+        "name": "waves.mp4",
+        "type": "video",
+        "directory_id": 11,
+        "metadataCaption": "Waves crashing",
+        "metadataRating": 3,
+        "metadataPersonsLength": 0,
+        "metadataCreationDate": 1757001000000
+      }
+    ],
+    "File": [
+      {
+        "id": 200,
+        "name": "sunset.md",
+        "type": "mdFile",
+        "directory_id": 10,
+        "date": 1757000000000
+      }
+    ],
+    "Person": [
+      {
+        "id": 300,
+        "name": "Alice",
+        "isFavourite": false
+      }
+    ],
+    "PersonJunction": [
+      {
+        "id": 400,
+        "media_id": 100,
+        "person_id": 300
+      }
+    ],
+    "Album": [
+      {
+        "id": 500,
+        "name": "Favourites",
+        "type": "savedSearch",
+        "locked": false,
+        "searchQuery": {
+          "type": "rating",
+          "text": "4"
+        }
+      }
+    ]
+  },
+  "summary": "PiGallery2 is a self-hosted photo gallery (TypeScript/Express + TypeORM over better-sqlite3): indexes photo/video folders into a media database, serves/searchs them via a REST API, supports user accounts, share links, saved-search albums, face/person tags, background jobs, uploads and extension/config management.",
+  "_auth_candidates": [
+    {
+      "entity": "User",
+      "username_col": "name",
+      "password_col": "password"
+    }
+  ],
+  "_fk_gravity": {
+    "entity": "Directory",
+    "fk_count": 4
+  },
+  "_read_denied": "forbidden",
+  "_no_edges": [
+    {
+      "id_local": "User.logout",
+      "why": "clears session only; no auth wall (public), calls nothing, persists nothing (AuthenticationMWs.ts:277)"
+    },
+    {
+      "id_local": "Gallery.zipDirectory",
+      "why": "read/download only; guarded merely by route-level authorise(LimitedGuest); no pre-checks, calls SearchManager.search internally (GalleryMWs.ts:168)"
+    },
+    {
+      "id_local": "Gallery.getRandomImage",
+      "why": "read/download; guarded by route authorise(LimitedGuest); no pre-checks other than search validity (GalleryMWs.ts:449)"
+    }
+  ],
+  "auth": {
+    "account_entity": "User",
+    "username_col": "name",
+    "password_col": "password"
+  }
+}

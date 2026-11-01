@@ -1,0 +1,67 @@
+{
+  "app": "relate",
+  "role": "source-bound record operations",
+  "domains": [
+    "operations"
+  ],
+  "kinds": {
+    "update_record": [
+      "participation_edit"
+    ]
+  },
+  "check_kinds": [
+    "record_exists",
+    "record_field_equals",
+    "record_field_unchanged"
+  ],
+  "carriers": {
+    "notes_field": {
+      "entity": "Participation",
+      "field": "notes"
+    }
+  },
+  "login": {
+    "tool": "user_sign_in_by_user_pw",
+    "user_field": "username",
+    "persona_entity": "User"
+  },
+  "content_entities": [
+    "Participation"
+  ],
+  "seed_helpers": [
+    "records"
+  ],
+  "tool_families_to_keep": [
+    ""
+  ],
+  "obs_reads": [
+    "participation_query"
+  ],
+  "known_patches": [
+    "Neutral namespace; original tool names/count/order retained",
+    "Integer input identities and consistent existing seed identity references",
+    "Existing source persona credentials only; all source guards retained",
+    "Declared participation_id and original target precondition identify Participation.id; correct the upsert key from undeclared participation_id column to actual id.",
+    "Source course/enrollment.py:627 explicitly Participation.objects.filter(course); original target/member guards already resolve Course.identifier=course_identifier to Course.id. Replace wrong user-account scope with that exact source Course binding."
+  ],
+  "missing_tools": [],
+  "limitations": [
+    "Only Participation.notes updates and native note readback certified. No quiz content, grading, flow evaluation, examination tickets, code execution or email/network effects executed.",
+    "Original actor course memberships/instructor-student role strings are retained. Four additional ordinary student fixture users/participations follow the existing student shape and unique user/course keys; no new privileged role or source guard is introduced.",
+    "Original update guard requires an active participation, not instructor role. Query scope fixes the compiler account-id mismatch using exact source ORM filter(course) and the same original Course.identifier guard lookup. No extra role check or full query-language semantics is claimed.",
+    "Repair only source-proven upsert target alias and copy the already declared fields mapping into supported set_on_exists so undeclared routing arguments are not written into rows."
+  ],
+  "smoke": {
+    "passed": true,
+    "date": "2026-10-24",
+    "report": "ok"
+  },
+  "register_file": "pack/newspecs3/relate/register.py",
+  "base_spec": "pack/base_specs/relate.spec.json",
+  "onboarding_qualification": {
+    "passed": true,
+    "status": "PASS",
+    "original_checker_returncode": 0,
+    "deterministic_checks_passed": true
+  }
+}

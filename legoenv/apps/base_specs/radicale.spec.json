@@ -1,0 +1,2079 @@
+{
+  "env_id": "radicale",
+  "_prep_version": 3,
+  "entities": [
+    {
+      "name": "Collection",
+      "columns": [
+        {
+          "name": "path",
+          "type": "text",
+          "pk": true,
+          "immutable": true
+        },
+        {
+          "name": "owner",
+          "type": "text",
+          "nullable": false,
+          "immutable": true
+        },
+        {
+          "name": "tag",
+          "type": "text",
+          "enum": [
+            "VCALENDAR",
+            "VADDRESSBOOK",
+            "VSUBSCRIBED"
+          ]
+        },
+        {
+          "name": "displayname",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "calendar_description",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "calendar_color",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "calendar_order",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "addressbook_description",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "addressbook_color",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "source",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "supported_calendar_component_set",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "meta_extra",
+          "type": "json",
+          "nullable": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "path"
+          ]
+        },
+        {
+          "kind": "check",
+          "left": {
+            "col": "path"
+          },
+          "op": "ne",
+          "right": {
+            "lit": ""
+          }
+        }
+      ]
+    },
+    {
+      "name": "CalendarItem",
+      "columns": [
+        {
+          "name": "href",
+          "type": "text",
+          "pk": true
+        },
+        {
+          "name": "collection_path",
+          "type": "text",
+          "nullable": false,
+          "fk_to": "Collection.path",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "serialized",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "uid",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "component_name",
+          "type": "text",
+          "enum": [
+            "VEVENT",
+            "VTODO",
+            "VJOURNAL",
+            "VCARD",
+            "VLIST"
+          ]
+        },
+        {
+          "name": "last_modified",
+          "type": "datetime"
+        },
+        {
+          "name": "etag",
+          "type": "text"
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "collection_path",
+            "uid"
+          ]
+        },
+        {
+          "kind": "unique",
+          "cols": [
+            "collection_path",
+            "href"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Share",
+      "columns": [
+        {
+          "name": "ShareType",
+          "type": "text",
+          "nullable": false,
+          "immutable": true,
+          "enum": [
+            "token",
+            "map"
+          ]
+        },
+        {
+          "name": "PathOrToken",
+          "type": "text",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "PathMapped",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "Conversion",
+          "type": "text",
+          "enum": [
+            "none",
+            "bday"
+          ],
+          "default": "none"
+        },
+        {
+          "name": "Owner",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "User",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "Permissions",
+          "type": "text",
+          "nullable": false,
+          "default": "r"
+        },
+        {
+          "name": "EnabledByOwner",
+          "type": "bool",
+          "nullable": false,
+          "default": false
+        },
+        {
+          "name": "EnabledByUser",
+          "type": "bool",
+          "nullable": false,
+          "default": false
+        },
+        {
+          "name": "HiddenByOwner",
+          "type": "bool",
+          "nullable": false,
+          "default": true
+        },
+        {
+          "name": "HiddenByUser",
+          "type": "bool",
+          "nullable": false,
+          "default": true
+        },
+        {
+          "name": "TimestampCreated",
+          "type": "int",
+          "nullable": false,
+          "immutable": true
+        },
+        {
+          "name": "TimestampUpdated",
+          "type": "int",
+          "nullable": false,
+          "audit": true
+        },
+        {
+          "name": "Properties",
+          "type": "json",
+          "nullable": true
+        },
+        {
+          "name": "Actions",
+          "type": "json",
+          "nullable": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "ShareType",
+            "PathOrToken"
+          ]
+        },
+        {
+          "kind": "unique",
+          "cols": [
+            "ShareType",
+            "PathOrToken",
+            "PathMapped",
+            "User"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "SyncToken",
+      "columns": [
+        {
+          "name": "token_name",
+          "type": "text",
+          "pk": true
+        },
+        {
+          "name": "state",
+          "type": "json",
+          "nullable": false
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "audit": true
+        }
+      ]
+    },
+    {
+      "name": "HtpasswdAccount",
+      "columns": [
+        {
+          "name": "login",
+          "type": "text",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "digest",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "id",
+          "type": "id",
+          "nullable": false
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "login"
+          ]
+        }
+      ]
+    }
+  ],
+  "tools": [
+    {
+      "tool": "sign_in",
+      "description": "Sign in with a Radicale account login and password. Every calendar, addressbook and sharing operation requires an authenticated session first; the account you sign in as is what $actor resolves to and is recorded as the owner of the collections and shares you create.",
+      "op": "auth",
+      "family": "guard.auth",
+      "entity": "HtpasswdAccount",
+      "input_schema": {
+        "login": {
+          "type": "text",
+          "required": true,
+          "description": "The Radicale username (the htpasswd account name)."
+        },
+        "password": {
+          "type": "text",
+          "required": true,
+          "description": "The account password."
+        }
+      },
+      "exec_spec": {
+        "verify": {
+          "entity": "HtpasswdAccount"
+        }
+      },
+      "guards": {
+        "requires_auth": false,
+        "messages": {
+          "precondition": "Incorrect login or password."
+        }
+      }
+    },
+    {
+      "tool": "collection_create_calendar",
+      "op": "create",
+      "family": "crud.insert",
+      "entity": "Collection",
+      "description": "Create a new calendar collection (CalDAV MKCALENDAR) under an existing parent collection. The new collection is tagged VCALENDAR and owned by the signed-in user. Fails if the parent does not exist or a collection already occupies that path.",
+      "exec_spec": {
+        "entity": "Collection",
+        "fields": {
+          "tag": "VCALENDAR",
+          "displayname": {
+            "$arg": "displayname"
+          }
+        },
+        "set_on_create": {
+          "path": {
+            "$arg": "path"
+          },
+          "owner": {
+            "$session": "account_name"
+          }
+        },
+        "unique_on": [
+          "path"
+        ]
+      },
+      "input_schema": {
+        "path": {
+          "type": "text",
+          "required": true,
+          "description": "Full path of the new calendar, e.g. /ada/calendar/."
+        },
+        "parent_path": {
+          "type": "text",
+          "required": true,
+          "description": "Path of the parent collection the calendar is created under; it must already exist."
+        },
+        "displayname": {
+          "type": "text",
+          "required": false,
+          "description": "The calendar display name, used as its title."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "path",
+          "parent_path"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Collection",
+                "where": {
+                  "node": "field",
+                  "col": "path",
+                  "op": "eq",
+                  "value": {
+                    "arg": "path"
+                  }
+                }
+              },
+              "op": "eq",
+              "n": 0
+            },
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Collection",
+                "where": {
+                  "node": "field",
+                  "col": "path",
+                  "op": "eq",
+                  "value": {
+                    "arg": "parent_path"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must sign in before creating a calendar.",
+          "precondition": "The parent collection must exist, and no collection may already occupy the target path.",
+          "not_found": "The parent collection does not exist; create it first.",
+          "unique": "A collection already exists at that path."
+        }
+      },
+      "_evidence": {
+        "locator": "radicale/app/mkcalendar.py:34",
+        "id_local": "Collection.create_calendar",
+        "entry": {
+          "kind": "http",
+          "route": "MKCALENDAR /{path}",
+          "locator": "radicale/app/mkcalendar.py:34"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "def do_MKCALENDAR(self, environ, base_prefix, path, user, request_info):\n    if \"w\" not in self._rights.authorization(user, path):\n        return httputils.NOT_ALLOWED\n    props_with_remove = xmlutils.props_from_request(xml_content)\n    props_with_remove[\"tag\"] = \"VCALENDAR\"\n    props = radicale_item.check_and_sanitize_props(props_with_remove)\n    with self._storage.acquire_lock(\"w\", user, path=path):\n        item = next(iter(self._storage.discover(path)), None)\n        if item: return self._webdav_error_response(client.CONFLICT, \"D:resource-must-be-null\")\n        parent_item = next(iter(self.",
+        "edges": [
+          "radicale/app/mkcalendar.py:37 access.check('w'); :67 discover existing; parent folder",
+          "radicale/app/mkcalendar.py:37 (note: requires 'w' on target path at collection level)"
+        ]
+      }
+    },
+    {
+      "tool": "collection_create",
+      "op": "create",
+      "family": "crud.insert",
+      "entity": "Collection",
+      "description": "Create a plain collection folder (CalDAV MKCOL) at the given path. If a tag (VCALENDAR or VADDRESSBOOK) is supplied the new collection is a leaf of that type, otherwise it is an intermediate folder. Fails if a collection already exists at the path.",
+      "exec_spec": {
+        "entity": "Collection",
+        "fields": {
+          "tag": {
+            "$arg": "tag"
+          }
+        },
+        "set_on_create": {
+          "path": {
+            "$arg": "path"
+          },
+          "owner": {
+            "$session": "account_name"
+          }
+        },
+        "unique_on": [
+          "path"
+        ]
+      },
+      "input_schema": {
+        "path": {
+          "type": "text",
+          "required": true,
+          "description": "Full path of the new collection, e.g. /ada/."
+        },
+        "tag": {
+          "type": "text",
+          "required": false,
+          "description": "Collection type: VCALENDAR or VADDRESSBOOK; omit to create a plain intermediate folder."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "path"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Collection",
+                "where": {
+                  "node": "field",
+                  "col": "path",
+                  "op": "eq",
+                  "value": {
+                    "arg": "path"
+                  }
+                }
+              },
+              "op": "eq",
+              "n": 0
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must sign in before creating a collection.",
+          "precondition": "A collection already exists at that path.",
+          "unique": "A collection already exists at that path."
+        }
+      },
+      "_evidence": {
+        "locator": "radicale/app/mkcol.py:34",
+        "id_local": "Collection.create",
+        "entry": {
+          "kind": "http",
+          "route": "MKCOL /{path}",
+          "locator": "radicale/app/mkcol.py:34"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "def do_MKCOL(self, environ, base_prefix, path, user, request_info):\n    permissions = self._rights.authorization(user, path)\n    if not rights.intersect(permissions, \"Ww\"): return httputils.NOT_ALLOWED\n    props_with_remove = xmlutils.props_from_request(xml_content)\n    props = radicale_item.check_and_sanitize_props(props_with_remove)\n    if props.get(\"tag\") and \"w\" not in permissions: return httputils.NOT_ALLOWED\n    if not props.get(\"tag\") and \"W\" not in permissions: return httputils.NOT_ALLOWED\n    with self._storage.acquire_lock(\"w\", user, path=path, request=\"MKCOL\"):\n        item = next(i",
+        "edges": [
+          "radicale/app/mkcol.py:72 discover existing; parent must exist (config conflict)",
+          "radicale/app/mkcol.py:38-63 (note: requires W/w via rights.authorization per-collection)"
+        ]
+      }
+    },
+    {
+      "tool": "collection_set_meta",
+      "op": "update",
+      "family": "update.field_set",
+      "entity": "Collection",
+      "description": "Update a collection's display metadata (display name, calendar description/color/order, or arbitrary extra meta) in place. Fails if the collection does not exist or you do not have permission to edit it.",
+      "exec_spec": {
+        "entity": "Collection",
+        "row_key": {
+          "path": {
+            "$arg": "path"
+          }
+        },
+        "fields": [
+          "displayname",
+          "calendar_description",
+          "calendar_color",
+          "calendar_order",
+          "addressbook_description",
+          "addressbook_color",
+          "source",
+          "supported_calendar_component_set",
+          "meta_extra"
+        ]
+      },
+      "input_schema": {
+        "path": {
+          "type": "text",
+          "required": true,
+          "description": "Path of the collection whose metadata to update."
+        },
+        "displayname": {
+          "type": "text",
+          "required": false,
+          "description": "New display name (title) of the collection."
+        },
+        "calendar_description": {
+          "type": "text",
+          "required": false,
+          "description": "New calendar description text."
+        },
+        "calendar_color": {
+          "type": "text",
+          "required": false,
+          "description": "New calendar color value."
+        },
+        "calendar_order": {
+          "type": "text",
+          "required": false,
+          "description": "New calendar order value."
+        },
+        "addressbook_description": {
+          "type": "text",
+          "required": false,
+          "description": "New addressbook description text."
+        },
+        "addressbook_color": {
+          "type": "text",
+          "required": false,
+          "description": "New addressbook color value."
+        },
+        "source": {
+          "type": "text",
+          "required": false,
+          "description": "New source URL for a subscribed collection."
+        },
+        "supported_calendar_component_set": {
+          "type": "text",
+          "required": false,
+          "description": "Comma-separated supported components (VTODO/VEVENT/VJOURNAL)."
+        },
+        "meta_extra": {
+          "type": "json",
+          "required": false,
+          "description": "Arbitrary extra metadata keys to persist."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "path"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Collection",
+                "where": {
+                  "node": "field",
+                  "col": "path",
+                  "op": "eq",
+                  "value": {
+                    "arg": "path"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must sign in before editing collection metadata.",
+          "precondition": "The collection does not exist, or you do not have permission to edit it.",
+          "not_found": "That collection was not found."
+        }
+      },
+      "_evidence": {
+        "locator": "radicale/app/proppatch.py:210",
+        "id_local": "Collection.set_meta",
+        "entry": {
+          "kind": "http",
+          "route": "PROPPATCH /{path}",
+          "locator": "radicale/app/proppatch.py:101"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "def do_PROPPATCH(self, environ, base_prefix, path, user, request_info):\n    access = Access(self._rights, user, path, permissions_filter)\n    if not access.check(\"w\"): return httputils.NOT_ALLOWED\n    with self._storage.acquire_lock(\"w\", user, path=path, request=\"PROPPATCH\"):\n        item = next(iter(self._storage.discover(path)), None)\n        if not item: return httputils.NOT_FOUND\n        if not access.check(\"w\", item): return httputils.NOT_ALLOWED\n        if not isinstance(item, storage.BaseCollection): return httputils.FORBIDDEN\n        xml_answer = xml_proppatch(base_prefix, path, xml_co",
+        "edges": [
+          "radicale/app/proppatch.py:211 discover(path)",
+          "radicale/app/proppatch.py:119-144 (note: requires 'w'; share overlay gated by P/p permission)"
+        ]
+      }
+    },
+    {
+      "tool": "collection_delete",
+      "op": "delete",
+      "family": "crud.delete",
+      "entity": "Collection",
+      "description": "Delete a collection and everything on it: all its calendar/addressbook items and any shares mapping it. Fails if the collection does not exist or you do not have permission to delete it.",
+      "exec_spec": {
+        "entity": "Collection",
+        "lookup_by": {
+          "path": {
+            "$arg": "path"
+          }
+        }
+      },
+      "input_schema": {
+        "path": {
+          "type": "text",
+          "required": true,
+          "description": "Path of the collection to delete."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "path"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Collection",
+                "where": {
+                  "node": "field",
+                  "col": "path",
+                  "op": "eq",
+                  "value": {
+                    "arg": "path"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must sign in before deleting a collection.",
+          "precondition": "The collection does not exist.",
+          "not_found": "That collection was not found."
+        }
+      },
+      "_evidence": {
+        "locator": "radicale/app/delete.py:89",
+        "id_local": "Collection.delete",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /{path}",
+          "locator": "radicale/app/delete.py:68"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "def do_DELETE(self, environ, base_prefix, path, user, request_info):\n    access = Access(self._rights, user, path, permissions_filter)\n    if not access.check(\"w\"): return httputils.NOT_ALLOWED\n    with self._storage.acquire_lock(\"w\", user, path=path, request=\"DELETE\"):\n        item = next(iter(self._storage.discover(path)), None)\n        if not item: return httputils.NOT_FOUND\n        if not access.check(\"w\", item): return httputils.NOT_ALLOWED\n        if isinstance(item, storage.BaseCollection):\n            if not access.check(\"D\", item): return httputils.NOT_ALLOWED  # or 'd' if permit_dele",
+        "edges": [
+          "radicale/app/delete.py:90 discover(path)",
+          "radicale/app/delete.py:93,101-108 (note: requires 'w' then 'D' (or 'd' if permit_delete_collection))"
+        ]
+      }
+    },
+    {
+      "tool": "calendaritem_upload",
+      "op": "update",
+      "family": "crud.upsert",
+      "entity": "CalendarItem",
+      "description": "Create or replace a single calendar/addressbook item in a collection. Inserting or overwriting is refused when it would create a duplicate UID in that collection. Fails if the parent collection does not exist.",
+      "exec_spec": {
+        "entity": "CalendarItem",
+        "key": {
+          "collection_path": {
+            "$arg": "collection_path"
+          },
+          "href": {
+            "$arg": "href"
+          }
+        },
+        "insert_fields": {
+          "serialized": {
+            "$arg": "serialized"
+          },
+          "collection_path": {
+            "$arg": "collection_path"
+          }
+        },
+        "set_on_exists": {
+          "serialized": {
+            "$arg": "serialized"
+          }
+        }
+      },
+      "input_schema": {
+        "collection_path": {
+          "type": "text",
+          "required": true,
+          "description": "Path of the parent collection the item is uploaded into."
+        },
+        "href": {
+          "type": "text",
+          "required": true,
+          "description": "The item's file name (href) inside the collection, e.g. event.ics or contact.vcf."
+        },
+        "serialized": {
+          "type": "text",
+          "required": true,
+          "description": "The raw iCalendar (VCALENDAR) or vCard (VCARD) text of the item."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "collection_path",
+          "href"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Collection",
+                "where": {
+                  "node": "field",
+                  "col": "path",
+                  "op": "eq",
+                  "value": {
+                    "arg": "collection_path"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must sign in before uploading a calendar or addressbook item.",
+          "precondition": "The parent collection must exist.",
+          "not_found": "The parent collection does not exist.",
+          "fk": "The parent collection does not exist.",
+          "unique": "A calendar item with that UID already exists in this collection."
+        }
+      },
+      "_evidence": {
+        "locator": "radicale/app/put.py:351",
+        "id_local": "CalendarItem.upload",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /{path}",
+          "locator": "radicale/app/put.py:351"
+        },
+        "entity_why": "primary effect row_upsert lands on this table",
+        "ref_code": "else:\n    prepared_item, = prepared_items\n    if (item and item.uid != prepared_item.uid or\n            not item and parent_item.has_uid(prepared_item.uid)):\n        return self._webdav_error_response(client.CONFLICT, \"%s:no-uid-conflict\" % ...)\n    href = posixpath.basename(pathutils.strip_path(path))\n    uploaded_item, replaced_item = parent_item.upload(href, prepared_item)\n    etag = uploaded_item.etag\n    return client.NO_CONTENT/... with {\"ETag\": etag}",
+        "edges": [
+          "radicale/app/put.py:239-242 parent collection must exist (else CONFLICT)",
+          "radicale/app/put.py:202,266 (note: requires 'w' content write on the parent collection)"
+        ]
+      }
+    },
+    {
+      "tool": "calendaritem_get",
+      "op": "read",
+      "family": "crud.fetch",
+      "entity": "CalendarItem",
+      "description": "Fetch a single calendar or addressbook item's raw serialized text by its collection path and href. Fails (not_found) if no such item exists.",
+      "exec_spec": {
+        "entity": "CalendarItem",
+        "lookup_by": {
+          "collection_path": {
+            "$arg": "collection_path"
+          },
+          "href": {
+            "$arg": "href"
+          }
+        }
+      },
+      "input_schema": {
+        "collection_path": {
+          "type": "text",
+          "required": true,
+          "description": "Path of the collection the item lives in."
+        },
+        "href": {
+          "type": "text",
+          "required": true,
+          "description": "The item's file name (href) within the collection, e.g. event.ics."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "collection_path",
+          "href"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Collection",
+                "where": {
+                  "node": "field",
+                  "col": "path",
+                  "op": "eq",
+                  "value": {
+                    "arg": "collection_path"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must sign in to read a calendar item.",
+          "precondition": "The collection does not exist.",
+          "not_found": "That calendar item was not found."
+        }
+      },
+      "_evidence": {
+        "locator": "radicale/app/get.py:70",
+        "id_local": "CalendarItem.get",
+        "entry": {
+          "kind": "http",
+          "route": "GET /{path}",
+          "locator": "radicale/app/get.py:70"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "def do_GET(self, environ, base_prefix, path, user, request_info):\n    access = Access(self._rights, user, path, permissions_filter)\n    if not access.check(\"r\") and \"i\" not in access.permissions: return httputils.NOT_ALLOWED\n    with self._storage.acquire_lock(\"r\", user):\n        item = next(iter(self._storage.discover(path)), None)\n        if not item: return httputils.NOT_FOUND\n        if access.check(\"r\", item): limited_access = False\n        ...\n        answer = item.serialize()\n    return client.OK, headers, answer, None",
+        "edges": [
+          "radicale/app/get.py:105 discover(path)",
+          "radicale/app/get.py:101-113 (note: requires 'r' or 'i' limited access)"
+        ]
+      }
+    },
+    {
+      "tool": "calendaritem_search",
+      "op": "search",
+      "family": "search",
+      "entity": "CalendarItem",
+      "description": "List the calendar or addressbook items in a collection (CalDAV REPORT, e.g. a time-range or component filter). Returns the matching items of that collection.",
+      "exec_spec": {
+        "entity": "CalendarItem",
+        "filter": {
+          "op": "and",
+          "clauses": [
+            {
+              "col": "collection_path",
+              "mode": "exact",
+              "val": {
+                "$arg": "path"
+              }
+            },
+            {
+              "col": "component_name",
+              "mode": "exact",
+              "val": {
+                "$arg": "component"
+              },
+              "optional": true
+            }
+          ]
+        }
+      },
+      "input_schema": {
+        "path": {
+          "type": "text",
+          "required": true,
+          "description": "Path of the collection whose items to list."
+        },
+        "component": {
+          "type": "text",
+          "required": false,
+          "description": "If given, only items of this component type (VEVENT, VTODO, VJOURNAL, VCARD)."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "path"
+        ],
+        "messages": {
+          "auth": "You must sign in to query the calendar.",
+          "precondition": "The collection does not exist.",
+          "not_found": "The collection does not exist."
+        }
+      },
+      "_evidence": {
+        "locator": "radicale/app/report.py:860",
+        "id_local": "CalendarItem.search",
+        "entry": {
+          "kind": "http",
+          "route": "REPORT /{path}",
+          "locator": "radicale/app/report.py:860"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "def do_REPORT(self, environ, base_prefix, path, user, request_info):\n    access = Access(self._rights, user, path, permissions_filter)\n    if not access.check(\"r\"): return httputils.NOT_ALLOWED\n    with contextlib.ExitStack() as lock_stack:\n        lock_stack.enter_context(self._storage.acquire_lock(\"r\", user))\n        item = next(iter(self._storage.discover(path)), None)\n        if not item: return httputils.NOT_FOUND\n        if not access.check(\"r\", item): return httputils.NOT_ALLOWED\n        ... xml_report(...) / free_busy_report(...)\n        return status, headers, self._xml_response(xml_a",
+        "edges": [
+          "radicale/app/report.py:890 discover(path)",
+          "radicale/app/report.py:876-893 (note: requires 'r')"
+        ]
+      }
+    },
+    {
+      "tool": "calendaritem_propfind",
+      "op": "search",
+      "family": "search",
+      "entity": "CalendarItem",
+      "description": "List the resources (calendar items and sub-collections) beneath a collection path and their WebDAV properties, at the requested depth (CalDAV PROPFIND).",
+      "exec_spec": {
+        "entity": "CalendarItem",
+        "filter": {
+          "op": "and",
+          "clauses": [
+            {
+              "col": "collection_path",
+              "mode": "exact",
+              "val": {
+                "$arg": "path"
+              }
+            }
+          ]
+        }
+      },
+      "input_schema": {
+        "path": {
+          "type": "text",
+          "required": true,
+          "description": "Path of the collection whose children to enumerate."
+        },
+        "depth": {
+          "type": "text",
+          "required": false,
+          "description": "WebDAV depth: '0', '1' (default) or 'infinity'."
+        },
+        "prop": {
+          "type": "json",
+          "required": false,
+          "description": "Optional list of requested property names."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "path"
+        ],
+        "messages": {
+          "auth": "You must sign in to enumerate collections.",
+          "precondition": "The collection does not exist.",
+          "not_found": "The collection does not exist."
+        }
+      },
+      "_evidence": {
+        "locator": "radicale/app/propfind.py:582",
+        "id_local": "CalendarItem.propfind",
+        "entry": {
+          "kind": "http",
+          "route": "PROPFIND /{path}",
+          "locator": "radicale/app/propfind.py:582"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "def do_PROPFIND(self, environ, base_prefix, path, user, request_info):\n    access = Access(self._rights, user, path, permissions_filter)\n    if not access.check(\"r\"): return httputils.NOT_ALLOWED\n    with self._storage.acquire_lock(\"r\", user):\n        items_iter = iter(self._storage.discover(path, http_depth, None, self._rights._user_groups))\n        item = next(items_iter, None)\n        if not item: return httputils.NOT_FOUND\n        if not access.check(\"r\", item): return httputils.NOT_ALLOWED\n        item_list = list(self._collect_allowed_items(items_iter, user))\n    return client.MULTI_STAT",
+        "edges": [
+          "radicale/app/propfind.py:614-624 discover(path)",
+          "radicale/app/propfind.py:602-624 (note: requires 'r'; _collect_allowed_items per item)"
+        ]
+      }
+    },
+    {
+      "tool": "calendaritem_delete",
+      "op": "delete",
+      "family": "crud.delete",
+      "entity": "CalendarItem",
+      "description": "Delete a single calendar or addressbook item from a collection. Fails (not_found) if the item does not exist.",
+      "exec_spec": {
+        "entity": "CalendarItem",
+        "lookup_by": {
+          "collection_path": {
+            "$arg": "collection_path"
+          },
+          "href": {
+            "$arg": "href"
+          }
+        }
+      },
+      "input_schema": {
+        "collection_path": {
+          "type": "text",
+          "required": true,
+          "description": "Path of the collection the item lives in."
+        },
+        "href": {
+          "type": "text",
+          "required": true,
+          "description": "The item's file name (href) within the collection, e.g. event.ics."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "collection_path",
+          "href"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Collection",
+                "where": {
+                  "node": "field",
+                  "col": "path",
+                  "op": "eq",
+                  "value": {
+                    "arg": "collection_path"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must sign in before deleting a calendar item.",
+          "precondition": "The collection does not exist.",
+          "not_found": "That calendar item was not found."
+        }
+      },
+      "_evidence": {
+        "locator": "radicale/app/delete.py:124",
+        "id_local": "CalendarItem.delete",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /{path}",
+          "locator": "radicale/app/delete.py:124"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "else:\n    assert item.collection is not None and item.href is not None\n    xml_answer = xml_delete(base_prefix, path, item.collection, item.href, share)\n    return client.OK, headers, self._xml_response(xml_answer, request_info), None\n# collection.delete(href) -> os.remove(path); _update_history_etag(href, None)",
+        "edges": [
+          "radicale/app/delete.py:90-94 item must exist (404 else); access.check('w', item)",
+          "radicale/app/delete.py:87-94 (note: requires 'w' on the parent item)"
+        ]
+      }
+    },
+    {
+      "tool": "calendaritem_move",
+      "op": "action",
+      "family": "update.field_set",
+      "entity": "CalendarItem",
+      "description": "Move a calendar or addressbook item from one collection to another (CalDAV MOVE). Fails if the item or the destination collection does not exist, or their types do not match.",
+      "exec_spec": {
+        "entity": "CalendarItem",
+        "row_key": {
+          "collection_path": {
+            "$arg": "from_collection"
+          },
+          "href": {
+            "$arg": "href"
+          }
+        },
+        "set": {
+          "collection_path": {
+            "$arg": "to_collection"
+          }
+        }
+      },
+      "input_schema": {
+        "href": {
+          "type": "text",
+          "required": true,
+          "description": "The item's file name (href) within the source collection."
+        },
+        "from_collection": {
+          "type": "text",
+          "required": true,
+          "description": "Path of the collection the item is currently in."
+        },
+        "to_collection": {
+          "type": "text",
+          "required": true,
+          "description": "Path of the destination collection."
+        },
+        "overwrite": {
+          "type": "bool",
+          "required": false,
+          "description": "Whether an existing item at the destination may be overwritten."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "href",
+          "from_collection",
+          "to_collection"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Collection",
+                "where": {
+                  "node": "field",
+                  "col": "path",
+                  "op": "eq",
+                  "value": {
+                    "arg": "to_collection"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            },
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Collection",
+                "where": {
+                  "node": "field",
+                  "col": "path",
+                  "op": "eq",
+                  "value": {
+                    "arg": "from_collection"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must sign in before moving a calendar item.",
+          "precondition": "Both the source and destination collections must exist.",
+          "not_found": "The calendar item or a referenced collection was not found."
+        }
+      },
+      "_evidence": {
+        "locator": "radicale/app/move.py:51",
+        "id_local": "CalendarItem.move",
+        "entry": {
+          "kind": "http",
+          "route": "MOVE /{path}",
+          "locator": "radicale/app/move.py:51"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "def do_MOVE(self, environ, base_prefix, path, user, request_info):\n    to_path = pathutils.sanitize_path(to_url.path)\n    to_access = Access(self._rights, to_user, to_path, to_permissions_filter)\n    if not to_access.check(\"w\"): return httputils.NOT_ALLOWED\n    with self._storage.acquire_lock(\"w\", user, path=path, request=\"MOVE\", to_path=to_path):\n        item = next(iter(self._storage.discover(path)), None)\n        if not item: return httputils.NOT_FOUND\n        if isinstance(item, storage.BaseCollection): return httputils.METHOD_NOT_ALLOWED\n        if to_item and environ.get(\"HTTP_OVERWRITE\"",
+        "edges": [
+          "radicale/app/move.py:127-136 destination parent must exist and collection tags must match",
+          "radicale/app/move.py:86,110-119 (note: requires 'w' on both source and destination access)"
+        ]
+      }
+    },
+    {
+      "tool": "calendaritem_sync",
+      "op": "search",
+      "family": "action.trigger",
+      "entity": "SyncToken",
+      "description": "Run a CalDAV sync-collection REPORT on a collection: record a fresh sync token that captures the collection's current state, so a client can later ask what changed after it. Fails if the collection does not exist.",
+      "exec_spec": {
+        "target": {
+          "entity": "Collection",
+          "lookup_by": {
+            "path": {
+              "$arg": "collection_path"
+            }
+          }
+        },
+        "spawn": [
+          {
+            "entity": "SyncToken",
+            "n": 1,
+            "fields": {
+              "token_name": {
+                "$arg": "token_name"
+              },
+              "state": {
+                "$const": {}
+              }
+            }
+          }
+        ]
+      },
+      "input_schema": {
+        "collection_path": {
+          "type": "text",
+          "required": true,
+          "description": "Path of the collection to sync."
+        },
+        "token_name": {
+          "type": "text",
+          "required": true,
+          "description": "A name to record this sync-token under (e.g. a version string)."
+        },
+        "old_token": {
+          "type": "text",
+          "required": false,
+          "description": "The previous sync-token the client holds; omit for a first sync."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "collection_path",
+          "token_name"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Collection",
+                "where": {
+                  "node": "field",
+                  "col": "path",
+                  "op": "eq",
+                  "value": {
+                    "arg": "collection_path"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must sign in to sync a collection.",
+          "precondition": "The collection does not exist.",
+          "not_found": "The collection does not exist.",
+          "unique": "A sync-token with that name already exists."
+        }
+      },
+      "_evidence": {
+        "locator": "radicale/storage/multifilesystem/sync.py:35",
+        "id_local": "CalendarItem.sync",
+        "entry": {
+          "kind": "http",
+          "route": "REPORT {path} sync-collection",
+          "locator": "radicale/app/report.py:208"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "def sync(self, old_token=\"\"):\n    old_token_name = ...\n    state = {}\n    for href, item in itertools.chain(((i.href, i) for i in self.get_all()),\n                                      ((h, None) for h in self._get_deleted_history_hrefs())):\n        history_etag = self._update_history_etag(href, item)\n        state[href] = history_etag\n    token = \"http://radicale.org/ns/sync/%s\" % token_name\n    if token_name == old_token_name: return token, ()\n    ... write token file via pickled state ...\n    changes = [href for href, h in state.items() if h != old_state.get(href)]\n    return token, changes",
+        "edges": [
+          "radicale/app/report.py:208,890-899 sync-collection branch",
+          "radicale/app/report.py:876-893 (note: requires 'r')"
+        ]
+      }
+    },
+    {
+      "tool": "share_list",
+      "op": "search",
+      "family": "search",
+      "entity": "Share",
+      "description": "List the shares you have created (owner-scoped). Optionally narrow to a type or a specific mapped collection or token.",
+      "exec_spec": {
+        "entity": "Share",
+        "scope": {
+          "where": {
+            "Owner": {
+              "$session": "account_name"
+            }
+          }
+        },
+        "filter": {
+          "op": "and",
+          "clauses": [
+            {
+              "col": "ShareType",
+              "mode": "exact",
+              "val": {
+                "$arg": "ShareType"
+              },
+              "optional": true
+            },
+            {
+              "col": "PathMapped",
+              "mode": "exact",
+              "val": {
+                "$arg": "PathMapped"
+              },
+              "optional": true
+            },
+            {
+              "col": "PathOrToken",
+              "mode": "exact",
+              "val": {
+                "$arg": "PathOrToken"
+              },
+              "optional": true
+            }
+          ]
+        }
+      },
+      "input_schema": {
+        "ShareType": {
+          "type": "text",
+          "required": false,
+          "description": "Which shares to list: 'token', 'map', or 'all' (omit for all)."
+        },
+        "PathMapped": {
+          "type": "text",
+          "required": false,
+          "description": "If given, only shares mapping this collection path."
+        },
+        "PathOrToken": {
+          "type": "text",
+          "required": false,
+          "description": "If given, only the share with this path-or-token."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [],
+        "messages": {
+          "auth": "You must sign in to list shares."
+        }
+      },
+      "_evidence": {
+        "locator": "radicale/sharing/__init__.py:1042",
+        "id_local": "Share.list",
+        "entry": {
+          "kind": "http",
+          "route": "POST /.sharing/v1/{token,map,all}/list",
+          "locator": "radicale/sharing/__init__.py:699"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "if action == \"list\":\n    if ShareType != \"all\":\n        result_array = self.database_list_sharing(\n            ShareType=ShareType, OwnerOrUser=user_lookup,\n            PathMapped=PathMapped, PathOrToken=PathOrToken, Conversion=Conversion)\n    else:\n        result_array = self.database_list_sharing(OwnerOrUser=user_lookup, ...)\n    answer['Lines'] = len(result_array)\n    answer['Status'] = \"success\" if result_array else \"not-found\"\n    answer['Content'] = result_array",
+        "edges": [
+          "radicale/sharing/__init__.py:754 anonymous users rejected (user=='')"
+        ]
+      }
+    },
+    {
+      "tool": "share_create_token",
+      "op": "create",
+      "family": "crud.insert",
+      "entity": "Share",
+      "description": "Create a token share: generate an opaque read token that maps to one of your collections, letting its holder reach that collection through a public path. Fails if the collection being shared does not exist or a share with that token already exists.",
+      "exec_spec": {
+        "entity": "Share",
+        "fields": {
+          "PathMapped": {
+            "$arg": "PathMapped"
+          },
+          "Permissions": {
+            "$arg": "Permissions"
+          },
+          "User": {
+            "$arg": "User"
+          },
+          "Conversion": {
+            "$arg": "Conversion"
+          },
+          "EnabledByOwner": {
+            "$arg": "Enabled"
+          },
+          "HiddenByOwner": {
+            "$arg": "Hidden"
+          }
+        },
+        "set_on_create": {
+          "ShareType": {
+            "$const": "token"
+          },
+          "PathOrToken": {
+            "$const": "/.token/v1/auto-generated/"
+          },
+          "Owner": {
+            "$session": "account_name"
+          }
+        },
+        "unique_on": [
+          "ShareType",
+          "PathOrToken"
+        ]
+      },
+      "input_schema": {
+        "PathMapped": {
+          "type": "text",
+          "required": true,
+          "description": "The path of a collection you can read that the token maps to."
+        },
+        "Permissions": {
+          "type": "text",
+          "required": false,
+          "description": "Radicale permission string over the share (default 'r')."
+        },
+        "User": {
+          "type": "text",
+          "required": false,
+          "description": "Optional target user of the share."
+        },
+        "Conversion": {
+          "type": "text",
+          "required": false,
+          "description": "vCard conversion: 'none' (default) or 'bday'."
+        },
+        "Enabled": {
+          "type": "bool",
+          "required": false,
+          "description": "Whether the share starts enabled by the owner."
+        },
+        "Hidden": {
+          "type": "bool",
+          "required": false,
+          "description": "Whether the share starts hidden by the owner."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "PathMapped"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Collection",
+                "where": {
+                  "node": "field",
+                  "col": "path",
+                  "op": "eq",
+                  "value": {
+                    "arg": "PathMapped"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must sign in to create a token share.",
+          "precondition": "The collection being shared must exist.",
+          "fk": "The collection being shared does not exist.",
+          "unique": "A share with that token already exists."
+        }
+      },
+      "_evidence": {
+        "locator": "radicale/sharing/__init__.py:1074",
+        "id_local": "Share.create_token",
+        "entry": {
+          "kind": "http",
+          "route": "POST /.sharing/v1/token/create",
+          "locator": "radicale/sharing/__init__.py:1074"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "if user: self._rights._user_groups = self._group.groups(user)\n...\naccess = Access(self._rights, user, PathMapped, None)\nif not access.check(\"r\"): return httputils.NOT_ALLOWED\nif ShareType == \"token\":\n    if self.permit_create_token is False and \"t\" not in access.permissions: return httputils.NOT_ALLOWED\n    token = \"/.token/v1/\" + base64.urlsafe_b64encode(uuid.uuid4().bytes + b\"\\0\" + uuid.uuid4().bytes).decode() + \"/\"\n    result = self.database_create_sharing(ShareType=\"token\", PathOrToken=token, PathMapped=PathMapped, Owner=user, User=User, Permissions=Permissions, EnabledByOwner=Enabled, ...",
+        "edges": [
+          "radicale/sharing/__init__.py:1092-1103 collection must exist and be a collection",
+          "radicale/sharing/__init__.py:754-757 requires authenticated user",
+          "radicale/sharing/__init__.py:1082-1144 (note: requires read 'r' on PathMapped and token-create permission t/T or permit_create_token)"
+        ]
+      }
+    },
+    {
+      "tool": "share_create_map",
+      "op": "create",
+      "family": "crud.insert",
+      "entity": "Share",
+      "description": "Create a map share: allow another user, group or realm to reach one of your collections through their own home path. Fails if the shared collection does not exist or the mapped path is already a collection.",
+      "exec_spec": {
+        "entity": "Share",
+        "fields": {
+          "PathMapped": {
+            "$arg": "PathMapped"
+          },
+          "Permissions": {
+            "$arg": "Permissions"
+          },
+          "User": {
+            "$arg": "User"
+          },
+          "Conversion": {
+            "$arg": "Conversion"
+          },
+          "EnabledByOwner": {
+            "$arg": "Enabled"
+          },
+          "HiddenByOwner": {
+            "$arg": "Hidden"
+          }
+        },
+        "set_on_create": {
+          "ShareType": {
+            "$const": "map"
+          },
+          "PathOrToken": {
+            "$arg": "PathOrToken"
+          },
+          "Owner": {
+            "$session": "account_name"
+          }
+        },
+        "unique_on": [
+          "ShareType",
+          "PathOrToken"
+        ]
+      },
+      "input_schema": {
+        "PathMapped": {
+          "type": "text",
+          "required": true,
+          "description": "The path of the collection you are sharing."
+        },
+        "User": {
+          "type": "text",
+          "required": true,
+          "description": "The recipient: a username, or a ':group' / '@realm' prefixed target."
+        },
+        "PathOrToken": {
+          "type": "text",
+          "required": true,
+          "description": "The recipient's home path this share maps to (e.g. '/{user}/calendar/')."
+        },
+        "Permissions": {
+          "type": "text",
+          "required": false,
+          "description": "Radicale permission string over the share (default 'r')."
+        },
+        "Conversion": {
+          "type": "text",
+          "required": false,
+          "description": "vCard conversion: 'none' (default) or 'bday'."
+        },
+        "Enabled": {
+          "type": "bool",
+          "required": false,
+          "description": "Whether the share starts enabled by the owner."
+        },
+        "Hidden": {
+          "type": "bool",
+          "required": false,
+          "description": "Whether the share starts hidden by the owner."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "PathMapped",
+          "User",
+          "PathOrToken"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Collection",
+                "where": {
+                  "node": "field",
+                  "col": "path",
+                  "op": "eq",
+                  "value": {
+                    "arg": "PathMapped"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must sign in to create a map share.",
+          "precondition": "The collection being shared must exist.",
+          "fk": "The collection being shared does not exist.",
+          "unique": "A share with that path-or-token already exists."
+        }
+      },
+      "_evidence": {
+        "locator": "radicale/sharing/__init__.py:1176",
+        "id_local": "Share.create_map",
+        "entry": {
+          "kind": "http",
+          "route": "POST /.sharing/v1/map/create",
+          "locator": "radicale/sharing/__init__.py:1074"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "elif ShareType == \"map\":\n    if PathOrToken is None: return httputils.bad_request(\"Missing PathOrToken\")\n    share = self.database_get_sharing(ShareType=\"map\", PathOrToken=PathOrToken, OnlyEnabled=False)\n    if share is not None: return httputils.CONFLICT\n    if User is None: return httputils.bad_request(\"Missing User\")\n    if self.permit_create_map is False and \"m\" not in access.permissions: return httputils.NOT_ALLOWED\n    result = self.database_create_sharing(ShareType=\"map\", PathOrToken=PathOrToken, PathMapped=PathMapped, Owner=user, User=User, Permissions=Permissions, EnabledByOwner=Enabl",
+        "edges": [
+          "radicale/sharing/__init__.py:1092-1233 PathMapped exists; PathOrToken not a real collection; duplicate check",
+          "radicale/sharing/__init__.py:754-757",
+          "radicale/sharing/__init__.py:1200-1224 (note: requires map-create permission m/M or permit_create_map)"
+        ]
+      }
+    },
+    {
+      "tool": "share_update",
+      "op": "update",
+      "family": "update.field_set",
+      "entity": "Share",
+      "description": "Update a share's mapped collection, permissions, target user, conversion or owner-side enable/hide flags. Only the share's owner may change the mapping, permissions or target; a recipient may update the share's properties.",
+      "exec_spec": {
+        "entity": "Share",
+        "row_key": {
+          "PathOrToken": {
+            "$arg": "PathOrToken"
+          }
+        },
+        "set": {
+          "PathMapped": {
+            "$arg": "PathMapped"
+          },
+          "Permissions": {
+            "$arg": "Permissions"
+          },
+          "User": {
+            "$arg": "User"
+          },
+          "Properties": {
+            "$arg": "Properties"
+          },
+          "Conversion": {
+            "$arg": "Conversion"
+          },
+          "EnabledByOwner": {
+            "$arg": "Enabled"
+          },
+          "HiddenByOwner": {
+            "$arg": "Hidden"
+          }
+        }
+      },
+      "input_schema": {
+        "ShareType": {
+          "type": "text",
+          "required": true,
+          "description": "Whether the share is 'token' or 'map'."
+        },
+        "PathOrToken": {
+          "type": "text",
+          "required": true,
+          "description": "The share's path-or-token that identifies it."
+        },
+        "PathMapped": {
+          "type": "text",
+          "required": false,
+          "description": "New collection path this share maps to."
+        },
+        "Permissions": {
+          "type": "text",
+          "required": false,
+          "description": "New Radicale permission string over the share."
+        },
+        "User": {
+          "type": "text",
+          "required": false,
+          "description": "New target user of the share."
+        },
+        "Conversion": {
+          "type": "text",
+          "required": false,
+          "description": "New vCard conversion: 'none' or 'bday'."
+        },
+        "Enabled": {
+          "type": "bool",
+          "required": false,
+          "description": "New enabled-by-owner state of the share."
+        },
+        "Hidden": {
+          "type": "bool",
+          "required": false,
+          "description": "New hidden-by-owner state of the share."
+        },
+        "Properties": {
+          "type": "json",
+          "required": false,
+          "description": "New overlay of collection properties (whitelisted keys)."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "ShareType",
+          "PathOrToken"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Share",
+                "where": {
+                  "node": "field",
+                  "col": "PathOrToken",
+                  "op": "eq",
+                  "value": {
+                    "arg": "PathOrToken"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must sign in to update a share.",
+          "precondition": "That share does not exist, or you do not have permission to change it.",
+          "not_found": "That share was not found."
+        }
+      },
+      "_evidence": {
+        "locator": "radicale/sharing/__init__.py:1287",
+        "id_local": "Share.update",
+        "entry": {
+          "kind": "http",
+          "route": "POST /.sharing/v1/{token,map}/update",
+          "locator": "radicale/sharing/__init__.py:1287"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "share = self.database_get_sharing(ShareType=ShareType, PathOrToken=PathOrToken, OnlyEnabled=False)\nif share is None: return httputils.NOT_FOUND\nif user == share['Owner']:\n    result = self.database_update_sharing(ShareType=ShareType, PathMapped=PathMapped, Permissions=Permissions, EnabledByOwner=Enabled, HiddenByOwner=Hidden, PathOrToken=PathOrToken, ...)\nelif user == share['User']:\n    if PathMapped is not None or Permissions is not None or User is not None:\n        return httputils.NOT_ALLOWED   # user only '.EnabledByUser,.HiddenByUser,.Properties'\n    result = self.database_update_sharing(",
+        "edges": [
+          "radicale/sharing/__init__.py:1301-1314 share must exist (404 else)",
+          "radicale/sharing/__init__.py:1383-1458 (note: owner may change most fields; user only EnabledByUser/HiddenByUser/Properties)"
+        ]
+      }
+    },
+    {
+      "tool": "share_delete",
+      "op": "delete",
+      "family": "crud.delete",
+      "entity": "Share",
+      "description": "Delete a share. Only the share's owner may delete it. Fails (not_found) if no such share exists.",
+      "exec_spec": {
+        "entity": "Share",
+        "lookup_by": {
+          "PathOrToken": {
+            "$arg": "PathOrToken"
+          }
+        }
+      },
+      "input_schema": {
+        "ShareType": {
+          "type": "text",
+          "required": true,
+          "description": "Whether the share is 'token' or 'map'."
+        },
+        "PathOrToken": {
+          "type": "text",
+          "required": true,
+          "description": "The share's path-or-token that identifies it."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "ShareType",
+          "PathOrToken"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Share",
+                "where": {
+                  "node": "field",
+                  "col": "PathOrToken",
+                  "op": "eq",
+                  "value": {
+                    "arg": "PathOrToken"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must sign in to delete a share.",
+          "precondition": "That share does not exist.",
+          "not_found": "That share was not found."
+        }
+      },
+      "_evidence": {
+        "locator": "radicale/sharing/__init__.py:1474",
+        "id_local": "Share.delete",
+        "entry": {
+          "kind": "http",
+          "route": "POST /.sharing/v1/{token,map}/delete",
+          "locator": "radicale/sharing/__init__.py:1474"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "if action == \"delete\":\n    share = self.database_get_sharing(ShareType=ShareType, PathOrToken=PathOrToken, OnlyEnabled=False)\n    if share is None: return httputils.NOT_FOUND\n    if user == share['Owner']:\n        result = self.database_delete_sharing(ShareType=ShareType, PathOrToken=PathOrToken, User=share['Owner'])\n    else:\n        return httputils.NOT_ALLOWED  # only owner may delete",
+        "edges": [
+          "radicale/sharing/__init__.py:1488-1490 share must exist",
+          "radicale/sharing/__init__.py:1492-1500 (note: only the Owner may delete a share)"
+        ]
+      }
+    },
+    {
+      "tool": "share_toggle",
+      "op": "update",
+      "family": "update.field_set",
+      "entity": "Share",
+      "description": "Enable, disable, hide or unhide a share by its action. A recipient uses this to accept (enable) or hide a share offered to them, updating their own accept/hide flags; the owner's flags are updated when the action is owner-scoped.",
+      "exec_spec": {
+        "entity": "Share",
+        "row_key": {
+          "PathOrToken": {
+            "$arg": "PathOrToken"
+          }
+        },
+        "set": {
+          "EnabledByUser": {
+            "$arg": "EnabledByUser"
+          },
+          "HiddenByUser": {
+            "$arg": "HiddenByUser"
+          }
+        }
+      },
+      "input_schema": {
+        "ShareType": {
+          "type": "text",
+          "required": true,
+          "description": "Whether the share is 'token' or 'map'."
+        },
+        "PathOrToken": {
+          "type": "text",
+          "required": true,
+          "description": "The share's path-or-token that identifies it."
+        },
+        "action": {
+          "type": "text",
+          "required": true,
+          "description": "One of: enable, disable, hide, unhide."
+        },
+        "EnabledByUser": {
+          "type": "bool",
+          "required": false,
+          "description": "New recipient-enabled state of the share (true for enable/disable actions)."
+        },
+        "HiddenByUser": {
+          "type": "bool",
+          "required": false,
+          "description": "New recipient-hidden state of the share (true for hide/unhide actions)."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "ShareType",
+          "PathOrToken",
+          "action"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Share",
+                "where": {
+                  "node": "field",
+                  "col": "PathOrToken",
+                  "op": "eq",
+                  "value": {
+                    "arg": "PathOrToken"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must sign in to toggle a share.",
+          "precondition": "That share does not exist, or only the relevant party can toggle it.",
+          "not_found": "That share was not found."
+        }
+      },
+      "_evidence": {
+        "locator": "radicale/sharing/__init__.py:1533",
+        "id_local": "Share.toggle",
+        "entry": {
+          "kind": "http",
+          "route": "POST /.sharing/v1/{token,map}/{enable,disable,hide,unhide}",
+          "locator": "radicale/sharing/__init__.py:1538"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "elif action in API_SHARE_TOGGLES_V1:\n    if action == \"disable\": Enabled = False\n    elif action == \"enable\": Enabled = True\n    elif action == \"hide\": Hidden = True\n    elif action == \"unhide\": Hidden = False\n    if user == share['Owner']:\n        if user == share['User']:\n            result = self.database_update_sharing(..., EnabledByOwner=Enabled, EnabledByUser=Enabled, HiddenByOwner=Hidden, HiddenByUser=Hidden, Timestamp=Timestamp)\n        else:\n            result = self.database_update_sharing(..., EnabledByOwner=Enabled, HiddenByOwner=Hidden, Timestamp=Timestamp)\n    elif user == share[",
+        "edges": [
+          "radicale/sharing/__init__.py:1545-1558 share must exist",
+          "radicale/sharing/__init__.py:1572-1598 (note: owner toggles EnabledByOwner/HiddenByOwner; user toggles EnabledByUser/HiddenByUser)"
+        ]
+      }
+    }
+  ],
+  "seed_state": {
+    "HtpasswdAccount": [
+      {
+        "login": "ops@radicale.example",
+        "digest": "pw-operations",
+        "id": 1
+      },
+      {
+        "login": "colleague@radicale.example",
+        "digest": "pw-colleague",
+        "id": 2
+      }
+    ],
+    "Collection": [
+      {
+        "path": "/ada/calendar/",
+        "owner": "ada",
+        "tag": "VCALENDAR",
+        "displayname": "Ada's Calendar",
+        "id": 1
+      },
+      {
+        "path": "/ada/contacts/",
+        "owner": "ada",
+        "tag": "VADDRESSBOOK",
+        "displayname": "Ada's Contacts",
+        "id": 2
+      },
+      {
+        "path": "/emma/calendar/",
+        "owner": "emma",
+        "tag": "VCALENDAR",
+        "displayname": "Emma's Calendar",
+        "id": 3
+      }
+    ],
+    "CalendarItem": [
+      {
+        "href": "event1.ics",
+        "collection_path": "/ada/calendar/",
+        "serialized": "BEGIN:VCALENDAR\n...\nEND:VCALENDAR",
+        "uid": "uid-1",
+        "component_name": "VEVENT",
+        "id": 1
+      },
+      {
+        "href": "event2.ics",
+        "collection_path": "/ada/calendar/",
+        "serialized": "BEGIN:VCALENDAR\n...\nEND:VCALENDAR",
+        "uid": "uid-2",
+        "component_name": "VEVENT",
+        "id": 2
+      },
+      {
+        "href": "contact1.vcf",
+        "collection_path": "/ada/contacts/",
+        "serialized": "BEGIN:VCARD\n...\nEND:VCARD",
+        "uid": "uid-3",
+        "component_name": "VCARD",
+        "id": 3
+      }
+    ],
+    "Share": [],
+    "SyncToken": []
+  },
+  "summary": "radicale is a CalDAV/CardDAV server (WebDAV) with concrete filesystem storage backends: one folder per collection and one file per calendar/addressbook object. Mined the multifilesystem storage (Collection, CalendarItem, derived item/SyncToken caches) and the CSV/file sharing database (Share), plus the htpasswd account backend. Impl atoms are the WebDAV protocol ops (MKCALENDAR/MKCOL/PUT/PROPPATCH/DELETE/REPORT/GET/PROPFIND/MOVE), the sync-collection REPORT (writes SyncToken), the sharing HTTP API (POST /.sharing/v1) and the internal login path. Guard edges are the per-operation Access.check rights gate and share owner/user checks; storage.write_goal ops unguarded by a route middleware instead gate on discovery existence.",
+  "_auth_candidates": [
+    {
+      "entity": "HtpasswdAccount",
+      "username_col": "login",
+      "password_col": "digest"
+    }
+  ],
+  "_fk_gravity": {
+    "entity": "Collection",
+    "fk_count": 1
+  },
+  "_read_denied": "not_found",
+  "_no_edges": [
+    {
+      "id_local": "Account.login",
+      "why": "the auth entrypoint itself; no prior auth wall exists by definition (radicale/app/__init__.py:541-558 calls auth.login); it triggers nothing downstream directly"
+    }
+  ],
+  "auth": {
+    "account_entity": "HtpasswdAccount",
+    "username_col": "login",
+    "password_col": "digest",
+    "session_fields": {
+      "account_name": "login"
+    }
+  }
+}

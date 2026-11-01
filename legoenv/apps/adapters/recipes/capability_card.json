@@ -1,0 +1,82 @@
+{
+  "app": "recipes",
+  "role": "Recipe, meal-plan and shopping scalar coordination",
+  "domains": [
+    "operations"
+  ],
+  "kinds": {
+    "create_record": [
+      "recipe_create",
+      "shoppinglistentry_create"
+    ],
+    "schedule_event": [
+      "mealplan_create"
+    ],
+    "update_record": [
+      "recipe_update",
+      "mealplan_update",
+      "shoppinglistentry_update"
+    ],
+    "record_status_change": [
+      "shoppinglistentry_update"
+    ],
+    "delete_or_archive_row": [
+      "recipe_destroy",
+      "mealplan_destroy",
+      "shoppinglistentry_destroy"
+    ]
+  },
+  "check_kinds": [
+    "record_exists",
+    "record_not_exists",
+    "record_field_equals",
+    "record_field_contains",
+    "record_field_unchanged"
+  ],
+  "carriers": {
+    "notes_field": {
+      "entity": "Recipe",
+      "field": "description"
+    }
+  },
+  "login": {
+    "tool": "sign_in",
+    "user_field": "username",
+    "persona_entity": "User"
+  },
+  "content_entities": [
+    "Recipe",
+    "MealPlan",
+    "ShoppingListEntry"
+  ],
+  "seed_helpers": [
+    "records"
+  ],
+  "tool_families_to_keep": [
+    ""
+  ],
+  "obs_reads": [
+    "recipe_list",
+    "mealplan_list"
+  ],
+  "known_patches": [
+    "Neutral prefix",
+    "Integer identity schemas and synthetic source persona",
+    "Original source semantics bounded by actual probes"
+  ],
+  "missing_tools": [],
+  "limitations": [
+    "All 153 source tools retained; nine declared tools certify scalar recipe/shopping records and dated meal-plan metadata only.",
+    "Original source uses actor/account id as space id, rather than resolving arbitrary UserSpace membership. Supported persona preserves original aligned ids; no general tenant mapping claim.",
+    "Nested recipe keywords/steps/properties, shopping_lists links and mealplan addshopping do not create full related workflow rows. No ingredient planning/connector/AI effects claimed.",
+    "MealPlan/ShoppingListEntry update/delete guards only check actor exists; comprehensive owner/tenant ACL absent. Recipe target guards retain source private/space checks.",
+    "Shopping checked update stamps fixed source completed_at timestamp; no real completion timing, scheduler, calendar export semantics or recurrence claim."
+  ],
+  "smoke": {
+    "passed": true,
+    "date": "2026-10-24",
+    "report": "ok"
+  },
+  "register_file": "pack/newspecs3/recipes/register.py",
+  "base_spec": "pack/base_specs/recipes.spec.json"
+}

@@ -1,0 +1,87 @@
+{
+  "app": "donetick",
+  "role": "Circle-scoped chore and project scalar coordination",
+  "domains": [
+    "operations",
+    "coordination"
+  ],
+  "kinds": {
+    "create_record": [
+      "chore_createchore",
+      "project_create"
+    ],
+    "update_record": [
+      "chore_editchore",
+      "chore_updatepriority",
+      "chore_updateduedate",
+      "project_update"
+    ],
+    "assign_owner": [
+      "chore_updateassignee"
+    ],
+    "record_status_change": [
+      "chore_archivechore",
+      "chore_unarchivechore"
+    ],
+    "delete_or_archive_row": [
+      "project_delete"
+    ]
+  },
+  "check_kinds": [
+    "record_exists",
+    "record_not_exists",
+    "record_field_equals",
+    "record_field_contains",
+    "record_field_unchanged"
+  ],
+  "carriers": {
+    "notes_field": {
+      "entity": "Chore",
+      "field": "description"
+    }
+  },
+  "login": {
+    "tool": "user_login",
+    "user_field": "username",
+    "persona_entity": "User"
+  },
+  "content_entities": [
+    "Chore",
+    "Project",
+    "ChoreHistory",
+    "Label",
+    "SubTask"
+  ],
+  "seed_helpers": [
+    "records",
+    "chores"
+  ],
+  "tool_families_to_keep": [
+    ""
+  ],
+  "obs_reads": [
+    "chore_getchores",
+    "project_list"
+  ],
+  "known_patches": [
+    "Neutral prefix, integer id argument/seed normalization and synthetic source users",
+    "Resolve declared scope.where session literals as actual session expressions"
+  ],
+  "missing_tools": [
+    "Full scheduler/recurrence and notification execution"
+  ],
+  "limitations": [
+    "All 100 original tools retained; ten declared tools certify scalar records, owner integer, due date and active flags. No full scheduler, approval/points or notification execution claim.",
+    "Source create does not materialize all assignees or defaults; completechore inserts a history row without advancing due date or awarding points. It is retained but not certified as full completion.",
+    "updatedAt is accepted without optimistic concurrency validation; assignedTo/assignee do not validate every membership/selection constraint.",
+    "Most chore guards require any UserCircle membership; circle-scoped row keys/read scopes isolate declared target circle but source private-chore, active-role and admin-only rules are incomplete.",
+    "includeArchived/includeSubtasks and general list ordering/filter parameters do not implement their full application meaning; archive/unarchive only changes is_active."
+  ],
+  "smoke": {
+    "passed": true,
+    "date": "2026-10-24",
+    "report": "ok"
+  },
+  "register_file": "pack/newspecs3/donetick/register.py",
+  "base_spec": "pack/base_specs/donetick.spec.json"
+}

@@ -1,0 +1,5156 @@
+{
+  "env_id": "erxes",
+  "_prep_version": 3,
+  "auth": {
+    "account_entity": "VendorUser",
+    "username_col": "email",
+    "password_col": "password",
+    "session_fields": {
+      "vendor": "vendor"
+    }
+  },
+  "entities": [
+    {
+      "name": "RiskType",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "createdAt",
+          "type": "datetime",
+          "audit": true
+        },
+        {
+          "name": "updatedAt",
+          "type": "datetime",
+          "audit": true
+        }
+      ]
+    },
+    {
+      "name": "InsuranceType",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "code",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "isCitizen",
+          "type": "bool",
+          "nullable": false,
+          "default": false
+        },
+        {
+          "name": "attributes",
+          "type": "json",
+          "nullable": false
+        },
+        {
+          "name": "createdAt",
+          "type": "datetime",
+          "audit": true
+        },
+        {
+          "name": "updatedAt",
+          "type": "datetime",
+          "audit": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "code"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Product",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "insuranceType",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "InsuranceType.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "regions",
+          "type": "json",
+          "nullable": false
+        },
+        {
+          "name": "coveredRisks",
+          "type": "json",
+          "nullable": false
+        },
+        {
+          "name": "pricingConfig",
+          "type": "json",
+          "nullable": false
+        },
+        {
+          "name": "pdfContent",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "templateId",
+          "type": "id",
+          "nullable": true,
+          "fk_to": "Template.id"
+        },
+        {
+          "name": "additionalCoverages",
+          "type": "json",
+          "nullable": true
+        },
+        {
+          "name": "compensationCalculations",
+          "type": "json",
+          "nullable": true
+        },
+        {
+          "name": "deductibleConfig",
+          "type": "json",
+          "nullable": true
+        },
+        {
+          "name": "createdAt",
+          "type": "datetime",
+          "audit": true
+        },
+        {
+          "name": "updatedAt",
+          "type": "datetime",
+          "audit": true
+        }
+      ]
+    },
+    {
+      "name": "Template",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "htmlContent",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "cssContent",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        },
+        {
+          "name": "version",
+          "type": "int",
+          "nullable": false,
+          "default": 1
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "draft",
+            "active",
+            "archived"
+          ],
+          "default": "draft"
+        },
+        {
+          "name": "createdBy",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "updatedBy",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "createdAt",
+          "type": "datetime",
+          "audit": true
+        },
+        {
+          "name": "updatedAt",
+          "type": "datetime",
+          "audit": true
+        }
+      ],
+      "_lifecycle": {
+        "col": "status",
+        "initial": "draft",
+        "states": [
+          "draft",
+          "active",
+          "archived"
+        ],
+        "via": {
+          "Template.update": {
+            "col": "status",
+            "from": [
+              "draft",
+              "active"
+            ],
+            "to": "archived"
+          }
+        }
+      }
+    },
+    {
+      "name": "Region",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "countries",
+          "type": "json",
+          "nullable": false
+        },
+        {
+          "name": "createdAt",
+          "type": "datetime",
+          "audit": true
+        },
+        {
+          "name": "updatedAt",
+          "type": "datetime",
+          "audit": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "name"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Customer",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "type",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "individual",
+            "company"
+          ]
+        },
+        {
+          "name": "firstName",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "lastName",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "companyName",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "registrationNumber",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "email",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "phone",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "createdAt",
+          "type": "datetime",
+          "audit": true
+        },
+        {
+          "name": "updatedAt",
+          "type": "datetime",
+          "audit": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "registrationNumber"
+          ]
+        },
+        {
+          "kind": "unique",
+          "cols": [
+            "email"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Vendor",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "offeredProducts",
+          "type": "json",
+          "nullable": false
+        },
+        {
+          "name": "createdAt",
+          "type": "datetime",
+          "audit": true
+        },
+        {
+          "name": "updatedAt",
+          "type": "datetime",
+          "audit": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "name"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "VendorUser",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "email",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "phone",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "password",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "vendor",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Vendor.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "role",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "user",
+            "admin",
+            "manager"
+          ],
+          "default": "user"
+        },
+        {
+          "name": "createdAt",
+          "type": "datetime",
+          "audit": true
+        },
+        {
+          "name": "updatedAt",
+          "type": "datetime",
+          "audit": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "email"
+          ]
+        },
+        {
+          "kind": "unique",
+          "cols": [
+            "phone"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Contract",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "contractNumber",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "vendor",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Vendor.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "customer",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Customer.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "insuranceType",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "InsuranceType.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "insuranceProduct",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Product.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "coveredRisks",
+          "type": "json",
+          "nullable": false
+        },
+        {
+          "name": "chargedAmount",
+          "type": "float",
+          "nullable": false
+        },
+        {
+          "name": "startDate",
+          "type": "datetime",
+          "nullable": false
+        },
+        {
+          "name": "endDate",
+          "type": "datetime",
+          "nullable": false
+        },
+        {
+          "name": "insuredObject",
+          "type": "json",
+          "nullable": false
+        },
+        {
+          "name": "paymentKind",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "qpay",
+            "cash"
+          ]
+        },
+        {
+          "name": "paymentStatus",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "pending",
+            "paid",
+            "cancelled",
+            "refunded"
+          ],
+          "default": "pending"
+        },
+        {
+          "name": "pdfContent",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "createdAt",
+          "type": "datetime",
+          "audit": true
+        },
+        {
+          "name": "updatedAt",
+          "type": "datetime",
+          "audit": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "contractNumber"
+          ]
+        },
+        {
+          "kind": "check",
+          "left": {
+            "col": "endDate"
+          },
+          "op": "gte",
+          "right": {
+            "col": "startDate"
+          }
+        }
+      ],
+      "_lifecycle": {
+        "col": "paymentStatus",
+        "initial": "pending",
+        "states": [
+          "pending",
+          "paid",
+          "cancelled",
+          "refunded"
+        ],
+        "via": {
+          "Contract.update": {
+            "col": "paymentStatus",
+            "from": [
+              "pending",
+              "paid"
+            ],
+            "to": "refunded"
+          }
+        }
+      }
+    }
+  ],
+  "tools": [
+    {
+      "tool": "vendoruser_login",
+      "family": "guard.auth",
+      "exec_spec": {
+        "verify": {
+          "entity": "VendorUser",
+          "username_col": "email",
+          "password_col": "password"
+        }
+      },
+      "input_schema": {
+        "email": {
+          "type": "text",
+          "description": "The vendor account email (or phone) to sign in with.",
+          "required": true
+        },
+        "password": {
+          "type": "text",
+          "description": "The account password.",
+          "required": true
+        }
+      },
+      "_evidence": {
+        "locator": "src/modules/insurance/graphql/resolvers/mutations/vendorUser.ts:99",
+        "id_local": "VendorUser.login",
+        "entry": {
+          "kind": "graphql",
+          "locator": "src/modules/insurance/graphql/schemas/insurance.ts",
+          "route": "mutation vendorUserLogin"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "const vendorUser = await models.VendorUser.findOne({ $or: [{ email: email.toLowerCase() }, { email }, { phone: email }] }).populate('vendor');\nif (!vendorUser) throw new Error('Invalid email or password');\nconst isPasswordValid = await bcrypt.compare(password, vendorUser.password);\nif (!isPasswordValid) throw new Error('Invalid email or password');\nconst token = jwt.sign({ vendorUserId, vendorId }, secret, { expiresIn: '1d' });",
+        "edges": [
+          "login looks up VendorUser by email/phone; also checks bcrypt password, JWT secret defined (mutations/vendorUser.ts:99)"
+        ]
+      },
+      "entity": "VendorUser",
+      "guards": {
+        "required": [
+          "email",
+          "password"
+        ],
+        "messages": {
+          "auth": "You must sign in as a vendor user before doing that.",
+          "realm": "Only a signed-in vendor user can do that.",
+          "precondition": "That operation is not allowed on the given row.",
+          "required": "Missing required input (see parameter list).",
+          "not_found": "That row does not exist in this system.",
+          "fk": "The referenced parent record does not exist (check vendor/customer/product/type ids).",
+          "fk_missing": "A required parent reference is missing; create or pass it first.",
+          "unique": "That value is already taken; choose a different one.",
+          "transition": "That status change is not allowed for this row.",
+          "on_child": "This row is still referenced; clear or remove the dependents first.",
+          "constraint": "The values given violate an entity rule.",
+          "off_panel": "A provided column is not accepted by this operation."
+        }
+      },
+      "description": "Sign in as a vendor user with the account email and password. The session it opens is what $actor resolves to; everything vendor-scoped (myVendor, current user, vendor contracts) requires it."
+    },
+    {
+      "tool": "contract_create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Contract",
+        "fields": [
+          "insuredObject",
+          "startDate",
+          "endDate",
+          "paymentKind",
+          "chargedAmount"
+        ],
+        "set_on_create": {
+          "vendor": {
+            "$arg": "vendorId"
+          },
+          "customer": {
+            "$arg": "customerId"
+          },
+          "insuranceProduct": {
+            "$arg": "productId"
+          },
+          "paymentStatus": "pending",
+          "insuranceType": {
+            "$arg": "insuranceTypeId"
+          },
+          "coveredRisks": {
+            "$arg": "coveredRisks"
+          }
+        },
+        "unique_on": [
+          "contractNumber"
+        ]
+      },
+      "input_schema": {
+        "vendorId": {
+          "type": "int",
+          "description": "Id of the vendor issuing the contract.",
+          "required": true
+        },
+        "customerId": {
+          "type": "int",
+          "description": "Id of the insured customer.",
+          "required": true
+        },
+        "productId": {
+          "type": "int",
+          "description": "Id of the insurance product being sold.",
+          "required": true
+        },
+        "insuredObject": {
+          "type": "json",
+          "description": "Details of the insured object (e.g. vehicle info).",
+          "required": true
+        },
+        "startDate": {
+          "type": "datetime",
+          "description": "Coverage start date/time.",
+          "required": true
+        },
+        "endDate": {
+          "type": "datetime",
+          "description": "Coverage end date/time.",
+          "required": true
+        },
+        "paymentKind": {
+          "type": "text",
+          "description": "How the premium is paid: qpay or cash.",
+          "required": true
+        },
+        "chargedAmount": {
+          "type": "float",
+          "description": "Premium charged; if omitted it is computed from the product's pricing."
+        },
+        "insuranceTypeId": {
+          "type": "int",
+          "description": "Id of the insurance type of the chosen product (must match it).",
+          "required": true
+        },
+        "coveredRisks": {
+          "type": "json",
+          "description": "The risks covered by this contract — normally the product's coveredRisks.",
+          "required": true
+        }
+      },
+      "_evidence": {
+        "locator": "src/modules/insurance/graphql/resolvers/mutations/contract.ts:36",
+        "id_local": "Contract.create",
+        "entry": {
+          "kind": "graphql",
+          "locator": "src/modules/insurance/graphql/schemas/insurance.ts",
+          "route": "mutation createInsuranceContract"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "const contract = await models.Contract.create({\n  contractNumber, vendor: vendorId, customer: customerId,\n  insuranceType: product.insuranceType._id, insuranceProduct: productId,\n  coveredRisks, chargedAmount: chargedAmount || calculatedAmount,\n  startDate, endDate, insuredObject, paymentKind, paymentStatus: 'pending', pdfContent\n});\nif (!product) throw new Error('Product not found')",
+        "edges": [
+          "createInsuranceContract: if (!product) throw new Error('Product not found') (mutations/contract.ts:56)"
+        ]
+      },
+      "entity": "Contract",
+      "guards": {
+        "required": [
+          "vendorId",
+          "customerId",
+          "productId",
+          "insuranceTypeId",
+          "coveredRisks",
+          "insuredObject",
+          "startDate",
+          "endDate",
+          "paymentKind"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Product",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "productId"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "insuranceType",
+                      "op": "eq",
+                      "value": {
+                        "arg": "insuranceTypeId"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must sign in as a vendor user before doing that.",
+          "realm": "Only a signed-in vendor user can do that.",
+          "precondition": "That operation is not allowed on the given row.",
+          "required": "Missing required input (see parameter list).",
+          "not_found": "That row does not exist in this system.",
+          "fk": "The referenced parent record does not exist (check vendor/customer/product/type ids).",
+          "fk_missing": "A required parent reference is missing; create or pass it first.",
+          "unique": "That value is already taken; choose a different one.",
+          "transition": "That status change is not allowed for this row.",
+          "on_child": "This row is still referenced; clear or remove the dependents first.",
+          "constraint": "The values given violate an entity rule.",
+          "off_panel": "A provided column is not accepted by this operation."
+        }
+      },
+      "description": "Create an insurance contract that binds a vendor, a customer and an insurance product. The contract inherits the product's insurance type and covered risks; payment starts as pending."
+    },
+    {
+      "tool": "contract_update_status",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Contract",
+        "row_key": {
+          "id": {
+            "$arg": "contractId"
+          }
+        },
+        "fields": [
+          "paymentStatus"
+        ]
+      },
+      "input_schema": {
+        "contractId": {
+          "type": "int",
+          "description": "Id of the contract to update.",
+          "required": true
+        },
+        "paymentStatus": {
+          "type": "text",
+          "description": "New payment status: pending, paid, cancelled or refunded.",
+          "required": true
+        }
+      },
+      "_evidence": {
+        "locator": "src/modules/insurance/graphql/resolvers/mutations/contract.ts:150",
+        "id_local": "Contract.update_status",
+        "entry": {
+          "kind": "graphql",
+          "locator": "src/modules/insurance/graphql/schemas/insurance.ts",
+          "route": "mutation updateContractPaymentStatus"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "const validStatuses = ['pending','paid','cancelled','refunded'];\nif (!validStatuses.includes(paymentStatus)) throw new Error('Invalid payment status...');\nif (!contract) throw new Error('Contract not found');\ncontract.paymentStatus = paymentStatus; await contract.save();",
+        "edges": [
+          "if (!contract) throw new Error('Contract not found'); paymentStatus must be one of [pending,paid,cancelled,refunded] (mutations/contract.ts:156,164)"
+        ]
+      },
+      "entity": "Contract",
+      "guards": {
+        "required": [
+          "contractId",
+          "paymentStatus"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Contract",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "contractId"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must sign in as a vendor user before doing that.",
+          "realm": "Only a signed-in vendor user can do that.",
+          "precondition": "That operation is not allowed on the given row.",
+          "required": "Missing required input (see parameter list).",
+          "not_found": "That row does not exist in this system.",
+          "fk": "The referenced parent record does not exist (check vendor/customer/product/type ids).",
+          "fk_missing": "A required parent reference is missing; create or pass it first.",
+          "unique": "That value is already taken; choose a different one.",
+          "transition": "That status change is not allowed for this row.",
+          "on_child": "This row is still referenced; clear or remove the dependents first.",
+          "constraint": "The values given violate an entity rule.",
+          "off_panel": "A provided column is not accepted by this operation."
+        }
+      },
+      "description": "Set the payment status of a contract. Use for recording that a premium was paid, cancelled or refunded."
+    },
+    {
+      "tool": "contract_update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Contract",
+        "row_key": {
+          "id": {
+            "$arg": "contractId"
+          }
+        },
+        "fields": [
+          "customer",
+          "insuredObject",
+          "paymentStatus"
+        ],
+        "set": {
+          "customer": {
+            "$arg": "customerId"
+          }
+        }
+      },
+      "input_schema": {
+        "contractId": {
+          "type": "int",
+          "description": "Id of the contract to update.",
+          "required": true
+        },
+        "customerId": {
+          "type": "int",
+          "description": "Replace the customer on the policy."
+        },
+        "insuredObject": {
+          "type": "json",
+          "description": "New insured-object details (merged over the existing ones)."
+        },
+        "paymentStatus": {
+          "type": "text",
+          "description": "New payment status (pending/paid/cancelled/refunded)."
+        }
+      },
+      "_evidence": {
+        "locator": "src/modules/insurance/graphql/resolvers/mutations/contract.ts:190",
+        "id_local": "Contract.update",
+        "entry": {
+          "kind": "graphql",
+          "locator": "src/modules/insurance/graphql/schemas/insurance.ts",
+          "route": "mutation updateContract"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "if (!contract) throw new Error('Contract not found');\nif (customerId) { const customer = await models.Customer.findById(customerId); if (!customer) throw new Error('Customer not found'); contract.customer = customerId; }\nif (insuredObject) contract.insuredObject = {...contract.insuredObject, ...insuredObject};\nif (paymentStatus) { validate; contract.paymentStatus = paymentStatus }\nawait contract.save();",
+        "edges": [
+          "if (!contract) throw new Error('Contract not found') (mutations/contract.ts:197)"
+        ]
+      },
+      "entity": "Contract",
+      "guards": {
+        "required": [
+          "contractId"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Contract",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "contractId"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must sign in as a vendor user before doing that.",
+          "realm": "Only a signed-in vendor user can do that.",
+          "precondition": "That operation is not allowed on the given row.",
+          "required": "Missing required input (see parameter list).",
+          "not_found": "That row does not exist in this system.",
+          "fk": "The referenced parent record does not exist (check vendor/customer/product/type ids).",
+          "fk_missing": "A required parent reference is missing; create or pass it first.",
+          "unique": "That value is already taken; choose a different one.",
+          "transition": "That status change is not allowed for this row.",
+          "on_child": "This row is still referenced; clear or remove the dependents first.",
+          "constraint": "The values given violate an entity rule.",
+          "off_panel": "A provided column is not accepted by this operation."
+        }
+      },
+      "description": "Update an existing insurance contract: change the insured object, the customer on the policy, or the payment status. Only the fields you pass are changed."
+    },
+    {
+      "tool": "contract_generate_pdf",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Contract",
+        "lookup_by": {
+          "id": {
+            "$arg": "contractId"
+          }
+        }
+      },
+      "input_schema": {
+        "contractId": {
+          "type": "int",
+          "description": "Id of the contract to render to PDF.",
+          "required": true
+        }
+      },
+      "_evidence": {
+        "locator": "src/modules/insurance/graphql/resolvers/mutations/contractPdf.ts:7",
+        "id_local": "Contract.generate_pdf",
+        "entry": {
+          "kind": "graphql",
+          "locator": "src/modules/insurance/graphql/schemas/insurance.ts",
+          "route": "mutation generateContractPDF"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "const contract = await models.Contract.findById(contractId).populate('vendor customer insuranceType insuranceProduct coveredRisks.risk').lean();\nif (!contract) throw new Error('Contract not found');\n... pdfGenerator.generatePDF(html) -> returns base64 + filename",
+        "edges": [
+          "generateContractPDF: if (!contract) throw new Error('Contract not found') (mutations/contractPdf.ts:15)"
+        ]
+      },
+      "entity": "Contract",
+      "guards": {
+        "required": [
+          "contractId"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Contract",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "contractId"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must sign in as a vendor user before doing that.",
+          "realm": "Only a signed-in vendor user can do that.",
+          "precondition": "That operation is not allowed on the given row.",
+          "required": "Missing required input (see parameter list).",
+          "not_found": "That row does not exist in this system.",
+          "fk": "The referenced parent record does not exist (check vendor/customer/product/type ids).",
+          "fk_missing": "A required parent reference is missing; create or pass it first.",
+          "unique": "That value is already taken; choose a different one.",
+          "transition": "That status change is not allowed for this row.",
+          "on_child": "This row is still referenced; clear or remove the dependents first.",
+          "constraint": "The values given violate an entity rule.",
+          "off_panel": "A provided column is not accepted by this operation."
+        }
+      },
+      "description": "Generate the PDF content for a contract from its template. Returns the base64 PDF and a filename; it does not change the saved contract."
+    },
+    {
+      "tool": "contract_save_pdf",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Contract",
+        "row_key": {
+          "id": {
+            "$arg": "contractId"
+          }
+        },
+        "fields": [
+          "pdfContent"
+        ]
+      },
+      "input_schema": {
+        "contractId": {
+          "type": "int",
+          "description": "Id of the contract to save the PDF onto.",
+          "required": true
+        },
+        "pdfContent": {
+          "type": "text",
+          "description": "The base64/html PDF content to store.",
+          "required": true
+        }
+      },
+      "_evidence": {
+        "locator": "src/modules/insurance/graphql/resolvers/mutations/contractPdf.ts:81",
+        "id_local": "Contract.save_pdf",
+        "entry": {
+          "kind": "graphql",
+          "locator": "src/modules/insurance/graphql/schemas/insurance.ts",
+          "route": "mutation saveContractPDF"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "const contract = await models.Contract.findByIdAndUpdate(contractId, { pdfContent }, { new: true });\nif (!contract) throw new Error('Contract not found');",
+        "edges": [
+          "saveContractPDF: if (!contract) throw new Error('Contract not found') (mutations/contractPdf.ts:89)"
+        ]
+      },
+      "entity": "Contract",
+      "guards": {
+        "required": [
+          "contractId",
+          "pdfContent"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Contract",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "contractId"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must sign in as a vendor user before doing that.",
+          "realm": "Only a signed-in vendor user can do that.",
+          "precondition": "That operation is not allowed on the given row.",
+          "required": "Missing required input (see parameter list).",
+          "not_found": "That row does not exist in this system.",
+          "fk": "The referenced parent record does not exist (check vendor/customer/product/type ids).",
+          "fk_missing": "A required parent reference is missing; create or pass it first.",
+          "unique": "That value is already taken; choose a different one.",
+          "transition": "That status change is not allowed for this row.",
+          "on_child": "This row is still referenced; clear or remove the dependents first.",
+          "constraint": "The values given violate an entity rule.",
+          "off_panel": "A provided column is not accepted by this operation."
+        }
+      },
+      "description": "Persist the generated PDF content onto an existing contract so it can be downloaded later."
+    },
+    {
+      "tool": "customer_create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Customer",
+        "fields": [
+          "firstName",
+          "lastName",
+          "companyName",
+          "type",
+          "registrationNumber",
+          "email",
+          "phone"
+        ],
+        "unique_on": [
+          "registrationNumber"
+        ]
+      },
+      "input_schema": {
+        "firstName": {
+          "type": "text",
+          "description": "Customer first name."
+        },
+        "lastName": {
+          "type": "text",
+          "description": "Customer last name."
+        },
+        "companyName": {
+          "type": "text",
+          "description": "Customer company name."
+        },
+        "type": {
+          "type": "text",
+          "description": "individual or company.",
+          "required": true
+        },
+        "registrationNumber": {
+          "type": "text",
+          "description": "Unique government registration number.",
+          "required": true
+        },
+        "email": {
+          "type": "text",
+          "description": "Customer email."
+        },
+        "phone": {
+          "type": "text",
+          "description": "Customer phone."
+        }
+      },
+      "_evidence": {
+        "locator": "src/modules/insurance/graphql/resolvers/mutations/customer.ts:4",
+        "id_local": "Customer.create",
+        "entry": {
+          "kind": "graphql",
+          "locator": "src/modules/insurance/graphql/schemas/insurance.ts",
+          "route": "mutation createCustomer"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "return models.Customer.create(input);"
+      },
+      "entity": "Customer",
+      "guards": {
+        "required": [
+          "type",
+          "registrationNumber"
+        ],
+        "messages": {
+          "auth": "You must sign in as a vendor user before doing that.",
+          "realm": "Only a signed-in vendor user can do that.",
+          "precondition": "That operation is not allowed on the given row.",
+          "required": "Missing required input (see parameter list).",
+          "not_found": "That row does not exist in this system.",
+          "fk": "The referenced parent record does not exist (check vendor/customer/product/type ids).",
+          "fk_missing": "A required parent reference is missing; create or pass it first.",
+          "unique": "That value is already taken; choose a different one.",
+          "transition": "That status change is not allowed for this row.",
+          "on_child": "This row is still referenced; clear or remove the dependents first.",
+          "constraint": "The values given violate an entity rule.",
+          "off_panel": "A provided column is not accepted by this operation."
+        }
+      },
+      "description": "Register a customer (individual or company) with a registration number. Enables issuing contracts to that customer."
+    },
+    {
+      "tool": "customer_update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Customer",
+        "row_key": {
+          "id": {
+            "$arg": "id"
+          }
+        },
+        "fields": [
+          "firstName",
+          "lastName",
+          "companyName",
+          "type",
+          "registrationNumber",
+          "email",
+          "phone"
+        ]
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "description": "Id of the customer to update.",
+          "required": true
+        },
+        "firstName": {
+          "type": "text",
+          "description": "New value for firstName."
+        },
+        "lastName": {
+          "type": "text",
+          "description": "New value for lastName."
+        },
+        "companyName": {
+          "type": "text",
+          "description": "New value for companyName."
+        },
+        "type": {
+          "type": "text",
+          "description": "New value for type."
+        },
+        "registrationNumber": {
+          "type": "text",
+          "description": "New value for registrationNumber."
+        },
+        "email": {
+          "type": "text",
+          "description": "New value for email."
+        },
+        "phone": {
+          "type": "text",
+          "description": "New value for phone."
+        }
+      },
+      "_evidence": {
+        "locator": "src/modules/insurance/graphql/resolvers/mutations/customer.ts:15",
+        "id_local": "Customer.update",
+        "entry": {
+          "kind": "graphql",
+          "locator": "src/modules/insurance/graphql/schemas/insurance.ts",
+          "route": "mutation updateCustomer"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "return models.Customer.findByIdAndUpdate(id, input, { new: true });"
+      },
+      "entity": "Customer",
+      "guards": {
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must sign in as a vendor user before doing that.",
+          "realm": "Only a signed-in vendor user can do that.",
+          "precondition": "That operation is not allowed on the given row.",
+          "required": "Missing required input (see parameter list).",
+          "not_found": "That row does not exist in this system.",
+          "fk": "The referenced parent record does not exist (check vendor/customer/product/type ids).",
+          "fk_missing": "A required parent reference is missing; create or pass it first.",
+          "unique": "That value is already taken; choose a different one.",
+          "transition": "That status change is not allowed for this row.",
+          "on_child": "This row is still referenced; clear or remove the dependents first.",
+          "constraint": "The values given violate an entity rule.",
+          "off_panel": "A provided column is not accepted by this operation."
+        }
+      },
+      "description": "Update an existing customer's profile (names, registration number, contact details)."
+    },
+    {
+      "tool": "customer_delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "Customer",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "description": "Id of the customer to delete.",
+          "required": true
+        }
+      },
+      "_evidence": {
+        "locator": "src/modules/insurance/graphql/resolvers/mutations/customer.ts:26",
+        "id_local": "Customer.delete",
+        "entry": {
+          "kind": "graphql",
+          "locator": "src/modules/insurance/graphql/schemas/insurance.ts",
+          "route": "mutation deleteCustomer"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "await models.Customer.findByIdAndDelete(id); return true;"
+      },
+      "entity": "Customer",
+      "guards": {
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must sign in as a vendor user before doing that.",
+          "realm": "Only a signed-in vendor user can do that.",
+          "precondition": "That operation is not allowed on the given row.",
+          "required": "Missing required input (see parameter list).",
+          "not_found": "That row does not exist in this system.",
+          "fk": "The referenced parent record does not exist (check vendor/customer/product/type ids).",
+          "fk_missing": "A required parent reference is missing; create or pass it first.",
+          "unique": "That value is already taken; choose a different one.",
+          "transition": "That status change is not allowed for this row.",
+          "on_child": "This row is still referenced; clear or remove the dependents first.",
+          "constraint": "The values given violate an entity rule.",
+          "off_panel": "A provided column is not accepted by this operation."
+        }
+      },
+      "description": "Delete a customer and any contracts linked to them."
+    },
+    {
+      "tool": "vendor_create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Vendor",
+        "fields": [
+          "name"
+        ],
+        "set_on_create": {
+          "offeredProducts": []
+        },
+        "unique_on": [
+          "name"
+        ]
+      },
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "description": "Unique vendor name.",
+          "required": true
+        }
+      },
+      "_evidence": {
+        "locator": "src/modules/insurance/graphql/resolvers/mutations/vendor.ts:4",
+        "id_local": "Vendor.create",
+        "entry": {
+          "kind": "graphql",
+          "locator": "src/modules/insurance/graphql/schemas/insurance.ts",
+          "route": "mutation createVendor"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "return models.Vendor.create({ name, offeredProducts: [] });"
+      },
+      "entity": "Vendor",
+      "guards": {
+        "required": [
+          "name"
+        ],
+        "messages": {
+          "auth": "You must sign in as a vendor user before doing that.",
+          "realm": "Only a signed-in vendor user can do that.",
+          "precondition": "That operation is not allowed on the given row.",
+          "required": "Missing required input (see parameter list).",
+          "not_found": "That row does not exist in this system.",
+          "fk": "The referenced parent record does not exist (check vendor/customer/product/type ids).",
+          "fk_missing": "A required parent reference is missing; create or pass it first.",
+          "unique": "That value is already taken; choose a different one.",
+          "transition": "That status change is not allowed for this row.",
+          "on_child": "This row is still referenced; clear or remove the dependents first.",
+          "constraint": "The values given violate an entity rule.",
+          "off_panel": "A provided column is not accepted by this operation."
+        }
+      },
+      "description": "Create a vendor (an insurance partner who sells policies)."
+    },
+    {
+      "tool": "vendor_update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Vendor",
+        "row_key": {
+          "id": {
+            "$arg": "id"
+          }
+        },
+        "fields": [
+          "name"
+        ]
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "description": "Id of the vendor to update.",
+          "required": true
+        },
+        "name": {
+          "type": "text",
+          "description": "New vendor name.",
+          "required": true
+        }
+      },
+      "_evidence": {
+        "locator": "src/modules/insurance/graphql/resolvers/mutations/vendor.ts:15",
+        "id_local": "Vendor.update",
+        "entry": {
+          "kind": "graphql",
+          "locator": "src/modules/insurance/graphql/schemas/insurance.ts",
+          "route": "mutation updateVendor"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "return models.Vendor.findByIdAndUpdate(id, { name }, { new: true });"
+      },
+      "entity": "Vendor",
+      "guards": {
+        "required": [
+          "id",
+          "name"
+        ],
+        "messages": {
+          "auth": "You must sign in as a vendor user before doing that.",
+          "realm": "Only a signed-in vendor user can do that.",
+          "precondition": "That operation is not allowed on the given row.",
+          "required": "Missing required input (see parameter list).",
+          "not_found": "That row does not exist in this system.",
+          "fk": "The referenced parent record does not exist (check vendor/customer/product/type ids).",
+          "fk_missing": "A required parent reference is missing; create or pass it first.",
+          "unique": "That value is already taken; choose a different one.",
+          "transition": "That status change is not allowed for this row.",
+          "on_child": "This row is still referenced; clear or remove the dependents first.",
+          "constraint": "The values given violate an entity rule.",
+          "off_panel": "A provided column is not accepted by this operation."
+        }
+      },
+      "description": "Rename a vendor."
+    },
+    {
+      "tool": "vendor_add_product",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Vendor",
+        "row_key": {
+          "id": {
+            "$arg": "vendorId"
+          }
+        },
+        "set": {
+          "offeredProducts": {
+            "$arg": "productIds"
+          }
+        }
+      },
+      "input_schema": {
+        "vendorId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the vendor to update."
+        },
+        "productIds": {
+          "type": "json",
+          "required": true,
+          "description": "New full list of Product ids the vendor should offer (replaces the current list)."
+        },
+        "pricingOverride": {
+          "type": "json",
+          "required": false,
+          "description": "Optional per-vendor pricing overrides."
+        },
+        "discountTiers": {
+          "type": "json",
+          "required": false,
+          "description": "Optional list of {minTravelers, discountPercent} tiers."
+        }
+      },
+      "_evidence": {
+        "locator": "src/modules/insurance/graphql/resolvers/mutations/vendor.ts:33",
+        "id_local": "Vendor.add_product",
+        "entry": {
+          "kind": "graphql",
+          "locator": "src/modules/insurance/graphql/schemas/insurance.ts",
+          "route": "mutation addProductToVendor"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "models.Vendor.findByIdAndUpdate(vendorId, { $push: { offeredProducts: { product: productId, pricingOverride, discountTiers: discountTiers || [] } } }, { new: true })",
+        "edges": [
+          "pushes productId into vendor offeredProducts (mutations/vendor.ts:40) — no explicit existence check, product must exist for the FK link to be valid"
+        ]
+      },
+      "entity": "Vendor",
+      "guards": {
+        "messages": {
+          "auth": "You must sign in as a vendor user before doing that.",
+          "realm": "Only a signed-in vendor user can do that.",
+          "precondition": "That operation is not allowed on the given row.",
+          "required": "Missing required input (see parameter list).",
+          "not_found": "That row does not exist in this system.",
+          "fk": "The referenced parent record does not exist (check vendor/customer/product/type ids).",
+          "fk_missing": "A required parent reference is missing; create or pass it first.",
+          "unique": "That value is already taken; choose a different one.",
+          "transition": "That status change is not allowed for this row.",
+          "on_child": "This row is still referenced; clear or remove the dependents first.",
+          "constraint": "The values given violate an entity rule.",
+          "off_panel": "A provided column is not accepted by this operation."
+        },
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Vendor",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "vendorId"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "vendorId",
+          "productIds"
+        ]
+      },
+      "description": "Add insurance product(s) to a vendor's offering. Pass the new full list of product ids (with per-vendor pricing/discount tiers if desired); it replaces the vendor's current offering."
+    },
+    {
+      "tool": "vendoruser_create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "VendorUser",
+        "fields": [
+          "name",
+          "email",
+          "phone",
+          "role",
+          "password"
+        ],
+        "set_on_create": {
+          "vendor": {
+            "$arg": "vendorId"
+          }
+        },
+        "unique_on": [
+          "email"
+        ]
+      },
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "description": "Display name of the user."
+        },
+        "email": {
+          "type": "text",
+          "description": "Unique login email.",
+          "required": true
+        },
+        "phone": {
+          "type": "text",
+          "description": "Optional unique phone number."
+        },
+        "password": {
+          "type": "text",
+          "description": "Plaintext password (stored hashed, compared at login).",
+          "required": true
+        },
+        "vendorId": {
+          "type": "int",
+          "description": "Id of the vendor this user belongs to.",
+          "required": true
+        },
+        "role": {
+          "type": "text",
+          "description": "user, admin or manager."
+        }
+      },
+      "_evidence": {
+        "locator": "src/modules/insurance/graphql/resolvers/mutations/vendorUser.ts:6",
+        "id_local": "VendorUser.create",
+        "entry": {
+          "kind": "graphql",
+          "locator": "src/modules/insurance/graphql/schemas/insurance.ts",
+          "route": "mutation createVendorUser"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "const existingUser = await models.VendorUser.findOne({ email });\nif (existingUser) throw new Error('A vendor user with this email already exists');\nconst hashedPassword = await bcrypt.hash(password, 10);\n... VendorUser.create({ ..., password: hashedPassword, vendor: vendorId, role: role || 'user' })",
+        "edges": [
+          "if (existingUser) throw new Error('A vendor user with this email already exists') (mutations/vendorUser.ts:9)"
+        ]
+      },
+      "entity": "VendorUser",
+      "guards": {
+        "required": [
+          "email",
+          "password",
+          "vendorId"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "VendorUser",
+                "where": {
+                  "node": "field",
+                  "col": "email",
+                  "op": "eq",
+                  "value": {
+                    "arg": "email"
+                  }
+                }
+              },
+              "op": "eq",
+              "n": 0
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must sign in as a vendor user before doing that.",
+          "realm": "Only a signed-in vendor user can do that.",
+          "precondition": "That operation is not allowed on the given row.",
+          "required": "Missing required input (see parameter list).",
+          "not_found": "That row does not exist in this system.",
+          "fk": "The referenced parent record does not exist (check vendor/customer/product/type ids).",
+          "fk_missing": "A required parent reference is missing; create or pass it first.",
+          "unique": "That value is already taken; choose a different one.",
+          "transition": "That status change is not allowed for this row.",
+          "on_child": "This row is still referenced; clear or remove the dependents first.",
+          "constraint": "The values given violate an entity rule.",
+          "off_panel": "A provided column is not accepted by this operation."
+        }
+      },
+      "description": "Create a vendor-user account that can sign in and manage a vendor. The email must be unique."
+    },
+    {
+      "tool": "vendoruser_update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "VendorUser",
+        "row_key": {
+          "id": {
+            "$arg": "id"
+          }
+        },
+        "fields": [
+          "name",
+          "email",
+          "phone",
+          "role",
+          "password"
+        ]
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "description": "Id of the vendor user to update.",
+          "required": true
+        },
+        "name": {
+          "type": "text",
+          "description": "New value for name."
+        },
+        "email": {
+          "type": "text",
+          "description": "New value for email."
+        },
+        "phone": {
+          "type": "text",
+          "description": "New value for phone."
+        },
+        "password": {
+          "type": "text",
+          "description": "New value for password."
+        },
+        "role": {
+          "type": "text",
+          "description": "New value for role."
+        }
+      },
+      "_evidence": {
+        "locator": "src/modules/insurance/graphql/resolvers/mutations/vendorUser.ts:46",
+        "id_local": "VendorUser.update",
+        "entry": {
+          "kind": "graphql",
+          "locator": "src/modules/insurance/graphql/schemas/insurance.ts",
+          "route": "mutation updateVendorUser"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "if (email !== undefined) { const existing = await models.VendorUser.findOne({ email, _id: { $ne: id } }); if (existing) throw new Error('A vendor user with this email already exists'); }\nif (password) updateData.password = await bcrypt.hash(password, 10);\n... findByIdAndUpdate(id, updateData, { new: true })",
+        "edges": [
+          "if (existing) throw new Error('A vendor user with this email already exists') (mutations/vendorUser.ts:51)"
+        ]
+      },
+      "entity": "VendorUser",
+      "guards": {
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must sign in as a vendor user before doing that.",
+          "realm": "Only a signed-in vendor user can do that.",
+          "precondition": "That operation is not allowed on the given row.",
+          "required": "Missing required input (see parameter list).",
+          "not_found": "That row does not exist in this system.",
+          "fk": "The referenced parent record does not exist (check vendor/customer/product/type ids).",
+          "fk_missing": "A required parent reference is missing; create or pass it first.",
+          "unique": "That value is already taken; choose a different one.",
+          "transition": "That status change is not allowed for this row.",
+          "on_child": "This row is still referenced; clear or remove the dependents first.",
+          "constraint": "The values given violate an entity rule.",
+          "off_panel": "A provided column is not accepted by this operation."
+        }
+      },
+      "description": "Update a vendor user's profile, role or password. Email and phone must stay unique."
+    },
+    {
+      "tool": "vendoruser_delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "VendorUser",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "description": "Id of the vendor user to delete.",
+          "required": true
+        }
+      },
+      "_evidence": {
+        "locator": "src/modules/insurance/graphql/resolvers/mutations/vendorUser.ts:90",
+        "id_local": "VendorUser.delete",
+        "entry": {
+          "kind": "graphql",
+          "locator": "src/modules/insurance/graphql/schemas/insurance.ts",
+          "route": "mutation deleteVendorUser"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "await models.VendorUser.findByIdAndDelete(id); return true;"
+      },
+      "entity": "VendorUser",
+      "guards": {
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must sign in as a vendor user before doing that.",
+          "realm": "Only a signed-in vendor user can do that.",
+          "precondition": "That operation is not allowed on the given row.",
+          "required": "Missing required input (see parameter list).",
+          "not_found": "That row does not exist in this system.",
+          "fk": "The referenced parent record does not exist (check vendor/customer/product/type ids).",
+          "fk_missing": "A required parent reference is missing; create or pass it first.",
+          "unique": "That value is already taken; choose a different one.",
+          "transition": "That status change is not allowed for this row.",
+          "on_child": "This row is still referenced; clear or remove the dependents first.",
+          "constraint": "The values given violate an entity rule.",
+          "off_panel": "A provided column is not accepted by this operation."
+        }
+      },
+      "description": "Delete a vendor-user account."
+    },
+    {
+      "tool": "insurancetype_create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "InsuranceType",
+        "fields": [
+          "name",
+          "attributes",
+          "isCitizen"
+        ],
+        "unique_on": [
+          "name"
+        ]
+      },
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "description": "Human-readable type name (e.g. Motor).",
+          "required": true
+        },
+        "attributes": {
+          "type": "json",
+          "description": "JSON attributes describing the type."
+        },
+        "isCitizen": {
+          "type": "bool",
+          "description": "Whether this is a citizen (personal) type."
+        }
+      },
+      "_evidence": {
+        "locator": "src/modules/insurance/graphql/resolvers/mutations/insuranceType.ts:31",
+        "id_local": "InsuranceType.create",
+        "entry": {
+          "kind": "graphql",
+          "locator": "src/modules/insurance/graphql/schemas/insurance.ts",
+          "route": "mutation createInsuranceType"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "const code = generateCode(name);\nreturn models.InsuranceType.create({ name, code, isCitizen: isCitizen || false, attributes: processedAttributes });"
+      },
+      "entity": "InsuranceType",
+      "guards": {
+        "required": [
+          "name"
+        ],
+        "messages": {
+          "auth": "You must sign in as a vendor user before doing that.",
+          "realm": "Only a signed-in vendor user can do that.",
+          "precondition": "That operation is not allowed on the given row.",
+          "required": "Missing required input (see parameter list).",
+          "not_found": "That row does not exist in this system.",
+          "fk": "The referenced parent record does not exist (check vendor/customer/product/type ids).",
+          "fk_missing": "A required parent reference is missing; create or pass it first.",
+          "unique": "That value is already taken; choose a different one.",
+          "transition": "That status change is not allowed for this row.",
+          "on_child": "This row is still referenced; clear or remove the dependents first.",
+          "constraint": "The values given violate an entity rule.",
+          "off_panel": "A provided column is not accepted by this operation."
+        }
+      },
+      "description": "Create an insurance type (motor, travel, ...). Its code, shown on policies, is derived from the name and must be unique."
+    },
+    {
+      "tool": "insurancetype_update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "InsuranceType",
+        "row_key": {
+          "id": {
+            "$arg": "id"
+          }
+        },
+        "fields": [
+          "name",
+          "attributes",
+          "isCitizen"
+        ]
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "description": "Id of the insurance type to update.",
+          "required": true
+        },
+        "name": {
+          "type": "text",
+          "description": "New value for name."
+        },
+        "attributes": {
+          "type": "json",
+          "description": "New value for attributes."
+        },
+        "isCitizen": {
+          "type": "bool",
+          "description": "New value for isCitizen."
+        }
+      },
+      "_evidence": {
+        "locator": "src/modules/insurance/graphql/resolvers/mutations/insuranceType.ts:54",
+        "id_local": "InsuranceType.update",
+        "entry": {
+          "kind": "graphql",
+          "locator": "src/modules/insurance/graphql/schemas/insurance.ts",
+          "route": "mutation updateInsuranceType"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "if (name) { updateData.name = name; updateData.code = generateCode(name); }\nif (attributes) updateData.attributes = processAttributes(attributes);\nif (isCitizen !== undefined) updateData.isCitizen = isCitizen;\nreturn models.InsuranceType.findByIdAndUpdate(id, updateData, { new: true });"
+      },
+      "entity": "InsuranceType",
+      "guards": {
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must sign in as a vendor user before doing that.",
+          "realm": "Only a signed-in vendor user can do that.",
+          "precondition": "That operation is not allowed on the given row.",
+          "required": "Missing required input (see parameter list).",
+          "not_found": "That row does not exist in this system.",
+          "fk": "The referenced parent record does not exist (check vendor/customer/product/type ids).",
+          "fk_missing": "A required parent reference is missing; create or pass it first.",
+          "unique": "That value is already taken; choose a different one.",
+          "transition": "That status change is not allowed for this row.",
+          "on_child": "This row is still referenced; clear or remove the dependents first.",
+          "constraint": "The values given violate an entity rule.",
+          "off_panel": "A provided column is not accepted by this operation."
+        }
+      },
+      "description": "Update an insurance type's name, attributes or citizen flag."
+    },
+    {
+      "tool": "insurancetype_delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "InsuranceType",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "description": "Id of the insurance type to delete.",
+          "required": true
+        }
+      },
+      "_evidence": {
+        "locator": "src/modules/insurance/graphql/resolvers/mutations/insuranceType.ts:83",
+        "id_local": "InsuranceType.delete",
+        "entry": {
+          "kind": "graphql",
+          "locator": "src/modules/insurance/graphql/schemas/insurance.ts",
+          "route": "mutation deleteInsuranceType"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "await models.InsuranceType.findByIdAndDelete(id); return true;"
+      },
+      "entity": "InsuranceType",
+      "guards": {
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must sign in as a vendor user before doing that.",
+          "realm": "Only a signed-in vendor user can do that.",
+          "precondition": "That operation is not allowed on the given row.",
+          "required": "Missing required input (see parameter list).",
+          "not_found": "That row does not exist in this system.",
+          "fk": "The referenced parent record does not exist (check vendor/customer/product/type ids).",
+          "fk_missing": "A required parent reference is missing; create or pass it first.",
+          "unique": "That value is already taken; choose a different one.",
+          "transition": "That status change is not allowed for this row.",
+          "on_child": "This row is still referenced; clear or remove the dependents first.",
+          "constraint": "The values given violate an entity rule.",
+          "off_panel": "A provided column is not accepted by this operation."
+        }
+      },
+      "description": "Delete an insurance type and any products that belong to it."
+    },
+    {
+      "tool": "product_create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Product",
+        "fields": [
+          "name",
+          "pricingConfig",
+          "pdfContent",
+          "templateId",
+          "additionalCoverages",
+          "compensationCalculations",
+          "deductibleConfig"
+        ],
+        "set_on_create": {
+          "insuranceType": {
+            "$arg": "insuranceTypeId"
+          },
+          "regions": {
+            "$arg": "regionIds"
+          },
+          "coveredRisks": {
+            "$arg": "coveredRisks"
+          }
+        }
+      },
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "description": "Product name.",
+          "required": true
+        },
+        "insuranceTypeId": {
+          "type": "int",
+          "description": "Id of the insurance type this product belongs to.",
+          "required": true
+        },
+        "coveredRisks": {
+          "type": "json",
+          "description": "List of {riskId, coveragePercentage}.",
+          "required": true
+        },
+        "pricingConfig": {
+          "type": "json",
+          "description": "JSON pricing configuration (daily rate, ...).",
+          "required": true
+        },
+        "pdfContent": {
+          "type": "text",
+          "description": "JSON pdfContent."
+        },
+        "templateId": {
+          "type": "int",
+          "description": "Contract template used to render this product's PDF."
+        },
+        "additionalCoverages": {
+          "type": "json",
+          "description": "JSON additionalCoverages."
+        },
+        "compensationCalculations": {
+          "type": "json",
+          "description": "JSON compensationCalculations."
+        },
+        "deductibleConfig": {
+          "type": "json",
+          "description": "JSON deductible configuration."
+        },
+        "regionIds": {
+          "type": "json",
+          "description": "Ids of the regions where the product is sold."
+        }
+      },
+      "_evidence": {
+        "locator": "src/modules/insurance/graphql/resolvers/mutations/product.ts:4",
+        "id_local": "Product.create",
+        "entry": {
+          "kind": "graphql",
+          "locator": "src/modules/insurance/graphql/schemas/insurance.ts",
+          "route": "mutation createInsuranceProduct"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "const product = await models.Product.create({ ...rest, insuranceType: insuranceTypeId, regions: regionIds || [], coveredRisks: coveredRisks.map(cr => ({ risk: cr.riskId, coveragePercentage: cr.coveragePercentage })), ... });",
+        "edges": [
+          "createInsuranceProduct sets insuranceType to insuranceTypeId (mutations/product.ts:4)"
+        ]
+      },
+      "entity": "Product",
+      "guards": {
+        "required": [
+          "name",
+          "insuranceTypeId",
+          "coveredRisks",
+          "pricingConfig"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "InsuranceType",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "insuranceTypeId"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must sign in as a vendor user before doing that.",
+          "realm": "Only a signed-in vendor user can do that.",
+          "precondition": "That operation is not allowed on the given row.",
+          "required": "Missing required input (see parameter list).",
+          "not_found": "That row does not exist in this system.",
+          "fk": "The referenced parent record does not exist (check vendor/customer/product/type ids).",
+          "fk_missing": "A required parent reference is missing; create or pass it first.",
+          "unique": "That value is already taken; choose a different one.",
+          "transition": "That status change is not allowed for this row.",
+          "on_child": "This row is still referenced; clear or remove the dependents first.",
+          "constraint": "The values given violate an entity rule.",
+          "off_panel": "A provided column is not accepted by this operation."
+        }
+      },
+      "description": "Create an insurance product under an insurance type, covering risk categories in given regions with a pricing config."
+    },
+    {
+      "tool": "product_update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Product",
+        "row_key": {
+          "id": {
+            "$arg": "id"
+          }
+        },
+        "fields": {
+          "name": {
+            "$arg": "name"
+          },
+          "pricingConfig": {
+            "$arg": "pricingConfig"
+          },
+          "pdfContent": {
+            "$arg": "pdfContent"
+          },
+          "templateId": {
+            "$arg": "templateId"
+          },
+          "additionalCoverages": {
+            "$arg": "additionalCoverages"
+          },
+          "compensationCalculations": {
+            "$arg": "compensationCalculations"
+          },
+          "deductibleConfig": {
+            "$arg": "deductibleConfig"
+          },
+          "regions": {
+            "$arg": "regionIds"
+          }
+        },
+        "set": {
+          "coveredRisks": {
+            "$arg": "coveredRisks"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "description": "Id of the product to update.",
+          "required": true
+        },
+        "name": {
+          "type": "text",
+          "description": "New value for name."
+        },
+        "coveredRisks": {
+          "type": "json",
+          "description": "New value for coveredRisks."
+        },
+        "pricingConfig": {
+          "type": "json",
+          "description": "New value for pricingConfig."
+        },
+        "pdfContent": {
+          "type": "text",
+          "description": "New value for pdfContent."
+        },
+        "templateId": {
+          "type": "int",
+          "description": "New value for templateId."
+        },
+        "additionalCoverages": {
+          "type": "json",
+          "description": "New value for additionalCoverages."
+        },
+        "compensationCalculations": {
+          "type": "json",
+          "description": "New value for compensationCalculations."
+        },
+        "deductibleConfig": {
+          "type": "json",
+          "description": "New value for deductibleConfig."
+        },
+        "regionIds": {
+          "type": "json",
+          "description": "New value for regionIds."
+        }
+      },
+      "_evidence": {
+        "locator": "src/modules/insurance/graphql/resolvers/mutations/product.ts:41",
+        "id_local": "Product.update",
+        "entry": {
+          "kind": "graphql",
+          "locator": "src/modules/insurance/graphql/schemas/insurance.ts",
+          "route": "mutation updateInsuranceProduct"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "const updateData = {};\nif (name !== undefined) updateData.name = name;\n...\nif (coveredRisks !== undefined) updateData.coveredRisks = coveredRisks.map(cr => ({ risk: cr.riskId, coveragePercentage: cr.coveragePercentage }));\nif (regionIds !== undefined) updateData.regions = regionIds;\nconst product = await models.Product.findByIdAndUpdate(id, updateData, { new: true });"
+      },
+      "entity": "Product",
+      "guards": {
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must sign in as a vendor user before doing that.",
+          "realm": "Only a signed-in vendor user can do that.",
+          "precondition": "That operation is not allowed on the given row.",
+          "required": "Missing required input (see parameter list).",
+          "not_found": "That row does not exist in this system.",
+          "fk": "The referenced parent record does not exist (check vendor/customer/product/type ids).",
+          "fk_missing": "A required parent reference is missing; create or pass it first.",
+          "unique": "That value is already taken; choose a different one.",
+          "transition": "That status change is not allowed for this row.",
+          "on_child": "This row is still referenced; clear or remove the dependents first.",
+          "constraint": "The values given violate an entity rule.",
+          "off_panel": "A provided column is not accepted by this operation."
+        }
+      },
+      "description": "Update an insurance product: pricing, risks, regions, template or coverage details. Only the fields you pass are changed."
+    },
+    {
+      "tool": "product_delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "Product",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "description": "Id of the product to delete.",
+          "required": true
+        }
+      },
+      "_evidence": {
+        "locator": "src/modules/insurance/graphql/resolvers/mutations/product.ts:108",
+        "id_local": "Product.delete",
+        "entry": {
+          "kind": "graphql",
+          "locator": "src/modules/insurance/graphql/schemas/insurance.ts",
+          "route": "mutation deleteInsuranceProduct"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "await models.Product.findByIdAndDelete(id); return true;"
+      },
+      "entity": "Product",
+      "guards": {
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must sign in as a vendor user before doing that.",
+          "realm": "Only a signed-in vendor user can do that.",
+          "precondition": "That operation is not allowed on the given row.",
+          "required": "Missing required input (see parameter list).",
+          "not_found": "That row does not exist in this system.",
+          "fk": "The referenced parent record does not exist (check vendor/customer/product/type ids).",
+          "fk_missing": "A required parent reference is missing; create or pass it first.",
+          "unique": "That value is already taken; choose a different one.",
+          "transition": "That status change is not allowed for this row.",
+          "on_child": "This row is still referenced; clear or remove the dependents first.",
+          "constraint": "The values given violate an entity rule.",
+          "off_panel": "A provided column is not accepted by this operation."
+        }
+      },
+      "description": "Delete an insurance product and any contracts issued against it."
+    },
+    {
+      "tool": "risktype_create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "RiskType",
+        "fields": [
+          "name",
+          "description"
+        ]
+      },
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "description": "Risk type name.",
+          "required": true
+        },
+        "description": {
+          "type": "text",
+          "description": "Short description of the risk."
+        }
+      },
+      "_evidence": {
+        "locator": "src/modules/insurance/graphql/resolvers/mutations/riskType.ts:4",
+        "id_local": "RiskType.create",
+        "entry": {
+          "kind": "graphql",
+          "locator": "src/modules/insurance/graphql/schemas/insurance.ts",
+          "route": "mutation createRiskType"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "return models.RiskType.create({ name, description });"
+      },
+      "entity": "RiskType",
+      "guards": {
+        "required": [
+          "name"
+        ],
+        "messages": {
+          "auth": "You must sign in as a vendor user before doing that.",
+          "realm": "Only a signed-in vendor user can do that.",
+          "precondition": "That operation is not allowed on the given row.",
+          "required": "Missing required input (see parameter list).",
+          "not_found": "That row does not exist in this system.",
+          "fk": "The referenced parent record does not exist (check vendor/customer/product/type ids).",
+          "fk_missing": "A required parent reference is missing; create or pass it first.",
+          "unique": "That value is already taken; choose a different one.",
+          "transition": "That status change is not allowed for this row.",
+          "on_child": "This row is still referenced; clear or remove the dependents first.",
+          "constraint": "The values given violate an entity rule.",
+          "off_panel": "A provided column is not accepted by this operation."
+        }
+      },
+      "description": "Create a risk type (a category of covered risk)."
+    },
+    {
+      "tool": "risktype_update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "RiskType",
+        "row_key": {
+          "id": {
+            "$arg": "id"
+          }
+        },
+        "fields": [
+          "name",
+          "description"
+        ]
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "description": "Id of the risk type to update.",
+          "required": true
+        },
+        "name": {
+          "type": "text",
+          "description": "New value for name."
+        },
+        "description": {
+          "type": "text",
+          "description": "New value for description."
+        }
+      },
+      "_evidence": {
+        "locator": "src/modules/insurance/graphql/resolvers/mutations/riskType.ts:15",
+        "id_local": "RiskType.update",
+        "entry": {
+          "kind": "graphql",
+          "locator": "src/modules/insurance/graphql/schemas/insurance.ts",
+          "route": "mutation updateRiskType"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "return models.RiskType.findByIdAndUpdate(id, { name, description }, { new: true });"
+      },
+      "entity": "RiskType",
+      "guards": {
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must sign in as a vendor user before doing that.",
+          "realm": "Only a signed-in vendor user can do that.",
+          "precondition": "That operation is not allowed on the given row.",
+          "required": "Missing required input (see parameter list).",
+          "not_found": "That row does not exist in this system.",
+          "fk": "The referenced parent record does not exist (check vendor/customer/product/type ids).",
+          "fk_missing": "A required parent reference is missing; create or pass it first.",
+          "unique": "That value is already taken; choose a different one.",
+          "transition": "That status change is not allowed for this row.",
+          "on_child": "This row is still referenced; clear or remove the dependents first.",
+          "constraint": "The values given violate an entity rule.",
+          "off_panel": "A provided column is not accepted by this operation."
+        }
+      },
+      "description": "Update a risk type's name or description."
+    },
+    {
+      "tool": "risktype_delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "RiskType",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "description": "Id of the risk type to delete.",
+          "required": true
+        }
+      },
+      "_evidence": {
+        "locator": "src/modules/insurance/graphql/resolvers/mutations/riskType.ts:34",
+        "id_local": "RiskType.delete",
+        "entry": {
+          "kind": "graphql",
+          "locator": "src/modules/insurance/graphql/schemas/insurance.ts",
+          "route": "mutation deleteRiskType"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "await models.RiskType.findByIdAndDelete(id); return true;"
+      },
+      "entity": "RiskType",
+      "guards": {
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must sign in as a vendor user before doing that.",
+          "realm": "Only a signed-in vendor user can do that.",
+          "precondition": "That operation is not allowed on the given row.",
+          "required": "Missing required input (see parameter list).",
+          "not_found": "That row does not exist in this system.",
+          "fk": "The referenced parent record does not exist (check vendor/customer/product/type ids).",
+          "fk_missing": "A required parent reference is missing; create or pass it first.",
+          "unique": "That value is already taken; choose a different one.",
+          "transition": "That status change is not allowed for this row.",
+          "on_child": "This row is still referenced; clear or remove the dependents first.",
+          "constraint": "The values given violate an entity rule.",
+          "off_panel": "A provided column is not accepted by this operation."
+        }
+      },
+      "description": "Delete a risk type."
+    },
+    {
+      "tool": "template_create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Template",
+        "fields": [
+          "name",
+          "description",
+          "htmlContent",
+          "cssContent"
+        ],
+        "set_on_create": {
+          "status": "draft",
+          "version": 1
+        }
+      },
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "description": "Template name.",
+          "required": true
+        },
+        "description": {
+          "type": "text",
+          "description": "Short description."
+        },
+        "htmlContent": {
+          "type": "text",
+          "description": "HTML body of the template.",
+          "required": true
+        },
+        "cssContent": {
+          "type": "text",
+          "description": "CSS for the template (defaults to empty)."
+        }
+      },
+      "_evidence": {
+        "locator": "src/modules/insurance/graphql/resolvers/mutations/template.ts:21",
+        "id_local": "Template.create",
+        "entry": {
+          "kind": "graphql",
+          "locator": "src/modules/insurance/graphql/schemas/insurance.ts",
+          "route": "mutation createContractTemplate"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "return models.Template.create({ name, description: description || '', htmlContent: htmlContent || defaultHtmlContent, cssContent: cssContent || '', status: 'draft', version: 1 });"
+      },
+      "entity": "Template",
+      "guards": {
+        "required": [
+          "name",
+          "htmlContent"
+        ],
+        "messages": {
+          "auth": "You must sign in as a vendor user before doing that.",
+          "realm": "Only a signed-in vendor user can do that.",
+          "precondition": "That operation is not allowed on the given row.",
+          "required": "Missing required input (see parameter list).",
+          "not_found": "That row does not exist in this system.",
+          "fk": "The referenced parent record does not exist (check vendor/customer/product/type ids).",
+          "fk_missing": "A required parent reference is missing; create or pass it first.",
+          "unique": "That value is already taken; choose a different one.",
+          "transition": "That status change is not allowed for this row.",
+          "on_child": "This row is still referenced; clear or remove the dependents first.",
+          "constraint": "The values given violate an entity rule.",
+          "off_panel": "A provided column is not accepted by this operation."
+        }
+      },
+      "description": "Create a contract template (HTML/CSS) used to render contract PDFs. Starts as a draft."
+    },
+    {
+      "tool": "template_update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Template",
+        "row_key": {
+          "id": {
+            "$arg": "id"
+          }
+        },
+        "fields": [
+          "name",
+          "description",
+          "htmlContent",
+          "cssContent",
+          "status"
+        ]
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "description": "Id of the template to update.",
+          "required": true
+        },
+        "name": {
+          "type": "text",
+          "description": "New value for name."
+        },
+        "description": {
+          "type": "text",
+          "description": "New value for description."
+        },
+        "htmlContent": {
+          "type": "text",
+          "description": "New value for htmlContent."
+        },
+        "cssContent": {
+          "type": "text",
+          "description": "New value for cssContent."
+        },
+        "status": {
+          "type": "text",
+          "description": "New value for status."
+        }
+      },
+      "_evidence": {
+        "locator": "src/modules/insurance/graphql/resolvers/mutations/template.ts:63",
+        "id_local": "Template.update",
+        "entry": {
+          "kind": "graphql",
+          "locator": "src/modules/insurance/graphql/schemas/insurance.ts",
+          "route": "mutation updateContractTemplate"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "const updateData = {};\nif (name !== undefined) updateData.name = name;\n...\nif (status !== undefined) updateData.status = status;\nreturn models.Template.findByIdAndUpdate(id, updateData, { new: true });"
+      },
+      "entity": "Template",
+      "guards": {
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must sign in as a vendor user before doing that.",
+          "realm": "Only a signed-in vendor user can do that.",
+          "precondition": "That operation is not allowed on the given row.",
+          "required": "Missing required input (see parameter list).",
+          "not_found": "That row does not exist in this system.",
+          "fk": "The referenced parent record does not exist (check vendor/customer/product/type ids).",
+          "fk_missing": "A required parent reference is missing; create or pass it first.",
+          "unique": "That value is already taken; choose a different one.",
+          "transition": "That status change is not allowed for this row.",
+          "on_child": "This row is still referenced; clear or remove the dependents first.",
+          "constraint": "The values given violate an entity rule.",
+          "off_panel": "A provided column is not accepted by this operation."
+        }
+      },
+      "description": "Update a contract template — its name, HTML/CSS content or status (draft/active/archived). Only the fields you pass are changed."
+    },
+    {
+      "tool": "template_delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "Template",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "description": "Id of the template to delete.",
+          "required": true
+        }
+      },
+      "_evidence": {
+        "locator": "src/modules/insurance/graphql/resolvers/mutations/template.ts:95",
+        "id_local": "Template.delete",
+        "entry": {
+          "kind": "graphql",
+          "locator": "src/modules/insurance/graphql/schemas/insurance.ts",
+          "route": "mutation deleteContractTemplate"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "await models.Template.findByIdAndDelete(id); return { success: true };"
+      },
+      "entity": "Template",
+      "guards": {
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must sign in as a vendor user before doing that.",
+          "realm": "Only a signed-in vendor user can do that.",
+          "precondition": "That operation is not allowed on the given row.",
+          "required": "Missing required input (see parameter list).",
+          "not_found": "That row does not exist in this system.",
+          "fk": "The referenced parent record does not exist (check vendor/customer/product/type ids).",
+          "fk_missing": "A required parent reference is missing; create or pass it first.",
+          "unique": "That value is already taken; choose a different one.",
+          "transition": "That status change is not allowed for this row.",
+          "on_child": "This row is still referenced; clear or remove the dependents first.",
+          "constraint": "The values given violate an entity rule.",
+          "off_panel": "A provided column is not accepted by this operation."
+        }
+      },
+      "description": "Delete a contract template."
+    },
+    {
+      "tool": "region_create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Region",
+        "fields": [
+          "name",
+          "countries"
+        ],
+        "unique_on": [
+          "name"
+        ]
+      },
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "description": "Unique region name.",
+          "required": true
+        },
+        "countries": {
+          "type": "json",
+          "description": "List of country names in the region.",
+          "required": true
+        }
+      },
+      "_evidence": {
+        "locator": "src/modules/insurance/graphql/resolvers/mutations/region.ts:216",
+        "id_local": "Region.create",
+        "entry": {
+          "kind": "graphql",
+          "locator": "src/modules/insurance/graphql/schemas/insurance.ts",
+          "route": "mutation createInsuranceRegion"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "await models.Region.updateMany({ countries: { $in: countries } }, { $pull: { countries: { $in: countries } } });\nreturn models.Region.create({ name, countries });",
+        "edges": [
+          "createInsuranceRegion removes countries from other regions, then creates (mutations/region.ts:216-231)"
+        ]
+      },
+      "entity": "Region",
+      "guards": {
+        "required": [
+          "name",
+          "countries"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Region",
+                "where": {
+                  "node": "field",
+                  "col": "name",
+                  "op": "eq",
+                  "value": {
+                    "arg": "name"
+                  }
+                }
+              },
+              "op": "eq",
+              "n": 0
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must sign in as a vendor user before doing that.",
+          "realm": "Only a signed-in vendor user can do that.",
+          "precondition": "That operation is not allowed on the given row.",
+          "required": "Missing required input (see parameter list).",
+          "not_found": "That row does not exist in this system.",
+          "fk": "The referenced parent record does not exist (check vendor/customer/product/type ids).",
+          "fk_missing": "A required parent reference is missing; create or pass it first.",
+          "unique": "That value is already taken; choose a different one.",
+          "transition": "That status change is not allowed for this row.",
+          "on_child": "This row is still referenced; clear or remove the dependents first.",
+          "constraint": "The values given violate an entity rule.",
+          "off_panel": "A provided column is not accepted by this operation."
+        }
+      },
+      "description": "Create a coverage region and the list of countries it covers."
+    },
+    {
+      "tool": "region_update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Region",
+        "row_key": {
+          "id": {
+            "$arg": "id"
+          }
+        },
+        "fields": [
+          "name",
+          "countries"
+        ]
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "description": "Id of the region to update.",
+          "required": true
+        },
+        "name": {
+          "type": "text",
+          "description": "New region name."
+        },
+        "countries": {
+          "type": "json",
+          "description": "Full replacement list of countries."
+        }
+      },
+      "_evidence": {
+        "locator": "src/modules/insurance/graphql/resolvers/mutations/region.ts:233",
+        "id_local": "Region.update",
+        "entry": {
+          "kind": "graphql",
+          "locator": "src/modules/insurance/graphql/schemas/insurance.ts",
+          "route": "mutation updateInsuranceRegion"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "if (countries !== undefined) { await models.Region.updateMany({ _id: { $ne: id }, countries: { $in: countries } }, { $pull: { countries: { $in: countries } } }); updateData.countries = countries; }\nreturn models.Region.findByIdAndUpdate(id, updateData, { new: true });",
+        "edges": [
+          "updateInsuranceRegion finds and updates by id (mutations/region.ts:233)"
+        ]
+      },
+      "entity": "Region",
+      "guards": {
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must sign in as a vendor user before doing that.",
+          "realm": "Only a signed-in vendor user can do that.",
+          "precondition": "That operation is not allowed on the given row.",
+          "required": "Missing required input (see parameter list).",
+          "not_found": "That row does not exist in this system.",
+          "fk": "The referenced parent record does not exist (check vendor/customer/product/type ids).",
+          "fk_missing": "A required parent reference is missing; create or pass it first.",
+          "unique": "That value is already taken; choose a different one.",
+          "transition": "That status change is not allowed for this row.",
+          "on_child": "This row is still referenced; clear or remove the dependents first.",
+          "constraint": "The values given violate an entity rule.",
+          "off_panel": "A provided column is not accepted by this operation."
+        }
+      },
+      "description": "Rename a region or replace the full list of countries it covers."
+    },
+    {
+      "tool": "region_delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "Region",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "description": "Id of the region to delete.",
+          "required": true
+        }
+      },
+      "_evidence": {
+        "locator": "src/modules/insurance/graphql/resolvers/mutations/region.ts:259",
+        "id_local": "Region.delete",
+        "entry": {
+          "kind": "graphql",
+          "locator": "src/modules/insurance/graphql/schemas/insurance.ts",
+          "route": "mutation deleteInsuranceRegion"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "await models.Region.findByIdAndDelete(id); return true;"
+      },
+      "entity": "Region",
+      "guards": {
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must sign in as a vendor user before doing that.",
+          "realm": "Only a signed-in vendor user can do that.",
+          "precondition": "That operation is not allowed on the given row.",
+          "required": "Missing required input (see parameter list).",
+          "not_found": "That row does not exist in this system.",
+          "fk": "The referenced parent record does not exist (check vendor/customer/product/type ids).",
+          "fk_missing": "A required parent reference is missing; create or pass it first.",
+          "unique": "That value is already taken; choose a different one.",
+          "transition": "That status change is not allowed for this row.",
+          "on_child": "This row is still referenced; clear or remove the dependents first.",
+          "constraint": "The values given violate an entity rule.",
+          "off_panel": "A provided column is not accepted by this operation."
+        }
+      },
+      "description": "Delete a coverage region."
+    },
+    {
+      "tool": "region_add_country",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Region",
+        "row_key": {
+          "id": {
+            "$arg": "regionId"
+          }
+        },
+        "set": {
+          "countries": {
+            "$arg": "countries"
+          }
+        }
+      },
+      "input_schema": {
+        "regionId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the region to update."
+        },
+        "countries": {
+          "type": "json",
+          "required": true,
+          "description": "New full list of country names the region should cover (replaces the current list)."
+        }
+      },
+      "_evidence": {
+        "locator": "src/modules/insurance/graphql/resolvers/mutations/region.ts:271",
+        "id_local": "Region.add_country",
+        "entry": {
+          "kind": "graphql",
+          "locator": "src/modules/insurance/graphql/schemas/insurance.ts",
+          "route": "mutation addCountryToRegion"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "await models.Region.updateMany({ countries: country }, { $pull: { countries: country } });\nreturn models.Region.findByIdAndUpdate(regionId, { $addToSet: { countries: country } }, { new: true });",
+        "edges": [
+          "addCountryToRegion findByIdAndUpdate regionId after removing country from others (mutations/region.ts:271)"
+        ]
+      },
+      "entity": "Region",
+      "guards": {
+        "messages": {
+          "auth": "You must sign in as a vendor user before doing that.",
+          "realm": "Only a signed-in vendor user can do that.",
+          "precondition": "That operation is not allowed on the given row.",
+          "required": "Missing required input (see parameter list).",
+          "not_found": "That row does not exist in this system.",
+          "fk": "The referenced parent record does not exist (check vendor/customer/product/type ids).",
+          "fk_missing": "A required parent reference is missing; create or pass it first.",
+          "unique": "That value is already taken; choose a different one.",
+          "transition": "That status change is not allowed for this row.",
+          "on_child": "This row is still referenced; clear or remove the dependents first.",
+          "constraint": "The values given violate an entity rule.",
+          "off_panel": "A provided column is not accepted by this operation."
+        },
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Region",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "regionId"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "regionId",
+          "countries"
+        ]
+      },
+      "description": "Add countries to a coverage region. Pass the new full list of country names; it replaces the region's current country list."
+    },
+    {
+      "tool": "risktype_read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "RiskType",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the record to fetch."
+        }
+      },
+      "_evidence": {
+        "locator": "src/modules/insurance/graphql/resolvers/queries/riskType.ts:11",
+        "id_local": "RiskType.read",
+        "entry": {
+          "kind": "graphql",
+          "locator": "src/modules/insurance/graphql/schemas/insurance.ts",
+          "route": "query riskType"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "return models.RiskType.findById(id);"
+      },
+      "entity": "RiskType",
+      "guards": {
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must sign in as a vendor user before doing that.",
+          "realm": "Only a signed-in vendor user can do that.",
+          "precondition": "That operation is not allowed on the given row.",
+          "required": "Missing required input (see parameter list).",
+          "not_found": "That row does not exist in this system.",
+          "fk": "The referenced parent record does not exist (check vendor/customer/product/type ids).",
+          "fk_missing": "A required parent reference is missing; create or pass it first.",
+          "unique": "That value is already taken; choose a different one.",
+          "transition": "That status change is not allowed for this row.",
+          "on_child": "This row is still referenced; clear or remove the dependents first.",
+          "constraint": "The values given violate an entity rule.",
+          "off_panel": "A provided column is not accepted by this operation."
+        }
+      },
+      "description": "Fetch a single risk type by id."
+    },
+    {
+      "tool": "risktype_list",
+      "family": "search",
+      "exec_spec": {
+        "entity": "RiskType",
+        "rank": {
+          "method": "exact"
+        }
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "src/modules/insurance/graphql/resolvers/queries/riskType.ts:4",
+        "id_local": "RiskType.list",
+        "entry": {
+          "kind": "graphql",
+          "locator": "src/modules/insurance/graphql/schemas/insurance.ts",
+          "route": "query riskTypes"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "return models.RiskType.find({});"
+      },
+      "entity": "RiskType",
+      "description": "List all risk types that policies can cover.",
+      "guards": {}
+    },
+    {
+      "tool": "insurancetype_read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "InsuranceType",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the record to fetch."
+        }
+      },
+      "_evidence": {
+        "locator": "src/modules/insurance/graphql/resolvers/queries/insuranceType.ts:11",
+        "id_local": "InsuranceType.read",
+        "entry": {
+          "kind": "graphql",
+          "locator": "src/modules/insurance/graphql/schemas/insurance.ts",
+          "route": "query insuranceType"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "return models.InsuranceType.findById(id);"
+      },
+      "entity": "InsuranceType",
+      "guards": {
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must sign in as a vendor user before doing that.",
+          "realm": "Only a signed-in vendor user can do that.",
+          "precondition": "That operation is not allowed on the given row.",
+          "required": "Missing required input (see parameter list).",
+          "not_found": "That row does not exist in this system.",
+          "fk": "The referenced parent record does not exist (check vendor/customer/product/type ids).",
+          "fk_missing": "A required parent reference is missing; create or pass it first.",
+          "unique": "That value is already taken; choose a different one.",
+          "transition": "That status change is not allowed for this row.",
+          "on_child": "This row is still referenced; clear or remove the dependents first.",
+          "constraint": "The values given violate an entity rule.",
+          "off_panel": "A provided column is not accepted by this operation."
+        }
+      },
+      "description": "Fetch a single insurance type by id."
+    },
+    {
+      "tool": "insurancetype_list",
+      "family": "search",
+      "exec_spec": {
+        "entity": "InsuranceType",
+        "rank": {
+          "method": "exact"
+        }
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "src/modules/insurance/graphql/resolvers/queries/insuranceType.ts:4",
+        "id_local": "InsuranceType.list",
+        "entry": {
+          "kind": "graphql",
+          "locator": "src/modules/insurance/graphql/schemas/insurance.ts",
+          "route": "query insuranceTypes"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "return models.InsuranceType.find({});"
+      },
+      "entity": "InsuranceType",
+      "description": "List all insurance types.",
+      "guards": {}
+    },
+    {
+      "tool": "product_read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Product",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the record to fetch."
+        }
+      },
+      "_evidence": {
+        "locator": "src/modules/insurance/graphql/resolvers/queries/product.ts:20",
+        "id_local": "Product.read",
+        "entry": {
+          "kind": "graphql",
+          "locator": "src/modules/insurance/graphql/schemas/insurance.ts",
+          "route": "query insuranceProduct"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "const product = await models.Product.findById(id).populate('insuranceType coveredRisks.risk regions');"
+      },
+      "entity": "Product",
+      "guards": {
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must sign in as a vendor user before doing that.",
+          "realm": "Only a signed-in vendor user can do that.",
+          "precondition": "That operation is not allowed on the given row.",
+          "required": "Missing required input (see parameter list).",
+          "not_found": "That row does not exist in this system.",
+          "fk": "The referenced parent record does not exist (check vendor/customer/product/type ids).",
+          "fk_missing": "A required parent reference is missing; create or pass it first.",
+          "unique": "That value is already taken; choose a different one.",
+          "transition": "That status change is not allowed for this row.",
+          "on_child": "This row is still referenced; clear or remove the dependents first.",
+          "constraint": "The values given violate an entity rule.",
+          "off_panel": "A provided column is not accepted by this operation."
+        }
+      },
+      "description": "Fetch a single insurance product by id."
+    },
+    {
+      "tool": "product_list",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Product",
+        "rank": {
+          "method": "exact"
+        }
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "src/modules/insurance/graphql/resolvers/queries/product.ts:4",
+        "id_local": "Product.list",
+        "entry": {
+          "kind": "graphql",
+          "locator": "src/modules/insurance/graphql/schemas/insurance.ts",
+          "route": "query insuranceProducts"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "const products = await models.Product.find({}).populate('insuranceType coveredRisks.risk regions');\nreturn products.filter(p => p?._id && p.insuranceType);"
+      },
+      "entity": "Product",
+      "description": "List all insurance products.",
+      "guards": {}
+    },
+    {
+      "tool": "product_by_type",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Product",
+        "search_fields": [
+          "insuranceType"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "insuranceType"
+          ]
+        }
+      },
+      "input_schema": {
+        "typeId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the insurance type whose products to list."
+        }
+      },
+      "_evidence": {
+        "locator": "src/modules/insurance/graphql/resolvers/queries/product.ts:43",
+        "id_local": "Product.by_type",
+        "entry": {
+          "kind": "graphql",
+          "locator": "src/modules/insurance/graphql/schemas/insurance.ts",
+          "route": "query productsByType"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "const products = await models.Product.find({ insuranceType: typeId }).populate('insuranceType coveredRisks.risk regions');"
+      },
+      "entity": "Product",
+      "guards": {
+        "required": [
+          "typeId"
+        ],
+        "messages": {
+          "auth": "You must sign in as a vendor user before doing that.",
+          "realm": "Only a signed-in vendor user can do that.",
+          "precondition": "That operation is not allowed on the given row.",
+          "required": "Missing required input (see parameter list).",
+          "not_found": "That row does not exist in this system.",
+          "fk": "The referenced parent record does not exist (check vendor/customer/product/type ids).",
+          "fk_missing": "A required parent reference is missing; create or pass it first.",
+          "unique": "That value is already taken; choose a different one.",
+          "transition": "That status change is not allowed for this row.",
+          "on_child": "This row is still referenced; clear or remove the dependents first.",
+          "constraint": "The values given violate an entity rule.",
+          "off_panel": "A provided column is not accepted by this operation."
+        }
+      },
+      "description": "List the insurance products that belong to one insurance type."
+    },
+    {
+      "tool": "product_by_country",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Product",
+        "search_fields": [
+          "regions"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "regions"
+          ]
+        }
+      },
+      "input_schema": {
+        "country": {
+          "type": "text",
+          "required": true,
+          "description": "Country name; returns products sold in a region containing it."
+        }
+      },
+      "_evidence": {
+        "locator": "src/modules/insurance/graphql/resolvers/queries/region.ts:23",
+        "id_local": "Product.by_country",
+        "entry": {
+          "kind": "graphql",
+          "locator": "src/modules/insurance/graphql/schemas/insurance.ts",
+          "route": "query productsByCountry"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "const regions = await models.Region.find({ countries: country });\nif (regions.length === 0) return [];\nconst products = await models.Product.find({ regions: { $in: regionIds } });"
+      },
+      "entity": "Product",
+      "guards": {
+        "required": [
+          "country"
+        ],
+        "messages": {
+          "auth": "You must sign in as a vendor user before doing that.",
+          "realm": "Only a signed-in vendor user can do that.",
+          "precondition": "That operation is not allowed on the given row.",
+          "required": "Missing required input (see parameter list).",
+          "not_found": "That row does not exist in this system.",
+          "fk": "The referenced parent record does not exist (check vendor/customer/product/type ids).",
+          "fk_missing": "A required parent reference is missing; create or pass it first.",
+          "unique": "That value is already taken; choose a different one.",
+          "transition": "That status change is not allowed for this row.",
+          "on_child": "This row is still referenced; clear or remove the dependents first.",
+          "constraint": "The values given violate an entity rule.",
+          "off_panel": "A provided column is not accepted by this operation."
+        }
+      },
+      "description": "List the insurance products available in a given country."
+    },
+    {
+      "tool": "vendor_read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Vendor",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the record to fetch."
+        }
+      },
+      "_evidence": {
+        "locator": "src/modules/insurance/graphql/resolvers/queries/vendor.ts:35",
+        "id_local": "Vendor.read",
+        "entry": {
+          "kind": "graphql",
+          "locator": "src/modules/insurance/graphql/schemas/insurance.ts",
+          "route": "query vendor"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "const vendor = await models.Vendor.findById(id).populate({ path: 'offeredProducts.product', populate: [...] });"
+      },
+      "entity": "Vendor",
+      "guards": {
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must sign in as a vendor user before doing that.",
+          "realm": "Only a signed-in vendor user can do that.",
+          "precondition": "That operation is not allowed on the given row.",
+          "required": "Missing required input (see parameter list).",
+          "not_found": "That row does not exist in this system.",
+          "fk": "The referenced parent record does not exist (check vendor/customer/product/type ids).",
+          "fk_missing": "A required parent reference is missing; create or pass it first.",
+          "unique": "That value is already taken; choose a different one.",
+          "transition": "That status change is not allowed for this row.",
+          "on_child": "This row is still referenced; clear or remove the dependents first.",
+          "constraint": "The values given violate an entity rule.",
+          "off_panel": "A provided column is not accepted by this operation."
+        }
+      },
+      "description": "Fetch a single vendor by id."
+    },
+    {
+      "tool": "vendor_list",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Vendor",
+        "rank": {
+          "method": "exact"
+        }
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "src/modules/insurance/graphql/resolvers/queries/vendor.ts:4",
+        "id_local": "Vendor.list",
+        "entry": {
+          "kind": "graphql",
+          "locator": "src/modules/insurance/graphql/schemas/insurance.ts",
+          "route": "query vendors"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "const vendors = await models.Vendor.find({}).populate({ path: 'offeredProducts.product', populate: [...] });"
+      },
+      "entity": "Vendor",
+      "description": "List all vendors.",
+      "guards": {}
+    },
+    {
+      "tool": "vendor_my",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Vendor",
+        "lookup_by": {
+          "id": {
+            "$session": "vendor"
+          }
+        },
+        "scope": {
+          "owner_col": "id"
+        }
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "src/modules/insurance/graphql/resolvers/queries/vendor.ts:72",
+        "id_local": "Vendor.my",
+        "entry": {
+          "kind": "graphql",
+          "locator": "src/modules/insurance/graphql/schemas/insurance.ts",
+          "route": "query myVendor"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "if (!insuranceVendorUser) throw new Error('Must be logged in');\nconst vendorUser = await models.VendorUser.findById(insuranceVendorUser._id);\nif (!vendorUser) throw new Error('Vendor user not found');\nconst vendor = await models.Vendor.findById(vendorUser.vendor);",
+        "edges": [
+          "if (!insuranceVendorUser) throw new Error('Must be logged in'); VendorUser.findById(insuranceVendorUser._id) (queries/vendor.ts:73)"
+        ]
+      },
+      "entity": "Vendor",
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "VendorUser",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must sign in as a vendor user before doing that.",
+          "realm": "Only a signed-in vendor user can do that.",
+          "precondition": "That operation is not allowed on the given row.",
+          "required": "Missing required input (see parameter list).",
+          "not_found": "That row does not exist in this system.",
+          "fk": "The referenced parent record does not exist (check vendor/customer/product/type ids).",
+          "fk_missing": "A required parent reference is missing; create or pass it first.",
+          "unique": "That value is already taken; choose a different one.",
+          "transition": "That status change is not allowed for this row.",
+          "on_child": "This row is still referenced; clear or remove the dependents first.",
+          "constraint": "The values given violate an entity rule.",
+          "off_panel": "A provided column is not accepted by this operation."
+        }
+      },
+      "description": "Fetch the vendor that the signed-in vendor user belongs to."
+    },
+    {
+      "tool": "vendoruser_read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "VendorUser",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the record to fetch."
+        }
+      },
+      "_evidence": {
+        "locator": "src/modules/insurance/graphql/resolvers/queries/vendorUser.ts:13",
+        "id_local": "VendorUser.read",
+        "entry": {
+          "kind": "graphql",
+          "locator": "src/modules/insurance/graphql/schemas/insurance.ts",
+          "route": "query vendorUser"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "return models.VendorUser.findById(id).populate('vendor');"
+      },
+      "entity": "VendorUser",
+      "guards": {
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must sign in as a vendor user before doing that.",
+          "realm": "Only a signed-in vendor user can do that.",
+          "precondition": "That operation is not allowed on the given row.",
+          "required": "Missing required input (see parameter list).",
+          "not_found": "That row does not exist in this system.",
+          "fk": "The referenced parent record does not exist (check vendor/customer/product/type ids).",
+          "fk_missing": "A required parent reference is missing; create or pass it first.",
+          "unique": "That value is already taken; choose a different one.",
+          "transition": "That status change is not allowed for this row.",
+          "on_child": "This row is still referenced; clear or remove the dependents first.",
+          "constraint": "The values given violate an entity rule.",
+          "off_panel": "A provided column is not accepted by this operation."
+        }
+      },
+      "description": "Fetch a single vendor user by id."
+    },
+    {
+      "tool": "vendoruser_list",
+      "family": "search",
+      "exec_spec": {
+        "entity": "VendorUser",
+        "rank": {
+          "method": "exact"
+        },
+        "search_fields": [
+          "vendor"
+        ]
+      },
+      "input_schema": {
+        "vendorId": {
+          "type": "int",
+          "required": false,
+          "description": "Optional vendor id; only users of that vendor are returned."
+        }
+      },
+      "_evidence": {
+        "locator": "src/modules/insurance/graphql/resolvers/queries/vendorUser.ts:4",
+        "id_local": "VendorUser.list",
+        "entry": {
+          "kind": "graphql",
+          "locator": "src/modules/insurance/graphql/schemas/insurance.ts",
+          "route": "query vendorUsers"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "const filter = vendorId ? { vendor: vendorId } : {};\nreturn models.VendorUser.find(filter).populate('vendor');"
+      },
+      "entity": "VendorUser",
+      "description": "List vendor users, optionally filtered to one vendor.",
+      "guards": {}
+    },
+    {
+      "tool": "vendoruser_current",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "VendorUser",
+        "lookup_by": {
+          "id": {
+            "$session": "account_id"
+          }
+        },
+        "scope": {
+          "owner_col": "id"
+        }
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "src/modules/insurance/graphql/resolvers/queries/vendorUser.ts:21",
+        "id_local": "VendorUser.current",
+        "entry": {
+          "kind": "graphql",
+          "locator": "src/modules/insurance/graphql/schemas/insurance.ts",
+          "route": "query currentVendorUser"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "if (!insuranceVendorUser) return null;\nreturn models.VendorUser.findById(insuranceVendorUser._id).populate('vendor');",
+        "edges": [
+          "reads insuranceVendorUser from context, set in src/main.ts:33-45 (queries/vendorUser.ts:22)"
+        ]
+      },
+      "entity": "VendorUser",
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "VendorUser",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must sign in as a vendor user before doing that.",
+          "realm": "Only a signed-in vendor user can do that.",
+          "precondition": "That operation is not allowed on the given row.",
+          "required": "Missing required input (see parameter list).",
+          "not_found": "That row does not exist in this system.",
+          "fk": "The referenced parent record does not exist (check vendor/customer/product/type ids).",
+          "fk_missing": "A required parent reference is missing; create or pass it first.",
+          "unique": "That value is already taken; choose a different one.",
+          "transition": "That status change is not allowed for this row.",
+          "on_child": "This row is still referenced; clear or remove the dependents first.",
+          "constraint": "The values given violate an entity rule.",
+          "off_panel": "A provided column is not accepted by this operation."
+        }
+      },
+      "description": "Fetch the vendor-user account that is currently signed in."
+    },
+    {
+      "tool": "customer_search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Customer",
+        "rank": {
+          "method": "substring",
+          "fields": [
+            "firstName",
+            "lastName",
+            "email",
+            "registrationNumber"
+          ]
+        },
+        "search_fields": [
+          "firstName",
+          "lastName",
+          "email",
+          "registrationNumber"
+        ]
+      },
+      "input_schema": {
+        "search": {
+          "type": "text",
+          "required": false,
+          "description": "Free text matched against name/email/registration."
+        },
+        "page": {
+          "type": "int",
+          "required": false,
+          "description": "1-based page number (default 1)."
+        },
+        "limit": {
+          "type": "int",
+          "required": false,
+          "description": "Page size (default 100)."
+        },
+        "sort": {
+          "type": "text",
+          "required": false,
+          "description": "Direction: asc or desc."
+        },
+        "sortField": {
+          "type": "text",
+          "required": false,
+          "description": "Column to sort by."
+        },
+        "filter": {
+          "type": "json",
+          "required": false,
+          "description": "Extra JSON filter."
+        },
+        "orderBy": {
+          "type": "json",
+          "required": false,
+          "description": "Ordering spec."
+        }
+      },
+      "_evidence": {
+        "locator": "src/modules/insurance/graphql/resolvers/queries/customer.ts:17",
+        "id_local": "Customer.search",
+        "entry": {
+          "kind": "graphql",
+          "locator": "src/modules/insurance/graphql/schemas/insurance.ts",
+          "route": "query insuranceCustomers"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "if (search) { const escapedSearch = escapeRegExp(search); query.$or = [ { firstName: { $regex: escapedSearch, $options: 'i' } }, ... ] }\nif (filter) Object.keys(filter).forEach(key => { if (filter[key]) query[key] = filter[key]; });\nreturn models.Customer.find(query).sort(sortOptions).skip(skip).limit(limit);"
+      },
+      "entity": "Customer",
+      "description": "Search customers by name, email or registration number. Returns the rows whose fields contain the search text.",
+      "guards": {}
+    },
+    {
+      "tool": "customer_read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Customer",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the record to fetch."
+        }
+      },
+      "_evidence": {
+        "locator": "src/modules/insurance/graphql/resolvers/queries/customer.ts:69",
+        "id_local": "Customer.read",
+        "entry": {
+          "kind": "graphql",
+          "locator": "src/modules/insurance/graphql/schemas/insurance.ts",
+          "route": "query insuranceCustomer"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "return models.Customer.findById(id);"
+      },
+      "entity": "Customer",
+      "guards": {
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must sign in as a vendor user before doing that.",
+          "realm": "Only a signed-in vendor user can do that.",
+          "precondition": "That operation is not allowed on the given row.",
+          "required": "Missing required input (see parameter list).",
+          "not_found": "That row does not exist in this system.",
+          "fk": "The referenced parent record does not exist (check vendor/customer/product/type ids).",
+          "fk_missing": "A required parent reference is missing; create or pass it first.",
+          "unique": "That value is already taken; choose a different one.",
+          "transition": "That status change is not allowed for this row.",
+          "on_child": "This row is still referenced; clear or remove the dependents first.",
+          "constraint": "The values given violate an entity rule.",
+          "off_panel": "A provided column is not accepted by this operation."
+        }
+      },
+      "description": "Fetch a single customer by id."
+    },
+    {
+      "tool": "customer_by_registration",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Customer",
+        "lookup_by": {
+          "registrationNumber": {
+            "$arg": "registrationNumber"
+          }
+        }
+      },
+      "input_schema": {
+        "registrationNumber": {
+          "type": "text",
+          "required": true,
+          "description": "The value to look up."
+        }
+      },
+      "_evidence": {
+        "locator": "src/modules/insurance/graphql/resolvers/queries/customer.ts:80",
+        "id_local": "Customer.by_registration",
+        "entry": {
+          "kind": "graphql",
+          "locator": "src/modules/insurance/graphql/schemas/insurance.ts",
+          "route": "query customerByRegistration"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "return models.Customer.findOne({ registrationNumber });"
+      },
+      "entity": "Customer",
+      "guards": {
+        "required": [
+          "registrationNumber"
+        ],
+        "messages": {
+          "auth": "You must sign in as a vendor user before doing that.",
+          "realm": "Only a signed-in vendor user can do that.",
+          "precondition": "That operation is not allowed on the given row.",
+          "required": "Missing required input (see parameter list).",
+          "not_found": "That row does not exist in this system.",
+          "fk": "The referenced parent record does not exist (check vendor/customer/product/type ids).",
+          "fk_missing": "A required parent reference is missing; create or pass it first.",
+          "unique": "That value is already taken; choose a different one.",
+          "transition": "That status change is not allowed for this row.",
+          "on_child": "This row is still referenced; clear or remove the dependents first.",
+          "constraint": "The values given violate an entity rule.",
+          "off_panel": "A provided column is not accepted by this operation."
+        }
+      },
+      "description": "Fetch the customer whose registration number matches."
+    },
+    {
+      "tool": "customer_by_email",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Customer",
+        "lookup_by": {
+          "email": {
+            "$arg": "email"
+          }
+        }
+      },
+      "input_schema": {
+        "email": {
+          "type": "text",
+          "required": true,
+          "description": "The value to look up."
+        }
+      },
+      "_evidence": {
+        "locator": "src/modules/insurance/graphql/resolvers/queries/customer.ts:91",
+        "id_local": "Customer.by_email",
+        "entry": {
+          "kind": "graphql",
+          "locator": "src/modules/insurance/graphql/schemas/insurance.ts",
+          "route": "query customerByEmail"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "return models.Customer.findOne({ email });"
+      },
+      "entity": "Customer",
+      "guards": {
+        "required": [
+          "email"
+        ],
+        "messages": {
+          "auth": "You must sign in as a vendor user before doing that.",
+          "realm": "Only a signed-in vendor user can do that.",
+          "precondition": "That operation is not allowed on the given row.",
+          "required": "Missing required input (see parameter list).",
+          "not_found": "That row does not exist in this system.",
+          "fk": "The referenced parent record does not exist (check vendor/customer/product/type ids).",
+          "fk_missing": "A required parent reference is missing; create or pass it first.",
+          "unique": "That value is already taken; choose a different one.",
+          "transition": "That status change is not allowed for this row.",
+          "on_child": "This row is still referenced; clear or remove the dependents first.",
+          "constraint": "The values given violate an entity rule.",
+          "off_panel": "A provided column is not accepted by this operation."
+        }
+      },
+      "description": "Fetch the customer whose email matches."
+    },
+    {
+      "tool": "customer_company_by_registration",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Customer",
+        "lookup_by": {
+          "registrationNumber": {
+            "$arg": "registrationNumber"
+          }
+        }
+      },
+      "input_schema": {
+        "registrationNumber": {
+          "type": "text",
+          "required": true,
+          "description": "The value to look up."
+        }
+      },
+      "_evidence": {
+        "locator": "src/modules/insurance/graphql/resolvers/queries/customer.ts:102",
+        "id_local": "Customer.company_by_registration",
+        "entry": {
+          "kind": "graphql",
+          "locator": "src/modules/insurance/graphql/schemas/insurance.ts",
+          "route": "query companyByRegistration"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "return models.Customer.findOne({ registrationNumber, type: 'company' });"
+      },
+      "entity": "Customer",
+      "guards": {
+        "required": [
+          "registrationNumber"
+        ],
+        "messages": {
+          "auth": "You must sign in as a vendor user before doing that.",
+          "realm": "Only a signed-in vendor user can do that.",
+          "precondition": "That operation is not allowed on the given row.",
+          "required": "Missing required input (see parameter list).",
+          "not_found": "That row does not exist in this system.",
+          "fk": "The referenced parent record does not exist (check vendor/customer/product/type ids).",
+          "fk_missing": "A required parent reference is missing; create or pass it first.",
+          "unique": "That value is already taken; choose a different one.",
+          "transition": "That status change is not allowed for this row.",
+          "on_child": "This row is still referenced; clear or remove the dependents first.",
+          "constraint": "The values given violate an entity rule.",
+          "off_panel": "A provided column is not accepted by this operation."
+        }
+      },
+      "description": "Fetch the company customer whose registration number matches."
+    },
+    {
+      "tool": "contract_search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Contract",
+        "rank": {
+          "method": "substring",
+          "fields": [
+            "contractNumber",
+            "vendor",
+            "customer",
+            "insuranceType",
+            "paymentStatus",
+            "startDate",
+            "insuredObject"
+          ]
+        },
+        "search_fields": [
+          "contractNumber",
+          "vendor",
+          "customer",
+          "insuranceType",
+          "paymentStatus",
+          "startDate",
+          "insuredObject"
+        ]
+      },
+      "input_schema": {
+        "vendorId": {
+          "type": "int",
+          "required": false,
+          "description": "Filter to one vendor."
+        },
+        "customerId": {
+          "type": "int",
+          "required": false,
+          "description": "Filter to one customer."
+        },
+        "searchValue": {
+          "type": "text",
+          "required": false,
+          "description": "Free text matched against contract number, plate or customer."
+        },
+        "contractNumber": {
+          "type": "text",
+          "required": false,
+          "description": "Filter by exact contract number."
+        },
+        "customerRegistration": {
+          "type": "text",
+          "required": false,
+          "description": "Filter by customer registration number."
+        },
+        "plateNumber": {
+          "type": "text",
+          "required": false,
+          "description": "Filter by insured vehicle plate."
+        },
+        "paymentStatus": {
+          "type": "text",
+          "required": false,
+          "description": "Filter by payment status."
+        },
+        "insuranceTypeId": {
+          "type": "int",
+          "required": false,
+          "description": "Filter by insurance type."
+        },
+        "startDate": {
+          "type": "datetime",
+          "required": false,
+          "description": "Earliest start date."
+        },
+        "endDate": {
+          "type": "datetime",
+          "required": false,
+          "description": "Latest end date."
+        },
+        "orderBy": {
+          "type": "json",
+          "required": false,
+          "description": "Ordering spec."
+        }
+      },
+      "_evidence": {
+        "locator": "src/modules/insurance/graphql/resolvers/queries/contract.ts:8",
+        "id_local": "Contract.search",
+        "entry": {
+          "kind": "graphql",
+          "locator": "src/modules/insurance/graphql/schemas/insurance.ts",
+          "route": "query contracts"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "const query = {};\n... if (str(args.contractNumber)) query.contractNumber = { $regex: escapeRegex(...), $options: 'i' };\n... return models.Contract.find(query).select(...).populate([...]).filter(c => c.insuranceProduct != null && c.insuranceType != null);"
+      },
+      "entity": "Contract",
+      "description": "Search insurance contracts with optional filters on vendor, customer, status or date range, plus free-text search. Global; does not require sign-in.",
+      "guards": {}
+    },
+    {
+      "tool": "contract_read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Contract",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the record to fetch."
+        }
+      },
+      "_evidence": {
+        "locator": "src/modules/insurance/graphql/resolvers/queries/contract.ts:134",
+        "id_local": "Contract.read",
+        "entry": {
+          "kind": "graphql",
+          "locator": "src/modules/insurance/graphql/schemas/insurance.ts",
+          "route": "query contract"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "const contract = await models.Contract.findById(id).populate('vendor customer insuranceType insuranceProduct coveredRisks.risk');\nif (!contract?.insuranceProduct || !contract?.insuranceType) return null;"
+      },
+      "entity": "Contract",
+      "guards": {
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must sign in as a vendor user before doing that.",
+          "realm": "Only a signed-in vendor user can do that.",
+          "precondition": "That operation is not allowed on the given row.",
+          "required": "Missing required input (see parameter list).",
+          "not_found": "That row does not exist in this system.",
+          "fk": "The referenced parent record does not exist (check vendor/customer/product/type ids).",
+          "fk_missing": "A required parent reference is missing; create or pass it first.",
+          "unique": "That value is already taken; choose a different one.",
+          "transition": "That status change is not allowed for this row.",
+          "on_child": "This row is still referenced; clear or remove the dependents first.",
+          "constraint": "The values given violate an entity rule.",
+          "off_panel": "A provided column is not accepted by this operation."
+        }
+      },
+      "description": "Fetch a single contract by id. Global; does not require sign-in."
+    },
+    {
+      "tool": "contract_list_vendor",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Contract",
+        "scope": {
+          "where": {
+            "vendor": "$session.vendor"
+          }
+        },
+        "search_fields": [
+          "vendor"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "vendor"
+          ]
+        }
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "src/modules/insurance/graphql/resolvers/queries/contract.ts:156",
+        "id_local": "Contract.list_vendor",
+        "entry": {
+          "kind": "graphql",
+          "locator": "src/modules/insurance/graphql/schemas/insurance.ts",
+          "route": "query vendorContracts"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "if (!insuranceVendorUser) throw new Error('Must be logged in');\nconst vendorUser = await models.VendorUser.findById(insuranceVendorUser._id);\nif (!vendorUser) throw new Error('Vendor user not found');\nconst contracts = await models.Contract.find({ vendor: vendorUser.vendor });",
+        "edges": [
+          "if (!insuranceVendorUser) throw new Error('Must be logged in'); then VendorUser.findById(insuranceVendorUser._id) (queries/contract.ts:158,189,224,376) — context set from Bearer JWT vendorUserId in sr"
+        ]
+      },
+      "entity": "Contract",
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "VendorUser",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must sign in as a vendor user before doing that.",
+          "realm": "Only a signed-in vendor user can do that.",
+          "precondition": "That operation is not allowed on the given row.",
+          "required": "Missing required input (see parameter list).",
+          "not_found": "That row does not exist in this system.",
+          "fk": "The referenced parent record does not exist (check vendor/customer/product/type ids).",
+          "fk_missing": "A required parent reference is missing; create or pass it first.",
+          "unique": "That value is already taken; choose a different one.",
+          "transition": "That status change is not allowed for this row.",
+          "on_child": "This row is still referenced; clear or remove the dependents first.",
+          "constraint": "The values given violate an entity rule.",
+          "off_panel": "A provided column is not accepted by this operation."
+        }
+      },
+      "description": "List the contracts of the signed-in user's vendor."
+    },
+    {
+      "tool": "contract_search_vendor_items",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Contract",
+        "scope": {
+          "where": {
+            "vendor": "$session.vendor"
+          }
+        },
+        "search_fields": [
+          "vendor",
+          "insuranceType",
+          "startDate",
+          "contractNumber",
+          "paymentStatus",
+          "paymentKind",
+          "insuranceProduct",
+          "insuredObject",
+          "chargedAmount"
+        ],
+        "rank": {
+          "method": "substring",
+          "fields": [
+            "vendor",
+            "insuranceType",
+            "startDate",
+            "contractNumber",
+            "paymentStatus",
+            "paymentKind",
+            "insuranceProduct",
+            "insuredObject",
+            "chargedAmount"
+          ]
+        }
+      },
+      "input_schema": {
+        "page": {
+          "type": "int",
+          "required": false,
+          "description": "1-based page (default 1)."
+        },
+        "perPage": {
+          "type": "int",
+          "required": false,
+          "description": "Page size (default 20)."
+        },
+        "filters": {
+          "type": "json",
+          "required": false,
+          "description": "JSON filter over contract fields."
+        },
+        "startDate": {
+          "type": "datetime",
+          "required": false,
+          "description": "Filter from this date."
+        },
+        "endDate": {
+          "type": "datetime",
+          "required": false,
+          "description": "Filter to this date."
+        },
+        "sortDirection": {
+          "type": "text",
+          "required": false,
+          "description": "asc/desc."
+        },
+        "sortField": {
+          "type": "text",
+          "required": false,
+          "description": "Column to sort by."
+        },
+        "vendorUserId": {
+          "type": "text",
+          "required": false,
+          "description": "Filter by vendor user id."
+        },
+        "categoryId": {
+          "type": "int",
+          "required": false,
+          "description": "Filter by insurance type id."
+        }
+      },
+      "_evidence": {
+        "locator": "src/modules/insurance/graphql/resolvers/queries/contract.ts:219",
+        "id_local": "Contract.search_vendor_items",
+        "entry": {
+          "kind": "graphql",
+          "locator": "src/modules/insurance/graphql/schemas/insurance.ts",
+          "route": "query vendorInsuranceItems"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "if (!insuranceVendorUser) throw new Error('Must be logged in');\nconst vendorUser = await models.VendorUser.findOne({ _id: insuranceVendorUser._id });\nconst query = { vendor: vendorUser.vendor };\n... const [list, totalCount] = await Promise.all([ models.Contract.find(query).sort(sort).skip(skip).limit(perPage).populate(...), models.Contract.countDocuments(query) ]);",
+        "edges": [
+          "if (!insuranceVendorUser) throw new Error('Must be logged in'); then VendorUser.findById(insuranceVendorUser._id) (queries/contract.ts:158,189,224,376) — context set from Bearer JWT vendorUserId in sr"
+        ]
+      },
+      "entity": "Contract",
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "VendorUser",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must sign in as a vendor user before doing that.",
+          "realm": "Only a signed-in vendor user can do that.",
+          "precondition": "That operation is not allowed on the given row.",
+          "required": "Missing required input (see parameter list).",
+          "not_found": "That row does not exist in this system.",
+          "fk": "The referenced parent record does not exist (check vendor/customer/product/type ids).",
+          "fk_missing": "A required parent reference is missing; create or pass it first.",
+          "unique": "That value is already taken; choose a different one.",
+          "transition": "That status change is not allowed for this row.",
+          "on_child": "This row is still referenced; clear or remove the dependents first.",
+          "constraint": "The values given violate an entity rule.",
+          "off_panel": "A provided column is not accepted by this operation."
+        }
+      },
+      "description": "Search within the contracts of the signed-in user's vendor, with paging."
+    },
+    {
+      "tool": "contract_read_vendor",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Contract",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        },
+        "scope": {
+          "where": {
+            "vendor": "$session.vendor"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the contract to fetch."
+        }
+      },
+      "_evidence": {
+        "locator": "src/modules/insurance/graphql/resolvers/queries/contract.ts:187",
+        "id_local": "Contract.read_vendor",
+        "entry": {
+          "kind": "graphql",
+          "locator": "src/modules/insurance/graphql/schemas/insurance.ts",
+          "route": "query vendorContract"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "if (!insuranceVendorUser) throw new Error('Must be logged in');\nconst vendorUser = await models.VendorUser.findById(insuranceVendorUser._id);\nif (!vendorUser) throw new Error('Vendor user not found');\nconst contract = await models.Contract.findOne({ _id: id, vendor: vendorUser.vendor });",
+        "edges": [
+          "if (!insuranceVendorUser) throw new Error('Must be logged in'); then VendorUser.findById(insuranceVendorUser._id) (queries/contract.ts:158,189,224,376) — context set from Bearer JWT vendorUserId in sr"
+        ]
+      },
+      "entity": "Contract",
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "VendorUser",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must sign in as a vendor user before doing that.",
+          "realm": "Only a signed-in vendor user can do that.",
+          "precondition": "That operation is not allowed on the given row.",
+          "required": "Missing required input (see parameter list).",
+          "not_found": "That row does not exist in this system.",
+          "fk": "The referenced parent record does not exist (check vendor/customer/product/type ids).",
+          "fk_missing": "A required parent reference is missing; create or pass it first.",
+          "unique": "That value is already taken; choose a different one.",
+          "transition": "That status change is not allowed for this row.",
+          "on_child": "This row is still referenced; clear or remove the dependents first.",
+          "constraint": "The values given violate an entity rule.",
+          "off_panel": "A provided column is not accepted by this operation."
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "description": "Fetch one of the signed-in user's vendor's contracts by id."
+    },
+    {
+      "tool": "contract_read_vendor_item",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Contract",
+        "lookup_by": {
+          "id": {
+            "$arg": "_id"
+          }
+        },
+        "scope": {
+          "where": {
+            "vendor": "$session.vendor"
+          }
+        }
+      },
+      "input_schema": {
+        "_id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the contract to fetch."
+        }
+      },
+      "_evidence": {
+        "locator": "src/modules/insurance/graphql/resolvers/queries/contract.ts:373",
+        "id_local": "Contract.read_vendor_item",
+        "entry": {
+          "kind": "graphql",
+          "locator": "src/modules/insurance/graphql/schemas/insurance.ts",
+          "route": "query vendorInsuranceItem"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "if (!insuranceVendorUser) throw new Error('Must be logged in');\nconst vendorUser = await models.VendorUser.findById(insuranceVendorUser._id);\nconst contract = await models.Contract.findOne({ _id, vendor: vendorUser.vendor });",
+        "edges": [
+          "if (!insuranceVendorUser) throw new Error('Must be logged in'); then VendorUser.findById(insuranceVendorUser._id) (queries/contract.ts:158,189,224,376) — context set from Bearer JWT vendorUserId in sr"
+        ]
+      },
+      "entity": "Contract",
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "VendorUser",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must sign in as a vendor user before doing that.",
+          "realm": "Only a signed-in vendor user can do that.",
+          "precondition": "That operation is not allowed on the given row.",
+          "required": "Missing required input (see parameter list).",
+          "not_found": "That row does not exist in this system.",
+          "fk": "The referenced parent record does not exist (check vendor/customer/product/type ids).",
+          "fk_missing": "A required parent reference is missing; create or pass it first.",
+          "unique": "That value is already taken; choose a different one.",
+          "transition": "That status change is not allowed for this row.",
+          "on_child": "This row is still referenced; clear or remove the dependents first.",
+          "constraint": "The values given violate an entity rule.",
+          "off_panel": "A provided column is not accepted by this operation."
+        },
+        "required": [
+          "_id"
+        ]
+      },
+      "description": "Fetch one contract belonging to the signed-in user's vendor."
+    },
+    {
+      "tool": "template_read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Template",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the record to fetch."
+        }
+      },
+      "_evidence": {
+        "locator": "src/modules/insurance/graphql/resolvers/queries/template.ts:11",
+        "id_local": "Template.read",
+        "entry": {
+          "kind": "graphql",
+          "locator": "src/modules/insurance/graphql/schemas/insurance.ts",
+          "route": "query contractTemplate"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "return models.Template.findById(id);"
+      },
+      "entity": "Template",
+      "guards": {
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must sign in as a vendor user before doing that.",
+          "realm": "Only a signed-in vendor user can do that.",
+          "precondition": "That operation is not allowed on the given row.",
+          "required": "Missing required input (see parameter list).",
+          "not_found": "That row does not exist in this system.",
+          "fk": "The referenced parent record does not exist (check vendor/customer/product/type ids).",
+          "fk_missing": "A required parent reference is missing; create or pass it first.",
+          "unique": "That value is already taken; choose a different one.",
+          "transition": "That status change is not allowed for this row.",
+          "on_child": "This row is still referenced; clear or remove the dependents first.",
+          "constraint": "The values given violate an entity rule.",
+          "off_panel": "A provided column is not accepted by this operation."
+        }
+      },
+      "description": "Fetch a single contract template by id."
+    },
+    {
+      "tool": "template_list",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Template",
+        "rank": {
+          "method": "exact"
+        }
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "src/modules/insurance/graphql/resolvers/queries/template.ts:4",
+        "id_local": "Template.list",
+        "entry": {
+          "kind": "graphql",
+          "locator": "src/modules/insurance/graphql/schemas/insurance.ts",
+          "route": "query contractTemplates"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "return models.Template.find({}).sort({ createdAt: -1 });"
+      },
+      "entity": "Template",
+      "description": "List all contract templates.",
+      "guards": {}
+    },
+    {
+      "tool": "region_read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Region",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the record to fetch."
+        }
+      },
+      "_evidence": {
+        "locator": "src/modules/insurance/graphql/resolvers/queries/region.ts:12",
+        "id_local": "Region.read",
+        "entry": {
+          "kind": "graphql",
+          "locator": "src/modules/insurance/graphql/schemas/insurance.ts",
+          "route": "query insuranceRegion"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "return models.Region.findById(id);"
+      },
+      "entity": "Region",
+      "guards": {
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must sign in as a vendor user before doing that.",
+          "realm": "Only a signed-in vendor user can do that.",
+          "precondition": "That operation is not allowed on the given row.",
+          "required": "Missing required input (see parameter list).",
+          "not_found": "That row does not exist in this system.",
+          "fk": "The referenced parent record does not exist (check vendor/customer/product/type ids).",
+          "fk_missing": "A required parent reference is missing; create or pass it first.",
+          "unique": "That value is already taken; choose a different one.",
+          "transition": "That status change is not allowed for this row.",
+          "on_child": "This row is still referenced; clear or remove the dependents first.",
+          "constraint": "The values given violate an entity rule.",
+          "off_panel": "A provided column is not accepted by this operation."
+        }
+      },
+      "description": "Fetch a single coverage region by id."
+    },
+    {
+      "tool": "region_list",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Region",
+        "rank": {
+          "method": "exact"
+        }
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "src/modules/insurance/graphql/resolvers/queries/region.ts:5",
+        "id_local": "Region.list",
+        "entry": {
+          "kind": "graphql",
+          "locator": "src/modules/insurance/graphql/schemas/insurance.ts",
+          "route": "query insuranceRegions"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "return models.Region.find({}).sort({ name: 1 });"
+      },
+      "entity": "Region",
+      "description": "List all coverage regions.",
+      "guards": {}
+    },
+    {
+      "tool": "product_calculate_travel_price",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Product",
+        "lookup_by": {
+          "id": {
+            "$arg": "productId"
+          }
+        }
+      },
+      "input_schema": {
+        "productId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the travel product to price."
+        },
+        "vendorId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the selling vendor (for discount tiers)."
+        },
+        "startDate": {
+          "type": "datetime",
+          "required": true,
+          "description": "Trip start."
+        },
+        "endDate": {
+          "type": "datetime",
+          "required": true,
+          "description": "Trip end."
+        },
+        "travelerCount": {
+          "type": "int",
+          "required": true,
+          "description": "Number of travelers."
+        }
+      },
+      "_evidence": {
+        "locator": "src/modules/insurance/graphql/resolvers/queries/region.ts:49",
+        "id_local": "Product.calculate_travel_price",
+        "entry": {
+          "kind": "graphql",
+          "locator": "src/modules/insurance/graphql/schemas/insurance.ts",
+          "route": "query calculateTravelPrice"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "const product = await models.Product.findById(productId);\nif (!product) throw new Error('Product not found');\nconst pricingConfig = product.pricingConfig; if (!pricingConfig) throw new Error('Product has no pricing config');\nconst vendor = await models.Vendor.findById(vendorId); ... compute perPerson/total/discountPercent/days",
+        "edges": [
+          "if (!product) throw new Error('Product not found'); if (!pricingConfig) throw new Error('Product has no pricing config') (queries/region.ts:54,56)"
+        ]
+      },
+      "entity": "Product",
+      "guards": {
+        "required": [
+          "productId",
+          "vendorId",
+          "startDate",
+          "endDate",
+          "travelerCount"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Product",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "productId"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must sign in as a vendor user before doing that.",
+          "realm": "Only a signed-in vendor user can do that.",
+          "precondition": "That operation is not allowed on the given row.",
+          "required": "Missing required input (see parameter list).",
+          "not_found": "That row does not exist in this system.",
+          "fk": "The referenced parent record does not exist (check vendor/customer/product/type ids).",
+          "fk_missing": "A required parent reference is missing; create or pass it first.",
+          "unique": "That value is already taken; choose a different one.",
+          "transition": "That status change is not allowed for this row.",
+          "on_child": "This row is still referenced; clear or remove the dependents first.",
+          "constraint": "The values given violate an entity rule.",
+          "off_panel": "A provided column is not accepted by this operation."
+        }
+      },
+      "description": "Compute a travel-insurance premium for a product, vendor and trip. Returns per-person and total price, discount and days; changes nothing."
+    },
+    {
+      "tool": "contract_render_preview",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Contract",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the contract."
+        }
+      },
+      "_evidence": {
+        "locator": "src/main.ts:67",
+        "id_local": "Contract.render_preview",
+        "entry": {
+          "kind": "http",
+          "route": "GET /contracts/:id/preview",
+          "locator": "src/main.ts:65"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "const contract = await models.Contract.findById(contractId);\nif (!contract) { res.status(404).send('Contract not found'); return; }\nconst html = await templateManager.generateHTML(contract.toObject(), models);\nres.send(html);",
+        "edges": [
+          "GET /contracts/:id/preview: if (!contract) res.status(404) (main.ts:70)"
+        ]
+      },
+      "entity": "Contract",
+      "guards": {
+        "required": [
+          "id"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Contract",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must sign in as a vendor user before doing that.",
+          "realm": "Only a signed-in vendor user can do that.",
+          "precondition": "That operation is not allowed on the given row.",
+          "required": "Missing required input (see parameter list).",
+          "not_found": "That row does not exist in this system.",
+          "fk": "The referenced parent record does not exist (check vendor/customer/product/type ids).",
+          "fk_missing": "A required parent reference is missing; create or pass it first.",
+          "unique": "That value is already taken; choose a different one.",
+          "transition": "That status change is not allowed for this row.",
+          "on_child": "This row is still referenced; clear or remove the dependents first.",
+          "constraint": "The values given violate an entity rule.",
+          "off_panel": "A provided column is not accepted by this operation."
+        }
+      },
+      "description": "Render an HTML preview of a contract's PDF content."
+    },
+    {
+      "tool": "contract_download_pdf",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Contract",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the contract."
+        }
+      },
+      "_evidence": {
+        "locator": "src/main.ts:91",
+        "id_local": "Contract.download_pdf",
+        "entry": {
+          "kind": "http",
+          "route": "GET /contracts/:id/pdf",
+          "locator": "src/main.ts:89"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "const contract = await models.Contract.findById(contractId);\nif (!contract) { res.status(404).send('Contract not found'); return; }\nconst html = await templateManager.generateHTML(contract.toObject(), models);\nconst pdfBuffer = await pdfGenerator.generatePDF(html);\nres.setHeader('Content-Type', 'application/pdf'); res.send(pdfBuffer);",
+        "edges": [
+          "GET /contracts/:id/pdf: if (!contract) res.status(404) (main.ts:94)"
+        ]
+      },
+      "entity": "Contract",
+      "guards": {
+        "required": [
+          "id"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Contract",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must sign in as a vendor user before doing that.",
+          "realm": "Only a signed-in vendor user can do that.",
+          "precondition": "That operation is not allowed on the given row.",
+          "required": "Missing required input (see parameter list).",
+          "not_found": "That row does not exist in this system.",
+          "fk": "The referenced parent record does not exist (check vendor/customer/product/type ids).",
+          "fk_missing": "A required parent reference is missing; create or pass it first.",
+          "unique": "That value is already taken; choose a different one.",
+          "transition": "That status change is not allowed for this row.",
+          "on_child": "This row is still referenced; clear or remove the dependents first.",
+          "constraint": "The values given violate an entity rule.",
+          "off_panel": "A provided column is not accepted by this operation."
+        }
+      },
+      "description": "Download the stored PDF of a contract."
+    },
+    {
+      "tool": "vendor_remove_product",
+      "description": "Remove insurance product(s) from a vendor's offering. Pass the new full list of product ids the vendor should keep; it replaces the current offering.",
+      "family": "update.field_set",
+      "entity": "Vendor",
+      "exec_spec": {
+        "entity": "Vendor",
+        "row_key": {
+          "id": {
+            "$arg": "vendorId"
+          }
+        },
+        "set": {
+          "offeredProducts": {
+            "$arg": "productIds"
+          }
+        }
+      },
+      "input_schema": {
+        "vendorId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the vendor to update."
+        },
+        "productIds": {
+          "type": "json",
+          "required": true,
+          "description": "New full list of Product ids the vendor should keep offering (replaces the current list)."
+        }
+      },
+      "guards": {
+        "messages": {
+          "auth": "You must sign in as a vendor user before doing that.",
+          "realm": "Only a signed-in vendor user can do that.",
+          "precondition": "That operation is not allowed on the given row.",
+          "required": "Missing required input (see parameter list).",
+          "not_found": "That row does not exist in this system.",
+          "fk": "The referenced parent record does not exist (check vendor/customer/product/type ids).",
+          "fk_missing": "A required parent reference is missing; create or pass it first.",
+          "unique": "That value is already taken; choose a different one.",
+          "transition": "That status change is not allowed for this row.",
+          "on_child": "This row is still referenced; clear or remove the dependents first.",
+          "constraint": "The values given violate an entity rule.",
+          "off_panel": "A provided column is not accepted by this operation."
+        },
+        "required": [
+          "vendorId",
+          "productIds"
+        ]
+      },
+      "_evidence": {
+        "locator": "src/modules/insurance/graphql/resolvers/mutations/vendor.ts:78",
+        "id_local": "Vendor.remove_product",
+        "entry": {
+          "kind": "graphql",
+          "locator": "src/modules/insurance/graphql/schemas/insurance.ts",
+          "route": "mutation removeProductFromVendor"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "models.Vendor.findByIdAndUpdate(vendorId, { $pull: { offeredProducts: { product: productId } } }, { new: true })",
+        "edges": null
+      },
+      "_binds": {
+        "vendorId": "Vendor.id",
+        "productId": "Product.id"
+      },
+      "_output_schema": {
+        "vendor": "the InsuranceVendor row with the product removed"
+      }
+    },
+    {
+      "tool": "region_remove_country",
+      "description": "Remove countries from a coverage region. Pass the new full list of country names to keep; it replaces the region's current country list.",
+      "family": "update.field_set",
+      "entity": "Region",
+      "exec_spec": {
+        "entity": "Region",
+        "row_key": {
+          "id": {
+            "$arg": "regionId"
+          }
+        },
+        "set": {
+          "countries": {
+            "$arg": "countries"
+          }
+        }
+      },
+      "input_schema": {
+        "regionId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the region to update."
+        },
+        "countries": {
+          "type": "json",
+          "required": true,
+          "description": "New full list of country names the region should keep covering (replaces the current list)."
+        }
+      },
+      "guards": {
+        "messages": {
+          "auth": "You must sign in as a vendor user before doing that.",
+          "realm": "Only a signed-in vendor user can do that.",
+          "precondition": "That operation is not allowed on the given row.",
+          "required": "Missing required input (see parameter list).",
+          "not_found": "That row does not exist in this system.",
+          "fk": "The referenced parent record does not exist (check vendor/customer/product/type ids).",
+          "fk_missing": "A required parent reference is missing; create or pass it first.",
+          "unique": "That value is already taken; choose a different one.",
+          "transition": "That status change is not allowed for this row.",
+          "on_child": "This row is still referenced; clear or remove the dependents first.",
+          "constraint": "The values given violate an entity rule.",
+          "off_panel": "A provided column is not accepted by this operation."
+        },
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Region",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "regionId"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "regionId",
+          "countries"
+        ]
+      },
+      "_evidence": {
+        "locator": "src/modules/insurance/graphql/resolvers/mutations/region.ts:292",
+        "id_local": "Region.remove_country",
+        "entry": {
+          "kind": "graphql",
+          "locator": "src/modules/insurance/graphql/schemas/insurance.ts",
+          "route": "mutation removeCountryFromRegion"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "return models.Region.findByIdAndUpdate(regionId, { $pull: { countries: country } }, { new: true });",
+        "edges": [
+          "removeCountryFromRegion findByIdAndUpdate regionId (mutations/region.ts:292)"
+        ]
+      },
+      "_binds": {
+        "regionId": "Region.id"
+      },
+      "_output_schema": {
+        "region": "the InsuranceRegion row with the country removed"
+      }
+    }
+  ],
+  "seed_state": {
+    "RiskType": [
+      {
+        "id": 1,
+        "name": "Theft"
+      },
+      {
+        "id": 2,
+        "name": "Collision"
+      }
+    ],
+    "InsuranceType": [
+      {
+        "id": 1,
+        "name": "Motor",
+        "code": "motor",
+        "isCitizen": false,
+        "attributes": {
+          "vehicles": true
+        }
+      },
+      {
+        "id": 2,
+        "name": "Travel",
+        "code": "travel",
+        "isCitizen": false,
+        "attributes": {
+          "trips": true
+        }
+      }
+    ],
+    "Template": [
+      {
+        "id": 1,
+        "name": "Motor Contract",
+        "description": "Motor policy",
+        "htmlContent": "<h1>Motor Policy</h1>",
+        "cssContent": "",
+        "version": 1,
+        "status": "active"
+      }
+    ],
+    "Region": [
+      {
+        "id": 1,
+        "name": "Asia-Pacific",
+        "countries": [
+          "Australia",
+          "Japan"
+        ]
+      },
+      {
+        "id": 2,
+        "name": "Europe",
+        "countries": [
+          "Germany",
+          "France"
+        ]
+      }
+    ],
+    "Customer": [
+      {
+        "id": 1,
+        "type": "individual",
+        "firstName": "Alice",
+        "lastName": "Wang",
+        "companyName": null,
+        "registrationNumber": "REG-1001",
+        "email": "alice@example.com",
+        "phone": "555-0101"
+      },
+      {
+        "id": 2,
+        "type": "company",
+        "firstName": null,
+        "lastName": null,
+        "companyName": "Acme Logistics",
+        "registrationNumber": "REG-2002",
+        "email": "billing@acme.example",
+        "phone": "555-0102"
+      }
+    ],
+    "Vendor": [
+      {
+        "id": 1,
+        "name": "Nomad Insurance",
+        "offeredProducts": []
+      },
+      {
+        "id": 2,
+        "name": "Steppe Broker",
+        "offeredProducts": []
+      }
+    ],
+    "Product": [
+      {
+        "id": 1,
+        "name": "Motor Full",
+        "insuranceType": 1,
+        "regions": [
+          1
+        ],
+        "coveredRisks": [
+          1,
+          2
+        ],
+        "pricingConfig": {
+          "dailyRate": 10.0
+        },
+        "pdfContent": null,
+        "templateId": 1,
+        "additionalCoverages": null,
+        "compensationCalculations": null,
+        "deductibleConfig": null
+      }
+    ],
+    "VendorUser": [
+      {
+        "id": 1,
+        "name": "ada",
+        "email": "ops@erxes.example",
+        "phone": "555-1001",
+        "password": "pw-operations",
+        "vendor": 1,
+        "role": "admin"
+      },
+      {
+        "id": 2,
+        "name": "bob",
+        "email": "peer1@erxes.example",
+        "phone": "555-1002",
+        "password": "pw-peer",
+        "vendor": 2,
+        "role": "user"
+      }
+    ],
+    "Contract": [
+      {
+        "id": 1,
+        "contractNumber": "C-0001",
+        "vendor": 1,
+        "customer": 1,
+        "insuranceType": 1,
+        "insuranceProduct": 1,
+        "coveredRisks": [
+          1,
+          2
+        ],
+        "chargedAmount": 120.0,
+        "startDate": "2026-01-01T00:00:00Z",
+        "endDate": "2027-01-01T00:00:00Z",
+        "insuredObject": {
+          "plate": "AB-123"
+        },
+        "paymentKind": "cash",
+        "paymentStatus": "paid",
+        "pdfContent": null
+      }
+    ]
+  },
+  "summary": "erxes insurance_api plugin: a GraphQL insurance CRM vertical (Node/TS, mongoose+Apollo). One actor on the panel — VendorUser (email/password) — whose login opens a session carrying $actor.id plus $session.vendor (the user's Vendor). Vendor-scoped reads (myVendor, vendor contracts) are gated on that session. drop list: health_check (candidate health probe, no persisted domain), region_seed (a hardcoded seeder — recreated via region_create/region_set_countries), vendor/region add-/remove- granular list mutations (consolidated into update_offerings / set_countries so their write effect is verifiable)."
+}

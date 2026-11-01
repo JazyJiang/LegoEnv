@@ -1,0 +1,2918 @@
+{
+  "env_id": "filebrowser",
+  "entities": [
+    {
+      "name": "User",
+      "columns": [
+        {
+          "name": "ID",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "Username",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "Password",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "Scope",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "Locale",
+          "type": "text",
+          "default": "en"
+        },
+        {
+          "name": "LockPassword",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "ViewMode",
+          "type": "text",
+          "enum": [
+            "list",
+            "mosaic"
+          ],
+          "default": "list"
+        },
+        {
+          "name": "SingleClick",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "RedirectAfterCopyMove",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "Perm",
+          "type": "json"
+        },
+        {
+          "name": "Perm.Admin",
+          "type": "bool",
+          "default": false,
+          "note": "decomposed flag of Permissions.Admin (mined as Perm.Admin in guards)"
+        },
+        {
+          "name": "Perm.Execute",
+          "type": "bool",
+          "default": false,
+          "note": "decomposed flag of Permissions.Execute (mined as Perm.Execute in guards)"
+        },
+        {
+          "name": "Perm.Create",
+          "type": "bool",
+          "default": false,
+          "note": "decomposed flag of Permissions.Create (mined as Perm.Create in guards)"
+        },
+        {
+          "name": "Perm.Rename",
+          "type": "bool",
+          "default": false,
+          "note": "decomposed flag of Permissions.Rename (mined as Perm.Rename in guards)"
+        },
+        {
+          "name": "Perm.Modify",
+          "type": "bool",
+          "default": false,
+          "note": "decomposed flag of Permissions.Modify (mined as Perm.Modify in guards)"
+        },
+        {
+          "name": "Perm.Delete",
+          "type": "bool",
+          "default": false,
+          "note": "decomposed flag of Permissions.Delete (mined as Perm.Delete in guards)"
+        },
+        {
+          "name": "Perm.Share",
+          "type": "bool",
+          "default": false,
+          "note": "decomposed flag of Permissions.Share (mined as Perm.Share in guards)"
+        },
+        {
+          "name": "Perm.Download",
+          "type": "bool",
+          "default": false,
+          "note": "decomposed flag of Permissions.Download (mined as Perm.Download in guards)"
+        },
+        {
+          "name": "Commands",
+          "type": "json"
+        },
+        {
+          "name": "Sorting",
+          "type": "json"
+        },
+        {
+          "name": "Rules",
+          "type": "json"
+        },
+        {
+          "name": "HideDotfiles",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "DateFormat",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "AceEditorTheme",
+          "type": "text",
+          "nullable": true,
+          "default": ""
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "Username"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ShareLink",
+      "columns": [
+        {
+          "name": "Hash",
+          "type": "text",
+          "pk": true
+        },
+        {
+          "name": "Path",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "UserID",
+          "type": "id",
+          "fk_to": "User.ID",
+          "on_delete": "cascade",
+          "note": " deleting a user removes their share links"
+        },
+        {
+          "name": "Expire",
+          "type": "int",
+          "default": 0
+        },
+        {
+          "name": "PasswordHash",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "Token",
+          "type": "text",
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "name": "Settings",
+      "columns": [
+        {
+          "name": "Key",
+          "type": "text",
+          "pk": true,
+          "nullable": true
+        },
+        {
+          "name": "Signup",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "HideLoginButton",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "CreateUserDir",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "UserHomeBasePath",
+          "type": "text",
+          "default": "/users"
+        },
+        {
+          "name": "Defaults",
+          "type": "json"
+        },
+        {
+          "name": "AuthMethod",
+          "type": "text",
+          "enum": [
+            "json",
+            "proxy",
+            "hook",
+            "noauth"
+          ],
+          "default": "json"
+        },
+        {
+          "name": "LogoutPage",
+          "type": "text",
+          "default": "/login"
+        },
+        {
+          "name": "Branding",
+          "type": "json"
+        },
+        {
+          "name": "Tus",
+          "type": "json"
+        },
+        {
+          "name": "Commands",
+          "type": "json"
+        },
+        {
+          "name": "Shell",
+          "type": "json"
+        },
+        {
+          "name": "Rules",
+          "type": "json"
+        },
+        {
+          "name": "MinimumPasswordLength",
+          "type": "int",
+          "default": 12
+        },
+        {
+          "name": "FileMode",
+          "type": "int",
+          "default": "0640"
+        },
+        {
+          "name": "DirMode",
+          "type": "int",
+          "default": "0750"
+        },
+        {
+          "name": "HideDotfiles",
+          "type": "bool",
+          "default": false
+        }
+      ]
+    },
+    {
+      "name": "Server",
+      "columns": [
+        {
+          "name": "Root",
+          "type": "text",
+          "pk": true
+        },
+        {
+          "name": "BaseURL",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "Socket",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "TLSKey",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "TLSCert",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "Port",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "Address",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "Log",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "EnableThumbnails",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "ResizePreview",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "EnableExec",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "TypeDetectionByHeader",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "ImageResolutionCal",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "AuthHook",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "TokenExpirationTime",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "FollowExternalSymlinks",
+          "type": "bool",
+          "default": false
+        }
+      ]
+    },
+    {
+      "name": "AuthConfig",
+      "columns": [
+        {
+          "name": "Method",
+          "type": "text",
+          "pk": true,
+          "enum": [
+            "json",
+            "proxy",
+            "hook",
+            "noauth"
+          ]
+        },
+        {
+          "name": "Config",
+          "type": "json"
+        }
+      ]
+    },
+    {
+      "name": "DirEntry",
+      "columns": [
+        {
+          "name": "Path",
+          "type": "text",
+          "pk": true
+        },
+        {
+          "name": "Name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "Size",
+          "type": "int",
+          "default": 0
+        },
+        {
+          "name": "ModTime",
+          "type": "datetime"
+        },
+        {
+          "name": "Mode",
+          "type": "int",
+          "default": 0
+        },
+        {
+          "name": "IsDir",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "IsSymlink",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "Extension",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "Type",
+          "type": "text",
+          "nullable": true
+        }
+      ]
+    }
+  ],
+  "tools": [
+    {
+      "tool": "sign_in",
+      "family": "guard.auth",
+      "entity": "User",
+      "description": "Sign in with a username and password. Opens the session that every file, user and share operation resolves $actor from. Fails on a wrong username or password.",
+      "input_schema": {
+        "Username": {
+          "type": "text",
+          "required": true,
+          "description": "The account username."
+        },
+        "Password": {
+          "type": "text",
+          "required": true,
+          "description": "The account password."
+        }
+      },
+      "exec_spec": {
+        "verify": {
+          "entity": "User",
+          "username_col": "Username",
+          "password_col": "Password"
+        }
+      },
+      "guards": {
+        "messages": {
+          "auth": "You must sign in before doing that."
+        },
+        "preconditions": [],
+        "required": [
+          "Username",
+          "Password"
+        ]
+      },
+      "_evidence": {
+        "locator": "http/auth.go:156",
+        "id_local": "User.login",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/login",
+          "locator": "http/http.go:52"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "func loginHandler(tokenExpireTime time.Duration) handleFunc {\n\treturn func(w http.ResponseWriter, r *http.Request, d *data) (int, error) {\n\t\tauther, err := d.store.Auth.Get(d.settings.AuthMethod)\n\t\tuser, err := auther.Auth(r, d.store.Users, d.settings, d.server)\n\t\t...\n\t\treturn printToken(w, r, d, user, tokenExpireTime)\n\t}\n}",
+        "edges": [
+          "http/auth.go store.Auth.Get(d.settings.AuthMethod); proxy/hook login may auto-provision a user via SaveProvisioned"
+        ]
+      }
+    },
+    {
+      "tool": "user_list",
+      "family": "search",
+      "entity": "User",
+      "description": "List all users with their account settings and permissions (passwords are never returned). Admin only.",
+      "input_schema": {},
+      "exec_spec": {
+        "entity": "User"
+      },
+      "_evidence": {
+        "locator": "http/users.go:73",
+        "id_local": "User.getList",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/users",
+          "locator": "http/http.go:57"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "var usersGetHandler = withAdmin(func(w http.ResponseWriter, r *http.Request, d *data) (int, error) {\n\tusers, err := d.store.Users.Gets(d.server.Root, d.server.FollowExternalSymlinks)\n\tfor _, u := range users { u.Password = \"\" }\n\t...\n\treturn renderJSON(w, r, users)\n}",
+        "edges": [
+          "http/users.go:73 withAdmin middleware (Admin gate on listing all users)"
+        ]
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "Please sign in first.",
+          "precondition": "Only an admin can list all users."
+        },
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "ID",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "Perm.Admin",
+                      "op": "eq",
+                      "value": true
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "tool": "user_get",
+      "family": "crud.fetch",
+      "entity": "User",
+      "description": "Get one user’s account row. You may read your own row, or any row as an admin. Passwords are blanked.",
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the user to fetch."
+        }
+      },
+      "exec_spec": {
+        "entity": "User",
+        "lookup_by": {
+          "ID": {
+            "$arg": "id"
+          }
+        },
+        "scope": {
+          "owner_col": "ID"
+        }
+      },
+      "_evidence": {
+        "locator": "http/users.go:90",
+        "id_local": "User.get",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/users/{id:[0-9]+}",
+          "locator": "http/http.go:60"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "var userGetHandler = withSelfOrAdmin(func(w http.ResponseWriter, r *http.Request, d *data) (int, error) {\n\tu, err := d.store.Users.Get(d.server.Root, d.server.FollowExternalSymlinks, d.raw.(uint))\n\t...\n\tu.Password = \"\"; if !d.user.Perm.Admin { u.Scope = \"\" }\n\treturn renderJSON(w, r, u)\n}",
+        "edges": [
+          "http/users.go:44 withSelfOrAdmin middleware"
+        ]
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "Please sign in first.",
+          "not_found": "No such user.",
+          "precondition": "You can only read your own account unless you are an admin."
+        },
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "ID",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "ID",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "ID",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "Perm.Admin",
+                      "op": "eq",
+                      "value": true
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "tool": "user_create",
+      "family": "crud.insert",
+      "entity": "User",
+      "description": "Create a new user account. Only admins can create users. Fails if the username is already taken or a non-admin is given share without download permission.",
+      "input_schema": {
+        "username": {
+          "type": "text",
+          "required": true,
+          "description": "Unique username for the new account."
+        },
+        "password": {
+          "type": "text",
+          "required": true,
+          "description": "Plaintext password; the server hashes it. Must meet the minimum length."
+        },
+        "scope": {
+          "type": "text",
+          "description": "Filesystem scope (home directory) the user is bound to. Defaults to the user home base path."
+        },
+        "locale": {
+          "type": "text",
+          "description": "Preferred locale, e.g. en."
+        },
+        "lock_password": {
+          "type": "bool",
+          "description": "Lock the password so only an admin can change it."
+        },
+        "view_mode": {
+          "type": "text",
+          "description": "Default view mode: list or mosaic."
+        },
+        "single_click": {
+          "type": "bool",
+          "description": "Open files on a single click instead of double."
+        },
+        "redirect_after_copy_move": {
+          "type": "bool",
+          "description": "Remember the last copy/move destination."
+        },
+        "hide_dotfiles": {
+          "type": "bool",
+          "description": "Hide dotfiles from this user."
+        },
+        "date_format": {
+          "type": "bool",
+          "description": "Use the date formatting option."
+        },
+        "commands": {
+          "type": "json",
+          "description": "List of shell commands this user may run."
+        },
+        "sorting": {
+          "type": "json",
+          "description": "Default file sorting {By,Asc}."
+        },
+        "rules": {
+          "type": "json",
+          "description": "Per-user ACL rules."
+        },
+        "perm_admin": {
+          "type": "bool",
+          "description": "Whether the new user may admin."
+        },
+        "perm_execute": {
+          "type": "bool",
+          "description": "Whether the new user may execute."
+        },
+        "perm_create": {
+          "type": "bool",
+          "description": "Whether the new user may create."
+        },
+        "perm_rename": {
+          "type": "bool",
+          "description": "Whether the new user may rename."
+        },
+        "perm_modify": {
+          "type": "bool",
+          "description": "Whether the new user may modify."
+        },
+        "perm_delete": {
+          "type": "bool",
+          "description": "Whether the new user may delete."
+        },
+        "perm_share": {
+          "type": "bool",
+          "description": "Whether the new user may share."
+        },
+        "perm_download": {
+          "type": "bool",
+          "description": "Whether the new user may download."
+        }
+      },
+      "exec_spec": {
+        "entity": "User",
+        "fields": {
+          "Username": {
+            "$arg": "username"
+          },
+          "Scope": {
+            "$arg": "scope"
+          },
+          "Locale": {
+            "$arg": "locale"
+          },
+          "LockPassword": {
+            "$arg": "lock_password"
+          },
+          "ViewMode": {
+            "$arg": "view_mode"
+          },
+          "SingleClick": {
+            "$arg": "single_click"
+          },
+          "RedirectAfterCopyMove": {
+            "$arg": "redirect_after_copy_move"
+          },
+          "Commands": {
+            "$arg": "commands"
+          },
+          "Sorting": {
+            "$arg": "sorting"
+          },
+          "Rules": {
+            "$arg": "rules"
+          },
+          "HideDotfiles": {
+            "$arg": "hide_dotfiles"
+          },
+          "DateFormat": {
+            "$arg": "date_format"
+          },
+          "Perm.Admin": {
+            "$arg": "perm_admin"
+          },
+          "Perm.Execute": {
+            "$arg": "perm_execute"
+          },
+          "Perm.Create": {
+            "$arg": "perm_create"
+          },
+          "Perm.Rename": {
+            "$arg": "perm_rename"
+          },
+          "Perm.Modify": {
+            "$arg": "perm_modify"
+          },
+          "Perm.Delete": {
+            "$arg": "perm_delete"
+          },
+          "Perm.Share": {
+            "$arg": "perm_share"
+          },
+          "Perm.Download": {
+            "$arg": "perm_download"
+          }
+        },
+        "set_on_create": {
+          "Password": {
+            "$arg": "password"
+          }
+        },
+        "unique_on": [
+          "Username"
+        ]
+      },
+      "_evidence": {
+        "locator": "http/users.go:134",
+        "id_local": "User.create",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/users",
+          "locator": "http/http.go:58"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "var userPostHandler = withAdmin(func(w http.ResponseWriter, r *http.Request, d *data) (int, error) {\n\t...\n\tif req.Data.Password == \"\" { return http.StatusBadRequest, fberrors.ErrEmptyPassword }\n\treq.Data.Password, err = users.ValidateAndHashPwd(req.Data.Password, d.settings.MinimumPasswordLength)\n\t...\n\tif req.Data.Perm.Share && !req.Data.Perm.Download { return http.StatusBadRequest, fberrors.ErrShareRequiresDownload }\n\tuserHome, err := d.settings.MakeUserDir(req.Data.Username, req.Data.Scope, d.server.Root)\n\t...\n\terr = d.store.Users.Save(req.Data)\n\treturn http.StatusCreated, nil\n}",
+        "edges": [
+          "http/users.go:134 withAdmin middleware"
+        ]
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "username",
+          "password"
+        ],
+        "messages": {
+          "auth": "Please sign in first.",
+          "precondition": "Only an admin can create users.",
+          "unique": "That username is already taken."
+        },
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "ID",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "Perm.Admin",
+                      "op": "eq",
+                      "value": true
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "tool": "user_update",
+      "family": "update.field_set",
+      "entity": "User",
+      "description": "Update a user’s account settings and permissions. You can update your own row, or any row as an admin; non-admins cannot change Username, Scope, LockPassword, Perm, Commands or Rules, and can only change their own password if it is not locked.",
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the user to update."
+        },
+        "password": {
+          "type": "text",
+          "description": "New password. Only you (if not locked) or an admin can change it."
+        },
+        "scope": {
+          "type": "text",
+          "description": "New filesystem scope."
+        },
+        "locale": {
+          "type": "text",
+          "description": "New locale."
+        },
+        "lock_password": {
+          "type": "bool",
+          "description": "Lock/unlock the password."
+        },
+        "view_mode": {
+          "type": "text",
+          "description": "New default view mode."
+        },
+        "single_click": {
+          "type": "bool",
+          "description": "Single-click to open."
+        },
+        "redirect_after_copy_move": {
+          "type": "bool",
+          "description": "Remember last destination."
+        },
+        "hide_dotfiles": {
+          "type": "bool",
+          "description": "Hide dotfiles."
+        },
+        "date_format": {
+          "type": "bool",
+          "description": "DateFormat option."
+        },
+        "commands": {
+          "type": "json",
+          "description": "Commands the user may run."
+        },
+        "sorting": {
+          "type": "json",
+          "description": "Default sorting."
+        },
+        "rules": {
+          "type": "json",
+          "description": "Per-user ACL rules."
+        },
+        "perm_admin": {
+          "type": "bool",
+          "description": "Whether the user may admin."
+        },
+        "perm_execute": {
+          "type": "bool",
+          "description": "Whether the user may execute."
+        },
+        "perm_create": {
+          "type": "bool",
+          "description": "Whether the user may create."
+        },
+        "perm_rename": {
+          "type": "bool",
+          "description": "Whether the user may rename."
+        },
+        "perm_modify": {
+          "type": "bool",
+          "description": "Whether the user may modify."
+        },
+        "perm_delete": {
+          "type": "bool",
+          "description": "Whether the user may delete."
+        },
+        "perm_share": {
+          "type": "bool",
+          "description": "Whether the user may share."
+        },
+        "perm_download": {
+          "type": "bool",
+          "description": "Whether the user may download."
+        }
+      },
+      "exec_spec": {
+        "entity": "User",
+        "row_key": {
+          "ID": {
+            "$arg": "id"
+          }
+        },
+        "fields": {
+          "Scope": {
+            "$arg": "scope"
+          },
+          "Locale": {
+            "$arg": "locale"
+          },
+          "LockPassword": {
+            "$arg": "lock_password"
+          },
+          "ViewMode": {
+            "$arg": "view_mode"
+          },
+          "SingleClick": {
+            "$arg": "single_click"
+          },
+          "RedirectAfterCopyMove": {
+            "$arg": "redirect_after_copy_move"
+          },
+          "Commands": {
+            "$arg": "commands"
+          },
+          "Sorting": {
+            "$arg": "sorting"
+          },
+          "Rules": {
+            "$arg": "rules"
+          },
+          "HideDotfiles": {
+            "$arg": "hide_dotfiles"
+          },
+          "DateFormat": {
+            "$arg": "date_format"
+          },
+          "Perm.Admin": {
+            "$arg": "perm_admin"
+          },
+          "Perm.Execute": {
+            "$arg": "perm_execute"
+          },
+          "Perm.Create": {
+            "$arg": "perm_create"
+          },
+          "Perm.Rename": {
+            "$arg": "perm_rename"
+          },
+          "Perm.Modify": {
+            "$arg": "perm_modify"
+          },
+          "Perm.Delete": {
+            "$arg": "perm_delete"
+          },
+          "Perm.Share": {
+            "$arg": "perm_share"
+          },
+          "Perm.Download": {
+            "$arg": "perm_download"
+          }
+        },
+        "set": {
+          "Scope": {
+            "$arg": "scope"
+          },
+          "Locale": {
+            "$arg": "locale"
+          },
+          "LockPassword": {
+            "$arg": "lock_password"
+          },
+          "ViewMode": {
+            "$arg": "view_mode"
+          },
+          "SingleClick": {
+            "$arg": "single_click"
+          },
+          "RedirectAfterCopyMove": {
+            "$arg": "redirect_after_copy_move"
+          },
+          "Commands": {
+            "$arg": "commands"
+          },
+          "Sorting": {
+            "$arg": "sorting"
+          },
+          "Rules": {
+            "$arg": "rules"
+          },
+          "HideDotfiles": {
+            "$arg": "hide_dotfiles"
+          },
+          "DateFormat": {
+            "$arg": "date_format"
+          },
+          "Password": {
+            "$arg": "password"
+          },
+          "Perm.Admin": {
+            "$arg": "perm_admin"
+          },
+          "Perm.Execute": {
+            "$arg": "perm_execute"
+          },
+          "Perm.Create": {
+            "$arg": "perm_create"
+          },
+          "Perm.Rename": {
+            "$arg": "perm_rename"
+          },
+          "Perm.Modify": {
+            "$arg": "perm_modify"
+          },
+          "Perm.Delete": {
+            "$arg": "perm_delete"
+          },
+          "Perm.Share": {
+            "$arg": "perm_share"
+          },
+          "Perm.Download": {
+            "$arg": "perm_download"
+          }
+        }
+      },
+      "_evidence": {
+        "locator": "http/users.go:180",
+        "id_local": "User.update",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /api/users/{id:[0-9]+}",
+          "locator": "http/http.go:59"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "var userPutHandler = withSelfOrAdmin(func(w http.ResponseWriter, r *http.Request, d *data) (int, error) {\n\t...\n\tif req.Data.ID != d.raw.(uint) { return http.StatusBadRequest, nil }\n\t... non-admin may not touch Username/Scope/LockPassword/Perm/Commands/Rules ...\n\tif v == \"Password\" { if !d.user.Perm.Admin && d.user.LockPassword { return http.StatusForbidden, nil }\n\t\treq.Data.Password, err = users.ValidateAndHashPwd(...) }\n\t...\n\terr = d.store.Users.Update(req.Data, req.Which...)\n\treturn http.StatusOK, nil\n}",
+        "edges": [
+          "http/users.go:44 withSelfOrAdmin (admin or same id); Permission guard on Password when LockPassword; NonModifiableFieldsForNonAdmin",
+          "http/users.go:261 if v=='Password' admin-or-not-LockPassword; NonModifiableFieldsForNonAdmin"
+        ]
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "Please sign in first.",
+          "not_found": "No such user.",
+          "precondition": "You can only update your own account unless you are an admin."
+        },
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "ID",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "ID",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "ID",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "Perm.Admin",
+                      "op": "eq",
+                      "value": true
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "tool": "user_delete",
+      "family": "crud.delete",
+      "entity": "User",
+      "description": "Delete a user account. You may delete yourself or, as an admin, anyone. The last admin cannot be deleted.",
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the user to delete."
+        }
+      },
+      "exec_spec": {
+        "entity": "User",
+        "lookup_by": {
+          "ID": {
+            "$arg": "id"
+          }
+        }
+      },
+      "_evidence": {
+        "locator": "http/users.go:107",
+        "id_local": "User.delete",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/users/{id:[0-9]+}",
+          "locator": "http/http.go:61"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "var userDeleteHandler = withSelfOrAdmin(func(_ http.ResponseWriter, r *http.Request, d *data) (int, error) {\n\tif d.settings.AuthMethod == auth.MethodJSONAuth {\n\t\tif !users.CheckPwd(body.CurrentPassword, d.user.Password) { return http.StatusBadRequest, fberrors.ErrCurrentPasswordIncorrect }\n\t}\n\terr := d.store.Users.Delete(d.raw.(uint))\n\treturn errToStatus(err), err\n}",
+        "edges": [
+          "users/storage.go:142 IsUniqueAdmin -> ErrRootUserDeletion; userDeleteHandler runs if user is not the sole admin"
+        ]
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "Please sign in first.",
+          "not_found": "No such user.",
+          "precondition": "The last admin cannot be deleted."
+        },
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "ID",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "Perm.Admin",
+                      "op": "eq",
+                      "value": false
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "ID",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "Perm.Admin",
+                      "op": "eq",
+                      "value": true
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            },
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "Perm.Admin",
+                      "op": "eq",
+                      "value": true
+                    },
+                    {
+                      "node": "field",
+                      "col": "ID",
+                      "op": "ne",
+                      "value": {
+                        "arg": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "tool": "settings_get",
+      "family": "crud.fetch",
+      "entity": "Settings",
+      "description": "Get the global application settings (signup flag, auth method, defaults, branding, shell commands, password policy). Admin only.",
+      "input_schema": {},
+      "exec_spec": {
+        "entity": "Settings",
+        "lookup_by": {
+          "Key": "settings"
+        }
+      },
+      "_evidence": {
+        "locator": "http/settings.go:26",
+        "id_local": "Settings.get",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/settings",
+          "locator": "http/http.go:82"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "var settingsGetHandler = withAdmin(func(w http.ResponseWriter, r *http.Request, d *data) (int, error) {\n\tdata := &settingsData{ Signup: d.settings.Signup, ... }\n\treturn renderJSON(w, r, data)\n}",
+        "edges": [
+          "http/settings.go:26 withAdmin middleware"
+        ]
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "Please sign in first.",
+          "precondition": "Only an admin can read the settings."
+        },
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "ID",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "Perm.Admin",
+                      "op": "eq",
+                      "value": true
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "tool": "settings_update",
+      "family": "update.field_set",
+      "entity": "Settings",
+      "description": "Update the global application settings. Admin only. All fields optional; only the ones given are changed.",
+      "input_schema": {
+        "signup": {
+          "type": "bool",
+          "description": "Enable or disable self sign-up."
+        },
+        "hide_login_button": {
+          "type": "bool",
+          "description": "Hide the login button on the page."
+        },
+        "create_user_dir": {
+          "type": "bool",
+          "description": "Create a home directory for new users."
+        },
+        "user_home_base_path": {
+          "type": "text",
+          "description": "Base path for user home directories."
+        },
+        "defaults": {
+          "type": "json",
+          "description": "Default settings applied to new users."
+        },
+        "branding": {
+          "type": "json",
+          "description": "Branding configuration."
+        },
+        "tus": {
+          "type": "json",
+          "description": "Tus upload configuration."
+        },
+        "shell": {
+          "type": "json",
+          "description": "Shell / terminal configuration."
+        },
+        "commands": {
+          "type": "json",
+          "description": "Event-to-command hooks (before/after save, copy, rename, upload, delete)."
+        },
+        "minimum_password_length": {
+          "type": "int",
+          "description": "Minimum password length for new passwords."
+        }
+      },
+      "exec_spec": {
+        "entity": "Settings",
+        "row_key": {
+          "Key": "settings"
+        },
+        "fields": {
+          "Signup": {
+            "$arg": "signup"
+          },
+          "HideLoginButton": {
+            "$arg": "hide_login_button"
+          },
+          "CreateUserDir": {
+            "$arg": "create_user_dir"
+          },
+          "UserHomeBasePath": {
+            "$arg": "user_home_base_path"
+          },
+          "Defaults": {
+            "$arg": "defaults"
+          },
+          "Branding": {
+            "$arg": "branding"
+          },
+          "Tus": {
+            "$arg": "tus"
+          },
+          "Shell": {
+            "$arg": "shell"
+          },
+          "Commands": {
+            "$arg": "commands"
+          },
+          "MinimumPasswordLength": {
+            "$arg": "minimum_password_length"
+          }
+        },
+        "set": {
+          "Signup": {
+            "$arg": "signup"
+          },
+          "HideLoginButton": {
+            "$arg": "hide_login_button"
+          },
+          "CreateUserDir": {
+            "$arg": "create_user_dir"
+          },
+          "UserHomeBasePath": {
+            "$arg": "user_home_base_path"
+          },
+          "Defaults": {
+            "$arg": "defaults"
+          },
+          "Branding": {
+            "$arg": "branding"
+          },
+          "Tus": {
+            "$arg": "tus"
+          },
+          "Shell": {
+            "$arg": "shell"
+          },
+          "Commands": {
+            "$arg": "commands"
+          },
+          "MinimumPasswordLength": {
+            "$arg": "minimum_password_length"
+          }
+        }
+      },
+      "_evidence": {
+        "locator": "http/settings.go:45",
+        "id_local": "Settings.update",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /api/settings",
+          "locator": "http/http.go:83"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "var settingsPutHandler = withAdmin(func(_ http.ResponseWriter, r *http.Request, d *data) (int, error) {\n\treq := &settingsData{}; json.NewDecoder(r.Body).Decode(req)\n\td.settings.Signup = req.Signup; d.settings.CreateUserDir = req.CreateUserDir; ...\n\terr = d.store.Settings.Save(d.settings); return errToStatus(err), err\n}",
+        "edges": [
+          "http/settings.go:45 withAdmin middleware"
+        ]
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "Please sign in first.",
+          "precondition": "Only an admin can change the settings."
+        },
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "ID",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "Perm.Admin",
+                      "op": "eq",
+                      "value": true
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "tool": "sharelink_create",
+      "family": "crud.insert",
+      "entity": "ShareLink",
+      "description": "Create a public share link to a file or directory. Requires the Share and Download permissions. The hash you choose becomes the public token of the link.",
+      "input_schema": {
+        "path": {
+          "type": "text",
+          "required": true,
+          "description": "Filesystem path to share."
+        },
+        "hash": {
+          "type": "text",
+          "required": true,
+          "description": "Short share id string you choose for the link (e.g. a base64 token)."
+        },
+        "password": {
+          "type": "text",
+          "description": "Optional password protecting the share."
+        },
+        "expires": {
+          "type": "int",
+          "description": "Expiry unix timestamp, or 0 for permanent."
+        }
+      },
+      "exec_spec": {
+        "entity": "ShareLink",
+        "fields": {
+          "Hash": {
+            "$arg": "hash"
+          },
+          "Path": {
+            "$arg": "path"
+          }
+        },
+        "set_on_create": {
+          "UserID": {
+            "$session": "account_id"
+          },
+          "Expire": 0
+        }
+      },
+      "_evidence": {
+        "locator": "http/share.go:158",
+        "id_local": "ShareLink.create",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/share/{path:.*}",
+          "locator": "http/http.go:79"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "var sharePostHandler = withPermShare(func(w http.ResponseWriter, r *http.Request, d *data) (int, error) {\n\tif _, err := d.user.Fs.Stat(r.URL.Path); err != nil {\n\t\treturn errToStatus(err), err\n\t}\n\t...\n\ts = &share.Link{Path: r.URL.Path, Hash: str, Expire: expire, UserID: d.user.ID, PasswordHash: string(hash), Token: token}\n\tif err := d.store.Share.Save(s); err != nil {\n\t\treturn http.StatusInternalServerError, err\n\t}\n\treturn renderJSON(w, r, toShareResponse(s))\n}",
+        "edges": [
+          "http/share.go:62 withPermShare middleware"
+        ]
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "path",
+          "hash"
+        ],
+        "messages": {
+          "auth": "Please sign in first.",
+          "precondition": "You need both Share and Download permissions to create a share link."
+        },
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "ID",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "Perm.Share",
+                      "op": "eq",
+                      "value": true
+                    },
+                    {
+                      "node": "field",
+                      "col": "Perm.Download",
+                      "op": "eq",
+                      "value": true
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "tool": "sharelink_list",
+      "family": "search",
+      "entity": "ShareLink",
+      "description": "List the share links you created. As an admin, lists every share link.",
+      "input_schema": {},
+      "exec_spec": {
+        "entity": "ShareLink",
+        "scope": {
+          "owner_col": "UserID"
+        },
+        "rank": {
+          "method": "exact"
+        }
+      },
+      "_evidence": {
+        "locator": "http/share.go:62",
+        "id_local": "ShareLink.list",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/shares",
+          "locator": "http/http.go:77"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "var shareListHandler = withPermShare(func(w http.ResponseWriter, r *http.Request, d *data) (int, error) {\n\tif d.user.Perm.Admin { s, err = d.store.Share.All() } else { s, err = d.store.Share.FindByUserID(d.user.ID) }\n\t...\n\treturn renderJSON(w, r, toShareResponses(s))\n}"
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "Please sign in first."
+        }
+      }
+    },
+    {
+      "tool": "sharelink_get",
+      "family": "crud.fetch",
+      "entity": "ShareLink",
+      "description": "Get the share link(s) you created for a given path. Admin may read any path’s links.",
+      "input_schema": {
+        "path": {
+          "type": "text",
+          "required": true,
+          "description": "Path of the shared file to find share links for."
+        }
+      },
+      "exec_spec": {
+        "entity": "ShareLink",
+        "lookup_by": {
+          "Path": {
+            "$arg": "path"
+          }
+        },
+        "scope": {
+          "owner_col": "UserID"
+        }
+      },
+      "_evidence": {
+        "locator": "http/share.go:90",
+        "id_local": "ShareLink.getByPath",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/share/{path:.*}",
+          "locator": "http/http.go:78"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "var shareGetsHandler = withPermShare(func(w http.ResponseWriter, r *http.Request, d *data) (int, error) {\n\tif d.user.Perm.Admin { s, err = getSharesForAdminPath(d, r.URL.Path) } else { s, err = d.store.Share.Gets(r.URL.Path, d.user.ID) }\n\treturn renderJSON(w, r, toShareResponses(s))\n}"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "path"
+        ],
+        "messages": {
+          "auth": "Please sign in first.",
+          "not_found": "No share link for that path."
+        }
+      }
+    },
+    {
+      "tool": "sharelink_delete",
+      "family": "crud.delete",
+      "entity": "ShareLink",
+      "description": "Delete one of your share links. As an admin, may delete any share link. Requires Share and Download permissions.",
+      "input_schema": {
+        "hash": {
+          "type": "text",
+          "required": true,
+          "description": "The share id of the link to delete."
+        }
+      },
+      "exec_spec": {
+        "entity": "ShareLink",
+        "lookup_by": {
+          "Hash": {
+            "$arg": "hash"
+          }
+        }
+      },
+      "_evidence": {
+        "locator": "http/share.go:137",
+        "id_local": "ShareLink.delete",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/share/{hash}",
+          "locator": "http/http.go:80"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "var shareDeleteHandler = withPermShare(func(_ http.ResponseWriter, r *http.Request, d *data) (int, error) {\n\thash := strings.TrimSuffix(r.URL.Path, \"/\"); hash = strings.TrimPrefix(hash, \"/\")\n\tlink, err := d.store.Share.GetByHash(hash); if err != nil { return errToStatus(err), err }\n\tif link.UserID != d.user.ID && !d.user.Perm.Admin { return http.StatusForbidden, nil }\n\terr = d.store.Share.Delete(hash); return errToStatus(err), err\n}",
+        "edges": [
+          "http/share.go:137 withPermShare (Perm.Share && Perm.Download) + link.UserID ownership check"
+        ]
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "hash"
+        ],
+        "messages": {
+          "auth": "Please sign in first.",
+          "not_found": "No such share link.",
+          "precondition": "You can only delete your own share links unless you are an admin, and you need Share and Download permissions."
+        },
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "ID",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "Perm.Share",
+                      "op": "eq",
+                      "value": true
+                    },
+                    {
+                      "node": "field",
+                      "col": "Perm.Download",
+                      "op": "eq",
+                      "value": true
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            },
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "ShareLink",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "Hash",
+                      "op": "eq",
+                      "value": {
+                        "arg": "hash"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "UserID",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "ID",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "Perm.Admin",
+                      "op": "eq",
+                      "value": true
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "tool": "listen_dir",
+      "family": "search",
+      "entity": "DirEntry",
+      "description": "List files and directories under a path, with size, mime type and modification time.",
+      "input_schema": {
+        "path": {
+          "type": "text",
+          "required": true,
+          "description": "Directory path to list."
+        }
+      },
+      "exec_spec": {
+        "entity": "DirEntry",
+        "rank": {
+          "method": "exact"
+        }
+      },
+      "_evidence": {
+        "locator": "http/resource.go:25",
+        "id_local": "DirEntry.get",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/resources/{path:.*}",
+          "locator": "http/http.go:64"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "var resourceGetHandler = withUser(func(w http.ResponseWriter, r *http.Request, d *data) (int, error) {\n\tfile, err := files.NewFileInfo(&files.FileOptions{ Fs: d.user.Fs, Path: r.URL.Path, Modify: d.user.Perm.Modify, Expand: true, ReadHeader: d.server.TypeDetectionByHeader, Checker: d, Content: d.user.Perm.Download })\n\t...\n\tif checksum := r.URL.Query().Get(\"checksum\"); checksum != \"\" { err := file.Checksum(checksum); ... }\n\treturn renderJSON(w, r, file)\n}"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "path"
+        ],
+        "messages": {
+          "auth": "Please sign in first."
+        }
+      }
+    },
+    {
+      "tool": "file_get",
+      "family": "crud.fetch",
+      "entity": "DirEntry",
+      "description": "Get metadata (size, type, modification time, whether it is a directory) for one file or directory.",
+      "input_schema": {
+        "path": {
+          "type": "text",
+          "required": true,
+          "description": "Path of the file to read metadata for."
+        }
+      },
+      "exec_spec": {
+        "entity": "DirEntry",
+        "lookup_by": {
+          "Path": {
+            "$arg": "path"
+          }
+        }
+      },
+      "_evidence": {
+        "locator": "http/resource.go:25",
+        "id_local": "DirEntry.get",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/resources/{path:.*}",
+          "locator": "http/http.go:64"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "var resourceGetHandler = withUser(func(w http.ResponseWriter, r *http.Request, d *data) (int, error) {\n\tfile, err := files.NewFileInfo(&files.FileOptions{ Fs: d.user.Fs, Path: r.URL.Path, Modify: d.user.Perm.Modify, Expand: true, ReadHeader: d.server.TypeDetectionByHeader, Checker: d, Content: d.user.Perm.Download })\n\t...\n\tif checksum := r.URL.Query().Get(\"checksum\"); checksum != \"\" { err := file.Checksum(checksum); ... }\n\treturn renderJSON(w, r, file)\n}"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "path"
+        ],
+        "messages": {
+          "auth": "Please sign in first.",
+          "not_found": "No such file or directory."
+        }
+      }
+    },
+    {
+      "tool": "file_search",
+      "family": "search",
+      "entity": "DirEntry",
+      "description": "Find files whose name contains a query substring, recursively under a path.",
+      "input_schema": {
+        "path": {
+          "type": "text",
+          "required": true,
+          "description": "Directory to search under."
+        },
+        "query": {
+          "type": "text",
+          "required": true,
+          "description": "Substring to search file names for."
+        }
+      },
+      "exec_spec": {
+        "entity": "DirEntry",
+        "filter": {
+          "col": "Name",
+          "mode": "substring",
+          "val": {
+            "$arg": "query"
+          }
+        },
+        "rank": {
+          "method": "substring",
+          "fields": [
+            "Name"
+          ]
+        }
+      },
+      "_evidence": {
+        "locator": "http/search.go:17",
+        "id_local": "DirEntry.search",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/search/{path:.*}",
+          "locator": "http/http.go:89"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "func Search(ctx context.Context, fs afero.Fs, scope, query string, checker rules.Checker, found func(path string, f os.FileInfo) error) error {\n\treturn afero.Walk(fs, scope, func(fPath string, f os.FileInfo, _ error) error {\n\t\t... if !checker.Check(fPath) { return nil } ...\n\t\tfor _, term := range search.Terms { if strings.Contains(fileName, term) { return found(relativePath, f) } }\n\t\treturn nil }) }"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "path",
+          "query"
+        ],
+        "messages": {
+          "auth": "Please sign in first."
+        }
+      }
+    },
+    {
+      "tool": "file_create",
+      "family": "crud.insert",
+      "entity": "DirEntry",
+      "description": "Create a new file or directory. For a directory the scope must be writable; requires the Create permission. Fails if the target already exists.",
+      "input_schema": {
+        "path": {
+          "type": "text",
+          "required": true,
+          "description": "Path where to create the file or directory (a trailing slash means a directory)."
+        },
+        "name": {
+          "type": "text",
+          "description": "Base name of the new file/directory.",
+          "required": true
+        },
+        "is_dir": {
+          "type": "bool",
+          "description": "Create the path as a directory."
+        }
+      },
+      "exec_spec": {
+        "entity": "DirEntry",
+        "fields": {
+          "Path": {
+            "$arg": "path"
+          },
+          "Name": {
+            "$arg": "name"
+          }
+        }
+      },
+      "_evidence": {
+        "locator": "http/resource.go:133",
+        "id_local": "DirEntry.create",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/resources/{path:.*}",
+          "locator": "http/http.go:66"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "var resourcePostHandler = withUser(func(w http.ResponseWriter, r *http.Request, d *data) (int, error) {\n\tif !d.user.Perm.Create || !d.Check(r.URL.Path) { return http.StatusForbidden, nil }\n\tif strings.HasSuffix(r.URL.Path, \"/\") { return d.RunHook(func() error { return d.user.Fs.MkdirAll(r.URL.Path, d.settings.DirMode) }, \"upload\", r.URL.Path, \"\", d.user) }\n\tfile, err := files.NewFileInfo(...)\n\tif err == nil { if r.URL.Query().Get(\"override\") != \"true\" { return http.StatusConflict, nil } ... }\n\treturn d.RunHook(func() error { return writeFile(d.user.Fs, r.URL.Path, r.Body, ...) }, \"upload\", ...",
+        "edges": [
+          "http/resource.go:138 !d.user.Perm.Create -> Forbidden"
+        ]
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "path",
+          "name"
+        ],
+        "messages": {
+          "auth": "Please sign in first.",
+          "precondition": "You need the Create permission to add files."
+        },
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "ID",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "Perm.Create",
+                      "op": "eq",
+                      "value": true
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "tool": "file_write",
+      "family": "update.field_set",
+      "entity": "DirEntry",
+      "description": "Overwrite a file (PUT). Updates its size and modification time metadata. The name is the path basename; use file_move to rename. Requires the Modify permission.",
+      "input_schema": {
+        "path": {
+          "type": "text",
+          "required": true,
+          "description": "Path of the file whose content is being overwritten."
+        },
+        "size": {
+          "type": "int",
+          "description": "New size in bytes after writing."
+        },
+        "mod_time": {
+          "type": "text",
+          "description": "New modification timestamp."
+        }
+      },
+      "exec_spec": {
+        "entity": "DirEntry",
+        "row_key": {
+          "Path": {
+            "$arg": "path"
+          }
+        },
+        "fields": {
+          "Size": {
+            "$arg": "size"
+          },
+          "ModTime": {
+            "$arg": "mod_time"
+          }
+        },
+        "set": {
+          "Size": {
+            "$arg": "size"
+          },
+          "ModTime": {
+            "$arg": "mod_time"
+          }
+        }
+      },
+      "_evidence": {
+        "locator": "http/resource.go:190",
+        "id_local": "DirEntry.write",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /api/resources/{path:.*}",
+          "locator": "http/http.go:67"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "var resourcePutHandler = withUser(func(w http.ResponseWriter, r *http.Request, d *data) (int, error) {\n\tif !d.user.Perm.Modify || !d.Check(r.URL.Path) { return http.StatusForbidden, nil }\n\tif strings.HasSuffix(r.URL.Path, \"/\") { return http.StatusMethodNotAllowed, nil }\n\texists, err := afero.Exists(d.user.Fs, r.URL.Path); if err != nil { ... }; if !exists { return http.StatusNotFound, nil }\n\treturn d.RunHook(func() error { return writeFile(d.user.Fs, r.URL.Path, r.Body, ...) }, \"save\", r.URL.Path, \"\", d.user)\n}",
+        "edges": [
+          "http/resource.go:194 !d.user.Perm.Modify -> Forbidden"
+        ]
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "path"
+        ],
+        "messages": {
+          "auth": "Please sign in first.",
+          "not_found": "No such file.",
+          "precondition": "You need the Modify permission to change files."
+        },
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "ID",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "Perm.Modify",
+                      "op": "eq",
+                      "value": true
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "tool": "file_move",
+      "family": "update.field_set",
+      "entity": "DirEntry",
+      "description": "Move (rename) a file or directory to a new path. Requires the Rename permission on both source and destination.",
+      "input_schema": {
+        "path": {
+          "type": "text",
+          "required": true,
+          "description": "Current path of the file or directory to move."
+        },
+        "destination": {
+          "type": "text",
+          "required": true,
+          "description": "New path to move it to."
+        }
+      },
+      "exec_spec": {
+        "entity": "DirEntry",
+        "row_key": {
+          "Path": {
+            "$arg": "path"
+          }
+        },
+        "set": {
+          "Path": {
+            "$arg": "destination"
+          }
+        }
+      },
+      "_evidence": {
+        "locator": "http/resource.go:222",
+        "id_local": "DirEntry.patchMove",
+        "entry": {
+          "kind": "http",
+          "route": "PATCH /api/resources/{path:.*}",
+          "locator": "http/http.go:68"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "func resourcePatchHandler(fileCache FileCache) handleFunc {\n\treturn withUser(func(_ http.ResponseWriter, r *http.Request, d *data) (int, error) {\n\t\tsrc := r.URL.Path; dst := r.URL.Query().Get(\"destination\"); action := r.URL.Query().Get(\"action\")\n\t\tif !d.Check(src) || !d.Check(dst) { return http.StatusForbidden, nil }\n\t\t...\n\t\terr = checkDescendants(d, src, dst); if err != nil { return errToStatus(err), err }\n\t\terr = d.RunHook(func() error { return patchAction(r.Context(), action, src, dst, d, fileCache) }, action, src, dst, d.user)\n\t\treturn errToStatus(err), err\n\t})} // patchAction: copy -> fil",
+        "edges": [
+          "http/resource.go:222 -> patchAction: copy requires Perm.Create, rename requires Perm.Rename (http/resource.go:307,318)"
+        ]
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "path",
+          "destination"
+        ],
+        "messages": {
+          "auth": "Please sign in first.",
+          "precondition": "You need the Rename permission to move files."
+        },
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "ID",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "Perm.Rename",
+                      "op": "eq",
+                      "value": true
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "tool": "file_copy",
+      "family": "crud.insert",
+      "entity": "DirEntry",
+      "description": "Copy a file or directory to a new path. Requires the Create permission on the destination.",
+      "input_schema": {
+        "path": {
+          "type": "text",
+          "required": true,
+          "description": "Source path to copy from."
+        },
+        "destination": {
+          "type": "text",
+          "required": true,
+          "description": "Destination path to copy to."
+        },
+        "name": {
+          "type": "text",
+          "description": "Base name for the copy; defaults to the source name.",
+          "required": true
+        }
+      },
+      "exec_spec": {
+        "entity": "DirEntry",
+        "fields": {
+          "Path": {
+            "$arg": "destination"
+          },
+          "Name": {
+            "$arg": "name"
+          }
+        }
+      },
+      "_evidence": {
+        "locator": "http/resource.go:222",
+        "id_local": "DirEntry.patchMove",
+        "entry": {
+          "kind": "http",
+          "route": "PATCH /api/resources/{path:.*}",
+          "locator": "http/http.go:68"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "func resourcePatchHandler(fileCache FileCache) handleFunc {\n\treturn withUser(func(_ http.ResponseWriter, r *http.Request, d *data) (int, error) {\n\t\tsrc := r.URL.Path; dst := r.URL.Query().Get(\"destination\"); action := r.URL.Query().Get(\"action\")\n\t\tif !d.Check(src) || !d.Check(dst) { return http.StatusForbidden, nil }\n\t\t...\n\t\terr = checkDescendants(d, src, dst); if err != nil { return errToStatus(err), err }\n\t\terr = d.RunHook(func() error { return patchAction(r.Context(), action, src, dst, d, fileCache) }, action, src, dst, d.user)\n\t\treturn errToStatus(err), err\n\t})} // patchAction: copy -> fil",
+        "edges": [
+          "http/resource.go:222 -> patchAction: copy requires Perm.Create, rename requires Perm.Rename (http/resource.go:307,318)"
+        ]
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "path",
+          "destination",
+          "name"
+        ],
+        "messages": {
+          "auth": "Please sign in first.",
+          "precondition": "You need the Create permission to copy files."
+        },
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "ID",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "Perm.Create",
+                      "op": "eq",
+                      "value": true
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "tool": "file_delete",
+      "family": "crud.delete",
+      "entity": "DirEntry",
+      "description": "Delete a file or directory recursively. Requires the Delete permission.",
+      "input_schema": {
+        "path": {
+          "type": "text",
+          "required": true,
+          "description": "Path of the file or directory to delete (recursively)."
+        }
+      },
+      "exec_spec": {
+        "entity": "DirEntry",
+        "lookup_by": {
+          "Path": {
+            "$arg": "path"
+          }
+        }
+      },
+      "_evidence": {
+        "locator": "http/resource.go:88",
+        "id_local": "DirEntry.remove",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/resources/{path:.*}",
+          "locator": "http/http.go:65"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "var resourceDeleteHandler = withUser(func(_ http.ResponseWriter, r *http.Request, d *data) (int, error) {\n\tif r.URL.Path == \"/\" || !d.user.Perm.Delete { return http.StatusForbidden, nil }\n\t...\n\terr := d.store.Share.DeleteWithPathPrefix(file.Path, d.user.ID)\n\terr = delThumbs(r.Context(), fileCache, file)\n\terr = d.RunHook(func() error { return d.user.Fs.RemoveAll(r.URL.Path) }, \"delete\", r.URL.Path, \"\", d.user)\n\treturn http.StatusNoContent, nil\n}",
+        "edges": [
+          "http/resource.go:91 !d.user.Perm.Delete -> Forbidden"
+        ]
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "path"
+        ],
+        "messages": {
+          "auth": "Please sign in first.",
+          "not_found": "No such file.",
+          "precondition": "You need the Delete permission to remove files."
+        },
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "ID",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "Perm.Delete",
+                      "op": "eq",
+                      "value": true
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "tool": "file_download",
+      "family": "crud.fetch",
+      "entity": "DirEntry",
+      "description": "Fetch (download) the bytes of a file, or an archive of a directory. Requires the Download permission.",
+      "input_schema": {
+        "path": {
+          "type": "text",
+          "required": true,
+          "description": "Path of the file to download."
+        }
+      },
+      "exec_spec": {
+        "entity": "DirEntry",
+        "lookup_by": {
+          "Path": {
+            "$arg": "path"
+          }
+        }
+      },
+      "_evidence": {
+        "locator": "http/raw.go:77",
+        "id_local": "DirEntry.download",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/raw/{path:.*}",
+          "locator": "http/http.go:85"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "var rawHandler = withUser(func(w http.ResponseWriter, r *http.Request, d *data) (int, error) {\n\tif !d.user.Perm.Download { return http.StatusAccepted, nil }\n\tfile, err := files.NewFileInfo(...)\n\tif !file.IsDir { return rawFileHandler(w, r, file) }\n\treturn rawDirHandler(w, r, d, file)\n}",
+        "edges": [
+          "http/raw.go:80 !d.user.Perm.Download -> Accepted"
+        ]
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "path"
+        ],
+        "messages": {
+          "auth": "Please sign in first.",
+          "precondition": "You need the Download permission to download files."
+        },
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "ID",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "Perm.Download",
+                      "op": "eq",
+                      "value": true
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "tool": "file_recursive",
+      "family": "search",
+      "entity": "DirEntry",
+      "description": "Recursively enumerate all files and directories under a path.",
+      "input_schema": {
+        "path": {
+          "type": "text",
+          "required": true,
+          "description": "Directory to walk recursively."
+        }
+      },
+      "exec_spec": {
+        "entity": "DirEntry",
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "Path"
+          ]
+        }
+      },
+      "_evidence": {
+        "locator": "http/resource.go:441",
+        "id_local": "DirEntry.getRecursive",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/resources/recursive/{path:.*}",
+          "locator": "http/http.go:63"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "var resourceGetRecursiveHandler = withUser(func(w http.ResponseWriter, r *http.Request, d *data) (int, error) {\n\tinfo, err := d.user.Fs.Stat(rootPath); if err != nil { return errToStatus(err), err }\n\tif !info.IsDir() { return http.StatusBadRequest, ... }\n\terr = afero.Walk(d.user.Fs, rootPath, func(fPath string, info os.FileInfo, err error) error {\n\t\t... if !d.Check(fPath) { if info.IsDir() { return filepath.SkipDir }; return nil }\n\t\tentries = append(entries, RecursiveEntry{...}); return nil })\n\treturn renderJSON(w, r, entries)\n}"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "path"
+        ],
+        "messages": {
+          "auth": "Please sign in first."
+        }
+      }
+    },
+    {
+      "tool": "renew_token",
+      "family": "action.probe",
+      "entity": "User",
+      "description": "Re-issue the authentication token for the current session / check that the session is still valid. Requires an active login.",
+      "input_schema": {},
+      "exec_spec": {
+        "entity": "User",
+        "target_key": "user"
+      },
+      "_evidence": {
+        "locator": "http/auth.go:245",
+        "id_local": "User.renewToken",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/renew",
+          "locator": "http/http.go:54"
+        },
+        "entity_why": "fell back to the entity prefix of id_local",
+        "ref_code": "func renewHandler(tokenExpireTime time.Duration) handleFunc {\n\treturn withUser(func(w http.ResponseWriter, r *http.Request, d *data) (int, error) {\n\t\tw.Header().Set(\"X-Renew-Token\", \"false\")\n\t\treturn printToken(w, r, d, d.user, tokenExpireTime)\n\t})\n}",
+        "edges": [
+          "renewHandler is wrapped in withUser (http/auth.go:245) which validates the JWT and loads the user by ID"
+        ]
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "Your session has expired; sign in again."
+        },
+        "preconditions": []
+      }
+    },
+    {
+      "tool": "sign_up",
+      "family": "auth.register",
+      "entity": "User",
+      "description": "Self-register a new user account. Only works when the admin has sign-up enabled. Fails if the username is taken or sign-up is disabled.",
+      "input_schema": {
+        "username": {
+          "type": "text",
+          "required": true,
+          "description": "Username for the new account; must be unique."
+        },
+        "password": {
+          "type": "text",
+          "required": true,
+          "description": "Plaintext password; the server hashes it. Must meet the minimum length."
+        }
+      },
+      "exec_spec": {
+        "entity": "User",
+        "fields": {
+          "Username": {
+            "$arg": "username"
+          },
+          "Perm.Admin": {
+            "$const": false
+          },
+          "Perm.Execute": {
+            "$const": false
+          },
+          "Perm.Create": {
+            "$const": true
+          },
+          "Perm.Rename": {
+            "$const": true
+          },
+          "Perm.Modify": {
+            "$const": true
+          },
+          "Perm.Delete": {
+            "$const": true
+          },
+          "Perm.Share": {
+            "$const": false
+          },
+          "Perm.Download": {
+            "$const": false
+          }
+        },
+        "set_on_create": {
+          "Password": {
+            "$arg": "password"
+          },
+          "Scope": {
+            "$const": "/"
+          }
+        },
+        "prechecks": [
+          {
+            "entity": "User",
+            "where": {
+              "Username": {
+                "$arg": "username"
+              }
+            },
+            "negate": true,
+            "message": "That username is already registered."
+          }
+        ]
+      },
+      "_evidence": {
+        "locator": "http/auth.go:184",
+        "id_local": "User.signup",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/signup",
+          "locator": "http/http.go:53"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "var signupHandler = func(w http.ResponseWriter, r *http.Request, d *data) (int, error) {\n\tif !d.settings.Signup { return http.StatusMethodNotAllowed, nil }\n\t...\n\tuser := &users.User{Username: info.Username}\n\td.settings.Defaults.Apply(user)\n\tuser.Perm.Admin = false; user.Perm.Execute = false; user.Commands = []string{}\n\tpwd, err := users.ValidateAndHashPwd(info.Password, d.settings.MinimumPasswordLength)\n\tuser.Password = pwd\n\tderivedScope, err := d.settings.CreateUserHome(user, d.server.Root, false)\n\terr = d.store.Users.SaveProvisioned(user, derivedScope)\n\t...\n}",
+        "edges": [
+          "http/auth.go:186 !d.settings.Signup -> MethodNotAllowed"
+        ]
+      },
+      "guards": {
+        "required": [
+          "username",
+          "password"
+        ],
+        "messages": {
+          "register": "That username is already registered.",
+          "precondition": "Self sign-up is disabled."
+        },
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Settings",
+                "where": {
+                  "node": "field",
+                  "col": "Signup",
+                  "op": "eq",
+                  "value": true
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "tool": "sign_out",
+      "family": "guard.logout",
+      "entity": "User",
+      "description": "End the current session. After this, signing in is required again.",
+      "input_schema": {},
+      "exec_spec": {
+        "entity": "User"
+      },
+      "_evidence": {
+        "id_local": "User.logout",
+        "locator": "http/auth.go",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/logout"
+        },
+        "synthetic": true,
+        "note": "guard.logout is protocol-level; no logout impl atom mined"
+      },
+      "guards": {
+        "preconditions": []
+      }
+    }
+  ],
+  "auth": {
+    "account_entity": "User",
+    "username_col": "Username",
+    "password_col": "Password"
+  },
+  "seed_state": {
+    "User": [
+      {
+        "ID": 1,
+        "Username": "ops@filebrowser.example",
+        "Password": "pw-operations",
+        "Scope": "/",
+        "Locale": "en",
+        "LockPassword": false,
+        "ViewMode": "list",
+        "SingleClick": false,
+        "RedirectAfterCopyMove": false,
+        "Perm": {
+          "Admin": true,
+          "Execute": true,
+          "Create": true,
+          "Rename": true,
+          "Modify": true,
+          "Delete": true,
+          "Share": true,
+          "Download": true
+        },
+        "Commands": [],
+        "Sorting": {
+          "By": "name",
+          "Asc": true
+        },
+        "Rules": [],
+        "HideDotfiles": false,
+        "DateFormat": false,
+        "AceEditorTheme": "monokai",
+        "Perm.Admin": true,
+        "Perm.Execute": true,
+        "Perm.Create": true,
+        "Perm.Rename": true,
+        "Perm.Modify": true,
+        "Perm.Delete": true,
+        "Perm.Share": true,
+        "Perm.Download": true,
+        "id": 1
+      },
+      {
+        "ID": 2,
+        "Username": "member@filebrowser.example",
+        "Password": "pw-member",
+        "Scope": "/users/ada",
+        "Locale": "en",
+        "LockPassword": false,
+        "ViewMode": "list",
+        "SingleClick": false,
+        "RedirectAfterCopyMove": false,
+        "Perm": {
+          "Admin": false,
+          "Execute": false,
+          "Create": true,
+          "Rename": true,
+          "Modify": true,
+          "Delete": true,
+          "Share": true,
+          "Download": true
+        },
+        "Commands": [],
+        "Sorting": {
+          "By": "name",
+          "Asc": true
+        },
+        "Rules": [],
+        "HideDotfiles": false,
+        "DateFormat": false,
+        "AceEditorTheme": "",
+        "Perm.Admin": false,
+        "Perm.Execute": false,
+        "Perm.Create": true,
+        "Perm.Rename": true,
+        "Perm.Modify": true,
+        "Perm.Delete": true,
+        "Perm.Share": true,
+        "Perm.Download": true,
+        "id": 2
+      },
+      {
+        "ID": 3,
+        "Username": "third@filebrowser.example",
+        "Password": "pw-third",
+        "Scope": "/users/bob",
+        "Locale": "en",
+        "LockPassword": false,
+        "ViewMode": "list",
+        "SingleClick": false,
+        "RedirectAfterCopyMove": false,
+        "Perm": {
+          "Admin": false,
+          "Execute": false,
+          "Create": true,
+          "Rename": true,
+          "Modify": true,
+          "Delete": true,
+          "Share": false,
+          "Download": true
+        },
+        "Commands": [],
+        "Sorting": {
+          "By": "name",
+          "Asc": true
+        },
+        "Rules": [],
+        "HideDotfiles": true,
+        "DateFormat": false,
+        "AceEditorTheme": "",
+        "Perm.Admin": false,
+        "Perm.Execute": false,
+        "Perm.Create": true,
+        "Perm.Rename": true,
+        "Perm.Modify": true,
+        "Perm.Delete": true,
+        "Perm.Share": false,
+        "Perm.Download": true,
+        "id": 3
+      }
+    ],
+    "Settings": [
+      {
+        "Key": "settings",
+        "Signup": true,
+        "HideLoginButton": false,
+        "CreateUserDir": false,
+        "UserHomeBasePath": "/users",
+        "Defaults": {
+          "ViewMode": "list"
+        },
+        "AuthMethod": "json",
+        "LogoutPage": "/login",
+        "Branding": {},
+        "Tus": {},
+        "Commands": {},
+        "Shell": {},
+        "Rules": [],
+        "MinimumPasswordLength": 4,
+        "FileMode": "0640",
+        "DirMode": "0750",
+        "HideDotfiles": false,
+        "id": 1
+      }
+    ],
+    "ShareLink": []
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "app": "cal_diy",
+  "role": "schedule owner",
+  "domains": [
+    "operations"
+  ],
+  "kinds": {
+    "create_record": [
+      "schedule_create"
+    ],
+    "update_record": [
+      "schedule_update"
+    ],
+    "delete_or_archive_row": [
+      "schedule_delete"
+    ]
+  },
+  "check_kinds": [
+    "record_exists",
+    "record_not_exists",
+    "record_field_equals",
+    "record_field_contains",
+    "record_field_unchanged"
+  ],
+  "carriers": {
+    "notes_field": {
+      "entity": "EventType",
+      "field": "description"
+    }
+  },
+  "login": {
+    "tool": "auth_signin",
+    "user_field": "email",
+    "persona_entity": "User"
+  },
+  "content_entities": [
+    "Schedule",
+    "EventType"
+  ],
+  "seed_helpers": [
+    "records"
+  ],
+  "tool_families_to_keep": [
+    ""
+  ],
+  "obs_reads": [
+    "eventtype_list",
+    "eventtype_get",
+    "schedule_getallschedulesbyuserid"
+  ],
+  "known_patches": [
+    "Neutral prefix",
+    "Integer identity schemas and synthetic source persona",
+    "Original source semantics bounded by actual probes"
+  ],
+  "missing_tools": [],
+  "limitations": [
+    "Only Schedule name/timeZone metadata CRUD certified; source schedule/days/startTime/endTime inputs do not create availability blocks in these executors. No booking, email/SMS, external calendar, webhooks, payment or video effect executed.",
+    "Source Schedule update checks target owner. Schedule delete only counts caller-owned schedules >=2 and does not bind target owner: deletion of another account schedule succeeds and is probed.",
+    "Source eventtype_list scopes owner, but eventtype_get crud.fetch ignores declared owner scope and another signed-in user reads known id. User roles and team membership remain unchanged.",
+    "String business UUIDs and unused text primary keys remain source values; no unclaimed entity/tool modernization."
+  ],
+  "smoke": {
+    "passed": true,
+    "date": "2026-10-24",
+    "report": "ok"
+  },
+  "register_file": "pack/newspecs3/cal_diy/register.py",
+  "base_spec": "pack/base_specs/cal_diy.spec.json"
+}

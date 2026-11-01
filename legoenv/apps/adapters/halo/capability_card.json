@@ -1,0 +1,99 @@
+{
+  "app": "halo",
+  "role": "Blog snapshot scalar edits, phase and comment moderation, attachment groups",
+  "domains": [
+    "operations",
+    "marketing",
+    "support"
+  ],
+  "kinds": {
+    "create_record": [
+      "group_create"
+    ],
+    "update_record": [
+      "group_update",
+      "post_updatecontent",
+      "comment_update"
+    ],
+    "attach_note_or_task": [
+      "comment_create"
+    ],
+    "record_status_change": [
+      "post_publish",
+      "post_unpublish",
+      "comment_approve",
+      "comment_unapprove"
+    ],
+    "delete_or_archive_row": [
+      "group_delete",
+      "comment_delete",
+      "post_recycle"
+    ]
+  },
+  "check_kinds": [
+    "record_exists",
+    "record_not_exists",
+    "record_field_equals",
+    "record_field_contains",
+    "record_field_unchanged",
+    "note_or_task_exists"
+  ],
+  "carriers": {
+    "notes_field": {
+      "entity": "Snapshot",
+      "field": "spec_raw_patch"
+    }
+  },
+  "login": {
+    "tool": "sign_in",
+    "user_field": "name",
+    "persona_entity": "User"
+  },
+  "content_entities": [
+    "Post",
+    "Snapshot",
+    "Comment",
+    "Group",
+    "Attachment"
+  ],
+  "seed_helpers": [
+    "posts",
+    "snapshots",
+    "comments",
+    "groups"
+  ],
+  "tool_families_to_keep": [
+    ""
+  ],
+  "obs_reads": [
+    "post_list",
+    "snapshot_listbypost",
+    "comment_list"
+  ],
+  "known_patches": [
+    "Neutral halo env_id and integer internal seed ids; synthetic User 1",
+    "Runtime-supported password alias and textual account_name session for name-based source identity guards",
+    "Execute original post_updatecontent argument mappings",
+    "Concrete post/snapshot/comment filters"
+  ],
+  "missing_tools": [
+    "Full consistent post content/snapshot/release pipeline",
+    "Binary attachment transfer"
+  ],
+  "limitations": [
+    "All 112 original tools are retained; only twelve explicitly listed write tools are certified.",
+    "post_updatecontent edits the named Snapshot row. No guard verifies that snapshotName belongs to the supplied Post; use known matching identities.",
+    "post_publish/unpublish only change status_phase; they do not set spec_publish, advance head/release snapshots or publish a complete rendered document.",
+    "post_draft inserts only Post metadata, dropping raw/content rather than creating a linked Snapshot. post_update inserts a Snapshot but does not update Post title/head references.",
+    "comment_delete only sets deletion_timestamp and post_recycle marks spec_deleted; lists do not automatically hide these rows.",
+    "Many source writes lack authentication/role guards. Original guards are preserved with name/id normalization; no complete RBAC claim is made. Attachment interfaces store metadata, not binary bytes.",
+    "snapshot_listbypost uses substring matching on the serialized subject reference, because the original read filter cannot address JSON subfields; overlapping metadata names can match multiple subjects."
+  ],
+  "smoke": {
+    "passed": true,
+    "date": "2026-10-24",
+    "report": "ok"
+  },
+  "register_file": "pack/newspecs3/halo/register.py",
+  "base_spec": "pack/base_specs/halo.spec.json"
+}

@@ -1,0 +1,6277 @@
+{
+  "env_id": "october",
+  "_prep_version": 3,
+  "entities": [
+    {
+      "name": "BackendUser",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "first_name",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "last_name",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "login",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "email",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "password",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "activation_code",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "persist_code",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "reset_password_code",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "reset_password_at",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "permissions",
+          "type": "json",
+          "nullable": true
+        },
+        {
+          "name": "is_activated",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "is_superuser",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "is_password_expired",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "activated_at",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "last_login",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "password_changed_at",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "deleted_at",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "role_id",
+          "type": "id",
+          "nullable": true,
+          "fk_to": "UserRole.id"
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "audit": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "login"
+          ]
+        },
+        {
+          "kind": "unique",
+          "cols": [
+            "email"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "UserGroup",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "code",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "is_new_user_default",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "audit": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "name"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "UserRole",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "code",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "color_background",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "permissions",
+          "type": "json",
+          "nullable": true
+        },
+        {
+          "name": "is_system",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "sort_order",
+          "type": "int",
+          "nullable": true
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "audit": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "name"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "UserThrottle",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "user_id",
+          "type": "id",
+          "nullable": true,
+          "fk_to": "BackendUser.id"
+        },
+        {
+          "name": "ip_address",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "attempts",
+          "type": "int",
+          "default": 0
+        },
+        {
+          "name": "last_attempt_at",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "is_suspended",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "suspended_at",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "is_banned",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "banned_at",
+          "type": "datetime",
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "name": "UserPreference",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "user_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "BackendUser.id"
+        },
+        {
+          "name": "namespace",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "group",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "item",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "value",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "site_id",
+          "type": "id",
+          "nullable": true
+        },
+        {
+          "name": "site_root_id",
+          "type": "id",
+          "nullable": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "user_id",
+            "namespace",
+            "group",
+            "item"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "AccessLog",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "user_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "BackendUser.id",
+          "on_delete": "restrict"
+        },
+        {
+          "name": "ip_address",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "audit": true
+        }
+      ]
+    },
+    {
+      "name": "SettingModel",
+      "columns": [
+        {
+          "name": "id",
+          "type": "int",
+          "pk": true
+        },
+        {
+          "name": "item",
+          "type": "text",
+          "nullable": true,
+          "immutable": true
+        },
+        {
+          "name": "value",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "site_id",
+          "type": "id",
+          "nullable": true
+        },
+        {
+          "name": "site_root_id",
+          "type": "id",
+          "nullable": true
+        },
+        {
+          "name": "site_group_id",
+          "type": "id",
+          "nullable": true
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "audit": true
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        }
+      ]
+    },
+    {
+      "name": "Parameter",
+      "columns": [
+        {
+          "name": "id",
+          "type": "int",
+          "pk": true
+        },
+        {
+          "name": "namespace",
+          "type": "text",
+          "nullable": false,
+          "max": 100
+        },
+        {
+          "name": "group",
+          "type": "text",
+          "nullable": true,
+          "max": 50
+        },
+        {
+          "name": "item",
+          "type": "text",
+          "nullable": false,
+          "max": 150
+        },
+        {
+          "name": "value",
+          "type": "text",
+          "nullable": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "namespace",
+            "group",
+            "item"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "MailTemplate",
+      "columns": [
+        {
+          "name": "id",
+          "type": "int",
+          "pk": true
+        },
+        {
+          "name": "code",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "subject",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "content_html",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "content_text",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "layout_id",
+          "type": "id",
+          "nullable": true,
+          "fk_to": "MailLayout.id"
+        },
+        {
+          "name": "is_custom",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "audit": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "code"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "MailLayout",
+      "columns": [
+        {
+          "name": "id",
+          "type": "int",
+          "pk": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "code",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "content_html",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "content_text",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "content_css",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "is_locked",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "options",
+          "type": "json",
+          "nullable": true
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "audit": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "code"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "MailPartial",
+      "columns": [
+        {
+          "name": "id",
+          "type": "int",
+          "pk": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "code",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "content_html",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "content_text",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "is_custom",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "audit": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "code"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "PluginVersion",
+      "columns": [
+        {
+          "name": "id",
+          "type": "int",
+          "pk": true
+        },
+        {
+          "name": "code",
+          "type": "text",
+          "nullable": false,
+          "immutable": true
+        },
+        {
+          "name": "version",
+          "type": "text",
+          "nullable": true,
+          "max": 50
+        },
+        {
+          "name": "is_frozen",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "is_disabled",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        }
+      ]
+    },
+    {
+      "name": "EventLog",
+      "columns": [
+        {
+          "name": "id",
+          "type": "int",
+          "pk": true
+        },
+        {
+          "name": "level",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "message",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "details",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "audit": true
+        }
+      ]
+    },
+    {
+      "name": "RequestLog",
+      "columns": [
+        {
+          "name": "id",
+          "type": "int",
+          "pk": true
+        },
+        {
+          "name": "status_code",
+          "type": "int",
+          "nullable": true
+        },
+        {
+          "name": "url",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "referer",
+          "type": "json",
+          "nullable": true
+        },
+        {
+          "name": "count",
+          "type": "int",
+          "default": 0
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "audit": true
+        }
+      ]
+    },
+    {
+      "name": "Revision",
+      "columns": [
+        {
+          "name": "id",
+          "type": "int",
+          "pk": true
+        },
+        {
+          "name": "revisionable_type",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "revisionable_id",
+          "type": "int",
+          "nullable": false
+        },
+        {
+          "name": "user_id",
+          "type": "id",
+          "nullable": true,
+          "fk_to": "BackendUser.id"
+        },
+        {
+          "name": "field",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "cast",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "old_value",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "new_value",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "audit": true
+        }
+      ]
+    },
+    {
+      "name": "File",
+      "columns": [
+        {
+          "name": "id",
+          "type": "int",
+          "pk": true
+        },
+        {
+          "name": "disk_name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "file_name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "file_size",
+          "type": "int",
+          "nullable": false
+        },
+        {
+          "name": "content_type",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "field",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "attachment_id",
+          "type": "int",
+          "nullable": true
+        },
+        {
+          "name": "attachment_type",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "is_public",
+          "type": "bool",
+          "default": true
+        },
+        {
+          "name": "sort_order",
+          "type": "int",
+          "nullable": true
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "audit": true
+        }
+      ]
+    },
+    {
+      "name": "Dashboard",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "code",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "icon",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "owner_type",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "owner_field",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "definition",
+          "type": "json",
+          "nullable": true
+        },
+        {
+          "name": "is_custom",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "is_global",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "is_hidden",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "is_system",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "is_interval_hidden",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "default_start",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "default_end",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "default_interval",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "default_compare",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "sort_order",
+          "type": "int",
+          "nullable": true
+        },
+        {
+          "name": "updated_user_id",
+          "type": "id",
+          "nullable": true,
+          "fk_to": "BackendUser.id"
+        },
+        {
+          "name": "created_user_id",
+          "type": "id",
+          "nullable": true,
+          "fk_to": "BackendUser.id"
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "audit": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "code"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ReportDataCache",
+      "columns": [
+        {
+          "name": "id",
+          "type": "int",
+          "pk": true
+        },
+        {
+          "name": "key",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "value",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "value_date",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "audit": true
+        }
+      ]
+    },
+    {
+      "name": "TrafficStatisticsPageview",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "site_id",
+          "type": "id",
+          "nullable": true,
+          "immutable": true
+        },
+        {
+          "name": "ev_datetime",
+          "type": "datetime",
+          "nullable": true,
+          "immutable": true
+        },
+        {
+          "name": "ev_date",
+          "type": "datetime",
+          "nullable": true,
+          "immutable": true
+        },
+        {
+          "name": "ev_year_month_day",
+          "type": "text",
+          "nullable": true,
+          "immutable": true
+        },
+        {
+          "name": "ev_year_month",
+          "type": "text",
+          "nullable": true,
+          "immutable": true
+        },
+        {
+          "name": "ev_year_quarter",
+          "type": "text",
+          "nullable": true,
+          "immutable": true
+        },
+        {
+          "name": "ev_year_week",
+          "type": "text",
+          "nullable": true,
+          "immutable": true
+        },
+        {
+          "name": "ev_year",
+          "type": "text",
+          "nullable": true,
+          "immutable": true
+        },
+        {
+          "name": "ev_timestamp",
+          "type": "datetime",
+          "nullable": true,
+          "immutable": true
+        },
+        {
+          "name": "user_authenticated",
+          "type": "bool",
+          "nullable": true,
+          "immutable": true
+        },
+        {
+          "name": "client_id",
+          "type": "text",
+          "nullable": true,
+          "immutable": true,
+          "max": 64
+        },
+        {
+          "name": "first_time_visit",
+          "type": "bool",
+          "immutable": true,
+          "default": false
+        },
+        {
+          "name": "user_agent",
+          "type": "text",
+          "nullable": true,
+          "immutable": true
+        },
+        {
+          "name": "page_path",
+          "type": "text",
+          "nullable": true,
+          "immutable": true
+        },
+        {
+          "name": "ip",
+          "type": "text",
+          "nullable": true,
+          "immutable": true
+        },
+        {
+          "name": "city",
+          "type": "text",
+          "nullable": true,
+          "immutable": true
+        },
+        {
+          "name": "country",
+          "type": "text",
+          "nullable": true,
+          "immutable": true
+        },
+        {
+          "name": "referral_domain",
+          "type": "text",
+          "nullable": true,
+          "immutable": true
+        }
+      ]
+    },
+    {
+      "name": "SiteDefinition",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "code",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "sort_order",
+          "type": "int",
+          "nullable": true
+        },
+        {
+          "name": "is_custom_url",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "app_url",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "theme",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "locale",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "fallback_locale",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "timezone",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "is_host_restricted",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "allow_hosts",
+          "type": "json",
+          "nullable": true
+        },
+        {
+          "name": "is_prefixed",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "route_prefix",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "is_styled",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "color_foreground",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "color_background",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "is_role_restricted",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "allow_roles",
+          "type": "json",
+          "nullable": true
+        },
+        {
+          "name": "is_primary",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "is_enabled",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "is_enabled_edit",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "group_id",
+          "type": "id",
+          "nullable": true,
+          "fk_to": "SiteGroup.id"
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "audit": true
+        }
+      ]
+    },
+    {
+      "name": "SiteGroup",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "code",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "audit": true
+        }
+      ]
+    },
+    {
+      "name": "PluginSiteGroup",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "plugin_code",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "site_id",
+          "type": "id",
+          "nullable": true,
+          "fk_to": "SiteDefinition.id"
+        },
+        {
+          "name": "site_group_id",
+          "type": "id",
+          "nullable": true,
+          "fk_to": "SiteGroup.id"
+        },
+        {
+          "name": "is_enabled",
+          "type": "bool",
+          "default": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "plugin_code",
+            "site_id",
+            "site_group_id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "TranslateAttribute",
+      "columns": [
+        {
+          "name": "id",
+          "type": "int",
+          "pk": true
+        },
+        {
+          "name": "model_type",
+          "type": "text",
+          "nullable": false,
+          "max": 512
+        },
+        {
+          "name": "model_id",
+          "type": "int",
+          "nullable": false
+        },
+        {
+          "name": "locale",
+          "type": "text",
+          "nullable": false,
+          "max": 16
+        },
+        {
+          "name": "attribute",
+          "type": "text",
+          "nullable": false,
+          "max": 128
+        },
+        {
+          "name": "value",
+          "type": "text",
+          "nullable": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "model_type",
+            "model_id",
+            "locale",
+            "attribute"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ThemeData",
+      "columns": [
+        {
+          "name": "id",
+          "type": "int",
+          "pk": true
+        },
+        {
+          "name": "theme",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "data",
+          "type": "json",
+          "nullable": true
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "audit": true
+        }
+      ]
+    },
+    {
+      "name": "ThemeLog",
+      "columns": [
+        {
+          "name": "id",
+          "type": "int",
+          "pk": true
+        },
+        {
+          "name": "type",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "create",
+            "update",
+            "delete"
+          ]
+        },
+        {
+          "name": "theme",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "template",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "old_template",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "content",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "old_content",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "user_id",
+          "type": "id",
+          "nullable": true,
+          "fk_to": "BackendUser.id"
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "audit": true
+        }
+      ]
+    },
+    {
+      "name": "ThemeTemplate",
+      "columns": [
+        {
+          "name": "id",
+          "type": "int",
+          "pk": true
+        },
+        {
+          "name": "source",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "path",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "content",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "file_size",
+          "type": "int",
+          "nullable": false
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "nullable": true,
+          "audit": true
+        },
+        {
+          "name": "deleted_at",
+          "type": "datetime",
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "name": "SourceFile",
+      "columns": [
+        {
+          "name": "id",
+          "type": "int",
+          "pk": true
+        },
+        {
+          "name": "source",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "path",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "content",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "disk",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "disk_path",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "file_size",
+          "type": "int",
+          "default": 0
+        },
+        {
+          "name": "mime_type",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "audit": true
+        },
+        {
+          "name": "deleted_at",
+          "type": "datetime",
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "name": "ContentSchema",
+      "columns": [
+        {
+          "name": "id",
+          "type": "int",
+          "pk": true
+        },
+        {
+          "name": "table_name",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "meta",
+          "type": "json",
+          "nullable": true
+        },
+        {
+          "name": "fields",
+          "type": "json",
+          "nullable": true
+        },
+        {
+          "name": "deleted_at",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "audit": true
+        }
+      ]
+    },
+    {
+      "name": "PreviewToken",
+      "columns": [
+        {
+          "name": "id",
+          "type": "int",
+          "pk": true
+        },
+        {
+          "name": "site_id",
+          "type": "id",
+          "nullable": true
+        },
+        {
+          "name": "route",
+          "type": "json",
+          "nullable": true
+        },
+        {
+          "name": "token",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "count_use",
+          "type": "int",
+          "default": 0
+        },
+        {
+          "name": "count_limit",
+          "type": "int",
+          "default": 0
+        },
+        {
+          "name": "created_user_id",
+          "type": "id",
+          "nullable": true
+        },
+        {
+          "name": "expired_at",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "deleted_at",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "audit": true
+        }
+      ]
+    },
+    {
+      "name": "GlobalRecord",
+      "columns": [
+        {
+          "name": "id",
+          "type": "int",
+          "pk": true
+        },
+        {
+          "name": "site_id",
+          "type": "id",
+          "nullable": true
+        },
+        {
+          "name": "site_root_id",
+          "type": "id",
+          "nullable": true
+        },
+        {
+          "name": "blueprint_uuid",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "content",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "deleted_at",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "audit": true
+        }
+      ]
+    },
+    {
+      "name": "EntryRecord",
+      "columns": [
+        {
+          "name": "id",
+          "type": "int",
+          "pk": true
+        },
+        {
+          "name": "site_id",
+          "type": "id",
+          "nullable": true
+        },
+        {
+          "name": "blueprint_uuid",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "slug",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "fullslug",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "is_enabled",
+          "type": "bool",
+          "default": true
+        },
+        {
+          "name": "is_version",
+          "type": "bool",
+          "nullable": true
+        },
+        {
+          "name": "published_at",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "published_at_date",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "expired_at",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "parent_id",
+          "type": "int",
+          "nullable": true
+        },
+        {
+          "name": "primary_id",
+          "type": "int",
+          "nullable": true
+        },
+        {
+          "name": "content_group",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "deleted_at",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "created_user_id",
+          "type": "id",
+          "nullable": true
+        },
+        {
+          "name": "updated_user_id",
+          "type": "id",
+          "nullable": true
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "audit": true
+        }
+      ]
+    },
+    {
+      "name": "SubmissionRecord",
+      "columns": [
+        {
+          "name": "id",
+          "type": "int",
+          "pk": true
+        },
+        {
+          "name": "site_id",
+          "type": "id",
+          "nullable": true
+        },
+        {
+          "name": "blueprint_uuid",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "slug",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "is_enabled",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "submitted_ip",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "submitted_user_agent",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "deleted_at",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "created_user_id",
+          "type": "id",
+          "nullable": true
+        },
+        {
+          "name": "updated_user_id",
+          "type": "id",
+          "nullable": true
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "audit": true
+        }
+      ]
+    },
+    {
+      "name": "RepeaterItem",
+      "columns": [
+        {
+          "name": "id",
+          "type": "int",
+          "pk": true
+        },
+        {
+          "name": "host_id",
+          "type": "int",
+          "nullable": true
+        },
+        {
+          "name": "host_field",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "site_id",
+          "type": "id",
+          "nullable": true
+        },
+        {
+          "name": "site_root_id",
+          "type": "id",
+          "nullable": true
+        },
+        {
+          "name": "content_group",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "content_value",
+          "type": "json",
+          "nullable": true
+        },
+        {
+          "name": "content_spawn_path",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "parent_id",
+          "type": "int",
+          "nullable": true
+        },
+        {
+          "name": "sort_order",
+          "type": "int",
+          "nullable": true
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "audit": true
+        }
+      ]
+    },
+    {
+      "name": "MediaLibraryItem",
+      "columns": [
+        {
+          "name": "path",
+          "type": "text",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "size",
+          "type": "int",
+          "nullable": false
+        },
+        {
+          "name": "lastModified",
+          "type": "int",
+          "nullable": true
+        },
+        {
+          "name": "type",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "file",
+            "folder"
+          ]
+        },
+        {
+          "name": "publicUrl",
+          "type": "text",
+          "nullable": true
+        }
+      ]
+    }
+  ],
+  "tools": [
+    {
+      "tool": "sign_in",
+      "op": "action",
+      "family": "guard.auth",
+      "exec_spec": {
+        "verify": {
+          "entity": "BackendUser",
+          "username_col": "login",
+          "password_col": "password"
+        }
+      },
+      "input_schema": {
+        "login": {
+          "type": "text",
+          "required": true,
+          "description": "The admin user's login name."
+        },
+        "password": {
+          "type": "text",
+          "required": true,
+          "description": "The admin user's password (checked against their account)."
+        }
+      },
+      "_evidence": {
+        "locator": "modules/backend/controllers/Auth.php:100",
+        "id_local": "BackendAuth.signin",
+        "entry": {
+          "kind": "http",
+          "route": "POST /backend/auth/signin",
+          "locator": "modules/backend/controllers/Auth.php:signin (publicActions)"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "$user = BackendAuth::authenticate([\n  'login' => post('login'),\n  'password' => post('password')\n], (bool) $remember);\nAccessLog::add($user);\nreturn Backend::redirectIntended('backend');",
+        "edges": [
+          "controllers/Auth.php:100 (BackendAuth::authenticate validates login/password; throttled via UserThrottle)"
+        ]
+      },
+      "entity": "BackendUser",
+      "_binds": {
+        "login": "BackendUser.login"
+      },
+      "_output_schema": {
+        "user": "the authenticated BackendUser"
+      },
+      "guards": {
+        "required": [
+          "login",
+          "password"
+        ],
+        "messages": {
+          "auth": "Sign in with a backend administrator login and password.",
+          "required": "Provide both the login and password.",
+          "precondition": "That login is not an activated backend account; only activated administrators can sign in."
+        },
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "BackendUser",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "login",
+                      "op": "eq",
+                      "value": {
+                        "arg": "login"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "is_activated",
+                      "op": "eq",
+                      "value": true
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ]
+      },
+      "description": "Sign in to the October CMS backend with an account login and password. Opens the session that $actor resolves to; nearly every other tool requires it first. Fails if the login or password is wrong."
+    },
+    {
+      "tool": "sign_out",
+      "op": "action",
+      "family": "guard.logout",
+      "exec_spec": {},
+      "input_schema": {},
+      "_evidence": {
+        "locator": "modules/backend/controllers/Auth.php:147",
+        "id_local": "BackendAuth.signout",
+        "entry": {
+          "kind": "http",
+          "route": "POST /backend/auth/signout",
+          "locator": "modules/backend/controllers/Auth.php:signout (publicActions)"
+        },
+        "entity_why": "cannot determine the entity",
+        "ref_code": "BackendAuth::logout();\nreturn Backend::redirect('backend');"
+      },
+      "_output_schema": {
+        "result": "redirect to backend"
+      },
+      "_defaulted": [
+        "family (matched by an id_local regex, not by the effects)"
+      ],
+      "description": "Sign out of the backend, ending the current admin session. Fails only if no session is open.",
+      "guards": {}
+    },
+    {
+      "tool": "request_password_reset",
+      "op": "action",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "BackendUser",
+        "row_key": {
+          "login": {
+            "$arg": "login"
+          }
+        },
+        "set": {
+          "reset_password_at": "2026-01-01T00:00:00Z"
+        }
+      },
+      "input_schema": {
+        "login": {
+          "type": "text",
+          "required": true,
+          "description": "The login of the account to send a password-reset email to."
+        }
+      },
+      "_evidence": {
+        "locator": "modules/backend/controllers/Auth.php:160",
+        "id_local": "BackendAuth.restore",
+        "entry": {
+          "kind": "http",
+          "route": "POST /backend/auth/restore",
+          "locator": "modules/backend/controllers/Auth.php:restore (publicActions)"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "$user = BackendAuth::findUserByLogin(post('login'));\nif ($user) {\n  $code = $user->getResetPasswordCode();\n  $link = Backend::url('backend/auth/reset/'.$user->id.'/'.$code);\n  Mail::send('backend:restore', $data, function($message) use ($user) {...});\n}",
+        "edges": [
+          "controllers/Auth.php:160 (RateLimiter backend.auth.restore) - silently no-op when user not found"
+        ]
+      },
+      "entity": "BackendUser",
+      "_binds": {
+        "login": "BackendUser.login"
+      },
+      "_output_schema": {
+        "result": "password reset email sent or silent"
+      },
+      "guards": {
+        "required": [
+          "login"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "BackendUser",
+                "where": {
+                  "node": "field",
+                  "col": "login",
+                  "op": "eq",
+                  "value": {
+                    "arg": "login"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "precondition": "No account has that login, so no reset email could be sent.",
+          "not_found": "No account with that login exists."
+        }
+      },
+      "_defaulted": [
+        "argument invented from the write column",
+        "fields"
+      ],
+      "description": "Send a password-reset email to the account with the given login, stamping its reset_password_at timestamp. No account with that login is the only way it can fail, and nothing is written then."
+    },
+    {
+      "tool": "reset_password",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "BackendUser",
+        "row_key": {
+          "id": {
+            "$arg": "id"
+          }
+        },
+        "set": {
+          "reset_password_code": null,
+          "reset_password_at": null,
+          "password_changed_at": "2026-01-01T00:00:00Z"
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the account whose password is being reset."
+        },
+        "code": {
+          "type": "text",
+          "required": true,
+          "description": "The reset code from the emailed link; must match the account's stored reset_password_code."
+        },
+        "password": {
+          "type": "text",
+          "required": true,
+          "description": "The new password to set for the account."
+        }
+      },
+      "_evidence": {
+        "locator": "modules/backend/controllers/Auth.php:255",
+        "id_local": "BackendAuth.resetPassword",
+        "entry": {
+          "kind": "http",
+          "route": "POST /backend/auth/reset/{id}/{code}",
+          "locator": "modules/backend/controllers/Auth.php:reset (publicActions)"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "$user = BackendAuth::findUserById(post('id'));\nif (!$user || !$user->checkResetPasswordCode($code)) throw new ApplicationException(...);\n$user->validatePasswordPolicy(post('password'));\nif (!$user->attemptResetPassword($code, post('password'))) throw ...;\n$user->clearResetPassword();\nBackendAuth::clearThrottleForUserId($user->id);",
+        "edges": [
+          "controllers/Auth.php:268 (checkResetPasswordCode enforces reset_password_at TTL)"
+        ]
+      },
+      "entity": "BackendUser",
+      "_binds": {
+        "id": "BackendUser.id"
+      },
+      "_output_schema": {
+        "result": "redirect to signin"
+      },
+      "guards": {
+        "required": [
+          "id",
+          "code",
+          "password"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "BackendUser",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "reset_password_code",
+                      "op": "eq",
+                      "value": {
+                        "arg": "code"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "precondition": "That reset code does not match the account, or it has already been used or expired.",
+          "not_found": "No account with that id exists."
+        }
+      },
+      "description": "Complete a password reset: set a new password and clear the reset code for the account addressed by id. Fails if the account does not exist or the given reset code does not match it."
+    },
+    {
+      "tool": "setup_admin",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "BackendUser",
+        "fields": [
+          "first_name",
+          "last_name",
+          "email",
+          "login",
+          "password"
+        ],
+        "set_on_create": {
+          "is_superuser": true,
+          "is_activated": true,
+          "permissions": []
+        },
+        "unique_on": [
+          "login"
+        ]
+      },
+      "input_schema": {
+        "first_name": {
+          "type": "text",
+          "required": true,
+          "description": "The admin's first name."
+        },
+        "last_name": {
+          "type": "text",
+          "required": true,
+          "description": "The admin's last name."
+        },
+        "email": {
+          "type": "text",
+          "required": true,
+          "description": "The admin's email address (must be unique)."
+        },
+        "login": {
+          "type": "text",
+          "required": true,
+          "description": "The admin's login name (must be unique)."
+        },
+        "password": {
+          "type": "text",
+          "required": true,
+          "description": "The admin's password."
+        },
+        "password_confirmation": {
+          "type": "text",
+          "required": true,
+          "description": "Confirmation of the password; must match."
+        }
+      },
+      "_evidence": {
+        "locator": "modules/backend/controllers/Auth.php:318",
+        "id_local": "BackendAuth.setupAdmin",
+        "entry": {
+          "kind": "http",
+          "route": "POST /backend/auth/setup",
+          "locator": "modules/backend/controllers/Auth.php:setup (publicActions)"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "$user = new User; $user->forceFill([...email,login,password...']);\n$user->is_superuser=true; $user->is_activated=true;\n$user->save();\nif ($group = UserGroup::where('code',UserGroup::CODE_OWNERS)->first()) { $user->addGroup($group); }",
+        "edges": [
+          "controllers/Auth.php:299 setup -> checkAdminAccounts"
+        ]
+      },
+      "entity": "BackendUser",
+      "_binds": {
+        "first_name": "BackendUser.first_name",
+        "last_name": "BackendUser.last_name",
+        "email": "BackendUser.email",
+        "login": "BackendUser.login"
+      },
+      "_output_schema": {
+        "user": "created BackendUser"
+      },
+      "guards": {
+        "required": [
+          "first_name",
+          "last_name",
+          "email",
+          "login",
+          "password",
+          "password_confirmation"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "BackendUser",
+                "where": {
+                  "node": "field",
+                  "col": "is_activated",
+                  "op": "eq",
+                  "value": true
+                }
+              },
+              "op": "eq",
+              "n": 0
+            }
+          ]
+        ],
+        "messages": {
+          "precondition": "Setup is only allowed before any activated administrator exists.",
+          "unique": "That login is already taken."
+        }
+      },
+      "description": "Create the first superuser administrator on first-run setup. Only allowed when no activated account exists yet. The account is activated and granted superuser rights immediately so it can be used to sign in."
+    },
+    {
+      "tool": "user_create",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "BackendUser",
+        "fields": [
+          "first_name",
+          "last_name",
+          "email",
+          "login",
+          "password"
+        ],
+        "set_on_create": {
+          "is_password_expired": true,
+          "is_activated": false
+        },
+        "unique_on": [
+          "login"
+        ]
+      },
+      "input_schema": {
+        "first_name": {
+          "type": "text",
+          "required": true,
+          "description": "The new user's first name."
+        },
+        "last_name": {
+          "type": "text",
+          "required": true,
+          "description": "The new user's last name."
+        },
+        "email": {
+          "type": "text",
+          "required": true,
+          "description": "The new user's email (must be unique)."
+        },
+        "login": {
+          "type": "text",
+          "required": true,
+          "description": "The new user's login (must be unique)."
+        },
+        "password": {
+          "type": "text",
+          "required": true,
+          "description": "The new user's password."
+        },
+        "role": {
+          "type": "int",
+          "required": false,
+          "description": "Id of the UserRole to assign."
+        },
+        "groups": {
+          "type": "json",
+          "required": false,
+          "description": "List of UserGroup ids to add the user to."
+        },
+        "send_invite": {
+          "type": "bool",
+          "required": false,
+          "description": "Whether to email the user an invitation."
+        }
+      },
+      "_evidence": {
+        "locator": "modules/backend/controllers/Users.php:199",
+        "id_local": "User.create",
+        "entry": {
+          "kind": "http",
+          "route": "POST /backend/users",
+          "locator": "modules/backend/controllers/Users.php:20 (FormController)"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "$this->formBeforeSave($model) checks role ranking;\n$model->is_password_expired = true (production);\nsave via FormController create_onSave;\nif ($model->send_invite) $model->sendInvitation();",
+        "edges": [
+          "controllers/Users.php:199 requiredPermissions=['admins.manage']; superuser can assign any role"
+        ]
+      },
+      "entity": "BackendUser",
+      "_binds": {
+        "first_name": "BackendUser.first_name",
+        "last_name": "BackendUser.last_name",
+        "email": "BackendUser.email",
+        "login": "BackendUser.login",
+        "role": "UserRole.id",
+        "groups": "UserGroup.id"
+      },
+      "_output_schema": {
+        "user": "created BackendUser"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "BackendUser",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "is_superuser",
+                      "op": "eq",
+                      "value": true
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "first_name",
+          "last_name",
+          "email",
+          "login",
+          "password"
+        ],
+        "messages": {
+          "auth": "You must sign in before creating a user.",
+          "unique": "That login or email is already taken.",
+          "precondition": "You must be signed in as a superuser to create users.",
+          "not_found": "The role or group referenced does not exist."
+        }
+      },
+      "description": "Create a backend user with login credentials. The account is created inactive with a forced password change on first login. Fails if the login or email is taken, or you are not signed in."
+    },
+    {
+      "tool": "user_update",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "BackendUser",
+        "row_key": {
+          "id": {
+            "$arg": "id"
+          }
+        },
+        "fields": [
+          "first_name",
+          "last_name",
+          "email",
+          "password"
+        ]
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the user to edit."
+        },
+        "first_name": {
+          "type": "text",
+          "required": false,
+          "description": "New first name."
+        },
+        "last_name": {
+          "type": "text",
+          "required": false,
+          "description": "New last name."
+        },
+        "email": {
+          "type": "text",
+          "required": false,
+          "description": "New email address."
+        },
+        "password": {
+          "type": "text",
+          "required": false,
+          "description": "New password."
+        }
+      },
+      "_evidence": {
+        "locator": "modules/backend/controllers/Users.php:199",
+        "id_local": "User.update",
+        "entry": {
+          "kind": "http",
+          "route": "POST /backend/users/update/{id}",
+          "locator": "modules/backend/controllers/Users.php:20 (FormController)"
+        },
+        "entity_why": "primary effect link lands on this table",
+        "ref_code": "update via FormController update_onSave;\nrank permission check in formBeforeSave;\nown account cannot be edited here (redirect to myaccount).",
+        "edges": [
+          "controllers/Users.php:179 formBeforeSave rank check; formExtendQuery hides superusers (403 ForbiddenException)"
+        ]
+      },
+      "entity": "BackendUser",
+      "_binds": {
+        "id": "BackendUser.id",
+        "first_name": "BackendUser.first_name",
+        "last_name": "BackendUser.last_name",
+        "email": "BackendUser.email",
+        "role": "UserRole.id"
+      },
+      "_output_schema": {
+        "user": "updated BackendUser"
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "BackendUser",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "is_superuser",
+                      "op": "eq",
+                      "value": true
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must sign in before editing a user.",
+          "precondition": "Only a superuser can edit users other than themselves.",
+          "not_found": "No user with that id exists."
+        }
+      },
+      "description": "Edit a backend user's profile fields (name, email, password). Your own account is edited via update_my_account, not here. Fails if the user does not exist or you are not a superuser."
+    },
+    {
+      "tool": "user_delete",
+      "op": "delete",
+      "family": "crud.soft_delete",
+      "exec_spec": {
+        "entity": "BackendUser",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        },
+        "set": {
+          "deleted_at": "$now"
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the user to soft-delete."
+        }
+      },
+      "_evidence": {
+        "locator": "modules/backend/behaviors/FormController.php:413",
+        "id_local": "User.delete",
+        "entry": {
+          "kind": "http",
+          "route": "POST /backend/users/delete/{id}",
+          "locator": "modules/backend/controllers/Users.php:20 (FormController update_onDelete)"
+        },
+        "entity_why": "primary effect row_soft_delete lands on this table",
+        "ref_code": "$model = $this->formFindModelObject($recordId);\n$model->delete(); // SoftDelete trait -> sets deleted_at",
+        "edges": [
+          "controllers/Users.php:20 + behaviors/FormController.php:413 (requiredPermissions admins.manage)"
+        ]
+      },
+      "entity": "BackendUser",
+      "_binds": {
+        "id": "BackendUser.id"
+      },
+      "_output_schema": {
+        "result": "redirect"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "BackendUser",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must sign in before deleting a user.",
+          "not_found": "No user with that id exists.",
+          "precondition": "Only an administrator with the admins.manage permission can delete users."
+        }
+      },
+      "description": "Soft-delete a backend user by marking them deleted (hidden from normal listings). Fails if the user does not exist or you are not a signed-in administrator."
+    },
+    {
+      "tool": "user_restore",
+      "op": "action",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "BackendUser",
+        "row_key": {
+          "id": {
+            "$arg": "id"
+          }
+        },
+        "set": {
+          "deleted_at": null
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the soft-deleted user to restore."
+        }
+      },
+      "_evidence": {
+        "locator": "modules/backend/controllers/Users.php:278",
+        "id_local": "User.restore",
+        "entry": {
+          "kind": "http",
+          "route": "POST /backend/users/update/{id}/onRestore",
+          "locator": "modules/backend/controllers/Users.php:278"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "$this->formFindModelObject($recordId)->restore();",
+        "edges": [
+          "controllers/Users.php:278 (admins.manage)"
+        ]
+      },
+      "entity": "BackendUser",
+      "_binds": {
+        "id": "BackendUser.id"
+      },
+      "_output_schema": {
+        "result": "redirect refresh"
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "BackendUser",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must sign in before restoring a user.",
+          "not_found": "No user with that id exists.",
+          "precondition": "Only an administrator with the admins.manage permission can restore users."
+        }
+      },
+      "_defaulted": [
+        "argument invented from the write column",
+        "fields"
+      ],
+      "description": "Restore a soft-deleted backend user so they are active again. Fails if the user does not exist."
+    },
+    {
+      "tool": "update_my_account",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "BackendUser",
+        "row_key": {
+          "id": {
+            "$session": "account_id"
+          }
+        },
+        "fields": [
+          "first_name",
+          "last_name",
+          "email",
+          "login",
+          "password"
+        ]
+      },
+      "input_schema": {
+        "first_name": {
+          "type": "text",
+          "required": false,
+          "description": "Your new first name."
+        },
+        "last_name": {
+          "type": "text",
+          "required": false,
+          "description": "Your new last name."
+        },
+        "email": {
+          "type": "text",
+          "required": false,
+          "description": "Your new email address."
+        },
+        "login": {
+          "type": "text",
+          "required": false,
+          "description": "Your new login name."
+        },
+        "password": {
+          "type": "text",
+          "required": false,
+          "description": "Your new password."
+        }
+      },
+      "_evidence": {
+        "locator": "modules/backend/controllers/Users.php:300",
+        "id_local": "User.updateMyAccount",
+        "entry": {
+          "kind": "http",
+          "route": "POST /backend/users/myaccount",
+          "locator": "modules/backend/controllers/Users.php:290"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "$result = $this->asExtension('FormController')->update_onSave($this->user->id, 'myaccount');\nif ($loginChanged || $passwordChanged) { BackendAuth::login($this->user->reload(), $remember); }",
+        "edges": [
+          "controllers/Users.php:290; requires logged-in BackendAuth user (Controller run checks BackendAuth::check)"
+        ]
+      },
+      "entity": "BackendUser",
+      "_binds": {
+        "first_name": "BackendUser.first_name",
+        "last_name": "BackendUser.last_name",
+        "email": "BackendUser.email",
+        "login": "BackendUser.login"
+      },
+      "_output_schema": {
+        "user": "updated BackendUser"
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "BackendUser",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must be signed in to update your own account.",
+          "precondition": "You must be signed in to a valid backend account to update your own profile."
+        }
+      },
+      "description": "Update your own account profile (name, email, login). The account edited is always the one you are signed in as. Fails if you are not signed in."
+    },
+    {
+      "tool": "usergroup_create",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "UserGroup",
+        "fields": [
+          "name",
+          "code",
+          "description",
+          "is_new_user_default"
+        ],
+        "unique_on": [
+          "name"
+        ]
+      },
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "Unique name of the user group."
+        },
+        "code": {
+          "type": "text",
+          "required": false,
+          "description": "Machine code for the group."
+        },
+        "description": {
+          "type": "text",
+          "required": false,
+          "description": "Human-readable description."
+        },
+        "is_new_user_default": {
+          "type": "bool",
+          "required": false,
+          "description": "If true, new users are auto-added to this group."
+        }
+      },
+      "_evidence": {
+        "locator": "modules/backend/controllers/UserGroups.php:16",
+        "id_local": "UserGroup.create",
+        "entry": {
+          "kind": "http",
+          "route": "POST /backend/usergroups",
+          "locator": "modules/backend/controllers/UserGroups.php:16"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "afterCreate: if ($this->is_new_user_default) $this->addAllUsersToGroup();",
+        "edges": [
+          "controllers/UserGroups.php:16"
+        ]
+      },
+      "entity": "UserGroup",
+      "_binds": {
+        "name": "UserGroup.name",
+        "code": "UserGroup.code",
+        "description": "UserGroup.description",
+        "is_new_user_default": "UserGroup.is_new_user_default"
+      },
+      "_output_schema": {
+        "group": "created UserGroup"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "BackendUser",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "name"
+        ],
+        "messages": {
+          "auth": "You must sign in before creating a user group.",
+          "unique": "A user group with that name already exists.",
+          "precondition": "You must be signed in to create a user group."
+        }
+      },
+      "description": "Create a backend user group. Fails if the name is already taken or you are not signed in."
+    },
+    {
+      "tool": "userrole_create",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "UserRole",
+        "fields": [
+          "name",
+          "code",
+          "description",
+          "permissions"
+        ],
+        "unique_on": [
+          "name"
+        ]
+      },
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "Unique name of the role."
+        },
+        "code": {
+          "type": "text",
+          "required": false,
+          "description": "Machine code for the role."
+        },
+        "description": {
+          "type": "text",
+          "required": false,
+          "description": "Human-readable description."
+        },
+        "permissions": {
+          "type": "json",
+          "required": false,
+          "description": "JSON permissions granted to the role."
+        }
+      },
+      "_evidence": {
+        "locator": "modules/backend/controllers/UserRoles.php:16",
+        "id_local": "UserRole.create",
+        "entry": {
+          "kind": "http",
+          "route": "POST /backend/userroles",
+          "locator": "modules/backend/controllers/UserRoles.php:16"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "// FormController create_onSave -> performSaveOnModel\n// rules: name required|unique:backend_user_roles, code unique\n// beforeSave: if ($this->isSystemRole()) { $this->is_system=true; $this->permissions=[]; }",
+        "edges": [
+          "controllers/UserRoles.php:16"
+        ]
+      },
+      "entity": "UserRole",
+      "_binds": {
+        "name": "UserRole.name",
+        "code": "UserRole.code",
+        "description": "UserRole.description",
+        "permissions": "UserRole.permissions"
+      },
+      "_output_schema": {
+        "role": "created UserRole"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "BackendUser",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "name"
+        ],
+        "messages": {
+          "auth": "You must sign in before creating a role.",
+          "unique": "A role with that name already exists.",
+          "precondition": "You must be signed in to create a role."
+        }
+      },
+      "description": "Create a backend user role (a named set of permissions). Fails if the name is taken or you are not signed in."
+    },
+    {
+      "tool": "userrole_impersonate",
+      "op": "action",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "UserRole",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the role to impersonate."
+        }
+      },
+      "_evidence": {
+        "locator": "modules/backend/controllers/UserRoles.php:58",
+        "id_local": "UserRole.impersonate",
+        "entry": {
+          "kind": "http",
+          "route": "POST /backend/userroles/onImpersonateRole/{id}",
+          "locator": "modules/backend/controllers/UserRoles.php:58"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "if ($role = $this->formFindModelObject($roleId)) { BackendAuth::impersonateRole($role); }",
+        "edges": [
+          "controllers/UserRoles.php:58 requiredPermissions=['admins.roles']"
+        ]
+      },
+      "entity": "UserRole",
+      "_binds": {
+        "id": "UserRole.id"
+      },
+      "_output_schema": {
+        "result": "redirect"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "BackendUser",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must sign in to impersonate a role.",
+          "not_found": "No role with that id exists.",
+          "precondition": "Only an administrator with the admins.roles permission can impersonate a role."
+        }
+      },
+      "description": "Look up a role to impersonate (switch the acting role to it). This is an admin action; the role is located globally by id and its detail returned. The role switch itself is session-side and not observable in this world."
+    },
+    {
+      "tool": "accesslog_list",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "AccessLog",
+        "rank": {
+          "method": "exact"
+        }
+      },
+      "input_schema": {
+        "sort": {
+          "type": "text",
+          "required": false,
+          "description": "Optional sort direction for the log (e.g. 'desc')."
+        }
+      },
+      "_evidence": {
+        "locator": "modules/backend/controllers/AccessLogs.php:12",
+        "id_local": "AccessLog.list",
+        "entry": {
+          "kind": "http",
+          "route": "GET /backend/accesslogs",
+          "locator": "modules/backend/controllers/AccessLogs.php:12"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "ListController index over Backend\\Models\\AccessLog; requiredPermissions = ['utilities.logs']"
+      },
+      "entity": "AccessLog",
+      "_output_schema": {
+        "records": "list of AccessLog rows"
+      },
+      "description": "List backend access log entries (who signed in and when). Returns matching AccessLog rows. Intended for signed-in administrators.",
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in to view access logs."
+        }
+      }
+    },
+    {
+      "tool": "settings_update_onsave",
+      "op": "update",
+      "family": "crud.upsert",
+      "exec_spec": {
+        "entity": "SettingModel",
+        "key": {
+          "item": {
+            "$arg": "code"
+          }
+        },
+        "insert_fields": {
+          "item": {
+            "$arg": "code"
+          },
+          "value": {
+            "$arg": "value"
+          }
+        },
+        "set_on_exists": {
+          "value": {
+            "$arg": "value"
+          }
+        }
+      },
+      "input_schema": {
+        "code": {
+          "type": "text",
+          "required": true,
+          "description": "The setting item key to save."
+        },
+        "value": {
+          "type": "json",
+          "required": true,
+          "description": "The value to store for that setting item."
+        }
+      },
+      "_evidence": {
+        "locator": "modules/system/controllers/Settings.php:111",
+        "id_local": "Settings.update_onSave",
+        "entry": {
+          "kind": "http",
+          "route": "POST /backend/system/settings/{author}/{plugin}/{code}",
+          "locator": "modules/system/controllers/Settings.php:111"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "$saveData = $this->formWidget->getSaveData();\nforeach ($saveData as $attribute => $value) { $model->{$attribute} = $value; }\n$model->save();",
+        "edges": [
+          "controllers/Settings.php:111 (SettingsManager item permission)"
+        ]
+      },
+      "entity": "SettingModel",
+      "_binds": {
+        "code": "SettingModel.item",
+        "value": "SettingModel.value"
+      },
+      "_output_schema": {
+        "result": "redirect"
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "BackendUser",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "code",
+          "value"
+        ],
+        "messages": {
+          "auth": "You must be signed in to change settings.",
+          "precondition": "Only a signed-in administrator can change system settings."
+        }
+      },
+      "description": "Set a key-value system setting, creating the setting row if it does not exist or updating it otherwise. Fails if you are not signed in."
+    },
+    {
+      "tool": "settings_update_onresetdefault",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "SettingModel",
+        "lookup_by": {
+          "item": {
+            "$arg": "code"
+          }
+        }
+      },
+      "input_schema": {
+        "code": {
+          "type": "text",
+          "required": true,
+          "description": "The setting item key to reset to default."
+        }
+      },
+      "_evidence": {
+        "locator": "modules/system/controllers/Settings.php:144",
+        "id_local": "Settings.update_onResetDefault",
+        "entry": {
+          "kind": "http",
+          "route": "POST /backend/system/settings/{author}/{plugin}/{code}",
+          "locator": "modules/system/controllers/Settings.php:144"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "$model->resetDefault(); // deletes settings record, re-inits initSettingsData()",
+        "edges": [
+          "controllers/Settings.php:144 (SettingsManager item permission)"
+        ]
+      },
+      "entity": "SettingModel",
+      "_binds": {
+        "code": "SettingModel.item"
+      },
+      "_output_schema": {
+        "result": "redirect"
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "BackendUser",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "code"
+        ],
+        "messages": {
+          "auth": "You must be signed in to reset settings.",
+          "not_found": "No setting with that code exists.",
+          "precondition": "Only a signed-in administrator can reset system settings to their defaults."
+        }
+      },
+      "description": "Reset a system setting back to its default, deleting the overridden value. Fails if you are not signed in."
+    },
+    {
+      "tool": "mailtemplate_create",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "MailTemplate",
+        "fields": [
+          "code",
+          "subject",
+          "description",
+          "content_html",
+          "content_text",
+          "layout_id"
+        ],
+        "set_on_create": {
+          "is_custom": true
+        },
+        "unique_on": [
+          "code"
+        ]
+      },
+      "input_schema": {
+        "code": {
+          "type": "text",
+          "required": true,
+          "description": "Unique code for the mail template."
+        },
+        "subject": {
+          "type": "text",
+          "required": true,
+          "description": "The email subject line."
+        },
+        "description": {
+          "type": "text",
+          "required": true,
+          "description": "A short description of the template."
+        },
+        "content_html": {
+          "type": "text",
+          "required": true,
+          "description": "The HTML body of the email."
+        },
+        "content_text": {
+          "type": "text",
+          "required": false,
+          "description": "The plain-text body."
+        },
+        "layout_id": {
+          "type": "int",
+          "required": false,
+          "description": "Id of the MailLayout to wrap this template."
+        },
+        "is_custom": {
+          "type": "bool",
+          "required": false,
+          "description": "Whether this is a custom template (forced true on creation)."
+        }
+      },
+      "_evidence": {
+        "locator": "modules/system/controllers/MailTemplates.php:26",
+        "id_local": "MailTemplate.create",
+        "entry": {
+          "kind": "http",
+          "route": "POST /backend/system/mailtemplates/create",
+          "locator": "modules/system/controllers/MailTemplates.php (FormController)"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "public function formBeforeSave($model) { $model->is_custom = true; }",
+        "edges": [
+          "controllers/MailTemplates.php:26"
+        ]
+      },
+      "entity": "MailTemplate",
+      "_binds": {
+        "code": "MailTemplate.code",
+        "subject": "MailTemplate.subject",
+        "description": "MailTemplate.description",
+        "content_html": "MailTemplate.content_html",
+        "content_text": "MailTemplate.content_text",
+        "layout_id": "MailLayout.id",
+        "is_custom": "MailTemplate.is_custom"
+      },
+      "_output_schema": {
+        "template": "created MailTemplate"
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "BackendUser",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "code",
+          "subject",
+          "description",
+          "content_html"
+        ],
+        "messages": {
+          "auth": "You must be signed in to create a mail template.",
+          "unique": "A mail template with that code already exists.",
+          "fk": "The referenced mail layout does not exist.",
+          "precondition": "Only a signed-in administrator can create a mail template."
+        }
+      },
+      "description": "Create a custom mail template. The template is always marked custom. Fails if the code is taken or you are not signed in."
+    },
+    {
+      "tool": "mailtemplate_update",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "MailTemplate",
+        "row_key": {
+          "id": {
+            "$arg": "id"
+          }
+        },
+        "fields": [
+          "subject",
+          "content_html",
+          "content_text"
+        ],
+        "set": {
+          "is_custom": true
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the mail template to edit."
+        },
+        "subject": {
+          "type": "text",
+          "required": false,
+          "description": "New subject line."
+        },
+        "content_html": {
+          "type": "text",
+          "required": false,
+          "description": "New HTML body."
+        },
+        "content_text": {
+          "type": "text",
+          "required": false,
+          "description": "New plain-text body."
+        }
+      },
+      "_evidence": {
+        "locator": "modules/system/controllers/MailTemplates.php:26",
+        "id_local": "MailTemplate.update",
+        "entry": {
+          "kind": "http",
+          "route": "POST /backend/system/mailtemplates/update/{id}",
+          "locator": "modules/system/controllers/MailTemplates.php (FormController)"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "return $this->asExtension('FormController')->update($recordId);",
+        "edges": [
+          "controllers/MailTemplates.php:26"
+        ]
+      },
+      "entity": "MailTemplate",
+      "_binds": {
+        "id": "MailTemplate.id",
+        "subject": "MailTemplate.subject",
+        "content_html": "MailTemplate.content_html",
+        "content_text": "MailTemplate.content_text"
+      },
+      "_output_schema": {
+        "template": "updated MailTemplate"
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "BackendUser",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must be signed in to edit a mail template.",
+          "not_found": "No mail template with that id exists.",
+          "precondition": "Only a signed-in administrator can edit a mail template."
+        }
+      },
+      "description": "Edit a mail template's subject and content. Editing marks the template custom. Fails if the template does not exist or you are not signed in."
+    },
+    {
+      "tool": "mailtemplate_delete",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "MailTemplate",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the custom mail template to delete."
+        }
+      },
+      "_evidence": {
+        "locator": "modules/system/controllers/MailTemplates.php:26",
+        "id_local": "MailTemplate.delete",
+        "entry": {
+          "kind": "http",
+          "route": "POST /backend/system/mailtemplates/delete/{id}",
+          "locator": "modules/system/controllers/MailTemplates.php (FormController)"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "view-backed (is_custom=false) templates cannot be deleted; resetToDefault instead.",
+        "edges": [
+          "models/MailTemplate.php (view-backed is_custom=false cannot delete; reset instead)"
+        ]
+      },
+      "entity": "MailTemplate",
+      "_binds": {
+        "id": "MailTemplate.id"
+      },
+      "_output_schema": {
+        "result": "redirect"
+      },
+      "guards": {
+        "required": [
+          "id"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "MailTemplate",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "is_custom",
+                      "op": "eq",
+                      "value": true
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "precondition": "Only custom mail templates can be deleted; reset a system template to default instead.",
+          "not_found": "No mail template with that id exists."
+        }
+      },
+      "description": "Delete a custom mail template. Only custom templates can be deleted; view-backed system templates must be reset instead. Fails if the template is not custom or does not exist."
+    },
+    {
+      "tool": "mailtemplate_update_onresetdefault",
+      "op": "action",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "MailTemplate",
+        "row_key": {
+          "id": {
+            "$arg": "id"
+          }
+        },
+        "fields": [
+          "code",
+          "subject",
+          "description",
+          "content_html",
+          "content_text",
+          "layout_id",
+          "is_custom"
+        ],
+        "set": {
+          "is_custom": false
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the mail template to reset to its default."
+        },
+        "code": {
+          "type": "text",
+          "required": false,
+          "description": "System default code restored for this template."
+        },
+        "subject": {
+          "type": "text",
+          "required": false,
+          "description": "Default subject line restored."
+        },
+        "content_html": {
+          "type": "text",
+          "required": false,
+          "description": "Default HTML body restored."
+        },
+        "content_text": {
+          "type": "text",
+          "required": false,
+          "description": "Default plain-text body restored."
+        }
+      },
+      "_evidence": {
+        "locator": "modules/system/controllers/MailTemplates.php:116",
+        "id_local": "MailTemplate.update_onResetDefault",
+        "entry": {
+          "kind": "http",
+          "route": "POST /backend/system/mailtemplates/update/{id}",
+          "locator": "modules/system/controllers/MailTemplates.php:116"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "$model = $this->formFindModelObject($recordId);\n$model->resetToDefault();\nFlash::success(Lang::get('backend::lang.form.reset_success'));\nreturn Redirect::refresh();",
+        "edges": [
+          "controllers/MailTemplates.php:116"
+        ]
+      },
+      "entity": "MailTemplate",
+      "_binds": {
+        "id": "MailTemplate.id"
+      },
+      "_output_schema": {
+        "result": "redirect refresh"
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "BackendUser",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must be signed in to reset a mail template.",
+          "not_found": "No mail template with that id exists.",
+          "precondition": "Only a signed-in administrator can reset a mail template to its default."
+        }
+      },
+      "_defaulted": [
+        "argument invented from the write column",
+        "fields"
+      ],
+      "description": "Reset a mail template back to its system default, clearing any custom content and marking it non-custom. Fails if the template does not exist or you are not signed in."
+    },
+    {
+      "tool": "mailtemplate_ontest",
+      "op": "action",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "MailTemplate",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the mail template to send as a test."
+        }
+      },
+      "_evidence": {
+        "locator": "modules/system/controllers/MailTemplates.php:130",
+        "id_local": "MailTemplate.onTest",
+        "entry": {
+          "kind": "http",
+          "route": "POST /backend/system/mailtemplates/onTest/{id}",
+          "locator": "modules/system/controllers/MailTemplates.php:130"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "$model = $this->formFindModelObject($recordId); $user = $this->user;\nMail::sendTo([$user->email => $user->full_name], $model->code);",
+        "edges": [
+          "controllers/MailTemplates.php requiredPermissions=['mail.templates']"
+        ]
+      },
+      "entity": "MailTemplate",
+      "_binds": {
+        "id": "MailTemplate.id"
+      },
+      "_output_schema": {
+        "result": "test email sent"
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "BackendUser",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must be signed in to send a test mail.",
+          "not_found": "No mail template with that id exists.",
+          "precondition": "Only a signed-in administrator can send a test mail."
+        }
+      },
+      "description": "Send a test email using the named mail template to your own address. Returns the template's detail; the send itself is side-channel and not observable in this world. Fails if the template does not exist."
+    },
+    {
+      "tool": "maillayout_delete",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "MailLayout",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the mail layout to delete."
+        }
+      },
+      "_evidence": {
+        "locator": "modules/system/models/MailLayout.php:78",
+        "id_local": "MailLayout.delete",
+        "entry": {
+          "kind": "http",
+          "route": "POST /backend/system/maillayouts/delete/{id}",
+          "locator": "modules/system/controllers/MailLayouts.php (FormController)"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "public function beforeDelete() { if ($this->isLocked()) { throw new ApplicationException('Cannot delete this template because it is locked'); } }",
+        "edges": [
+          "models/MailLayout.php:78 beforeDelete throws ApplicationException when locked"
+        ]
+      },
+      "entity": "MailLayout",
+      "_binds": {
+        "id": "MailLayout.id"
+      },
+      "_output_schema": {
+        "result": "redirect"
+      },
+      "guards": {
+        "required": [
+          "id"
+        ],
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "MailLayout",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "is_locked",
+                      "op": "eq",
+                      "value": false
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "precondition": "That mail layout is locked and cannot be deleted.",
+          "not_found": "No mail layout with that id exists."
+        }
+      },
+      "description": "Delete a mail layout. Locked layouts cannot be deleted. Fails if the layout is locked or does not exist."
+    },
+    {
+      "tool": "mailpartial_update_onresetdefault",
+      "op": "action",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "MailPartial",
+        "row_key": {
+          "id": {
+            "$arg": "id"
+          }
+        },
+        "set": {
+          "is_custom": false
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the mail partial to reset to default."
+        }
+      },
+      "_evidence": {
+        "locator": "modules/system/controllers/MailPartials.php:57",
+        "id_local": "MailPartial.update_onResetDefault",
+        "entry": {
+          "kind": "http",
+          "route": "POST /backend/system/mailpartials/update/{id}",
+          "locator": "modules/system/controllers/MailPartials.php:57"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "$model->resetToDefault();",
+        "edges": [
+          "controllers/MailPartials.php:57"
+        ]
+      },
+      "entity": "MailPartial",
+      "_binds": {
+        "id": "MailPartial.id"
+      },
+      "_output_schema": {
+        "result": "redirect"
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "BackendUser",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must be signed in to reset a mail partial.",
+          "not_found": "No mail partial with that id exists.",
+          "precondition": "Only a signed-in administrator can reset a mail partial to its default."
+        }
+      },
+      "_defaulted": [
+        "argument invented from the write column",
+        "fields"
+      ],
+      "description": "Reset a mail partial to its system default, marking it non-custom. Fails if the partial does not exist or you are not signed in."
+    },
+    {
+      "tool": "eventlogs_clear",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "EventLog",
+        "lookup_by": {
+          "id": {
+            "$arg": "ids"
+          }
+        }
+      },
+      "input_schema": {
+        "ids": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the event log records to remove."
+        }
+      },
+      "_evidence": {
+        "locator": "modules/system/controllers/EventLogs.php:64",
+        "id_local": "EventLogs.index_onEmptyLog",
+        "entry": {
+          "kind": "http",
+          "route": "POST /backend/system/eventlogs/index_onEmptyLog",
+          "locator": "modules/system/controllers/EventLogs.php:64"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "EventLog::truncate();",
+        "edges": [
+          "controllers/EventLogs.php requiredPermissions=['utilities.logs']"
+        ]
+      },
+      "entity": "EventLog",
+      "_binds": {
+        "ids": "EventLog.id"
+      },
+      "_output_schema": {
+        "result": "list refresh"
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "BackendUser",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must be signed in to clear the event log.",
+          "not_found": "No matching event log records with that id exists.",
+          "precondition": "Only a signed-in administrator with log access can clear the event log."
+        },
+        "required": [
+          "ids"
+        ]
+      },
+      "description": "Permanently delete event-log records by their ids. Pass the id(s) of the entries to remove."
+    },
+    {
+      "tool": "requestlogs_clear",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "RequestLog",
+        "lookup_by": {
+          "id": {
+            "$arg": "ids"
+          }
+        }
+      },
+      "input_schema": {
+        "ids": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the request log records to remove."
+        }
+      },
+      "_evidence": {
+        "locator": "modules/system/controllers/RequestLogs.php:56",
+        "id_local": "RequestLogs.index_onEmptyLog",
+        "entry": {
+          "kind": "http",
+          "route": "POST /backend/system/requestlogs/index_onEmptyLog",
+          "locator": "modules/system/controllers/RequestLogs.php:56"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "RequestLog::truncate();",
+        "edges": [
+          "controllers/RequestLogs.php:56"
+        ]
+      },
+      "entity": "RequestLog",
+      "_binds": {
+        "ids": "RequestLog.id"
+      },
+      "_output_schema": {
+        "result": "list refresh"
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "BackendUser",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must be signed in to clear the request log.",
+          "not_found": "No matching request log records with that id exists.",
+          "precondition": "Only a signed-in administrator with log access can clear the request log."
+        },
+        "required": [
+          "ids"
+        ]
+      },
+      "description": "Permanently delete request-log records by their ids. Pass the id(s) of the entries to remove."
+    },
+    {
+      "tool": "updates_manage_onbulkaction",
+      "op": "action",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "PluginVersion",
+        "lookup_by": {
+          "id": {
+            "$arg": "plugin_id"
+          }
+        }
+      },
+      "input_schema": {
+        "plugin_id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the plugin version to operate on."
+        },
+        "action": {
+          "type": "text",
+          "required": false,
+          "description": "The bulk action being applied (the persistent effect here is the remove action)."
+        }
+      },
+      "_evidence": {
+        "locator": "modules/system/controllers/Updates.php:124",
+        "id_local": "Updates.manage_onBulkAction",
+        "entry": {
+          "kind": "http",
+          "route": "POST /backend/system/updates/manage_onBulkAction",
+          "locator": "modules/system/controllers/Updates.php:124"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "switch ($bulkAction) {\n  case 'disable': $plugin->setContextDisabled(); break;\n  case 'enable': ... case 'refresh': ... case 'remove': $manager->deletePlugin($plugin->code); break;\n}",
+        "edges": [
+          "controllers/Updates.php:124"
+        ]
+      },
+      "entity": "PluginVersion",
+      "_binds": {
+        "plugin_id": "PluginVersion.id"
+      },
+      "_output_schema": {
+        "result": "list refresh"
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "BackendUser",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "plugin_id"
+        ],
+        "messages": {
+          "auth": "You must be signed in to manage plugins.",
+          "not_found": "No plugin version with that id exists.",
+          "precondition": "Only a signed-in administrator can manage plugin versions."
+        }
+      },
+      "description": "Apply a plugin-management bulk action; the only persistent row effect is removing the plugin version. Fails if you are not signed in or the plugin version does not exist."
+    },
+    {
+      "tool": "sitedefinition_create",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "SiteDefinition",
+        "fields": [
+          "name",
+          "code",
+          "theme",
+          "locale",
+          "is_enabled",
+          "is_primary",
+          "group_id"
+        ]
+      },
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "Human-readable name of the site."
+        },
+        "code": {
+          "type": "text",
+          "required": false,
+          "description": "Machine code for the site."
+        },
+        "theme": {
+          "type": "text",
+          "required": false,
+          "description": "Theme dir name for the site."
+        },
+        "locale": {
+          "type": "text",
+          "required": false,
+          "description": "Default locale for the site."
+        },
+        "is_enabled": {
+          "type": "bool",
+          "required": false,
+          "description": "Whether the site is enabled."
+        },
+        "is_primary": {
+          "type": "bool",
+          "required": false,
+          "description": "Whether this is the primary site."
+        },
+        "group_id": {
+          "type": "int",
+          "required": false,
+          "description": "Id of the SiteGroup this site belongs to (defaults to the first group)."
+        }
+      },
+      "_evidence": {
+        "locator": "modules/system/controllers/Sites.php:42",
+        "id_local": "SiteDefinition.create",
+        "entry": {
+          "kind": "http",
+          "route": "POST /backend/system/sites",
+          "locator": "modules/system/controllers/Sites.php (FormController)"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "requiredPermissions=['settings.manage_sites'];\nbeforeSave: if (!$this->group_id) { $this->group_id = SiteGroup::first()?->id; }",
+        "edges": [
+          "controllers/Sites.php:42 requiredPermissions=['settings.manage_sites'] (403 ForbiddenException)"
+        ]
+      },
+      "entity": "SiteDefinition",
+      "_binds": {
+        "name": "SiteDefinition.name",
+        "code": "SiteDefinition.code",
+        "theme": "SiteDefinition.theme",
+        "locale": "SiteDefinition.locale",
+        "is_enabled": "SiteDefinition.is_enabled",
+        "is_primary": "SiteDefinition.is_primary",
+        "group_id": "SiteGroup.id"
+      },
+      "_output_schema": {
+        "site": "created SiteDefinition"
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "BackendUser",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "name"
+        ],
+        "messages": {
+          "auth": "You must be signed in to create a site.",
+          "fk": "The referenced site group does not exist.",
+          "precondition": "Only a signed-in administrator with the settings.manage_sites permission can create a site."
+        }
+      },
+      "description": "Create a site definition (a multisite entry). Fails if you are not signed in or lack site-management rights."
+    },
+    {
+      "tool": "sitedefinition_update",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "SiteDefinition",
+        "row_key": {
+          "id": {
+            "$arg": "id"
+          }
+        },
+        "fields": [
+          "name",
+          "code",
+          "theme",
+          "is_enabled"
+        ]
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the site to edit."
+        },
+        "name": {
+          "type": "text",
+          "required": false,
+          "description": "New site name."
+        },
+        "code": {
+          "type": "text",
+          "required": false,
+          "description": "New site code."
+        },
+        "theme": {
+          "type": "text",
+          "required": false,
+          "description": "New theme dir name."
+        },
+        "is_enabled": {
+          "type": "bool",
+          "required": false,
+          "description": "Whether the site is enabled."
+        }
+      },
+      "_evidence": {
+        "locator": "modules/system/controllers/Sites.php:42",
+        "id_local": "SiteDefinition.update",
+        "entry": {
+          "kind": "http",
+          "route": "POST /backend/system/sites/update/{id}",
+          "locator": "modules/system/controllers/Sites.php (FormController)"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "formBeforeSave: if (post('SiteDefinition[is_enabled]')) { $this->formSetSaveValue('is_enabled_edit', true); }\nafterSave: Site::resetCache();",
+        "edges": [
+          "controllers/Sites.php:42"
+        ]
+      },
+      "entity": "SiteDefinition",
+      "_binds": {
+        "id": "SiteDefinition.id",
+        "name": "SiteDefinition.name",
+        "code": "SiteDefinition.code",
+        "theme": "SiteDefinition.theme",
+        "is_enabled": "SiteDefinition.is_enabled"
+      },
+      "_output_schema": {
+        "site": "updated SiteDefinition"
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "BackendUser",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must be signed in to edit a site.",
+          "not_found": "No site with that id exists.",
+          "precondition": "Only a signed-in administrator with the settings.manage_sites permission can edit a site."
+        }
+      },
+      "description": "Edit a site definition's name, code, theme and enabled flag. Fails if the site does not exist or you are not signed in."
+    },
+    {
+      "tool": "sitedefinition_delete",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "SiteDefinition",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the site to delete."
+        }
+      },
+      "_evidence": {
+        "locator": "modules/system/models/SiteDefinition.php:170",
+        "id_local": "SiteDefinition.delete",
+        "entry": {
+          "kind": "http",
+          "route": "POST /backend/system/sites/delete/{id}",
+          "locator": "modules/system/controllers/Sites.php (FormController)"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "afterDelete: PluginSiteGroup::where('site_id', $this->id)->delete(); Site::resetCache();"
+      },
+      "entity": "SiteDefinition",
+      "_binds": {
+        "id": "SiteDefinition.id"
+      },
+      "_output_schema": {
+        "result": "redirect"
+      },
+      "guards": {
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "not_found": "No site with that id exists."
+        }
+      },
+      "description": "Delete a site definition and its plugin-site-group associations. Fails if the site does not exist."
+    },
+    {
+      "tool": "sitegroup_create",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "SiteGroup",
+        "fields": [
+          "name",
+          "code"
+        ]
+      },
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "Name of the site group."
+        },
+        "code": {
+          "type": "text",
+          "required": false,
+          "description": "Machine code for the group."
+        }
+      },
+      "_evidence": {
+        "locator": "modules/system/controllers/SiteGroups.php",
+        "id_local": "SiteGroup.create",
+        "entry": {
+          "kind": "http",
+          "route": "POST /backend/system/sitegroups",
+          "locator": "modules/system/controllers/SiteGroups.php (FormController)"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "requiredPermissions=['settings.manage_sites']",
+        "edges": [
+          "controllers/SiteGroups.php"
+        ]
+      },
+      "entity": "SiteGroup",
+      "_binds": {
+        "name": "SiteGroup.name",
+        "code": "SiteGroup.code"
+      },
+      "_output_schema": {
+        "group": "created SiteGroup"
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "BackendUser",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "name"
+        ],
+        "messages": {
+          "auth": "You must be signed in to create a site group.",
+          "precondition": "Only a signed-in administrator with the settings.manage_sites permission can create a site group."
+        }
+      },
+      "description": "Create a site group for organizing sites. Fails if you are not signed in or lack site-management rights."
+    },
+    {
+      "tool": "themeoptions_save",
+      "op": "update",
+      "family": "crud.upsert",
+      "exec_spec": {
+        "entity": "ThemeData",
+        "key": {
+          "theme": {
+            "$arg": "dir"
+          }
+        },
+        "insert_fields": {
+          "theme": {
+            "$arg": "dir"
+          },
+          "data": {
+            "$arg": "data"
+          }
+        },
+        "set_on_exists": {
+          "data": {
+            "$arg": "data"
+          }
+        }
+      },
+      "input_schema": {
+        "dir": {
+          "type": "text",
+          "required": true,
+          "description": "Theme directory name whose options to save."
+        },
+        "data": {
+          "type": "json",
+          "required": true,
+          "description": "The theme options JSON to upsert."
+        }
+      },
+      "_evidence": {
+        "locator": "modules/cms/controllers/ThemeOptions.php",
+        "id_local": "ThemeOptions.update_onSave",
+        "entry": {
+          "kind": "http",
+          "route": "POST /backend/cms/themeoptions/{dir}",
+          "locator": "modules/cms/controllers/ThemeOptions.php:update_onSave"
+        },
+        "entity_why": "primary effect row_upsert lands on this table",
+        "ref_code": "$model = $this->getThemeData($this->getDirName($dirName));\n$this->asExtension('FormController')->update_onSave($model->id);\nbeforeSave: $this->data = $dynamicAttributes;",
+        "edges": [
+          "controllers/ThemeOptions.php requires cms.theme_customize"
+        ]
+      },
+      "entity": "ThemeData",
+      "_binds": {
+        "dir": "ThemeData.theme",
+        "data": "ThemeData.data"
+      },
+      "_output_schema": {
+        "result": "redirect"
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "BackendUser",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "dir",
+          "data"
+        ],
+        "messages": {
+          "auth": "You must be signed in to change theme options.",
+          "precondition": "Only a signed-in administrator can change theme options."
+        }
+      },
+      "_defaulted": [
+        "fields",
+        "fields (mapped to the real parameter names via binds)"
+      ],
+      "description": "Save theme options for a theme directory (creating the theme-data row if none exists, updating it otherwise). Fails if you are not signed in."
+    },
+    {
+      "tool": "themeoptions_reset_default",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "ThemeData",
+        "lookup_by": {
+          "theme": {
+            "$arg": "dir"
+          }
+        }
+      },
+      "input_schema": {
+        "dir": {
+          "type": "text",
+          "required": true,
+          "description": "Theme directory name whose options to reset."
+        }
+      },
+      "_evidence": {
+        "locator": "modules/cms/controllers/ThemeOptions.php",
+        "id_local": "ThemeOptions.update_onResetDefault",
+        "entry": {
+          "kind": "http",
+          "route": "POST /backend/cms/themeoptions/{dir}",
+          "locator": "modules/cms/controllers/ThemeOptions.php:update_onResetDefault"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "$model = $this->getThemeData($this->getDirName($dirName)); $model->delete();",
+        "edges": [
+          "controllers/ThemeOptions.php"
+        ]
+      },
+      "entity": "ThemeData",
+      "_binds": {
+        "dir": "ThemeData.theme"
+      },
+      "_output_schema": {
+        "result": "redirect refresh"
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "BackendUser",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "dir"
+        ],
+        "messages": {
+          "auth": "You must be signed in to reset theme options.",
+          "not_found": "No theme-data row for that theme directory.",
+          "precondition": "Only a signed-in administrator can reset theme options to their defaults."
+        }
+      },
+      "description": "Reset theme options for a theme directory back to default, deleting the theme-data row. Fails if you are not signed in."
+    },
+    {
+      "tool": "themes_set_active",
+      "op": "action",
+      "family": "action.emit",
+      "exec_spec": {
+        "channel": "event",
+        "record": {
+          "table": "DispatchLog"
+        }
+      },
+      "input_schema": {
+        "theme": {
+          "type": "text",
+          "required": true,
+          "description": "Theme code to set as the active theme."
+        }
+      },
+      "_evidence": {
+        "locator": "modules/cms/controllers/Themes.php",
+        "id_local": "Themes.index_onSetActiveTheme",
+        "entry": {
+          "kind": "http",
+          "route": "POST /backend/cms/themes",
+          "locator": "modules/cms/controllers/Themes.php:index_onSetActiveTheme"
+        },
+        "entity_why": "cannot determine the entity",
+        "ref_code": "if (!BackendAuth::userHasAccess('cms.themes.activate')) { throw new ForbiddenException; }\nCmsTheme::setActiveTheme($themeCode); CmsTheme::setEditTheme($themeCode);",
+        "edges": [
+          "controllers/Themes.php requires cms.themes.activate"
+        ]
+      },
+      "_output_schema": {
+        "result": "themes list refresh"
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "BackendUser",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "theme"
+        ],
+        "messages": {
+          "auth": "You must be signed in to activate a theme.",
+          "precondition": "Only a signed-in administrator with the cms.themes.activate permission can set the active theme."
+        }
+      },
+      "description": "Activate a theme so it becomes the site's active theme, and emit an activation event. The active-theme switch itself is not a row change in this world; only the emitted event is observable."
+    },
+    {
+      "tool": "themes_index_ondelete",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "ThemeData",
+        "lookup_by": {
+          "theme": {
+            "$arg": "theme"
+          }
+        }
+      },
+      "input_schema": {
+        "theme": {
+          "type": "text",
+          "required": true,
+          "description": "Theme code to delete."
+        }
+      },
+      "_evidence": {
+        "locator": "modules/cms/controllers/Themes.php",
+        "id_local": "Themes.index_onDelete",
+        "entry": {
+          "kind": "http",
+          "route": "POST /backend/cms/themes",
+          "locator": "modules/cms/controllers/Themes.php:index_onDelete"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "if (!BackendAuth::userHasAccess('cms.themes.delete')) { throw new ForbiddenException; }\nThemeManager::instance()->deleteTheme(post('theme'));",
+        "edges": [
+          "controllers/Themes.php index_onDelete"
+        ]
+      },
+      "entity": "ThemeData",
+      "_binds": {
+        "theme": "ThemeData.theme"
+      },
+      "_output_schema": {
+        "result": "themes list refresh"
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "BackendUser",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "theme"
+        ],
+        "messages": {
+          "auth": "You must be signed in to delete a theme.",
+          "precondition": "Only a signed-in administrator with theme-deletion rights can delete a theme."
+        }
+      },
+      "description": "Delete a theme's data. Fails if you are not signed in or lack theme-deletion rights."
+    },
+    {
+      "tool": "themelogs_clear",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "ThemeLog",
+        "lookup_by": {
+          "id": {
+            "$arg": "ids"
+          }
+        }
+      },
+      "input_schema": {
+        "ids": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the theme log records to remove."
+        }
+      },
+      "_evidence": {
+        "locator": "modules/cms/controllers/ThemeLogs.php",
+        "id_local": "ThemeLogs.index_onEmptyLog",
+        "entry": {
+          "kind": "http",
+          "route": "POST /backend/cms/themelogs",
+          "locator": "modules/cms/controllers/ThemeLogs.php:index_onEmptyLog"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "ThemeLog::truncate();\nFlash::success(Lang::get('cms::lang.theme_log.empty_success'));\nreturn $this->listRefresh();",
+        "edges": [
+          "controllers/ThemeLogs.php (requiredPermissions utilities.logs)"
+        ]
+      },
+      "entity": "ThemeLog",
+      "_binds": {
+        "ids": "ThemeLog.id"
+      },
+      "_output_schema": {
+        "result": "list refresh"
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "BackendUser",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must be signed in to clear the theme log.",
+          "not_found": "No matching theme log records with that id exists.",
+          "precondition": "Only a signed-in administrator can clear the theme log."
+        },
+        "required": [
+          "ids"
+        ]
+      },
+      "description": "Permanently delete theme-log records by their ids. Pass the id(s) of the entries to remove."
+    },
+    {
+      "tool": "entries_onsave",
+      "op": "update",
+      "family": "crud.upsert",
+      "exec_spec": {
+        "entity": "EntryRecord",
+        "key": {
+          "id": {
+            "$arg": "recordId"
+          }
+        },
+        "insert_fields": [
+          "title",
+          "slug",
+          "is_enabled",
+          "published_at",
+          "expired_at"
+        ],
+        "set_on_exists": {
+          "content_group": {
+            "$arg": "content_group"
+          }
+        }
+      },
+      "input_schema": {
+        "recordId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the entry to save; creates a new entry if it does not yet exist."
+        },
+        "title": {
+          "type": "text",
+          "required": true,
+          "description": "The entry's title."
+        },
+        "slug": {
+          "type": "text",
+          "required": false,
+          "description": "URL slug for the entry."
+        },
+        "is_enabled": {
+          "type": "bool",
+          "required": false,
+          "description": "Whether the entry is published/enabled."
+        },
+        "published_at": {
+          "type": "datetime",
+          "required": false,
+          "description": "When the entry should be published."
+        },
+        "expired_at": {
+          "type": "datetime",
+          "required": false,
+          "description": "When the entry should expire."
+        }
+      },
+      "_evidence": {
+        "locator": "modules/tailor/controllers/Entries.php:456",
+        "id_local": "Entries.onSave",
+        "entry": {
+          "kind": "http",
+          "route": "POST /backend/tailor/entries/{source}/{recordId}/onSave",
+          "locator": "modules/tailor/controllers/Entries.php:456"
+        },
+        "entity_why": "primary effect row_upsert lands on this table",
+        "ref_code": "if ($this->actionMethod === 'update') {\n  $redirect = $this->asExtension('FormController')->update_onSave($recordId);\n  ... } else { return $this->asExtension('FormController')->create_onSave(); }",
+        "edges": [
+          "controllers/Entries.php:456 (formCheckPermission + checkSourcePermission)"
+        ]
+      },
+      "entity": "EntryRecord",
+      "_binds": {
+        "recordId": "EntryRecord.id",
+        "title": "EntryRecord.title",
+        "slug": "EntryRecord.slug",
+        "is_enabled": "EntryRecord.is_enabled",
+        "published_at": "EntryRecord.published_at",
+        "expired_at": "EntryRecord.expired_at"
+      },
+      "_output_schema": {
+        "result": "ajax response with status/version info"
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "BackendUser",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "recordId",
+          "title"
+        ],
+        "messages": {
+          "auth": "You must be signed in to save an entry.",
+          "precondition": "Only a signed-in administrator with permission for this content source can save an entry."
+        }
+      },
+      "description": "Save an entry record — update the row with the given id, or create it if no such row exists. Fails if you are not signed in or lack entry permission for this source."
+    },
+    {
+      "tool": "entries_ondelete",
+      "op": "delete",
+      "family": "crud.soft_delete",
+      "exec_spec": {
+        "entity": "EntryRecord",
+        "lookup_by": {
+          "id": {
+            "$arg": "recordId"
+          }
+        },
+        "set": {
+          "deleted_at": "$now"
+        }
+      },
+      "input_schema": {
+        "recordId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the entry to soft-delete."
+        }
+      },
+      "_evidence": {
+        "locator": "modules/tailor/controllers/Entries.php:474",
+        "id_local": "Entries.onDelete",
+        "entry": {
+          "kind": "http",
+          "route": "POST /backend/tailor/entries/{source}/{recordId}/onDelete",
+          "locator": "modules/tailor/controllers/Entries.php:474"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "$this->checkSourcePermission('delete');\nif ($model->isSoftDeleteEnabled() && !$model->trashed()) { $model->delete(); }",
+        "edges": [
+          "controllers/Entries.php:476 checkSourcePermission('delete') -> ForbiddenException"
+        ]
+      },
+      "entity": "EntryRecord",
+      "_binds": {
+        "recordId": "EntryRecord.id"
+      },
+      "_output_schema": {
+        "result": "redirect"
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "BackendUser",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "recordId"
+        ],
+        "messages": {
+          "auth": "You must be signed in to delete an entry.",
+          "not_found": "No entry with that id exists.",
+          "precondition": "Only a signed-in administrator with delete permission for this content source can delete an entry."
+        }
+      },
+      "description": "Soft-delete an entry record (marked deleted, kept for restoration). Fails if you are not signed in or lack delete permission for this source."
+    },
+    {
+      "tool": "entries_onforcedelete",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "EntryRecord",
+        "lookup_by": {
+          "id": {
+            "$arg": "recordId"
+          }
+        }
+      },
+      "input_schema": {
+        "recordId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the entry to permanently delete."
+        }
+      },
+      "_evidence": {
+        "locator": "modules/tailor/controllers/Entries.php:504",
+        "id_local": "Entries.onForceDelete",
+        "entry": {
+          "kind": "http",
+          "route": "POST /backend/tailor/entries/{source}/{recordId}/onForceDelete",
+          "locator": "modules/tailor/controllers/Entries.php:504"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "$this->checkSourcePermission('delete'); $model->forceDelete();",
+        "edges": [
+          "controllers/Entries.php:504"
+        ]
+      },
+      "entity": "EntryRecord",
+      "_binds": {
+        "recordId": "EntryRecord.id"
+      },
+      "_output_schema": {
+        "result": "redirect"
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "BackendUser",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "recordId"
+        ],
+        "messages": {
+          "auth": "You must be signed in to force-delete an entry.",
+          "not_found": "No entry with that id exists.",
+          "precondition": "Only a signed-in administrator with delete permission for this content source can permanently delete an entry."
+        }
+      },
+      "description": "Permanently delete (force-delete) an entry record, bypassing soft-delete. Fails if you are not signed in or lack delete permission."
+    },
+    {
+      "tool": "entries_onrestore",
+      "op": "action",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "EntryRecord",
+        "row_key": {
+          "id": {
+            "$arg": "recordId"
+          }
+        },
+        "set": {
+          "deleted_at": null
+        }
+      },
+      "input_schema": {
+        "recordId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the soft-deleted entry to restore."
+        }
+      },
+      "_evidence": {
+        "locator": "modules/tailor/controllers/Entries.php:487",
+        "id_local": "Entries.onRestore",
+        "entry": {
+          "kind": "http",
+          "route": "POST /backend/tailor/entries/{source}/{recordId}/onRestore",
+          "locator": "modules/tailor/controllers/Entries.php:487"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "$this->checkSourcePermission('publish'); $model->restore();",
+        "edges": [
+          "controllers/Entries.php:488 checkSourcePermission('publish')"
+        ]
+      },
+      "entity": "EntryRecord",
+      "_binds": {
+        "recordId": "EntryRecord.id"
+      },
+      "_output_schema": {
+        "result": "redirect refresh"
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "BackendUser",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "recordId"
+        ],
+        "messages": {
+          "auth": "You must be signed in to restore an entry.",
+          "not_found": "No entry with that id exists.",
+          "precondition": "Only a signed-in administrator with publish permission for this content source can restore an entry."
+        }
+      },
+      "_defaulted": [
+        "argument invented from the write column",
+        "fields"
+      ],
+      "description": "Restore a soft-deleted entry record. Fails if you are not signed in or lack publish permission."
+    },
+    {
+      "tool": "entries_onsubmissionreject",
+      "op": "delete",
+      "family": "crud.soft_delete",
+      "exec_spec": {
+        "entity": "SubmissionRecord",
+        "lookup_by": {
+          "id": {
+            "$arg": "recordId"
+          }
+        },
+        "set": {
+          "deleted_at": "$now"
+        }
+      },
+      "input_schema": {
+        "recordId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the submission to reject (soft-delete)."
+        }
+      },
+      "_evidence": {
+        "locator": "modules/tailor/controllers/Entries.php:524",
+        "id_local": "Entries.onSubmissionReject",
+        "entry": {
+          "kind": "http",
+          "route": "POST /backend/tailor/entries/{source}/{recordId}/onSubmissionReject",
+          "locator": "modules/tailor/controllers/Entries.php:524"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "$this->checkSourcePermission('delete'); $model->delete();",
+        "edges": [
+          "controllers/Entries.php:524"
+        ]
+      },
+      "entity": "SubmissionRecord",
+      "_binds": {
+        "recordId": "SubmissionRecord.id"
+      },
+      "_output_schema": {
+        "result": "redirect"
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "BackendUser",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "recordId"
+        ],
+        "messages": {
+          "auth": "You must be signed in to reject a submission.",
+          "not_found": "No submission with that id exists.",
+          "precondition": "Only a signed-in administrator with delete permission for this content source can reject a submission."
+        }
+      },
+      "description": "Reject (soft-delete) a user submission. Fails if you are not signed in or lack delete permission."
+    },
+    {
+      "tool": "globals_onsave",
+      "op": "update",
+      "family": "crud.upsert",
+      "exec_spec": {
+        "entity": "GlobalRecord",
+        "key": {
+          "blueprint_uuid": {
+            "$arg": "blueprint_uuid"
+          }
+        },
+        "insert_fields": [
+          "content"
+        ],
+        "set_on_exists": {
+          "content": {
+            "$arg": "content"
+          }
+        }
+      },
+      "input_schema": {
+        "blueprint_uuid": {
+          "type": "text",
+          "required": true,
+          "description": "The blueprint UUID this global belongs to."
+        },
+        "content": {
+          "type": "json",
+          "required": true,
+          "description": "The global content to store."
+        }
+      },
+      "_evidence": {
+        "locator": "modules/tailor/controllers/Globals.php:95",
+        "id_local": "Globals.onSave",
+        "entry": {
+          "kind": "http",
+          "route": "POST /backend/tailor/globals/{source}/onSave",
+          "locator": "modules/tailor/controllers/Globals.php:95"
+        },
+        "entity_why": "primary effect row_upsert lands on this table",
+        "ref_code": "FormController update_onSave; storeBlueprintContent persists JSON",
+        "edges": [
+          "controllers/Globals.php findSingularModelObjectWithFallback creates when none"
+        ]
+      },
+      "entity": "GlobalRecord",
+      "_binds": {
+        "blueprint_uuid": "GlobalRecord.blueprint_uuid",
+        "content": "GlobalRecord.content"
+      },
+      "_output_schema": {
+        "result": "redirect"
+      },
+      "guards": {
+        "required": [
+          "blueprint_uuid",
+          "content"
+        ]
+      },
+      "description": "Save a global record's content for a blueprint, creating the row if none exists or updating it otherwise. Fails if required content is missing."
+    },
+    {
+      "tool": "dashboard_create",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Dashboard",
+        "fields": [
+          "name",
+          "code"
+        ],
+        "set_on_create": {
+          "is_custom": true,
+          "owner_type": "Index controller class",
+          "created_user_id": {
+            "$session": "account_id"
+          }
+        },
+        "unique_on": [
+          "code"
+        ]
+      },
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "Name of the dashboard."
+        },
+        "code": {
+          "type": "text",
+          "required": true,
+          "description": "Unique code for the dashboard."
+        }
+      },
+      "_evidence": {
+        "locator": "modules/dashboard/controllers/Dashboards.php:67",
+        "id_local": "Dashboard.create",
+        "entry": {
+          "kind": "http",
+          "route": "POST /backend/dashboard/dashboards",
+          "locator": "modules/dashboard/controllers/Dashboards.php:40"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "$model->is_custom = true; $model->owner_type = Index::class;\ncreated_user_id via UserFootprints; roles via belongsToMany",
+        "edges": [
+          "controllers/Dashboards.php:40 requiredPermissions=['dashboard.manage']; list quirk scoped by created_user_id unless manage_global"
+        ]
+      },
+      "entity": "Dashboard",
+      "_binds": {
+        "name": "Dashboard.name",
+        "code": "Dashboard.code"
+      },
+      "_output_schema": {
+        "dashboard": "created Dashboard"
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "BackendUser",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "name",
+          "code"
+        ],
+        "messages": {
+          "auth": "You must be signed in to create a dashboard.",
+          "unique": "A dashboard with that code already exists.",
+          "precondition": "Only a signed-in administrator with the dashboard.manage permission can create a dashboard."
+        }
+      },
+      "description": "Create a custom dashboard owned by you. Fails if the code is taken or you are not signed in."
+    },
+    {
+      "tool": "dashboard_update",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Dashboard",
+        "row_key": {
+          "id": {
+            "$arg": "id"
+          }
+        },
+        "fields": [
+          "name",
+          "definition"
+        ]
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the dashboard to edit."
+        },
+        "name": {
+          "type": "text",
+          "required": false,
+          "description": "New dashboard name."
+        },
+        "definition": {
+          "type": "json",
+          "required": false,
+          "description": "New dashboard definition JSON."
+        }
+      },
+      "_evidence": {
+        "locator": "modules/dashboard/controllers/Dashboards.php:67",
+        "id_local": "Dashboard.update",
+        "entry": {
+          "kind": "http",
+          "route": "POST /backend/dashboard/dashboards/update/{id}",
+          "locator": "modules/dashboard/controllers/Dashboards.php:40"
+        },
+        "entity_why": "primary effect link lands on this table",
+        "ref_code": "FormController update_onSave;\nif (dashboard.manage_global denied) { $model->is_global=false; $model->roles=[]; }",
+        "edges": [
+          "controllers/Dashboards.php:126 listExtendQuery scoped by created_user_id unless dashboard.manage_global"
+        ]
+      },
+      "entity": "Dashboard",
+      "_binds": {
+        "id": "Dashboard.id",
+        "name": "Dashboard.name",
+        "definition": "Dashboard.definition"
+      },
+      "_output_schema": {
+        "dashboard": "updated Dashboard"
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Dashboard",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "created_user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "BackendUser",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "is_superuser",
+                      "op": "eq",
+                      "value": true
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must be signed in to edit a dashboard.",
+          "precondition": "You can only edit dashboards you created, unless you have global dashboard rights.",
+          "not_found": "No dashboard with that id exists."
+        }
+      },
+      "description": "Edit a dashboard's name and definition. You may edit dashboards you own, or any if you hold global dashboard management rights. Fails if the dashboard does not exist, you do not own it, or you are not signed in."
+    },
+    {
+      "tool": "dashboard_resetdefault",
+      "op": "delete",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Dashboard",
+        "row_key": {
+          "id": {
+            "$arg": "id"
+          }
+        },
+        "set": {
+          "is_custom": false,
+          "definition": null
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the dashboard to reset to default."
+        }
+      },
+      "_evidence": {
+        "locator": "modules/dashboard/controllers/Dashboards.php:86",
+        "id_local": "Dashboard.resetDefault",
+        "entry": {
+          "kind": "http",
+          "route": "POST /backend/dashboard/dashboards/onResetDefault",
+          "locator": "modules/dashboard/controllers/Dashboards.php:86"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "$model->is_custom = false; $model->definition = null; $model->save();",
+        "edges": [
+          "controllers/Dashboards.php:86 (formCheckPermission modelDelete)"
+        ]
+      },
+      "entity": "Dashboard",
+      "_binds": {
+        "id": "Dashboard.id"
+      },
+      "_output_schema": {
+        "result": "list refresh"
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "BackendUser",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must be signed in to reset a dashboard.",
+          "not_found": "No dashboard with that id exists.",
+          "precondition": "Only a signed-in administrator can reset a dashboard to its default."
+        }
+      },
+      "_defaulted": [
+        "argument invented from the write column",
+        "fields"
+      ],
+      "description": "Reset a dashboard to its system default, clearing any custom definition. Fails if the dashboard does not exist or you are not signed in."
+    },
+    {
+      "tool": "trafficstats_purge",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "TrafficStatisticsPageview",
+        "lookup_by": {
+          "id": {
+            "$arg": "ids"
+          }
+        }
+      },
+      "input_schema": {
+        "ids": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the traffic pageview records to remove."
+        }
+      },
+      "_evidence": {
+        "locator": "modules/dashboard/controllers/DashboardSettings.php",
+        "id_local": "DashboardSettings.index_onPurgeData",
+        "entry": {
+          "kind": "http",
+          "route": "POST /backend/dashboard/dashboardsettings/index_onPurgeData",
+          "locator": "modules/dashboard/controllers/DashboardSettings.php:index_onPurgeData"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "TrafficStatisticsPageview::purgeAllRecords(); $this->vars['recordsTotal'] = 0;",
+        "edges": [
+          "controllers/DashboardSettings.php index_onPurgeData"
+        ]
+      },
+      "entity": "TrafficStatisticsPageview",
+      "_binds": {
+        "ids": "TrafficStatisticsPageview.id"
+      },
+      "_output_schema": {
+        "result": "void"
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "BackendUser",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must be signed in to purge traffic data.",
+          "not_found": "No matching traffic pageview records with that id exists.",
+          "precondition": "Only a signed-in administrator can purge traffic statistics data."
+        },
+        "required": [
+          "ids"
+        ]
+      },
+      "description": "Permanently delete traffic-statistics pageview records by their ids. Pass the id(s) of the records to remove."
+    }
+  ],
+  "seed_state": {
+    "UserRole": [
+      {
+        "id": 1,
+        "name": "Administrators",
+        "code": "administrators",
+        "is_system": true
+      },
+      {
+        "id": 2,
+        "name": "Editors",
+        "code": "editors",
+        "is_system": false
+      }
+    ],
+    "UserGroup": [
+      {
+        "id": 1,
+        "name": "Owners",
+        "code": "owners",
+        "is_new_user_default": false
+      },
+      {
+        "id": 2,
+        "name": "Editors",
+        "code": "editors",
+        "is_new_user_default": true
+      }
+    ],
+    "BackendUser": [
+      {
+        "id": 1,
+        "first_name": "Ada",
+        "last_name": "Lovelace",
+        "login": "ops@october.example",
+        "email": "ada@example.com",
+        "password": "pw-operations",
+        "is_activated": true,
+        "is_superuser": true,
+        "role_id": 1
+      },
+      {
+        "id": 2,
+        "first_name": "Grace",
+        "last_name": "Hopper",
+        "login": "editor@october.example",
+        "email": "grace@example.com",
+        "password": "pw-editor",
+        "is_activated": true,
+        "is_superuser": false,
+        "role_id": 2
+      },
+      {
+        "id": 3,
+        "first_name": "Alan",
+        "last_name": "Turing",
+        "login": "other@october.example",
+        "email": "alan@example.com",
+        "password": "pw-other",
+        "is_activated": true,
+        "is_superuser": false,
+        "role_id": 2
+      }
+    ],
+    "MailLayout": [
+      {
+        "id": 1,
+        "name": "Default Layout",
+        "code": "default",
+        "is_locked": true
+      },
+      {
+        "id": 2,
+        "name": "Custom Layout",
+        "code": "custom",
+        "is_locked": false
+      }
+    ],
+    "SiteGroup": [
+      {
+        "id": 1,
+        "name": "Default",
+        "code": "default"
+      }
+    ],
+    "SiteDefinition": [
+      {
+        "id": 1,
+        "name": "Main Site",
+        "code": "main",
+        "is_enabled": true,
+        "is_primary": true,
+        "group_id": 1
+      }
+    ],
+    "EventLog": [
+      {
+        "id": 1,
+        "level": "info",
+        "message": "Site installed",
+        "created_at": "2025-01-01T00:00:00Z"
+      },
+      {
+        "id": 2,
+        "level": "warning",
+        "message": "Mail not sent",
+        "created_at": "2025-01-02T00:00:00Z"
+      }
+    ],
+    "SettingModel": [
+      {
+        "id": 1,
+        "item": "cms.active_theme",
+        "value": "demo"
+      }
+    ],
+    "TrafficStatisticsPageview": [
+      {
+        "id": 1,
+        "ev_year_month_day": "2025-01-01",
+        "page_path": "/",
+        "user_authenticated": false
+      },
+      {
+        "id": 2,
+        "ev_year_month_day": "2025-01-02",
+        "page_path": "/about",
+        "user_authenticated": true
+      }
+    ],
+    "RequestLog": [
+      {
+        "id": 1,
+        "status_code": 200,
+        "url": "/",
+        "count": 3
+      }
+    ],
+    "ThemeLog": [
+      {
+        "id": 1,
+        "type": "create",
+        "theme": "demo",
+        "template": "home.htm"
+      }
+    ],
+    "MailPartial": [
+      {
+        "id": 1,
+        "name": "Footer",
+        "code": "footer",
+        "is_custom": false
+      }
+    ],
+    "ThemeData": [
+      {
+        "id": 1,
+        "theme": "demo",
+        "data": {
+          "color": "blue"
+        }
+      }
+    ],
+    "PluginVersion": [
+      {
+        "id": 1,
+        "code": "RainLab.Blog",
+        "version": "1.0.0",
+        "is_frozen": false,
+        "is_disabled": false
+      }
+    ],
+    "EntryRecord": [
+      {
+        "id": 5,
+        "blueprint_uuid": "bp1",
+        "title": "Our first post",
+        "slug": "first-post",
+        "is_enabled": true,
+        "deleted_at": null
+      }
+    ],
+    "SubmissionRecord": [
+      {
+        "id": 5,
+        "blueprint_uuid": "bp2",
+        "title": "Guest submission",
+        "slug": "guest",
+        "is_enabled": false
+      }
+    ]
+  },
+  "summary": "October CMS: a self-hosted PHP/Laravel content management system — admin backend (users/roles/groups/auth), structured content records (Tailor), mail templates/layouts/partials, key-value settings/parameters, multisite definitions, theme data/logs, dashboard and internal traffic statistics",
+  "_auth_candidates": [
+    {
+      "entity": "BackendUser",
+      "username_col": "login",
+      "password_col": "password"
+    }
+  ],
+  "_fk_gravity": {
+    "entity": "BackendUser",
+    "fk_count": 7
+  },
+  "_read_denied": "forbidden",
+  "_no_edges": [
+    {
+      "id_local": "SettingModel.set",
+      "why": "internal model API, no guards, no pre-checks, called by other code"
+    },
+    {
+      "id_local": "Parameter.set",
+      "why": "internal model API, no guards"
+    },
+    {
+      "id_local": "Parameter.get",
+      "why": "internal model API, no guards"
+    },
+    {
+      "id_local": "EventLog.add",
+      "why": "internal model method, no guards"
+    },
+    {
+      "id_local": "TrafficLogger.logPageview",
+      "why": "job/response-middleware hook, no guards, fires on GET requests"
+    },
+    {
+      "id_local": "MediaLibrary.validatePath",
+      "why": "pure path-validation guard, no edge of its own"
+    },
+    {
+      "id_local": "MediaLibrary.validateExtension",
+      "why": "pure extension guard, no edge"
+    },
+    {
+      "id_local": "BackendAuth.signout",
+      "why": "public endpoint (publicActions), no auth middleware of its own, calls only BackendAuth::logout (no DB op); Controller run() redirects guest instead of blocking (Auth.php signout publicActions)"
+    },
+    {
+      "id_local": "UserPreference.set",
+      "why": "internal model preference setter, no permission wall, called only by other code"
+    },
+    {
+      "id_local": "Parameter.reset",
+      "why": "internal model API, no permission wall"
+    },
+    {
+      "id_local": "RequestLog.add",
+      "why": "internal model method, no permission wall, invoked from request handling"
+    },
+    {
+      "id_local": "PluginVersion.setContextDisabled",
+      "why": "internal model helper, no wall"
+    },
+    {
+      "id_local": "PluginVersion.setContextEnabled",
+      "why": "internal model helper, no wall"
+    },
+    {
+      "id_local": "VersionManager.updatePlugin",
+      "why": "internal/CLI workflow (october:migrate), no route guard, no permission model"
+    },
+    {
+      "id_local": "UpdateManager.update",
+      "why": "internal/CLI workflow (october:migrate), no route guard, no permission model"
+    },
+    {
+      "id_local": "PluginSiteGroup.setDisabledForSite",
+      "why": "internal model helper, no wall"
+    },
+    {
+      "id_local": "SiteDefinition.syncPrimarySite",
+      "why": "seeder/bootstrap called on site list, no wall"
+    },
+    {
+      "id_local": "ThemeLog.add",
+      "why": "model observer bound to template save events, no wall"
+    },
+    {
+      "id_local": "PreviewToken.createToken",
+      "why": "internal model factory, no wall"
+    },
+    {
+      "id_local": "RecordImport.importData",
+      "why": "internal model method called by BulkActions importer, no wall"
+    },
+    {
+      "id_local": "Dashboard.setUserPreference",
+      "why": "internal model helper, no wall"
+    },
+    {
+      "id_local": "Dashboard.syncAll",
+      "why": "internal materialization of system dashboard rows, no wall"
+    },
+    {
+      "id_local": "ReportDataCache.putRange",
+      "why": "internal report cache writer, no wall"
+    },
+    {
+      "id_local": "TrafficStatisticsPageview.purge",
+      "why": "internal retention purge, no wall"
+    },
+    {
+      "id_local": "MediaLibrary.deleteFiles",
+      "why": "low-level disk op; permission wall is enforced at the MediaManager handler (MediaManager.onDeleteItem), not on the library method"
+    },
+    {
+      "id_local": "MediaLibrary.deleteFolder",
+      "why": "low-level disk op; permission wall enforced at handler"
+    },
+    {
+      "id_local": "MediaLibrary.put",
+      "why": "low-level disk write; permission wall enforced at handler; validates path/extension via separate guard ops"
+    },
+    {
+      "id_local": "MediaLibrary.moveFile",
+      "why": "low-level disk op; permission wall enforced at handler"
+    },
+    {
+      "id_local": "MediaLibrary.makeFolder",
+      "why": "low-level disk op; permission wall enforced at handler"
+    },
+    {
+      "id_local": "MediaLibrary.moveFolder",
+      "why": "low-level disk op; permission wall enforced at handler"
+    },
+    {
+      "id_local": "AccessLog.list",
+      "why": "read/search op; no auth wall of its own and no downstream op it triggers"
+    },
+    {
+      "id_local": "UserPreference.get",
+      "why": "read/search op; no auth wall of its own and no downstream op it triggers"
+    },
+    {
+      "id_local": "MediaLibrary.listFolderContents",
+      "why": "read/search op; no auth wall of its own and no downstream op it triggers"
+    },
+    {
+      "id_local": "ContentSchema.findRecord",
+      "why": "read/search op; no auth wall of its own and no downstream op it triggers"
+    }
+  ],
+  "auth": {
+    "account_entity": "BackendUser",
+    "username_col": "login",
+    "password_col": "password"
+  }
+}

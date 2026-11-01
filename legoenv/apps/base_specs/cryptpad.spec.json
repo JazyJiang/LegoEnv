@@ -1,0 +1,3205 @@
+{
+  "env_id": "cryptpad",
+  "_prep_version": 3,
+  "entities": [
+    {
+      "name": "LoginBlock",
+      "columns": [
+        {
+          "name": "blockId",
+          "type": "id",
+          "pk": true,
+          "nullable": false,
+          "immutable": true
+        },
+        {
+          "name": "content",
+          "type": "json",
+          "nullable": false,
+          "immutable": true
+        },
+        {
+          "name": "placeholderReason",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "archived",
+          "type": "bool",
+          "nullable": true,
+          "audit": true
+        },
+        {
+          "name": "email",
+          "type": "text",
+          "nullable": false,
+          "_note": "login credential column added in review; blockId stayed the integer account key so child FKs (MfaSettings/SsoBlock.blockId) can resolve. CryptPad users carry email on identified accounts."
+        }
+      ]
+    },
+    {
+      "name": "Challenge",
+      "columns": [
+        {
+          "name": "txid",
+          "type": "id",
+          "pk": true,
+          "nullable": false,
+          "immutable": true
+        },
+        {
+          "name": "command",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "publicKey",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "LoginBlock.blockId"
+        },
+        {
+          "name": "content",
+          "type": "json",
+          "nullable": true
+        },
+        {
+          "name": "secret",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "code",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "contact",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "session",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "recoveryKey",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "auth",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "registrationProof",
+          "type": "json",
+          "nullable": true
+        },
+        {
+          "name": "edPublic",
+          "type": "id",
+          "nullable": true
+        },
+        {
+          "name": "reason",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "date",
+          "type": "datetime",
+          "nullable": false,
+          "audit": true
+        }
+      ]
+    },
+    {
+      "name": "MfaSettings",
+      "columns": [
+        {
+          "name": "blockId",
+          "type": "id",
+          "pk": true,
+          "nullable": false,
+          "fk_to": "LoginBlock.blockId",
+          "on_delete": "cascade",
+          "_note": "pk=fk to LoginBlock.blockId (now integer account key, resolves cleanly)"
+        },
+        {
+          "name": "method",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "TOTP"
+          ]
+        },
+        {
+          "name": "secret",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "creation",
+          "type": "datetime",
+          "nullable": false
+        },
+        {
+          "name": "contact",
+          "type": "text",
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "name": "Session",
+      "columns": [
+        {
+          "name": "blockId",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "LoginBlock.blockId",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "token",
+          "type": "id",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "mfa",
+          "type": "json",
+          "nullable": true
+        },
+        {
+          "name": "sso",
+          "type": "json",
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "name": "SsoRequest",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true,
+          "nullable": false,
+          "immutable": true
+        },
+        {
+          "name": "type",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "saml"
+          ]
+        },
+        {
+          "name": "content",
+          "type": "json",
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "name": "SsoUser",
+      "columns": [
+        {
+          "name": "provider",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "immutable": true
+        },
+        {
+          "name": "id",
+          "type": "id",
+          "nullable": false
+        },
+        {
+          "name": "data",
+          "type": "json",
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "name": "SsoBlock",
+      "columns": [
+        {
+          "name": "blockId",
+          "type": "id",
+          "pk": true,
+          "nullable": false,
+          "fk_to": "LoginBlock.blockId",
+          "_note": "pk=fk to LoginBlock.blockId (now integer account key, resolves cleanly)"
+        },
+        {
+          "name": "data",
+          "type": "json",
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "name": "KnownUser",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "createdBy",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "KnownUser.id",
+          "on_delete": "no_action"
+        },
+        {
+          "name": "time",
+          "type": "datetime",
+          "nullable": false,
+          "audit": true
+        },
+        {
+          "name": "edPublic",
+          "type": "id",
+          "nullable": true
+        },
+        {
+          "name": "block",
+          "type": "id",
+          "nullable": true,
+          "fk_to": "LoginBlock.blockId",
+          "on_delete": "no_action"
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "alias",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "type",
+          "type": "text",
+          "nullable": true,
+          "enum": [
+            "invite:<id>",
+            "sso",
+            "manual"
+          ]
+        },
+        {
+          "name": "email",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "extra",
+          "type": "json",
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "name": "Invitation",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true,
+          "nullable": false,
+          "immutable": true
+        },
+        {
+          "name": "alias",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "email",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "createdBy",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "KnownUser.id"
+        },
+        {
+          "name": "time",
+          "type": "datetime",
+          "nullable": false,
+          "audit": true
+        },
+        {
+          "name": "block",
+          "type": "id",
+          "nullable": true,
+          "fk_to": "LoginBlock.blockId"
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "edPublic",
+          "type": "id",
+          "nullable": true,
+          "fk_to": "KnownUser.id"
+        },
+        {
+          "name": "type",
+          "type": "text",
+          "nullable": true,
+          "enum": [
+            "invite:<id>"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Moderator",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "createdBy",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "KnownUser.id"
+        },
+        {
+          "name": "time",
+          "type": "datetime",
+          "nullable": false,
+          "audit": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "edPublic",
+          "type": "id",
+          "nullable": true
+        },
+        {
+          "name": "curvePublic",
+          "type": "id",
+          "nullable": true
+        },
+        {
+          "name": "mailbox",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "profile",
+          "type": "text",
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "name": "PinLog",
+      "columns": [
+        {
+          "name": "userId",
+          "type": "id",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "pinnedChannels",
+          "type": "json",
+          "nullable": false
+        },
+        {
+          "name": "block",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "drive",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "time",
+          "type": "datetime",
+          "nullable": true,
+          "audit": true
+        },
+        {
+          "name": "surplus",
+          "type": "int",
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "name": "Blob",
+      "columns": [
+        {
+          "name": "blobId",
+          "type": "id",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "bytes",
+          "type": "json",
+          "nullable": false,
+          "immutable": true
+        },
+        {
+          "name": "placeholderReason",
+          "type": "text",
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "name": "BlobMetadata",
+      "columns": [
+        {
+          "name": "blobId",
+          "type": "id",
+          "pk": true,
+          "nullable": false,
+          "fk_to": "Blob.blobId"
+        },
+        {
+          "name": "owners",
+          "type": "json",
+          "nullable": true
+        },
+        {
+          "name": "allowed",
+          "type": "json",
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "name": "BlobStage",
+      "columns": [
+        {
+          "name": "safeKey",
+          "type": "id",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "bytes",
+          "type": "json",
+          "nullable": true
+        },
+        {
+          "name": "cookie",
+          "type": "text",
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "name": "Activity",
+      "columns": [
+        {
+          "name": "blobId",
+          "type": "id",
+          "pk": true,
+          "nullable": false,
+          "fk_to": "Blob.blobId"
+        },
+        {
+          "name": "lastAccess",
+          "type": "datetime",
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "name": "Channel",
+      "columns": [
+        {
+          "name": "channelId",
+          "type": "id",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "messages",
+          "type": "json",
+          "nullable": false,
+          "immutable": false,
+          "serialized_append": true
+        },
+        {
+          "name": "time",
+          "type": "datetime",
+          "nullable": true,
+          "audit": true
+        }
+      ]
+    },
+    {
+      "name": "ChannelMetadata",
+      "columns": [
+        {
+          "name": "channelId",
+          "type": "id",
+          "pk": true,
+          "nullable": false,
+          "fk_to": "Channel.channelId",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "validateKey",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "owners",
+          "type": "json",
+          "nullable": true
+        },
+        {
+          "name": "pending_owners",
+          "type": "json",
+          "nullable": true
+        },
+        {
+          "name": "restricted",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "allowed",
+          "type": "json",
+          "nullable": true
+        },
+        {
+          "name": "expire",
+          "type": "int",
+          "nullable": true
+        },
+        {
+          "name": "mailbox",
+          "type": "json",
+          "nullable": true
+        },
+        {
+          "name": "deleteLines",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "command",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "value",
+          "type": "json",
+          "nullable": true
+        },
+        {
+          "name": "time",
+          "type": "datetime",
+          "nullable": true,
+          "audit": true
+        }
+      ]
+    },
+    {
+      "name": "Task",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true,
+          "nullable": false,
+          "immutable": true
+        },
+        {
+          "name": "time",
+          "type": "datetime",
+          "nullable": false
+        },
+        {
+          "name": "command",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "EXPIRE"
+          ]
+        },
+        {
+          "name": "args",
+          "type": "json",
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "name": "Decree",
+      "columns": [
+        {
+          "name": "line",
+          "type": "id",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "command",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "args",
+          "type": "json",
+          "nullable": true
+        },
+        {
+          "name": "adminKey",
+          "type": "id",
+          "nullable": false
+        },
+        {
+          "name": "time",
+          "type": "datetime",
+          "nullable": false,
+          "audit": true
+        }
+      ]
+    }
+  ],
+  "tools": [
+    {
+      "tool": "pinlog_pin",
+      "op": "set",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "PinLog",
+        "row_key": {
+          "userId": {
+            "$session": "account_id"
+          }
+        },
+        "fields": [
+          "pinnedChannels"
+        ],
+        "set": {
+          "pinnedChannels": {
+            "$arg": "channels"
+          }
+        }
+      },
+      "input_schema": {
+        "channels": {
+          "type": "json",
+          "required": true,
+          "description": "List of channel ids to pin to this account."
+        }
+      },
+      "_evidence": {
+        "locator": "lib/commands/pin-rpc.js:158",
+        "id_local": "PinLog.pin",
+        "entry": {
+          "kind": "rpc",
+          "route": "RPC PIN",
+          "locator": "lib/rpc.js:52"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "getChannelList(Env, safeKey, function (pinned) {\n  var toStore = channels.filter(c => c && pinned.indexOf(c) === -1);\n  if (!toStore.length) return cb();\n  Env.pinStore.message(safeKey, JSON.stringify(['PIN', toStore, +new Date()]), function (e) {\n    if (e) return cb(e);\n    toStore.forEach(c => { session.channels[c] = true; });\n    cb();\n  });\n});",
+        "edges": [
+          "lib/commands/pin-rpc.js:193-205"
+        ]
+      },
+      "entity": "PinLog",
+      "_output_schema": {
+        "ok": "boolean"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "channels"
+        ],
+        "messages": {
+          "auth": "You must sign in before pinning channels.",
+          "precondition": "Your pin log does not exist yet; create it first.",
+          "required": "channels is required."
+        }
+      },
+      "_defaulted": [
+        "family corrected to update.field_set (real code appends to the user's existing pin-log row); see self-report"
+      ],
+      "description": "Pin channels to your account so they are kept and returned in your pinned list. Adds only the channels that are not already pinned; succeeds if your PinLog row already exists."
+    },
+    {
+      "tool": "pinlog_unpin",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "PinLog",
+        "row_key": {
+          "userId": {
+            "$session": "account_id"
+          }
+        },
+        "fields": [
+          "pinnedChannels"
+        ],
+        "set": {
+          "pinnedChannels": {
+            "$arg": "channels"
+          }
+        }
+      },
+      "input_schema": {
+        "channels": {
+          "type": "json",
+          "required": true,
+          "description": "List of channel ids to unpin from this account."
+        }
+      },
+      "_evidence": {
+        "locator": "lib/commands/pin-rpc.js:210",
+        "id_local": "PinLog.unpin",
+        "entry": {
+          "kind": "rpc",
+          "route": "RPC UNPIN",
+          "locator": "lib/rpc.js:53"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "getChannelList(Env, safeKey, function (pinned) {\n  var toStore = channels.filter(c => c && pinned.indexOf(c) !== -1);\n  if (!toStore.length) return cb();\n  Env.pinStore.message(safeKey, JSON.stringify(['UNPIN', toStore, +new Date()]), function (e) {\n    if (e) return cb(e);\n    toStore.forEach(c => { delete session.channels[c]; });\n    cb();\n  });\n});",
+        "edges": [
+          "lib/commands/pin-rpc.js:210-225"
+        ]
+      },
+      "entity": "PinLog",
+      "_output_schema": {
+        "ok": "boolean",
+        "updated": "the updated row"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "channels"
+        ],
+        "messages": {
+          "auth": "You must sign in before unpinning channels.",
+          "precondition": "Your pin log does not exist yet.",
+          "required": "channels is required."
+        }
+      },
+      "_defaulted": [
+        "argument invented from the write column",
+        "fields",
+        "drop (self-referential wall): real code only unpins currently-pinned channels"
+      ],
+      "description": "Unpin channels from your account, removing them from your pinned list. Succeeds if your PinLog row already exists."
+    },
+    {
+      "tool": "pinlog_reset",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "PinLog",
+        "row_key": {
+          "userId": {
+            "$session": "account_id"
+          }
+        },
+        "fields": [
+          "pinnedChannels"
+        ],
+        "set": {
+          "pinnedChannels": {
+            "$arg": "channelList"
+          }
+        }
+      },
+      "input_schema": {
+        "channelList": {
+          "type": "json",
+          "required": true,
+          "description": "The complete new list of channels to pin."
+        }
+      },
+      "_evidence": {
+        "locator": "lib/commands/pin-rpc.js:239",
+        "id_local": "PinLog.reset",
+        "entry": {
+          "kind": "rpc",
+          "route": "RPC RESET",
+          "locator": "lib/rpc.js:51"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "if (!Array.isArray(channelList)) return cb('INVALID_PIN_LIST');\nEnv.pinStore.message(safeKey, JSON.stringify(['RESET', channelList, +new Date()]), function (e) {\n  if (e) return cb(e);\n  var pins = {}; channelList.forEach(c => { pins[c] = true; });\n  if (session) session.channels = pins;\n  cb();\n});",
+        "edges": [
+          "lib/commands/pin-rpc.js:282-289"
+        ]
+      },
+      "entity": "PinLog",
+      "_output_schema": {
+        "ok": "boolean",
+        "updated": "the updated row"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "channelList"
+        ],
+        "messages": {
+          "auth": "You must sign in before resetting your pinned channels.",
+          "precondition": "Your pin log does not exist yet.",
+          "required": "channelList is required."
+        }
+      },
+      "_defaulted": [
+        "argument invented from the write column",
+        "fields",
+        "drop (self-referential wall): real code only resets an existing list"
+      ],
+      "description": "Replace your entire pinned-channel list with the given list. Succeeds if your PinLog row already exists."
+    },
+    {
+      "tool": "pinlog_removeall",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "PinLog",
+        "lookup_by": {
+          "userId": {
+            "$session": "account_id"
+          }
+        }
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "lib/commands/pin-rpc.js:119",
+        "id_local": "PinLog.removeAll",
+        "entry": {
+          "kind": "rpc",
+          "route": "RPC REMOVE_PINS",
+          "locator": "lib/rpc.js:72"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "Env.pinStore.archiveChannel(safeKey, undefined, function (err) {\n  Core.expireSession(Env.Sessions, safeKey);\n  Env.Log.info('ARCHIVAL_PIN_BY_OWNER_RPC', { safeKey, status: err? String(err) : 'SUCCESS' });\n  if (err) return cb(err);\n  cb(void 0, 'OK');\n});"
+      },
+      "entity": "PinLog",
+      "_output_schema": {
+        "ok": "boolean"
+      },
+      "description": "Destroy your entire pin log: unpin every channel you own and expire the linking session. The empty-delete case is a stated no-op in the real code, not a defect.",
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in before removing all your pins.",
+          "not_found": "You have no pin log to remove."
+        }
+      }
+    },
+    {
+      "tool": "pinlog_getchannels",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "PinLog",
+        "lookup_by": {
+          "userId": {
+            "$session": "account_id"
+          }
+        },
+        "scope": {
+          "owner_col": "userId"
+        }
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "lib/commands/pin-rpc.js:70",
+        "id_local": "PinLog.getChannels",
+        "entry": {
+          "kind": "rpc",
+          "route": "INLINE,(internal via loadUserPins)",
+          "locator": "lib/commands/pin-rpc.js:70"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "loadUserPins: session.channels or Env.getPinState(safeKey)"
+      },
+      "entity": "PinLog",
+      "_output_schema": {
+        "channels": "list of pinned channel ids"
+      },
+      "_defaulted": [
+        "drop (internal loadUserPins helper); see self-report"
+      ],
+      "description": "List the channel ids currently pinned to your account.",
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in to see your pinned channels."
+        }
+      }
+    },
+    {
+      "tool": "pinlog_gettotalsize",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "PinLog",
+        "lookup_by": {
+          "userId": {
+            "$session": "account_id"
+          }
+        },
+        "scope": {
+          "owner_col": "userId"
+        }
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "lib/commands/pin-rpc.js:77",
+        "id_local": "PinLog.getTotalSize",
+        "entry": {
+          "kind": "rpc",
+          "route": "RPC GET_TOTAL_SIZE",
+          "locator": "lib/rpc.js:68"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "getChannelList -> Env.getTotalSize(channels)"
+      },
+      "entity": "PinLog",
+      "_output_schema": {
+        "size": "int bytes"
+      },
+      "_defaulted": [
+        "drop (internal getTotalSize render-loop helper); see self-report"
+      ],
+      "description": "Return the total size in bytes of the channels you have pinned, used to budget your quota.",
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in to query your pinned size."
+        }
+      }
+    },
+    {
+      "tool": "pinlog_gethash",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "PinLog",
+        "lookup_by": {
+          "userId": {
+            "$session": "account_id"
+          }
+        },
+        "scope": {
+          "owner_col": "userId"
+        }
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "lib/commands/pin-rpc.js:152",
+        "id_local": "PinLog.getHash",
+        "entry": {
+          "kind": "rpc",
+          "route": "RPC GET_HASH",
+          "locator": "lib/rpc.js:67"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "getChannelList -> Env.hashChannelList(channels)"
+      },
+      "entity": "PinLog",
+      "_output_schema": {
+        "hash": "string"
+      },
+      "_defaulted": [
+        "drop (internal getHash render-loop helper); see self-report"
+      ],
+      "description": "Return a hash of your pinned-channel list, used by clients to detect whether the pins changed. Returns \"0\" when nothing is pinned.",
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in to hash your pinned channels."
+        }
+      }
+    },
+    {
+      "tool": "pinlog_getlimit",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Decree",
+        "lookup_by": {
+          "command": "SET_QUOTA"
+        }
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "lib/commands/pin-rpc.js:26",
+        "id_local": "PinLog.getLimit",
+        "entry": {
+          "kind": "rpc",
+          "route": "RPC GET_LIMIT",
+          "locator": "lib/rpc.js:70"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "Env.limits[unsafeKey] or defaultLimit -> [limit, plan, note]"
+      },
+      "entity": "Decree",
+      "_output_schema": {
+        "limit": "int",
+        "plan": "text",
+        "note": "text"
+      },
+      "_defaulted": [
+        "drop (internal getLimit render-loop helper); see self-report"
+      ],
+      "description": "Read this account's storage limit and plan from the quota decree. This mirrors the account row's quota state; it has no preconditions and is effectively global.",
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in to read your storage limit."
+        }
+      }
+    },
+    {
+      "tool": "quota_ispremium",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Decree",
+        "lookup_by": {
+          "command": "SET_QUOTA"
+        }
+      },
+      "input_schema": {
+        "userKey": {
+          "type": "int",
+          "required": true,
+          "description": "The account key (safeKey) to check."
+        }
+      },
+      "_evidence": {
+        "locator": "lib/commands/pin-rpc.js:313",
+        "id_local": "Quota.isPremium",
+        "entry": {
+          "kind": "rpc",
+          "route": "RPC IS_PREMIUM",
+          "locator": "lib/rpc.js:27"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "return !!Env.limits[userKey]?.plan"
+      },
+      "entity": "Decree",
+      "_output_schema": {
+        "premium": "boolean"
+      },
+      "guards": {
+        "required": [
+          "userKey"
+        ],
+        "messages": {
+          "required": "userKey is required."
+        }
+      },
+      "_defaulted": [
+        "drop (internal isPremium render-loop helper); see self-report"
+      ],
+      "description": "Report whether this account is on a premium plan, based on the quota decree."
+    },
+    {
+      "tool": "channelmetadata_set",
+      "op": "update",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "ChannelMetadata",
+        "fields": [
+          "command",
+          "value"
+        ],
+        "set_on_create": {
+          "channelId": {
+            "$arg": "channel"
+          }
+        }
+      },
+      "input_schema": {
+        "channel": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the channel whose metadata to set."
+        },
+        "command": {
+          "type": "text",
+          "required": true,
+          "description": "The metadata command to handle (e.g. owners, mailbox, allowed)."
+        },
+        "value": {
+          "type": "json",
+          "required": true,
+          "description": "The new value for that metadata field."
+        }
+      },
+      "_evidence": {
+        "locator": "lib/commands/metadata.js:78",
+        "id_local": "ChannelMetadata.set",
+        "entry": {
+          "kind": "rpc",
+          "route": "RPC SET_METADATA",
+          "locator": "lib/rpc.js:62"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "if(!Core.hasOwners(metadata)) E_NO_OWNERS; if(!Core.isOwner(metadata, unsafeKey) && !(pendingAccept)) INSUFFICIENT_PERMISSIONS; line=[command,data.value,+new Date()]; Meta.handleCommand(metadata,line); if(changed) Env.msgStore.writeMetadata(channel, JSON.stringify(line), ...)",
+        "edges": [
+          "lib/commands/metadata.js:94-127 (Core.isOwner)"
+        ]
+      },
+      "entity": "ChannelMetadata",
+      "_binds": {
+        "channel": "ChannelMetadata.channelId",
+        "command": "ChannelMetadata.command",
+        "value": "ChannelMetadata.value"
+      },
+      "_output_schema": {
+        "ok": "boolean",
+        "updated": "the updated row"
+      },
+      "guards": {
+        "required": [
+          "channel",
+          "command",
+          "value"
+        ],
+        "messages": {
+          "not_found": "That channel has no metadata record.",
+          "precondition": "This channel has no owners yet, or you are not one of its owners."
+        },
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "ChannelMetadata",
+                "where": {
+                  "node": "field",
+                  "col": "channelId",
+                  "op": "eq",
+                  "value": {
+                    "arg": "channel"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ]
+      },
+      "description": "Write / update the metadata record of a channel (owners, allowed list, mailbox, restricted flag). Fails if the channel has no owner yet or you are not an owner of it. Appends a metadata command line that the server handles."
+    },
+    {
+      "tool": "channelmetadata_get",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "ChannelMetadata",
+        "lookup_by": {
+          "channelId": {
+            "$arg": "channel"
+          }
+        }
+      },
+      "input_schema": {
+        "channel": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the channel whose metadata to read."
+        }
+      },
+      "_evidence": {
+        "locator": "lib/commands/metadata.js:47",
+        "id_local": "ChannelMetadata.get",
+        "entry": {
+          "kind": "rpc",
+          "route": "RPC GET_METADATA",
+          "locator": "lib/rpc.js:33"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "getMetadataRaw -> if restricted: allowed=HK.listAllowedUsers(metadata); if !HK.isUserSessionAllowed(allowed, session) return {restricted,allowed,rejected:true}"
+      },
+      "entity": "ChannelMetadata",
+      "_binds": {
+        "channel": "ChannelMetadata.channelId"
+      },
+      "_output_schema": {
+        "metadata": "ChannelMetadata row or {rejected:true}"
+      },
+      "guards": {
+        "required": [
+          "channel"
+        ],
+        "messages": {
+          "not_found": "That channel has no metadata record."
+        }
+      },
+      "description": "Read the metadata record of a channel (restricted flag, allowed list, owners, mailbox). Restricted channels return only the allowed list and want a valid session."
+    },
+    {
+      "tool": "channel_writemessage",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Channel",
+        "fields": {
+          "messages": {
+            "$arg": "msg"
+          }
+        },
+        "set_on_create": {
+          "channelId": {
+            "$arg": "channel"
+          },
+          "messages": {
+            "$arg": "msg"
+          }
+        }
+      },
+      "input_schema": {
+        "channel": {
+          "type": "int",
+          "required": true,
+          "description": "Id (32 or 33 char) of the channel/pad to write into."
+        },
+        "msg": {
+          "type": "json",
+          "required": true,
+          "description": "The encrypted message body to append to the channel."
+        }
+      },
+      "_evidence": {
+        "locator": "lib/commands/channel.js:293",
+        "id_local": "Channel.writeMessage",
+        "entry": {
+          "kind": "rpc",
+          "route": "RPC WRITE_PRIVATE_MESSAGE",
+          "locator": "lib/rpc.js:29"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "var channelId = args[0]; var msg = args[1];\nif (!msg) return cb('INVALID_MESSAGE');\nif (!Core.isValidId(channelId) || (channelId.length !== 32 && channelId.length !== 33)) return cb('INVALID_CHAN');\nMetadata.getMetadataRaw(Env, channelId, function (err, metadata) {\n  if (err) return cb('METADATA_ERR');\n  if (channelId.length === 33) metadata.restricted = true;\n  if (metadata && metadata.restricted && !HK.isUserSessionAllowed(HK.listAllowedUsers(metadata), session))\n    return cb('INSUFFICIENT_PERMISSIONS');\n});\nEnv.historyKeeper.channelMessage(Server, {id: channelId}, [0, null, 'MSG', channelI",
+        "edges": [
+          "lib/commands/channel.js:314-339"
+        ]
+      },
+      "entity": "Channel",
+      "_binds": {
+        "channel": "Channel.channelId",
+        "msg": "Channel.messages"
+      },
+      "_output_schema": {
+        "id": "id of created row",
+        "ok": "boolean"
+      },
+      "guards": {
+        "required": [
+          "channel",
+          "msg"
+        ],
+        "messages": {
+          "not_found": "That channel does not exist or has no metadata record.",
+          "precondition": "This channel is restricted and you are not on its allowed list.",
+          "required": "channel and msg are both required."
+        },
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "ChannelMetadata",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "channelId",
+                      "op": "eq",
+                      "value": {
+                        "arg": "channel"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "restricted",
+                      "op": "eq",
+                      "value": true
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ]
+      },
+      "_defaulted": [
+        "fields",
+        "fields (mapped to the real parameter names via binds)"
+      ],
+      "description": "Write an encrypted message into a channel (pad). Succeeds only if the channel is not restricted, or you are on the channel's allowed list. Appends to the immutable message log; the returned id is the channel it wrote to."
+    },
+    {
+      "tool": "channel_isnew",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Channel",
+        "lookup_by": {
+          "channelId": {
+            "$arg": "channel"
+          }
+        }
+      },
+      "input_schema": {
+        "channel": {
+          "type": "int",
+          "required": true,
+          "description": "Id (32 char) of the channel to check."
+        }
+      },
+      "_evidence": {
+        "locator": "lib/commands/channel.js:260",
+        "id_local": "Channel.isNew",
+        "entry": {
+          "kind": "rpc",
+          "route": "RPC IS_NEW_CHANNEL",
+          "locator": "lib/rpc.js:23"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "readMessagesBin(channel,0) -> if a line starts with '[' set isNew:false"
+      },
+      "entity": "Channel",
+      "_binds": {
+        "channel": "Channel.channelId"
+      },
+      "_output_schema": {
+        "isNew": "boolean",
+        "reason": "text"
+      },
+      "guards": {
+        "required": [
+          "channel"
+        ],
+        "messages": {
+          "not_found": "That channel does not exist."
+        }
+      },
+      "description": "Check whether a channel (pad) has any messages written to it yet, so a client can decide whether to initialise it with an owner block. Returns isNew=true when the pad is empty."
+    },
+    {
+      "tool": "channel_deleteline",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "Channel",
+        "lookup_by": {
+          "channelId": {
+            "$arg": "channel"
+          }
+        }
+      },
+      "input_schema": {
+        "channel": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the channel whose message log to edit."
+        },
+        "hash": {
+          "type": "text",
+          "required": true,
+          "description": "Hash of the message line to remove."
+        },
+        "proof": {
+          "type": "text",
+          "required": true,
+          "description": "Encrypted proof that you are allowed to delete this line."
+        }
+      },
+      "_evidence": {
+        "locator": "lib/commands/channel.js:222",
+        "id_local": "Channel.deleteLine",
+        "entry": {
+          "kind": "rpc",
+          "route": "RPC DELETE_MAILBOX_MESSAGE",
+          "locator": "lib/rpc.js:31"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "deleteChannelLine(channelId, hash, checkRights) where checkRights decrypts proof -> equals hash; store filterMessages requires meta.deleteLines",
+        "edges": [
+          "lib/storage/file.js:1187; lib/commands/channel.js:233"
+        ]
+      },
+      "entity": "Channel",
+      "_binds": {
+        "channel": "Channel.channelId"
+      },
+      "_output_schema": {
+        "ok": "boolean"
+      },
+      "guards": {
+        "required": [
+          "channel",
+          "hash",
+          "proof"
+        ],
+        "messages": {
+          "not_found": "That channel does not exist.",
+          "precondition": "This channel's metadata does not allow deleting lines (deleteLines not set)."
+        },
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "ChannelMetadata",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "channelId",
+                      "op": "eq",
+                      "value": {
+                        "arg": "channel"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "deleteLines",
+                      "op": "eq",
+                      "value": true
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ]
+      },
+      "description": "Delete a single line from a channel's message log (mailbox messages). Fails unless the channel's metadata has deleteLines enabled and the hash proof matches the line to delete."
+    },
+    {
+      "tool": "channel_trimhistory",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Channel",
+        "row_key": {
+          "channelId": {
+            "$arg": "channel"
+          }
+        },
+        "fields": [],
+        "set": {
+          "messages": null
+        }
+      },
+      "input_schema": {
+        "channel": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the owned channel to trim."
+        },
+        "hash": {
+          "type": "text",
+          "required": true,
+          "description": "64-char hash that the trimmed history should end at."
+        }
+      },
+      "_evidence": {
+        "locator": "lib/commands/channel.js:178",
+        "id_local": "Channel.trimHistory",
+        "entry": {
+          "kind": "rpc",
+          "route": "RPC TRIM_HISTORY",
+          "locator": "lib/rpc.js:56"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "if (!(data.channel && data.hash && data.hash.length === 64)) return cb('INVALID_ARGS');\nvar unsafeKey = Util.unescapeKeyCharacters(safeKey);\nMetadata.getMetadataRaw(Env, channelId, function (err, metadata) {\n  if (err) return cb(err);\n  if (!Core.hasOwners(metadata)) return cb('E_NO_OWNERS');\n  if (!Core.isOwner(metadata, unsafeKey)) return cb('INSUFFICIENT_PERMISSIONS');\n});\nEnv.msgStore.trimChannel(channelId, hash, function (err) {\n  if (err) return cb(err);\n  cb(void 0, 'OK');\n})",
+        "edges": [
+          "lib/commands/metadata.js:94-127 (Core.isOwner)"
+        ]
+      },
+      "entity": "Channel",
+      "_binds": {
+        "channel": "Channel.channelId"
+      },
+      "_output_schema": {
+        "ok": "boolean",
+        "updated": "the updated row"
+      },
+      "guards": {
+        "required": [
+          "channel",
+          "hash"
+        ],
+        "messages": {
+          "not_found": "That channel has no metadata record.",
+          "precondition": "Only an owner of this channel can trim its history."
+        },
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "ChannelMetadata",
+                "where": {
+                  "node": "field",
+                  "col": "channelId",
+                  "op": "eq",
+                  "value": {
+                    "arg": "channel"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ]
+      },
+      "description": "Trim a channel's history back to a given hash (truncation). Requires the channel metadata to exist and you to be one of its owners. This shrinks the stored message log of the pad."
+    },
+    {
+      "tool": "channel_clear",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "Channel",
+        "lookup_by": {
+          "channelId": {
+            "$arg": "channel"
+          }
+        }
+      },
+      "input_schema": {
+        "channel": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the owned channel to clear."
+        }
+      },
+      "_evidence": {
+        "locator": "lib/commands/channel.js:66",
+        "id_local": "Channel.clear",
+        "entry": {
+          "kind": "rpc",
+          "route": "RPC CLEAR_OWNED_CHANNEL",
+          "locator": "lib/rpc.js:54"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "if(!Core.hasOwners(metadata)) E_NO_OWNERS; if(!Core.isOwner(metadata,unsafeKey)) INSUFFICIENT_PERMISSIONS; Env.msgStore.clearChannel(channelId)",
+        "edges": [
+          "lib/commands/metadata.js:94-127 (Core.isOwner)",
+          "lib/commands/channel.js:75"
+        ]
+      },
+      "entity": "Channel",
+      "_binds": {
+        "channel": "Channel.channelId"
+      },
+      "_output_schema": {
+        "ok": "boolean"
+      },
+      "guards": {
+        "required": [
+          "channel"
+        ],
+        "messages": {
+          "not_found": "That channel has no metadata record.",
+          "precondition": "Only an owner of this channel can clear it."
+        },
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "ChannelMetadata",
+                "where": {
+                  "node": "field",
+                  "col": "channelId",
+                  "op": "eq",
+                  "value": {
+                    "arg": "channel"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ]
+      },
+      "description": "Clear the full message history of a channel whose metadata you own. Requires the metadata to exist and you to be one of its owners. This is a destructive operation on the pad."
+    },
+    {
+      "tool": "channel_remove",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "Channel",
+        "lookup_by": {
+          "channelId": {
+            "$arg": "channel"
+          }
+        }
+      },
+      "input_schema": {
+        "channel": {
+          "type": "int",
+          "required": true,
+          "description": "Id (32 for a pad, 48 for a blob) of the owned document to remove."
+        }
+      },
+      "_evidence": {
+        "locator": "lib/commands/channel.js:157",
+        "id_local": "Channel.remove",
+        "entry": {
+          "kind": "rpc",
+          "route": "RPC REMOVE_OWNED_CHANNEL",
+          "locator": "lib/rpc.js:55"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "var channelId = obj.channel; var reason = obj.reason;\nif (typeof(channelId) !== 'string' || !Core.isValidId(channelId)) return _cb('INVALID_ARGUMENTS');\nEnv.queueDeletes(safeKey, function (next) {\n  var cb = Util.both(_cb, next);\n  if (Env.blobStore.isFileId(channelId)) return Env.removeOwnedBlob(channelId, safeKey, reason, cb);\n  archiveOwnedChannel(Env, safeKey, channelId, reason, cb, Server); // owner check then Env.msgStore.archiveChannel\n});",
+        "edges": [
+          "lib/commands/metadata.js:94-127 (Core.isOwner)",
+          "lib/commands/channel.js:163"
+        ]
+      },
+      "entity": "Channel",
+      "_binds": {
+        "channel": "Channel.channelId"
+      },
+      "_output_schema": {
+        "ok": "boolean"
+      },
+      "guards": {
+        "required": [
+          "channel"
+        ],
+        "messages": {
+          "not_found": "That channel or blob does not exist.",
+          "precondition": "Only an owner of this document can remove it."
+        },
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "ChannelMetadata",
+                "where": {
+                  "node": "field",
+                  "col": "channelId",
+                  "op": "eq",
+                  "value": {
+                    "arg": "channel"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Channel",
+                "where": {
+                  "node": "field",
+                  "col": "channelId",
+                  "op": "eq",
+                  "value": {
+                    "arg": "channel"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ]
+      },
+      "description": "Permanently remove a channel (pad) or owned blob that you own — archives the owned document. Requires the metadata to exist and you to be one of its owners."
+    },
+    {
+      "tool": "upload_status",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "BlobStage",
+        "fields": [],
+        "lookup_by": {
+          "safeKey": {
+            "$session": "account_id"
+          }
+        },
+        "scope": {
+          "owner_col": "safeKey"
+        }
+      },
+      "input_schema": {
+        "size": {
+          "type": "int",
+          "required": true,
+          "description": "Size in bytes of the file you are about to upload."
+        }
+      },
+      "_evidence": {
+        "locator": "lib/commands/upload.js:11",
+        "id_local": "Upload.status",
+        "entry": {
+          "kind": "rpc",
+          "route": "RPC UPLOAD_STATUS",
+          "locator": "lib/rpc.js:60"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "if filesize<=maxUploadSize ok; else check premium plan (Pinning.getLimit); blobStore.status (no concurrent); Pinning.getFreeSpace -> NOT_ENOUGH_SPACE; user.pendingUploadSize=filesize; user.currentUploadSize=0",
+        "edges": [
+          "lib/commands/upload.js:43-48"
+        ]
+      },
+      "entity": "BlobStage",
+      "_output_schema": {
+        "ok": "boolean"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "size"
+        ],
+        "messages": {
+          "auth": "You must sign in before uploading.",
+          "precondition": "You already have an upload in progress; cancel or complete it first.",
+          "required": "size is required."
+        }
+      },
+      "description": "Begin a new upload: validate the file size against your quota and free space, and record it as your pending upload. Succeeds only if you have no concurrent upload in flight.",
+      "_defaulted": [
+        "drop (self-referential wall: real code checks no concurrent upload via in-memory sizes)"
+      ]
+    },
+    {
+      "tool": "upload_upload",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "BlobStage",
+        "fields": {
+          "bytes": {
+            "$arg": "chunk"
+          }
+        },
+        "set_on_create": {
+          "safeKey": {
+            "$session": "account_id"
+          },
+          "bytes": {
+            "$arg": "chunk"
+          }
+        }
+      },
+      "input_schema": {
+        "chunk": {
+          "type": "json",
+          "required": true,
+          "description": "The encrypted chunk of the file to append."
+        }
+      },
+      "_evidence": {
+        "locator": "lib/commands/upload.js:78",
+        "id_local": "Upload.upload",
+        "entry": {
+          "kind": "rpc",
+          "route": "RPC UPLOAD",
+          "locator": "lib/rpc.js:60"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "Env.blobStore.uploadWs(safeKey, data?.chunk, cb)",
+        "edges": [
+          "lib/commands/upload.js:78"
+        ]
+      },
+      "entity": "BlobStage",
+      "_binds": {
+        "chunk": "BlobStage.bytes"
+      },
+      "_output_schema": {
+        "id": "id of created row",
+        "ok": "boolean"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "chunk"
+        ],
+        "messages": {
+          "auth": "You must sign in before uploading.",
+          "precondition": "You have no upload in progress; begin one first.",
+          "required": "chunk is required."
+        }
+      },
+      "_defaulted": [
+        "fields",
+        "fields (mapped to the real parameter names via binds)"
+      ],
+      "description": "Send one chunk of a file being uploaded to this account. Each call appends a chunk to the staged blob. Requires you to have begun an upload first."
+    },
+    {
+      "tool": "upload_cancel",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "BlobStage",
+        "lookup_by": {
+          "safeKey": {
+            "$session": "account_id"
+          }
+        }
+      },
+      "input_schema": {
+        "size": {
+          "type": "int",
+          "required": true,
+          "description": "Size in bytes of the upload being cancelled."
+        }
+      },
+      "_evidence": {
+        "locator": "lib/commands/upload.js:82",
+        "id_local": "Upload.cancel",
+        "entry": {
+          "kind": "rpc",
+          "route": "RPC UPLOAD_CANCEL",
+          "locator": "lib/rpc.js:60"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "Env.blobStore.cancel(safeKey, arg?.size, cb)",
+        "edges": [
+          "lib/commands/upload.js:82-84"
+        ]
+      },
+      "entity": "BlobStage",
+      "_output_schema": {
+        "ok": "boolean"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "size"
+        ],
+        "messages": {
+          "auth": "You must sign in before cancelling an upload.",
+          "precondition": "You have no upload in progress to cancel.",
+          "required": "size is required."
+        }
+      },
+      "description": "Cancel the upload in progress for your account, discarding the staged chunks.",
+      "_defaulted": [
+        "drop (self-referential wall)"
+      ]
+    },
+    {
+      "tool": "upload_complete",
+      "op": "update",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Blob",
+        "fields": [
+          "bytes"
+        ],
+        "set_on_create": {
+          "blobId": {
+            "$arg": "arg"
+          }
+        }
+      },
+      "input_schema": {
+        "arg": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the uploaded blob (the target blobId)."
+        }
+      },
+      "_evidence": {
+        "locator": "lib/commands/upload.js:86",
+        "id_local": "Upload.complete",
+        "entry": {
+          "kind": "rpc",
+          "route": "RPC UPLOAD_COMPLETE",
+          "locator": "lib/rpc.js:59"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "closeBlobstage; size=user.pendingUploadSize; Env.completeUpload(safeKey, arg, false, size, cb)"
+      },
+      "entity": "Blob",
+      "_binds": {
+        "arg": "Blob.blobId"
+      },
+      "_output_schema": {
+        "ok": "boolean",
+        "updated": "the updated row"
+      },
+      "guards": {
+        "required": [
+          "arg"
+        ],
+        "messages": {
+          "not_found": "No upload is in progress to complete.",
+          "required": "arg is required."
+        }
+      },
+      "_defaulted": [
+        "argument invented from the write column",
+        "fields"
+      ],
+      "description": "Finalise a successful upload: the staged chunks become a stored Blob. The stored bytes are derived from the staged upload. Fails with not_found if no upload is in progress."
+    },
+    {
+      "tool": "upload_completeowned",
+      "op": "update",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "BlobMetadata",
+        "fields": [
+          "allowed"
+        ],
+        "set_on_create": {
+          "blobId": {
+            "$arg": "arg"
+          },
+          "owners": {
+            "$session": "account_id"
+          }
+        }
+      },
+      "input_schema": {
+        "arg": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the uploaded blob (the target blobId)."
+        },
+        "allowed": {
+          "type": "json",
+          "required": false,
+          "description": "Optional allow-list of viewers for the blob."
+        }
+      },
+      "_evidence": {
+        "locator": "lib/commands/upload.js:96",
+        "id_local": "Upload.completeOwned",
+        "entry": {
+          "kind": "rpc",
+          "route": "RPC OWNED_UPLOAD_COMPLETE",
+          "locator": "lib/rpc.js:61"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "Env.completeUpload(safeKey, arg, true, size, cb)"
+      },
+      "entity": "BlobMetadata",
+      "_binds": {
+        "arg": "Blob.blobId"
+      },
+      "_output_schema": {
+        "ok": "boolean",
+        "updated": "the updated row"
+      },
+      "guards": {
+        "required": [
+          "arg"
+        ],
+        "messages": {
+          "not_found": "No upload is in progress to complete.",
+          "required": "arg is required."
+        }
+      },
+      "_defaulted": [
+        "argument invented from the write column",
+        "fields"
+      ],
+      "description": "Finalise a successful owned upload: the staged chunks become a stored Blob and record this account as its owner (and an optional allow-list)."
+    },
+    {
+      "tool": "blob_servestatic",
+      "op": "read",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Activity",
+        "row_key": {
+          "blobId": {
+            "$arg": "url"
+          }
+        },
+        "fields": [
+          "lastAccess"
+        ],
+        "set": {
+          "lastAccess": "2026-09-05T00:00:00"
+        }
+      },
+      "input_schema": {
+        "url": {
+          "type": "text",
+          "required": true,
+          "description": "The 48-char blob id (or URL suffix) to serve."
+        }
+      },
+      "_evidence": {
+        "locator": "lib/http-worker.js:270",
+        "id_local": "Blob.serveStatic",
+        "entry": {
+          "kind": "http",
+          "route": "GET/HEAD /blob/*",
+          "locator": "lib/http-worker.js:270"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "if GET/HEAD matching 48-char id -> Env.blobStore.updateActivity(s[2]); Express.static(blobPath); HEAD returns Content-Length"
+      },
+      "entity": "Activity",
+      "_output_schema": {
+        "blob": "binary content; Content-Length header"
+      },
+      "guards": {
+        "required": [
+          "url"
+        ],
+        "messages": {
+          "not_found": "No blob with that id exists."
+        }
+      },
+      "_defaulted": [
+        "fields",
+        "drop (internal: static activity stamp; see self-report)"
+      ],
+      "description": "Serve / read the raw bytes of a stored blob by its id, and stamp the last-access activity timestamp. Public static read of an existing blob."
+    },
+    {
+      "tool": "admin_decree",
+      "op": "update",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Decree",
+        "fields": [
+          "command",
+          "args"
+        ],
+        "set_on_create": {
+          "adminKey": {
+            "$session": "account_id"
+          },
+          "command": {
+            "$arg": "command"
+          },
+          "args": {
+            "$arg": "args"
+          }
+        }
+      },
+      "input_schema": {
+        "command": {
+          "type": "text",
+          "required": true,
+          "description": "The admin command to execute, e.g. ADD_ADMIN_KEY or SET_QUOTA."
+        },
+        "args": {
+          "type": "json",
+          "required": true,
+          "description": "Arguments for the admin command."
+        }
+      },
+      "_evidence": {
+        "locator": "lib/commands/admin-rpc.js:437",
+        "id_local": "Admin.decree",
+        "entry": {
+          "kind": "rpc",
+          "route": "RPC ADMIN",
+          "locator": "lib/rpc.js:61"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "decree=[command,args,unsafeKey,+new Date()]; changed=Decrees.handleCommand(Env,decree); if(!changed) cb(); Decrees.write(Env,decree)",
+        "edges": [
+          "lib/commands/admin-rpc.js:437-478"
+        ]
+      },
+      "entity": "Decree",
+      "_binds": {
+        "command": "Decree.command",
+        "args": "Decree.args"
+      },
+      "_output_schema": {
+        "ok": "boolean",
+        "updated": "the updated row"
+      },
+      "guards": {
+        "required": [
+          "command",
+          "args"
+        ],
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in as an admin to issue a decree.",
+          "required": "command and args are required."
+        }
+      },
+      "description": "Issue an admin decree command that changes server configuration (e.g. ADMINS, SET_QUOTA, message limits). Each call appends a decree line. Requires an admin key already set up.",
+      "_defaulted": [
+        "replace (no-op wall from DECREE.empty) — see self-report"
+      ]
+    },
+    {
+      "tool": "admin_archivedocument",
+      "op": "update",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "Channel",
+        "lookup_by": {
+          "channelId": {
+            "$arg": "id"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the document (32-char channel or 48-char blob) to archive."
+        }
+      },
+      "_evidence": {
+        "locator": "lib/commands/admin-rpc.js:175",
+        "id_local": "Admin.archiveDocument",
+        "entry": {
+          "kind": "rpc",
+          "route": "RPC ADMIN",
+          "locator": "lib/rpc.js:61"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "case 32: Env.msgStore.archiveChannel(id, archiveReason, Util.both(cb, Channel.disconnectChannelMembers(...))); case 48: Env.blobStore.archive.blob(id, archiveReason, ...)"
+      },
+      "entity": "Channel",
+      "_output_schema": {
+        "ok": "boolean",
+        "updated": "the updated row"
+      },
+      "guards": {
+        "required": [
+          "id"
+        ],
+        "requires_auth": true,
+        "messages": {
+          "auth": "Admin privileges required.",
+          "not_found": "That document does not exist."
+        }
+      },
+      "description": "Admin: archive a document (32-char pad or 48-char blob) by id, moving it out of the live store. Requires admin privileges.",
+      "_defaulted": [
+        "drop (real switch dispatches by id length to pad vs blob; see self-report)"
+      ]
+    },
+    {
+      "tool": "admin_removedocument",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "Channel",
+        "lookup_by": {
+          "channelId": {
+            "$arg": "id"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the document to delete."
+        }
+      },
+      "_evidence": {
+        "locator": "lib/commands/admin-rpc.js:247",
+        "id_local": "Admin.removeDocument",
+        "entry": {
+          "kind": "rpc",
+          "route": "RPC ADMIN",
+          "locator": "lib/rpc.js:61"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "case 32: Env.msgStore.removeChannel(id, Util.both(cb, Channel.disconnectChannelMembers(...))); case 48: Env.blobStore.remove.blob(id, ...)"
+      },
+      "entity": "Channel",
+      "_output_schema": {
+        "ok": "boolean"
+      },
+      "guards": {
+        "required": [
+          "id"
+        ],
+        "requires_auth": true,
+        "messages": {
+          "auth": "Admin privileges required.",
+          "not_found": "That document does not exist."
+        }
+      },
+      "description": "Admin: permanently delete a document (32-char pad or 48-char blob) by id. Requires admin privileges.",
+      "_defaulted": [
+        "drop (real switch dispatches by id length to pad vs blob; see self-report)"
+      ]
+    },
+    {
+      "tool": "admin_restoredocument",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Channel",
+        "fields": [],
+        "row_key": {
+          "channelId": {
+            "$arg": "id"
+          }
+        },
+        "set": {
+          "messages": null
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the archived document to restore."
+        }
+      },
+      "_evidence": {
+        "locator": "lib/commands/admin-rpc.js:287",
+        "id_local": "Admin.restoreDocument",
+        "entry": {
+          "kind": "rpc",
+          "route": "RPC ADMIN",
+          "locator": "lib/rpc.js:61"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "var args = data[1]; var id = (typeof args === 'string') ? args : args.id;\nif (typeof(id) !== 'string' || id.length < 32) return cb('EINVAL');\nswitch (id.length) {\n  case 32: return Env.msgStore.restoreArchivedChannel(id, Util.both(cb, function (err) {\n    Env.Log.info('RESTORATION_CHANNEL_BY_ADMIN_RPC', { id, reason, status: err? String(err) : 'SUCCESS' });\n  }));\n  case 48: return Env.blobStore.restore.blob(id, Util.both(cb, function (err) {\n    Env.Log.info('RESTORATION_BLOB_BY_ADMIN_RPC', { id, reason, status: err? String(err) : 'SUCCESS' });\n  }));\n  default: return cb('INVALID_ID_LENGTH')"
+      },
+      "entity": "Channel",
+      "_output_schema": {
+        "ok": "boolean",
+        "updated": "the updated row"
+      },
+      "guards": {
+        "required": [
+          "id"
+        ],
+        "requires_auth": true,
+        "messages": {
+          "auth": "Admin privileges required.",
+          "not_found": "That archived document does not exist."
+        }
+      },
+      "_defaulted": [
+        "drop (internal Admin.restoreDocument); see self-report"
+      ],
+      "description": "Admin: restore an archived document (32-char pad or 48-char blob) back into the live store by id. Requires admin privileges."
+    },
+    {
+      "tool": "admin_disablemfa",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "MfaSettings",
+        "lookup_by": {
+          "blockId": {
+            "$arg": "id"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "The 44-char login block id of the user whose MFA to disable."
+        }
+      },
+      "_evidence": {
+        "locator": "lib/commands/admin-rpc.js:725",
+        "id_local": "Admin.disableMfa",
+        "entry": {
+          "kind": "rpc",
+          "route": "RPC ADMIN",
+          "locator": "lib/rpc.js:61"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "if(id.length!==44) EINVAL; MFA.revoke(Env, id, cb)"
+      },
+      "entity": "MfaSettings",
+      "_binds": {
+        "id": "MfaSettings.blockId"
+      },
+      "_output_schema": {
+        "ok": "boolean"
+      },
+      "guards": {
+        "required": [
+          "id"
+        ],
+        "requires_auth": true,
+        "messages": {
+          "auth": "Admin privileges required.",
+          "not_found": "That user has no MFA settings."
+        }
+      },
+      "description": "Admin: remove a user's two-factor authentication settings by their login block id, forcing them back to password-only sign-in. Requires admin privileges."
+    },
+    {
+      "tool": "admin_addknownuser",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "KnownUser",
+        "fields": [
+          "name",
+          "alias",
+          "email",
+          "block"
+        ],
+        "set_on_create": {
+          "id": {
+            "$arg": "edPublic"
+          },
+          "createdBy": {
+            "$session": "account_id"
+          },
+          "type": "manual"
+        }
+      },
+      "input_schema": {
+        "edPublic": {
+          "type": "int",
+          "required": true,
+          "description": "The user's ed public key id."
+        },
+        "name": {
+          "type": "text",
+          "required": false,
+          "description": "Display name for the known user."
+        },
+        "alias": {
+          "type": "text",
+          "required": false,
+          "description": "Alias for the known user."
+        },
+        "email": {
+          "type": "text",
+          "required": false,
+          "description": "Email address for the known user."
+        },
+        "block": {
+          "type": "int",
+          "required": false,
+          "description": "Id of the login block this user registers."
+        }
+      },
+      "_evidence": {
+        "locator": "lib/commands/admin-rpc.js:935",
+        "id_local": "Admin.addKnownUser",
+        "entry": {
+          "kind": "rpc",
+          "route": "RPC ADMIN",
+          "locator": "lib/rpc.js:61"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "userData={edPublic,block,alias,email,name,type:'manual'}; Users.add(Env, edPublic, userData, unsafeKey, cb)"
+      },
+      "entity": "KnownUser",
+      "_binds": {
+        "edPublic": "KnownUser.id",
+        "block": "LoginBlock.blockId",
+        "alias": "KnownUser.alias",
+        "email": "KnownUser.email",
+        "name": "KnownUser.name"
+      },
+      "_output_schema": {
+        "id": "id of created row",
+        "ok": "boolean"
+      },
+      "guards": {
+        "required": [
+          "edPublic"
+        ],
+        "requires_auth": true,
+        "messages": {
+          "auth": "Admin privileges required.",
+          "required": "edPublic is required."
+        }
+      },
+      "description": "Admin: add a known (invited/manual) user record so they can register a login block against it. Requires admin privileges.",
+      "_defaulted": [
+        "fix (add set_on_create.formal)"
+      ]
+    },
+    {
+      "tool": "admin_updateknownuser",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "KnownUser",
+        "row_key": {
+          "id": {
+            "$arg": "edPublic"
+          }
+        },
+        "fields": [
+          "name",
+          "alias",
+          "block",
+          "type",
+          "email",
+          "extra"
+        ]
+      },
+      "input_schema": {
+        "edPublic": {
+          "type": "int",
+          "required": true,
+          "description": "The user's ed public key id."
+        },
+        "name": {
+          "type": "text",
+          "required": false,
+          "description": "New display name."
+        },
+        "alias": {
+          "type": "text",
+          "required": false,
+          "description": "New alias."
+        },
+        "block": {
+          "type": "int",
+          "required": false,
+          "description": "Assigned login block id."
+        },
+        "type": {
+          "type": "text",
+          "required": false,
+          "description": "New type of the user."
+        },
+        "email": {
+          "type": "text",
+          "required": false,
+          "description": "New email."
+        },
+        "extra": {
+          "type": "json",
+          "required": false,
+          "description": "Additional user data."
+        }
+      },
+      "_evidence": {
+        "locator": "lib/commands/admin-rpc.js:954",
+        "id_local": "Admin.updateKnownUser",
+        "entry": {
+          "kind": "rpc",
+          "route": "RPC ADMIN",
+          "locator": "lib/rpc.js:61"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "Users.update(Env, edPublic, changes, cb)"
+      },
+      "entity": "KnownUser",
+      "_binds": {
+        "edPublic": "KnownUser.id",
+        "name": "KnownUser.name",
+        "alias": "KnownUser.alias",
+        "block": "KnownUser.block",
+        "type": "KnownUser.type",
+        "email": "KnownUser.email",
+        "extra": "KnownUser.extra"
+      },
+      "_output_schema": {
+        "ok": "boolean",
+        "updated": "the updated row"
+      },
+      "guards": {
+        "required": [
+          "edPublic"
+        ],
+        "requires_auth": true,
+        "messages": {
+          "auth": "Admin privileges required.",
+          "required": "edPublic is required."
+        }
+      },
+      "description": "Admin: update the contact / identity fields of a known user (name, alias, block, type, email, extra). Requires admin privileges."
+    },
+    {
+      "tool": "admin_deleteknownuser",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "KnownUser",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "The user's ed public key id to delete."
+        }
+      },
+      "_evidence": {
+        "locator": "lib/commands/admin-rpc.js:950",
+        "id_local": "Admin.deleteKnownUser",
+        "entry": {
+          "kind": "rpc",
+          "route": "RPC ADMIN",
+          "locator": "lib/rpc.js:61"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "Users.delete(Env, id, cb)"
+      },
+      "entity": "KnownUser",
+      "_binds": {
+        "id": "KnownUser.id"
+      },
+      "_output_schema": {
+        "ok": "boolean"
+      },
+      "guards": {
+        "required": [
+          "id"
+        ],
+        "requires_auth": true,
+        "messages": {
+          "auth": "Admin privileges required.",
+          "not_found": "That known user does not exist."
+        }
+      },
+      "description": "Admin: remove a known user record. Requires admin privileges."
+    },
+    {
+      "tool": "admin_createinvitation",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Invitation",
+        "fields": [
+          "alias",
+          "email"
+        ],
+        "set_on_create": {
+          "createdBy": {
+            "$session": "account_id"
+          },
+          "type": "invite:<id>"
+        }
+      },
+      "input_schema": {
+        "alias": {
+          "type": "text",
+          "required": false,
+          "description": "Alias for the invited user."
+        },
+        "email": {
+          "type": "text",
+          "required": false,
+          "description": "Email for the invited user."
+        }
+      },
+      "_evidence": {
+        "locator": "lib/commands/admin-rpc.js:964",
+        "id_local": "Admin.createInvitation",
+        "entry": {
+          "kind": "rpc",
+          "route": "RPC ADMIN",
+          "locator": "lib/rpc.js:61"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "Invitation.create(Env, args.alias, args.email, cb, unsafeKey)"
+      },
+      "entity": "Invitation",
+      "_binds": {
+        "alias": "Invitation.alias",
+        "email": "Invitation.email"
+      },
+      "_output_schema": {
+        "id": "id of created row",
+        "ok": "boolean"
+      },
+      "description": "Admin: create an invitation record so a user can register with a known block. Requires admin privileges.",
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "Admin privileges required."
+        }
+      },
+      "_defaulted": [
+        "fix (add set_on_create.type)"
+      ]
+    },
+    {
+      "tool": "admin_deleteinvitation",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "Invitation",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the invitation to delete."
+        }
+      },
+      "_evidence": {
+        "locator": "lib/commands/admin-rpc.js:969",
+        "id_local": "Admin.deleteInvitation",
+        "entry": {
+          "kind": "rpc",
+          "route": "RPC ADMIN",
+          "locator": "lib/rpc.js:61"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "Invitation.delete(Env, id, cb)"
+      },
+      "entity": "Invitation",
+      "_binds": {
+        "id": "Invitation.id"
+      },
+      "_output_schema": {
+        "ok": "boolean"
+      },
+      "guards": {
+        "required": [
+          "id"
+        ],
+        "requires_auth": true,
+        "messages": {
+          "auth": "Admin privileges required.",
+          "not_found": "That invitation does not exist."
+        }
+      },
+      "description": "Admin: delete an invitation record. Requires admin privileges."
+    },
+    {
+      "tool": "admin_addmoderator",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Moderator",
+        "fields": [
+          "name",
+          "curvePublic",
+          "mailbox",
+          "profile"
+        ],
+        "set_on_create": {
+          "id": {
+            "$arg": "edPublic"
+          },
+          "createdBy": {
+            "$session": "account_id"
+          }
+        }
+      },
+      "input_schema": {
+        "edPublic": {
+          "type": "int",
+          "required": true,
+          "description": "The moderator's ed public key id."
+        },
+        "name": {
+          "type": "text",
+          "required": false,
+          "description": "Display name."
+        },
+        "curvePublic": {
+          "type": "int",
+          "required": false,
+          "description": "Curve public key."
+        },
+        "mailbox": {
+          "type": "text",
+          "required": false,
+          "description": "Mailbox address."
+        },
+        "profile": {
+          "type": "text",
+          "required": false,
+          "description": "Profile reference."
+        }
+      },
+      "_evidence": {
+        "locator": "lib/commands/admin-rpc.js:977",
+        "id_local": "Admin.addModerator",
+        "entry": {
+          "kind": "rpc",
+          "route": "RPC ADMIN",
+          "locator": "lib/rpc.js:61"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "userData={name,edPublic,curvePublic,mailbox,profile}; Moderators.add(Env, edPublic, userData, unsafeKey, cb)"
+      },
+      "entity": "Moderator",
+      "_binds": {
+        "edPublic": "Moderator.id",
+        "name": "Moderator.name",
+        "curvePublic": "Moderator.curvePublic",
+        "mailbox": "Moderator.mailbox",
+        "profile": "Moderator.profile"
+      },
+      "_output_schema": {
+        "id": "id of created row",
+        "ok": "boolean"
+      },
+      "guards": {
+        "required": [
+          "edPublic"
+        ],
+        "requires_auth": true,
+        "messages": {
+          "auth": "Admin privileges required.",
+          "required": "edPublic is required."
+        }
+      },
+      "description": "Admin: add a moderator record to the moderation list. Requires admin privileges."
+    },
+    {
+      "tool": "admin_removemoderator",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "Moderator",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the moderator to remove."
+        }
+      },
+      "_evidence": {
+        "locator": "lib/commands/admin-rpc.js:993",
+        "id_local": "Admin.removeModerator",
+        "entry": {
+          "kind": "rpc",
+          "route": "RPC ADMIN",
+          "locator": "lib/rpc.js:61"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "Moderators.delete(Env, id, cb)"
+      },
+      "entity": "Moderator",
+      "_binds": {
+        "id": "Moderator.id"
+      },
+      "_output_schema": {
+        "ok": "boolean"
+      },
+      "guards": {
+        "required": [
+          "id"
+        ],
+        "requires_auth": true,
+        "messages": {
+          "auth": "Admin privileges required.",
+          "not_found": "That moderator does not exist."
+        }
+      },
+      "description": "Admin: remove a moderator record. Requires admin privileges."
+    },
+    {
+      "tool": "admin_addfirstadmin",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Decree",
+        "fields": [
+          "command",
+          "adminKey"
+        ],
+        "set_on_create": {
+          "command": "ADD_ADMIN_KEY",
+          "adminKey": {
+            "$arg": "edPublic"
+          },
+          "args": {
+            "$arg": "edPublic"
+          }
+        }
+      },
+      "input_schema": {
+        "token": {
+          "type": "text",
+          "required": true,
+          "description": "The server install token proving you may bootstrap."
+        },
+        "edPublic": {
+          "type": "int",
+          "required": true,
+          "description": "The ed public key to grant admin."
+        }
+      },
+      "_evidence": {
+        "locator": "lib/commands/admin-rpc.js:1159",
+        "id_local": "Admin.addFirstAdmin",
+        "entry": {
+          "kind": "rpc",
+          "route": "RPC ADD_FIRST_ADMIN",
+          "locator": "lib/rpc.js:33"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "if(token!==Env.installToken) FORBIDDEN; if(Env.admins.length) EEXISTS; adminDecree(['ADD_FIRST_ADMIN',['ADD_ADMIN_KEY',[key]]])",
+        "edges": [
+          "lib/commands/admin-rpc.js:1159"
+        ],
+        "_wall_evidence": "ref_code: if(Env.admins.length) EEXISTS at lib/commands/admin-rpc.js:1159"
+      },
+      "entity": "Decree",
+      "_output_schema": {
+        "id": "id of created row",
+        "ok": "boolean"
+      },
+      "guards": {
+        "required": [
+          "token",
+          "edPublic"
+        ],
+        "messages": {
+          "required": "Both token and edPublic are required.",
+          "precondition": "An admin already exists; you cannot add another this way.",
+          "register": "The given token is not the valid install token."
+        },
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Decree",
+                "where": {
+                  "node": "field",
+                  "col": "command",
+                  "op": "eq",
+                  "value": "ADD_ADMIN_KEY"
+                }
+              },
+              "op": "eq",
+              "n": 0
+            }
+          ]
+        ]
+      },
+      "_defaulted": [
+        "fields",
+        "fix (aliased ADD_ADMIN to ADD_ADMIN_KEY, filled args)"
+      ],
+      "description": "Bootstrap the first admin: provided the install token matches, issue the decree that seed the first admin key. Fails if an admin already exists. This is the admin-seeding tool an agent will use to create the admin account that unlocks every other admin RPC."
+    },
+    {
+      "tool": "admin_command",
+      "op": "action",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Decree",
+        "lookup_by": {
+          "command": "ADD_ADMIN_KEY"
+        }
+      },
+      "input_schema": {
+        "data": {
+          "type": "json",
+          "required": true,
+          "description": "An array [commandName, ...args] of the admin command to dispatch."
+        }
+      },
+      "_evidence": {
+        "locator": "lib/commands/admin-rpc.js:1179",
+        "id_local": "Admin.command",
+        "entry": {
+          "kind": "rpc",
+          "route": "RPC ADMIN",
+          "locator": "lib/rpc.js:61"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "var admins=Env.admins; if(admins.indexOf(unsafeKey)===-1) cb('FORBIDDEN'); command=commands[data[0]]; if(function) command(Env,Server,cb,data,unsafeKey); else UNHANDLED_ADMIN_COMMAND"
+      },
+      "entity": "Decree",
+      "_output_schema": {
+        "dispatched": "the named admin command result"
+      },
+      "guards": {
+        "required": [
+          "data"
+        ],
+        "requires_auth": true,
+        "messages": {
+          "auth": "Admin privileges required.",
+          "required": "data is required."
+        }
+      },
+      "_defaulted": [
+        "drop (internal admin dispatcher); see self-report"
+      ],
+      "description": "Admin dispatcher: run an arbitrary registered admin command from an array of arguments. Requires admin privileges."
+    },
+    {
+      "tool": "sign_in",
+      "description": "Sign in to a CryptPad account by its email and login-block secret. In CryptPad the server never sees a password — ownership is proven by an Ed25519 signature the client makes; this world represents that by the account existing. Every account-scoped tool (pins, uploads, admin) resolves the acting account from this session. Fails if no account has that email and secret.",
+      "family": "guard.auth",
+      "entity": "LoginBlock",
+      "input_schema": {
+        "email": {
+          "type": "text",
+          "required": true,
+          "description": "The account email to sign in with."
+        },
+        "content": {
+          "type": "text",
+          "required": true,
+          "description": "The account secret (encrypted login-block content) to verify ownership with."
+        }
+      },
+      "exec_spec": {
+        "verify": {
+          "entity": "LoginBlock"
+        }
+      },
+      "guards": {
+        "auth": "That account does not exist; sign in with a registered login block id."
+      },
+      "_evidence": {
+        "locator": "lib/http-commands.js:184",
+        "id_local": "Challenge.resolve",
+        "ref_code": "Account ownership in CryptPad is an Ed25519 signature verification over the login block (Nacl.sign.detached.verify). The signature check cannot be modelled (the runtime cannot verify signatures), so the login is represented by the account existing; the opening session makes it the $actor for every scoped tool.",
+        "_note": "auth wall is a real semantic (no such account) promoted to the auth wall; not evidence of a code precondition."
+      }
+    }
+  ],
+  "seed_state": {
+    "LoginBlock": [
+      {
+        "blockId": "b1",
+        "content": "{\"name\":\"Ada\",\"version\":\"4.0\"}",
+        "placeholderReason": null,
+        "archived": false,
+        "id": 1
+      },
+      {
+        "blockId": "b2",
+        "content": "{\"name\":\"Grace\",\"version\":\"4.0\"}",
+        "placeholderReason": null,
+        "archived": false,
+        "id": 2
+      }
+    ],
+    "MfaSettings": [],
+    "Session": [],
+    "Challenge": [],
+    "Channel": [
+      {
+        "channelId": "c-roadmap",
+        "messages": "[]",
+        "time": "2026-01-01T00:00:00",
+        "id": 1
+      },
+      {
+        "channelId": "c-shared",
+        "messages": "[]",
+        "time": "2026-01-01T00:00:00",
+        "id": 2
+      }
+    ],
+    "ChannelMetadata": [
+      {
+        "channelId": "c-roadmap",
+        "validateKey": "vk1",
+        "owners": [
+          "{\"id\":\"b1\"}"
+        ],
+        "restricted": false,
+        "deleteLines": true,
+        "time": "2026-01-01T00:00:00",
+        "id": 1
+      },
+      {
+        "channelId": "c-shared",
+        "validateKey": "vk2",
+        "owners": [
+          "{\"id\":\"b2\"}"
+        ],
+        "restricted": true,
+        "deleteLines": true,
+        "time": "2026-01-01T00:00:00",
+        "id": 2
+      }
+    ],
+    "PinLog": [],
+    "Blob": [],
+    "BlobMetadata": [],
+    "BlobStage": [],
+    "Activity": [],
+    "KnownUser": [],
+    "Invitation": [],
+    "Moderator": [],
+    "SsoRequest": [],
+    "SsoUser": [],
+    "SsoBlock": [],
+    "Task": [],
+    "Decree": [
+      {
+        "line": 1,
+        "command": "ADMIN_MODE",
+        "args": null,
+        "adminKey": "ak",
+        "time": "2026-01-01T00:00:00",
+        "id": 1
+      }
+    ]
+  },
+  "summary": "CryptPad is a self-hosted, filesystem-backed, end-to-end-encrypted collaborative office suite: pads (channels) store encrypted messages and per-channel metadata (owners, restricted allow-lists, mailboxes), user accounts are encrypted login blocks protected by optional TOTP 2FA with per-account sessions, file uploads stage (BlobStage) then promote to owned Blobs with activity tracking, users pin channels into append-only per-user PinLogs, invitations and moderators are flat-file records, and scheduled expiry Tasks plus admin config Decrees persist to ndjson logs; admins operate over all of it via a single ADMIN RPC.",
+  "_auth_candidates": [
+    {
+      "entity": "LoginBlock",
+      "username_col": "blockId",
+      "password_col": "content"
+    },
+    {
+      "entity": "MfaSettings",
+      "username_col": "blockId",
+      "password_col": "secret"
+    }
+  ],
+  "_fk_gravity": {
+    "entity": "LoginBlock",
+    "fk_count": 6
+  },
+  "_read_denied": "forbidden",
+  "_no_edges": [
+    {
+      "id_local": "Challenge.submit",
+      "why": "public challenge stage; validates command exists + key format, stores the challenge for later resolution; no wall of its own (lib/http-commands.js:107)"
+    },
+    {
+      "id_local": "BlobStage.issueUploadCookie",
+      "why": "challenge endpoint action; only a 44-char key format check, no wall (lib/challenge-commands/base.js:91)"
+    },
+    {
+      "id_local": "LoginBlock.archive",
+      "why": "internal storage move live->archive; no pre-checks, calls nothing (lib/storage/block.js:59)"
+    },
+    {
+      "id_local": "LoginBlock.restore",
+      "why": "internal storage move archive->live; no pre-checks, calls nothing (lib/storage/block.js:85)"
+    },
+    {
+      "id_local": "KnownUser.add",
+      "why": "internal; stamps createdBy/time from caller, no preconditions (lib/commands/users.js:17)"
+    },
+    {
+      "id_local": "KnownUser.delete",
+      "why": "internal ENOENT-tolerant delete; no preconditions (lib/commands/users.js:28)"
+    },
+    {
+      "id_local": "Invitation.create",
+      "why": "internal; creates an invite with no preconditions (lib/commands/invitation.js:23)"
+    },
+    {
+      "id_local": "Invitation.delete",
+      "why": "internal ENOENT-tolerant delete; no preconditions (lib/commands/invitation.js:38)"
+    },
+    {
+      "id_local": "Moderator.add",
+      "why": "internal; trusts adminKey, no preconditions (lib/commands/moderators.js:26)"
+    },
+    {
+      "id_local": "Moderator.delete",
+      "why": "internal ENOENT-tolerant delete; no preconditions (lib/commands/moderators.js:41)"
+    },
+    {
+      "id_local": "Blob.appendChunk",
+      "why": "internal storage append of a chunk; no pre-checks, calls nothing, no auth (lib/storage/blob.js:315)"
+    },
+    {
+      "id_local": "Blob.cancel",
+      "why": "internal stage clean; validates fileSize>0 then unlinks; calls nothing further, no wall (lib/storage/blob.js:362)"
+    },
+    {
+      "id_local": "Blob.remove",
+      "why": "internal unlink; no preconditions, no downstream call, no auth at this layer (lib/storage/blob.js:506)"
+    },
+    {
+      "id_local": "Blob.restore",
+      "why": "internal move archive->live; no pre-checks, calls nothing (lib/storage/block.js:549); reached by Blob.archive/Admin.restoreDocument but no direct logic of its own"
+    },
+    {
+      "id_local": "Task.schedule",
+      "why": "file write of a due-dated task; no preconditions, no downstream call at this layer (lib/storage/tasks.js:51)"
+    },
+    {
+      "id_local": "Admin.addFirstAdmin",
+      "why": "see edge evidence"
+    },
+    {
+      "id_local": "Admin.command",
+      "why": "see edge evidence"
+    }
+  ],
+  "auth": {
+    "account_entity": "LoginBlock",
+    "username_col": "email",
+    "password_col": "content"
+  }
+}

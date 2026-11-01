@@ -1,0 +1,4902 @@
+{
+  "env_id": "svix_webhooks",
+  "entities": [
+    {
+      "name": "Application",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "audit": true
+        },
+        {
+          "name": "org_id",
+          "type": "id",
+          "nullable": false
+        },
+        {
+          "name": "uid",
+          "type": "text",
+          "nullable": true,
+          "max": 256
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "rate_limit",
+          "type": "int",
+          "nullable": true
+        },
+        {
+          "name": "deleted",
+          "type": "bool",
+          "nullable": false,
+          "default": false
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "org_id",
+            "uid"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ApplicationMetadata",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true,
+          "fk_to": "Application.id",
+          "on_delete": "restrict"
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "audit": true
+        },
+        {
+          "name": "data",
+          "type": "json",
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "name": "Endpoint",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "audit": true
+        },
+        {
+          "name": "app_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Application.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "key",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "url",
+          "type": "text",
+          "nullable": false,
+          "max": 65536
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "event_types_ids",
+          "type": "json",
+          "nullable": true
+        },
+        {
+          "name": "version",
+          "type": "int",
+          "nullable": false,
+          "default": 1
+        },
+        {
+          "name": "rate_limit",
+          "type": "int",
+          "nullable": true
+        },
+        {
+          "name": "deleted",
+          "type": "bool",
+          "nullable": false,
+          "default": false
+        },
+        {
+          "name": "disabled",
+          "type": "bool",
+          "nullable": false,
+          "default": false
+        },
+        {
+          "name": "first_failure_at",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "uid",
+          "type": "text",
+          "nullable": true,
+          "max": 256
+        },
+        {
+          "name": "old_keys",
+          "type": "json",
+          "nullable": true
+        },
+        {
+          "name": "channels",
+          "type": "json",
+          "nullable": true
+        },
+        {
+          "name": "headers",
+          "type": "json",
+          "nullable": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "app_id",
+            "uid"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "EndpointMetadata",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true,
+          "fk_to": "Endpoint.id",
+          "on_delete": "restrict"
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "audit": true
+        },
+        {
+          "name": "data",
+          "type": "json",
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "name": "EventType",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "audit": true
+        },
+        {
+          "name": "org_id",
+          "type": "id",
+          "nullable": false
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "deleted",
+          "type": "bool",
+          "nullable": false,
+          "default": false
+        },
+        {
+          "name": "deprecated",
+          "type": "bool",
+          "nullable": false,
+          "default": false
+        },
+        {
+          "name": "schemas",
+          "type": "json",
+          "nullable": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "feature_flag",
+          "type": "text",
+          "nullable": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "org_id",
+            "name"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Message",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "org_id",
+          "type": "id",
+          "nullable": false
+        },
+        {
+          "name": "app_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Application.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "event_type",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "uid",
+          "type": "text",
+          "nullable": true,
+          "max": 256
+        },
+        {
+          "name": "legacy_payload",
+          "type": "json",
+          "nullable": true
+        },
+        {
+          "name": "channels",
+          "type": "json",
+          "nullable": true
+        },
+        {
+          "name": "expiration",
+          "type": "datetime",
+          "nullable": false
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "app_id",
+            "uid"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "MessageContent",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true,
+          "fk_to": "Message.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "payload",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "expiration",
+          "type": "datetime",
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "name": "MessageAttempt",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "msg_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Message.id",
+          "on_delete": "restrict"
+        },
+        {
+          "name": "msg_dest_id",
+          "type": "id",
+          "nullable": true
+        },
+        {
+          "name": "endp_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Endpoint.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "url",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "status",
+          "type": "int",
+          "nullable": false,
+          "enum": [
+            0,
+            1,
+            2,
+            3
+          ]
+        },
+        {
+          "name": "response_status_code",
+          "type": "int",
+          "nullable": false,
+          "default": 0
+        },
+        {
+          "name": "response",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        },
+        {
+          "name": "ended_at",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "trigger_type",
+          "type": "int",
+          "nullable": false,
+          "enum": [
+            0,
+            1
+          ]
+        },
+        {
+          "name": "response_duration_ms",
+          "type": "int",
+          "nullable": false,
+          "default": 0
+        },
+        {
+          "name": "next_attempt",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "attempt_number",
+          "type": "int",
+          "nullable": false,
+          "default": -1
+        }
+      ]
+    },
+    {
+      "name": "MessageDestination",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "audit": true
+        },
+        {
+          "name": "msg_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Message.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "endp_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Endpoint.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "status",
+          "type": "int",
+          "nullable": false,
+          "enum": [
+            0,
+            1,
+            2,
+            3
+          ]
+        },
+        {
+          "name": "next_attempt",
+          "type": "datetime",
+          "nullable": true
+        }
+      ]
+    }
+  ],
+  "tools": [
+    {
+      "tool": "application_create",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Application",
+        "fields": {
+          "name": {
+            "$arg": "name"
+          },
+          "uid": {
+            "$arg": "uid"
+          },
+          "rate_limit": {
+            "$arg": "throttle_rate"
+          }
+        },
+        "set_on_create": {
+          "org_id": {
+            "$const": 1
+          },
+          "deleted": false
+        },
+        "unique_on": [
+          "org_id",
+          "uid"
+        ]
+      },
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "description": "A name for the resource."
+        },
+        "uid": {
+          "type": "text",
+          "description": "Optional unique key (must be unique within the org/app)."
+        },
+        "throttle_rate": {
+          "type": "int"
+        },
+        "metadata": {
+          "type": "json",
+          "description": "Arbitrary JSON metadata stored with the row."
+        }
+      },
+      "_evidence": {
+        "locator": "server/svix-server/src/v1/endpoints/application.rs:178",
+        "id_local": "Application.create",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/v1/app",
+          "locator": "server/svix-server/src/v1/endpoints/application.rs:467"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "// conflict if uid already exists for org: returns conflict 409\nif let Some(ref uid) = data.uid {\n  if fetch_with_metadata(db, org_id, uid)?.is_some() { return Err(conflict) }\n}\nlet app = application::ActiveModel::new(org_id);\ndb.transaction(|txn| { let app = app.insert(txn)...; metadata.upsert_or_delete(txn) })",
+        "_unified_org": "org_id is pinned to $const 1: this open-source single-instance build has no user/account table (the collector found no account entity); Svix is a multi-tenant saas but self-hosted deployments run a single organization, so org scoping collapses to the implicit org. Auth for all tools is the org-level JWT, modeled implicitly here."
+      },
+      "entity": "Application",
+      "_binds": {
+        "name": "Application.name",
+        "uid": "Application.uid",
+        "throttle_rate": "Application.rate_limit",
+        "metadata": "ApplicationMetadata.data"
+      },
+      "_output_schema": {
+        "application": "the created/updated Application row and its metadata"
+      },
+      "guards": {
+        "required": [
+          "name"
+        ],
+        "messages": {
+          "unique": "An application with this name or key already exists in the organization.",
+          "fk": "No organization context for this application.",
+          "fk_missing": "A required parent (application/event type) is missing."
+        }
+      },
+      "_defaulted": [
+        "fields (mapped to the real parameter names via binds)"
+      ],
+      "description": "Create a webhook Application within the organization. An application groups endpoints that receive the same set of events. Fails if another application with the same uid already exists."
+    },
+    {
+      "tool": "application_list",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Application",
+        "rank": {
+          "method": "exact"
+        },
+        "pagination": {
+          "default_limit": 20
+        }
+      },
+      "input_schema": {
+        "limit": {
+          "type": "int"
+        },
+        "iterator": {
+          "type": "text"
+        },
+        "order": {
+          "type": "text"
+        }
+      },
+      "_evidence": {
+        "locator": "server/svix-server/src/v1/endpoints/application.rs:106",
+        "id_local": "Application.list",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v1/app",
+          "locator": "server/svix-server/src/v1/endpoints/application.rs:467"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "let query = apply_pagination(application::Entity::secure_find(org_id), Column::Id, limit, iterator, order);\nlet results = query.find_also_related(applicationmetadata::Entity).all(db)..."
+      },
+      "entity": "Application",
+      "_output_schema": {
+        "data": "list of Application rows with metadata",
+        "iterator": "next cursor",
+        "done": "bool"
+      },
+      "description": "List the applications defined in this organization, newest first. Returns application rows and their metadata.",
+      "guards": {
+        "messages": {}
+      }
+    },
+    {
+      "tool": "application_get",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Application",
+        "lookup_by": {
+          "id": {
+            "$arg": "app_id"
+          }
+        }
+      },
+      "input_schema": {
+        "app_id": {
+          "type": "int",
+          "description": "Id of the application this belongs to."
+        }
+      },
+      "_evidence": {
+        "locator": "server/svix-server/src/v1/endpoints/application.rs:242",
+        "id_local": "Application.get",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v1/app/{app_id}",
+          "locator": "server/svix-server/src/v1/endpoints/application.rs:473"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "async fn get_application(permissions::ApplicationWithMetadata { app, metadata }: ...) -> Result<Json<ApplicationOut>> { Ok(Json((app, metadata).into())) }",
+        "edges": [
+          "core/permissions.rs OrganizationWithApplication extractor (Organization token + app lookup; 404 if app missing) + application.rs:303"
+        ]
+      },
+      "entity": "Application",
+      "_binds": {
+        "app_id": "Application.id"
+      },
+      "_output_schema": {
+        "application": "the Application row and metadata"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Application",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "app_id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "precondition": "No application with that id exists.",
+          "not_found": "No application with that id exists."
+        },
+        "required": [
+          "app_id"
+        ]
+      },
+      "description": "Fetch a single webhook Application by its id."
+    },
+    {
+      "tool": "application_update",
+      "op": "update",
+      "family": "crud.upsert",
+      "exec_spec": {
+        "entity": "Application",
+        "key": {
+          "id": {
+            "$arg": "app_id"
+          }
+        },
+        "insert_fields": {
+          "uid": {
+            "$arg": "uid"
+          },
+          "name": {
+            "$arg": "name"
+          },
+          "rate_limit": {
+            "$arg": "throttle_rate"
+          }
+        },
+        "set_on_exists": {
+          "uid": {
+            "$arg": "uid"
+          },
+          "name": {
+            "$arg": "name"
+          },
+          "rate_limit": {
+            "$arg": "throttle_rate"
+          }
+        },
+        "set_on_create": {
+          "org_id": {
+            "$const": 1
+          }
+        }
+      },
+      "input_schema": {
+        "app_id": {
+          "type": "int",
+          "description": "Id of the application this belongs to."
+        },
+        "name": {
+          "type": "text",
+          "description": "A name for the resource."
+        },
+        "uid": {
+          "type": "text",
+          "description": "Optional unique key (must be unique within the org/app)."
+        },
+        "throttle_rate": {
+          "type": "int"
+        },
+        "metadata": {
+          "type": "json",
+          "description": "Arbitrary JSON metadata stored with the row."
+        },
+        "id": {
+          "type": "int"
+        }
+      },
+      "_evidence": {
+        "locator": "server/svix-server/src/v1/endpoints/application.rs:262",
+        "id_local": "Application.update",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /api/v1/app/{app_id}",
+          "locator": "server/svix-server/src/v1/endpoints/application.rs:473"
+        },
+        "entity_why": "primary effect row_upsert lands on this table",
+        "ref_code": "// creates app if missing\nlet (app, ids, metadata, create_models) = if let Some((app, metadata)) = fetch_with_metadata(...)? { (app.into(), Some(ids), metadata.into(), false) } else { (ActiveModel::new(org_id), None, ..., true) };\ndb.transaction(|txn| { let app = if create_models { app.insert(txn) } else { app.update(txn) }; metadata.upsert_or_delete(txn) })...\nCreateMessageApp::invalidate(cache, &app_id, &org_id)",
+        "edges": [
+          "core/permissions.rs OrganizationWithApplication extractor + application.rs:262"
+        ],
+        "_unified_org": "org_id is pinned to $const 1: this open-source single-instance build has no user/account table (the collector found no account entity); Svix is a multi-tenant saas but self-hosted deployments run a single organization, so org scoping collapses to the implicit org. Auth for all tools is the org-level JWT, modeled implicitly here."
+      },
+      "entity": "Application",
+      "_binds": {
+        "app_id": "Application.id",
+        "name": "Application.name",
+        "uid": "Application.uid",
+        "throttle_rate": "Application.rate_limit",
+        "metadata": "ApplicationMetadata.data"
+      },
+      "_output_schema": {
+        "application": "the upserted Application row"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Application",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "app_id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "precondition": "No application with that id exists.",
+          "not_found": "No application with that id exists."
+        },
+        "required": [
+          "app_id",
+          "name"
+        ]
+      },
+      "_defaulted": [
+        "fields (mapped to the real parameter names via binds)",
+        "entity and row target rewritten: primary effect is the {Application,Endpoint} row itself (this repo's update/patch write the row, not the metadata side-table)"
+      ],
+      "_override_note": "Primarily writes the {Application,Endpoint} row (name/uid/url/disabled); metadata (data JSON) is secondary and modeled as a write-ignored column in this unified world.",
+      "description": "Create, or fully replace if it already exists, an application (its name, uid and rate limit). Pass the full desired state; Fails with a conflict if the new uid collides with another application."
+    },
+    {
+      "tool": "application_patch",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Application",
+        "row_key": {
+          "id": {
+            "$arg": "app_id"
+          }
+        },
+        "fields": [
+          "name",
+          "uid",
+          "rate_limit"
+        ],
+        "set": {
+          "name": {
+            "$arg": "name"
+          },
+          "uid": {
+            "$arg": "uid"
+          },
+          "rate_limit": {
+            "$arg": "throttle_rate"
+          }
+        }
+      },
+      "input_schema": {
+        "app_id": {
+          "type": "int",
+          "description": "Id of the application this belongs to."
+        },
+        "name": {
+          "type": "text",
+          "description": "A name for the resource."
+        },
+        "uid": {
+          "type": "text",
+          "description": "Optional unique key (must be unique within the org/app)."
+        },
+        "throttle_rate": {
+          "type": "int"
+        },
+        "metadata": {
+          "type": "json",
+          "description": "Arbitrary JSON metadata stored with the row."
+        },
+        "id": {
+          "type": "int"
+        }
+      },
+      "_evidence": {
+        "locator": "server/svix-server/src/v1/endpoints/application.rs:303",
+        "id_local": "Application.patch",
+        "entry": {
+          "kind": "http",
+          "route": "PATCH /api/v1/app/{app_id}",
+          "locator": "server/svix-server/src/v1/endpoints/application.rs:473"
+        },
+        "entity_why": "primary effect row_upsert lands on this table",
+        "ref_code": "// requires existing app: OrganizationWithApplication resolves it (404 if missing)\nlet metadata = app.fetch_or_create_metadata(db)...;\ndb.transaction(|txn| { app.update(txn); metadata.upsert_or_delete(txn) });\nCreateMessageApp::invalidate(cache, &app.id, &app.org_id)",
+        "edges": [
+          "core/permissions.rs OrganizationWithApplication extractor (Organization token + app lookup) + v1/endpoints/v1/endpoints/application.rs:303"
+        ]
+      },
+      "entity": "Application",
+      "_binds": {
+        "app_id": "Application.id",
+        "name": "Application.name",
+        "uid": "Application.uid",
+        "throttle_rate": "Application.rate_limit",
+        "metadata": "ApplicationMetadata.data"
+      },
+      "_output_schema": {
+        "application": "the patched Application row"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Application",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "app_id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "precondition": "No application with that id exists.",
+          "not_found": "No application with that id exists."
+        },
+        "required": [
+          "app_id"
+        ]
+      },
+      "_defaulted": [
+        "fields (mapped to the real parameter names via binds)",
+        "entity and row target rewritten: primary effect is the {Application,Endpoint} row itself (this repo's update/patch write the row, not the metadata side-table)"
+      ],
+      "_override_note": "Primarily writes the {Application,Endpoint} row (name/uid/url/disabled); metadata (data JSON) is secondary and modeled as a write-ignored column in this unified world.",
+      "description": "Partially update an application's name, uid or rate limit. Only the fields you pass are changed. Fails if the application does not exist."
+    },
+    {
+      "tool": "application_delete",
+      "op": "delete",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Application",
+        "row_key": {
+          "id": {
+            "$arg": "app_id"
+          }
+        },
+        "fields": [
+          "org_id",
+          "uid",
+          "name",
+          "rate_limit",
+          "deleted"
+        ],
+        "set": {
+          "deleted": true,
+          "uid": null,
+          "updated_at": "2026-01-01T00:00:00"
+        }
+      },
+      "input_schema": {
+        "app_id": {
+          "type": "int",
+          "description": "Id of the application this belongs to."
+        },
+        "name": {
+          "type": "text",
+          "description": "A name for the resource."
+        },
+        "rate_limit": {
+          "type": "int"
+        }
+      },
+      "_evidence": {
+        "locator": "server/svix-server/src/v1/endpoints/application.rs:334",
+        "id_local": "Application.delete",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/v1/app/{app_id}",
+          "locator": "server/svix-server/src/v1/endpoints/application.rs:473"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "let mut app: application::ActiveModel = app.into();\napp.deleted = Set(true);\napp.uid = Set(None); // We don't want deleted UIDs to clash\napp.update(db).await?;\nCreateMessageApp::invalidate(cache, &app_id, &org_id)",
+        "edges": [
+          "core/permissions.rs OrganizationWithApplication extractor (Organization token + app lookup) + v1/endpoints/v1/endpoints/application.rs:334"
+        ]
+      },
+      "entity": "Application",
+      "_binds": {
+        "app_id": "Application.id"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Application",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "app_id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "precondition": "No application with that id exists.",
+          "not_found": "No application with that id exists."
+        },
+        "required": [
+          "app_id"
+        ]
+      },
+      "_defaulted": [
+        "argument invented from the write column",
+        "fields"
+      ],
+      "description": "Soft-delete an application (marks deleted, clears its uid so the id can be reused). Disabled endpoints and subsequent deliveries are stopped."
+    },
+    {
+      "tool": "application_app_portal_access",
+      "op": "action",
+      "family": "action.emit",
+      "exec_spec": {
+        "channel": "app_portal",
+        "record": {
+          "set": {
+            "app_id": {
+              "$arg": "app_id"
+            },
+            "token_generated": {
+              "$const": true
+            }
+          }
+        }
+      },
+      "input_schema": {
+        "app_id": {
+          "type": "int",
+          "description": "Id of the application this belongs to."
+        },
+        "feature_flags": {
+          "type": "json"
+        },
+        "application": {
+          "type": "json"
+        },
+        "application_name": {
+          "type": "text"
+        },
+        "application_uid": {
+          "type": "text"
+        }
+      },
+      "_evidence": {
+        "locator": "server/svix-server/src/v1/endpoints/auth.rs:44",
+        "id_local": "Application.app_portal_access",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/v1/auth/app-portal-access/{app_id}",
+          "locator": "server/svix-server/src/v1/endpoints/auth.rs:152"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "if let Some(data.application) && no app found { create_app_from_app_in(db, data.application, org_id) };\nlet token = generate_app_token(&cfg.jwt_signing_config, app.org_id, app.id, data.feature_flags)?;\nOk(Json(AppPortalAccessOut { url: \"https://docs.svix.com/app-portal/oss\".into(), token }))",
+        "edges": [
+          "core/permissions.rs OrganizationWithApplication extractor + auth.rs:44"
+        ]
+      },
+      "entity": null,
+      "_binds": {
+        "app_id": "Application.id",
+        "application_name": "Application.name",
+        "application_uid": "Application.uid"
+      },
+      "_output_schema": {
+        "url": "portal login URL",
+        "token": "app authentication JWT"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Application",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "app_id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "precondition": "No application with that id exists."
+        },
+        "required": [
+          "app_id"
+        ]
+      },
+      "_defaulted": [
+        "fields (mapped to the real parameter names via binds)"
+      ],
+      "description": "Generate an app-portal access token that lets you log into this application's portal without an organization-level credential. Creates the application first if it does not exist."
+    },
+    {
+      "tool": "endpoint_create",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Endpoint",
+        "fields": {
+          "app_id": {
+            "$arg": "app_id"
+          },
+          "url": {
+            "$arg": "url"
+          },
+          "description": {
+            "$arg": "description"
+          },
+          "uid": {
+            "$arg": "uid"
+          },
+          "key": {
+            "$arg": "secret"
+          },
+          "disabled": {
+            "$arg": "disabled"
+          },
+          "event_types_ids": {
+            "$arg": "event_types"
+          },
+          "channels": {
+            "$arg": "channels"
+          },
+          "rate_limit": {
+            "$arg": "throttle_rate"
+          }
+        },
+        "set_on_create": {
+          "version": 1,
+          "deleted": false,
+          "created_at": "2026-01-01T00:00:00",
+          "updated_at": "2026-01-01T00:00:00"
+        },
+        "unique_on": [
+          "app_id",
+          "uid"
+        ]
+      },
+      "input_schema": {
+        "app_id": {
+          "type": "int",
+          "description": "Id of the application this belongs to."
+        },
+        "url": {
+          "type": "text",
+          "description": "The destination URL that will receive webhook deliveries."
+        },
+        "description": {
+          "type": "text",
+          "description": "A human-readable description."
+        },
+        "uid": {
+          "type": "text",
+          "description": "Optional unique key (must be unique within the org/app)."
+        },
+        "secret": {
+          "type": "text",
+          "description": "The signing secret (whsec) or key value."
+        },
+        "disabled": {
+          "type": "bool"
+        },
+        "event_types": {
+          "type": "json"
+        },
+        "channels": {
+          "type": "json"
+        },
+        "throttle_rate": {
+          "type": "int"
+        },
+        "metadata": {
+          "type": "json",
+          "description": "Arbitrary JSON metadata stored with the row."
+        }
+      },
+      "_evidence": {
+        "locator": "server/svix-server/src/v1/endpoints/endpoint/crud.rs:115",
+        "id_local": "Endpoint.create",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/v1/app/{app_id}/endpoint",
+          "locator": "server/svix-server/src/v1/endpoints/endpoint/mod.rs:897"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "// validates: event_types all exist for org (else 422); url scheme when endpoint_https_only\nif let Some(event_types) = &data.event_types { validate_event_types(db, event_types, &app.org_id).await?; }\nvalidate_endpoint_url(&data.url, cfg.endpoint_https_only)?;\nlet key = data.key_take_or_generate(&cfg.encryption, &cfg.default_signature_type)?; // secret auto-gen\nlet endp = endpoint::ActiveModel::new(app.id.clone(), key);\ndb.transaction(insert endp + metadata.upsert_or_delete);\nCreateMessageApp::invalidate(cache, &app.id, &app.org_id);\nop_webhooks.send(OperationalWebhook::EndpointCreated)",
+        "edges": [
+          "core/permissions.rs permissions::Application extractor (secure_find app by org+id, check_app_is_permitted) + v1/endpoints/v1/endpoints/endpoint/crud.rs:115",
+          "validate_event_types checks every listed event_type exists for the org (crud.rs:359)"
+        ]
+      },
+      "entity": "Endpoint",
+      "_binds": {
+        "app_id": "Application.id",
+        "url": "Endpoint.url",
+        "description": "Endpoint.description",
+        "uid": "Endpoint.uid",
+        "secret": "Endpoint.key",
+        "disabled": "Endpoint.disabled",
+        "event_types": "Endpoint.event_types_ids",
+        "channels": "Endpoint.channels",
+        "throttle_rate": "Endpoint.rate_limit",
+        "metadata": "EndpointMetadata.data"
+      },
+      "_output_schema": {
+        "endpoint": "the created Endpoint row and metadata"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Application",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "app_id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "app_id",
+          "url",
+          "description"
+        ],
+        "messages": {
+          "precondition": "No application with that id exists.",
+          "fk_missing": "An endpoint must belong to an existing application.",
+          "unique": "An endpoint with this key already exists for the application.",
+          "fk": "The application or event type does not exist.",
+          "not_found": "No endpoint with that id in this application, or the application does not exist."
+        }
+      },
+      "_defaulted": [
+        "fields (mapped to the real parameter names via binds)"
+      ],
+      "description": "Register a new delivery Endpoint (a URL that will receive webhooks) within an application. Fails if the application or any listed event type does not exist."
+    },
+    {
+      "tool": "endpoint_list",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Endpoint",
+        "scope": {
+          "where": {
+            "app_id": {
+              "$arg": "app_id"
+            }
+          }
+        },
+        "rank": {
+          "method": "exact"
+        },
+        "pagination": {
+          "default_limit": 20
+        }
+      },
+      "input_schema": {
+        "app_id": {
+          "type": "int",
+          "description": "Id of the application this belongs to."
+        },
+        "limit": {
+          "type": "int"
+        },
+        "iterator": {
+          "type": "text"
+        },
+        "order": {
+          "type": "text"
+        }
+      },
+      "_evidence": {
+        "locator": "server/svix-server/src/v1/endpoints/endpoint/crud.rs:36",
+        "id_local": "Endpoint.list",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v1/app/{app_id}/endpoint",
+          "locator": "server/svix-server/src/v1/endpoints/endpoint/mod.rs:897"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "apply_pagination(endpoint::Entity::secure_find(app.id), Column::Id, limit, iterator, order)\n  .find_also_related(endpointmetadata::Entity).all(db)",
+        "edges": [
+          "core/permissions.rs permissions::Application extractor (secure_find app by org+id, check_app_is_permitted) + v1/endpoints/v1/endpoints/endpoint/crud.rs:36"
+        ]
+      },
+      "entity": "Endpoint",
+      "_binds": {
+        "app_id": "Application.id"
+      },
+      "_output_schema": {
+        "data": "list of Endpoint rows with metadata",
+        "iterator": "next cursor",
+        "done": "bool"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Application",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "app_id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "precondition": "No application with that id exists.",
+          "not_found": "No endpoint with that id in this application, or the application does not exist."
+        },
+        "required": [
+          "app_id"
+        ]
+      },
+      "description": "List the endpoints registered to an application."
+    },
+    {
+      "tool": "endpoint_get",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Endpoint",
+        "lookup_by": {
+          "id": {
+            "$arg": "endpoint_id"
+          }
+        },
+        "scope": {
+          "where": {
+            "app_id": {
+              "$arg": "app_id"
+            },
+            "id": {
+              "$arg": "endpoint_id"
+            }
+          }
+        }
+      },
+      "input_schema": {
+        "app_id": {
+          "type": "int",
+          "description": "Id of the application this belongs to."
+        },
+        "endpoint_id": {
+          "type": "int",
+          "description": "Id of the endpoint."
+        }
+      },
+      "_evidence": {
+        "locator": "server/svix-server/src/v1/endpoints/endpoint/crud.rs:141",
+        "id_local": "Endpoint.get",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v1/app/{app_id}/endpoint/{endpoint_id}",
+          "locator": "server/svix-server/src/v1/endpoints/endpoint/mod.rs:904"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "endpoint::Entity::secure_find_by_id_or_uid(app.id, endpoint_id).find_also_related(endpointmetadata::Entity).one(db).await?.ok_or(HttpError::not_found)?",
+        "edges": [
+          "core/permissions.rs permissions::Application extractor (secure_find app by org+id, check_app_is_permitted) + v1/endpoints/v1/endpoints/endpoint/crud.rs:141"
+        ]
+      },
+      "entity": "Endpoint",
+      "_binds": {
+        "app_id": "Application.id",
+        "endpoint_id": "Endpoint.id"
+      },
+      "_output_schema": {
+        "endpoint": "the Endpoint row and metadata"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Application",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "app_id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "precondition": "No application with that id exists.",
+          "not_found": "No endpoint with that id in this application."
+        },
+        "required": [
+          "app_id",
+          "endpoint_id"
+        ]
+      },
+      "description": "Fetch a single endpoint by its id within an application."
+    },
+    {
+      "tool": "endpoint_update",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Endpoint",
+        "row_key": {
+          "id": {
+            "$arg": "endpoint_id"
+          }
+        },
+        "fields": [
+          "url",
+          "description",
+          "uid",
+          "disabled",
+          "event_types_ids",
+          "channels",
+          "rate_limit"
+        ],
+        "set": {
+          "url": {
+            "$arg": "url"
+          },
+          "description": {
+            "$arg": "description"
+          },
+          "disabled": {
+            "$arg": "disabled"
+          },
+          "uid": {
+            "$arg": "uid"
+          }
+        }
+      },
+      "input_schema": {
+        "app_id": {
+          "type": "int",
+          "description": "Id of the application this belongs to."
+        },
+        "endpoint_id": {
+          "type": "int",
+          "description": "Id of the endpoint."
+        },
+        "url": {
+          "type": "text",
+          "description": "The destination URL that will receive webhook deliveries."
+        },
+        "description": {
+          "type": "text",
+          "description": "A human-readable description."
+        },
+        "uid": {
+          "type": "text",
+          "description": "Optional unique key (must be unique within the org/app)."
+        },
+        "disabled": {
+          "type": "bool"
+        },
+        "event_types": {
+          "type": "json"
+        },
+        "channels": {
+          "type": "json"
+        },
+        "throttle_rate": {
+          "type": "int"
+        },
+        "metadata": {
+          "type": "json",
+          "description": "Arbitrary JSON metadata stored with the row."
+        },
+        "id": {
+          "type": "int"
+        }
+      },
+      "_evidence": {
+        "locator": "server/svix-server/src/v1/endpoints/endpoint/crud.rs:190",
+        "id_local": "Endpoint.update",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /api/v1/app/{app_id}/endpoint/{endpoint_id}",
+          "locator": "server/svix-server/src/v1/endpoints/endpoint/mod.rs:904"
+        },
+        "entity_why": "primary effect row_upsert lands on this table",
+        "ref_code": "// validates event_types/url; upserts if missing\nlet models = Endpoint::ActiveModel::fetch_with_metadata(...).await?;\nif let Some((mut endp, mut metadata)) = models { update_endp_from_data(...) => Updated }\nelse { let data = data.into_in_with_default_key(); create_endp_from_data(...) => Created }",
+        "edges": [
+          "core/permissions.rs permissions::Application extractor (secure_find app by org+id, check_app_is_permitted) + v1/endpoints/v1/endpoints/endpoint/crud.rs:190"
+        ]
+      },
+      "entity": "Endpoint",
+      "_binds": {
+        "app_id": "Application.id",
+        "endpoint_id": "Endpoint.id",
+        "url": "Endpoint.url",
+        "description": "Endpoint.description",
+        "uid": "Endpoint.uid",
+        "disabled": "Endpoint.disabled",
+        "event_types": "Endpoint.event_types_ids",
+        "channels": "Endpoint.channels",
+        "throttle_rate": "Endpoint.rate_limit",
+        "metadata": "EndpointMetadata.data"
+      },
+      "_output_schema": {
+        "endpoint": "the upserted Endpoint row"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Application",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "app_id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "precondition": "No application with that id exists.",
+          "not_found": "No endpoint with that id in this application."
+        },
+        "required": [
+          "app_id",
+          "endpoint_id",
+          "url"
+        ]
+      },
+      "_defaulted": [
+        "fields (mapped to the real parameter names via binds)",
+        "entity and row target rewritten: primary effect is the {Application,Endpoint} row itself (this repo's update/patch write the row, not the metadata side-table)"
+      ],
+      "_override_note": "Primarily writes the {Application,Endpoint} row (name/uid/url/disabled); metadata (data JSON) is secondary and modeled as a write-ignored column in this unified world.",
+      "description": "Create, or fully replace if it already exists, an endpoint's URL, description, enabled state and event-type filters."
+    },
+    {
+      "tool": "endpoint_patch",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Endpoint",
+        "row_key": {
+          "id": {
+            "$arg": "endpoint_id"
+          }
+        },
+        "fields": [
+          "url",
+          "description",
+          "uid",
+          "disabled",
+          "event_types_ids",
+          "channels",
+          "rate_limit"
+        ],
+        "set": {
+          "url": {
+            "$arg": "url"
+          },
+          "description": {
+            "$arg": "description"
+          },
+          "disabled": {
+            "$arg": "disabled"
+          },
+          "uid": {
+            "$arg": "uid"
+          }
+        }
+      },
+      "input_schema": {
+        "app_id": {
+          "type": "int",
+          "description": "Id of the application this belongs to."
+        },
+        "endpoint_id": {
+          "type": "int",
+          "description": "Id of the endpoint."
+        },
+        "url": {
+          "type": "text",
+          "description": "The destination URL that will receive webhook deliveries."
+        },
+        "description": {
+          "type": "text",
+          "description": "A human-readable description."
+        },
+        "uid": {
+          "type": "text",
+          "description": "Optional unique key (must be unique within the org/app)."
+        },
+        "disabled": {
+          "type": "bool"
+        },
+        "event_types": {
+          "type": "json"
+        },
+        "channels": {
+          "type": "json"
+        },
+        "metadata": {
+          "type": "json",
+          "description": "Arbitrary JSON metadata stored with the row."
+        },
+        "id": {
+          "type": "int"
+        }
+      },
+      "_evidence": {
+        "locator": "server/svix-server/src/v1/endpoints/endpoint/crud.rs:229",
+        "id_local": "Endpoint.patch",
+        "entry": {
+          "kind": "http",
+          "route": "PATCH /api/v1/app/{app_id}/endpoint/{endpoint_id}",
+          "locator": "server/svix-server/src/v1/endpoints/endpoint/mod.rs:904"
+        },
+        "entity_why": "primary effect row_upsert lands on this table",
+        "ref_code": "let (mut endp, mut metadata) = Endpoint::ActiveModel::fetch_with_metadata(...).await?.ok_or(not_found)?;\n...patch update_model(&mut endp);\nupdate_endp_from_data(db, op_webhooks, cache, app, endp, metadata)",
+        "edges": [
+          "core/permissions.rs permissions::Application extractor (secure_find app by org+id, check_app_is_permitted) + v1/endpoints/v1/endpoints/endpoint/crud.rs:229"
+        ]
+      },
+      "entity": "Endpoint",
+      "_binds": {
+        "app_id": "Application.id",
+        "endpoint_id": "Endpoint.id",
+        "url": "Endpoint.url",
+        "description": "Endpoint.description",
+        "uid": "Endpoint.uid",
+        "disabled": "Endpoint.disabled",
+        "event_types": "Endpoint.event_types_ids",
+        "channels": "Endpoint.channels",
+        "metadata": "EndpointMetadata.data"
+      },
+      "_output_schema": {
+        "endpoint": "the patched Endpoint row"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Application",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "app_id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "precondition": "No application with that id exists.",
+          "not_found": "No endpoint with that id in this application."
+        },
+        "required": [
+          "app_id",
+          "endpoint_id"
+        ]
+      },
+      "_defaulted": [
+        "fields (mapped to the real parameter names via binds)",
+        "entity and row target rewritten: primary effect is the {Application,Endpoint} row itself (this repo's update/patch write the row, not the metadata side-table)"
+      ],
+      "_override_note": "Primarily writes the {Application,Endpoint} row (name/uid/url/disabled); metadata (data JSON) is secondary and modeled as a write-ignored column in this unified world.",
+      "description": "Partially update an endpoint's URL, description, enabled state or event-type filters. Only passed fields change."
+    },
+    {
+      "tool": "endpoint_delete",
+      "op": "delete",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Endpoint",
+        "row_key": {
+          "id": {
+            "$arg": "endpoint_id"
+          }
+        },
+        "fields": [
+          "app_id",
+          "key",
+          "url",
+          "description",
+          "event_types_ids",
+          "version",
+          "rate_limit",
+          "deleted",
+          "disabled",
+          "first_failure_at",
+          "uid",
+          "old_keys",
+          "channels",
+          "headers"
+        ],
+        "set": {
+          "deleted": true,
+          "uid": null,
+          "updated_at": "2026-01-01T00:00:00"
+        }
+      },
+      "input_schema": {
+        "app_id": {
+          "type": "int",
+          "description": "Id of the application this belongs to."
+        },
+        "endpoint_id": {
+          "type": "int",
+          "description": "Id of the endpoint."
+        },
+        "key": {
+          "type": "text",
+          "description": "The signing secret (whsec) or key value."
+        },
+        "url": {
+          "type": "text",
+          "description": "The destination URL that will receive webhook deliveries."
+        },
+        "description": {
+          "type": "text",
+          "description": "A human-readable description."
+        },
+        "event_types_ids": {
+          "type": "json"
+        },
+        "version": {
+          "type": "int"
+        },
+        "rate_limit": {
+          "type": "int"
+        },
+        "disabled": {
+          "type": "bool"
+        },
+        "first_failure_at": {
+          "type": "datetime"
+        },
+        "old_keys": {
+          "type": "json"
+        },
+        "channels": {
+          "type": "json"
+        },
+        "headers": {
+          "type": "json",
+          "description": "A map of custom HTTP header name to value to attach to deliveries."
+        }
+      },
+      "_evidence": {
+        "locator": "server/svix-server/src/v1/endpoints/endpoint/crud.rs:267",
+        "id_local": "Endpoint.delete",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/v1/app/{app_id}/endpoint/{endpoint_id}",
+          "locator": "server/svix-server/src/v1/endpoints/endpoint/mod.rs:904"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "let mut endp: endpoint::ActiveModel = endp.into();\nendp.deleted = Set(true);\nendp.uid = Set(None);\nendp.update(db).await?;\nCreateMessageApp::invalidate(cache, &app.id, &app.org_id);\nop_webhooks.send(OperationalWebhook::EndpointDeleted)",
+        "edges": [
+          "core/permissions.rs permissions::Application extractor (secure_find app by org+id, check_app_is_permitted) + v1/endpoints/v1/endpoints/endpoint/crud.rs:267"
+        ]
+      },
+      "entity": "Endpoint",
+      "_binds": {
+        "app_id": "Application.id",
+        "endpoint_id": "Endpoint.id"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Application",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "app_id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "precondition": "No application with that id exists.",
+          "not_found": "No endpoint with that id in this application."
+        },
+        "required": [
+          "app_id",
+          "endpoint_id"
+        ]
+      },
+      "_defaulted": [
+        "argument invented from the write column",
+        "fields"
+      ],
+      "description": "Soft-delete an endpoint (marks deleted, clears its uid). It will no longer receive deliveries."
+    },
+    {
+      "tool": "endpoint_get_secret",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Endpoint",
+        "lookup_by": {
+          "id": {
+            "$arg": "endpoint_id"
+          }
+        }
+      },
+      "input_schema": {
+        "app_id": {
+          "type": "int",
+          "description": "Id of the application this belongs to."
+        },
+        "endpoint_id": {
+          "type": "int",
+          "description": "Id of the endpoint."
+        }
+      },
+      "_evidence": {
+        "locator": "server/svix-server/src/v1/endpoints/endpoint/secrets.rs:99",
+        "id_local": "Endpoint.get_secret",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v1/app/{app_id}/endpoint/{endpoint_id}/secret",
+          "locator": "server/svix-server/src/v1/endpoints/endpoint/mod.rs:910"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "let endp = endpoint::Entity::secure_find_by_id_or_uid(app.id, endpoint_id).one(db).await?.ok_or(not_found)?;\nOk(Json(EndpointSecretOut { key: endp.key.into_endpoint_secret(&cfg.encryption)? }))",
+        "edges": [
+          "core/permissions.rs permissions::Application extractor (secure_find app by org+id, check_app_is_permitted) + v1/endpoints/v1/endpoints/endpoint/secrets.rs:99"
+        ]
+      },
+      "entity": "Endpoint",
+      "_binds": {
+        "app_id": "Application.id",
+        "endpoint_id": "Endpoint.id"
+      },
+      "_output_schema": {
+        "key": "the current plaintext signing secret"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Application",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "app_id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "precondition": "No application with that id exists.",
+          "not_found": "No endpoint with that id in this application."
+        },
+        "required": [
+          "app_id",
+          "endpoint_id"
+        ]
+      },
+      "description": "Fetch the current signing secret (whsec) for an endpoint. This is what verifies incoming webhook signatures."
+    },
+    {
+      "tool": "endpoint_rotate_secret",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Endpoint",
+        "row_key": {
+          "id": {
+            "$arg": "endpoint_id"
+          }
+        },
+        "fields": [
+          "key",
+          "url",
+          "description",
+          "event_types_ids",
+          "version",
+          "rate_limit",
+          "deleted",
+          "disabled",
+          "uid",
+          "old_keys",
+          "channels",
+          "headers"
+        ],
+        "set": {
+          "key": {
+            "$arg": "key"
+          },
+          "updated_at": "2026-01-01T00:00:00"
+        }
+      },
+      "input_schema": {
+        "app_id": {
+          "type": "int",
+          "description": "Id of the application this belongs to."
+        },
+        "endpoint_id": {
+          "type": "int",
+          "description": "Id of the endpoint."
+        },
+        "key": {
+          "type": "text",
+          "description": "The signing secret (whsec) or key value."
+        },
+        "rotation_grace_period": {
+          "type": "text"
+        },
+        "url": {
+          "type": "text",
+          "description": "The destination URL that will receive webhook deliveries."
+        },
+        "description": {
+          "type": "text",
+          "description": "A human-readable description."
+        },
+        "event_types_ids": {
+          "type": "json"
+        },
+        "version": {
+          "type": "int"
+        },
+        "rate_limit": {
+          "type": "int"
+        },
+        "deleted": {
+          "type": "bool"
+        },
+        "disabled": {
+          "type": "bool"
+        },
+        "first_failure_at": {
+          "type": "datetime"
+        },
+        "uid": {
+          "type": "text",
+          "description": "Optional unique key (must be unique within the org/app)."
+        },
+        "channels": {
+          "type": "json"
+        },
+        "headers": {
+          "type": "json",
+          "description": "A map of custom HTTP header name to value to attach to deliveries."
+        }
+      },
+      "_evidence": {
+        "locator": "server/svix-server/src/v1/endpoints/endpoint/secrets.rs:115",
+        "id_local": "Endpoint.rotate_secret",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/v1/app/{app_id}/endpoint/{endpoint_id}/secret/rotate",
+          "locator": "server/svix-server/src/v1/endpoints/endpoint/mod.rs:916"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "if unexpired_old_keys.len() > ExpiringSigningKeys::MAX_OLD_KEYS { return Err(limit_reached) }\nlet endp = endpoint::ActiveModel { key: Set(new_data.current_key.unwrap()), old_keys: Set(new_data.old_keys), ..endp.into() };\nendp.update(db); CreateMessageApp::invalidate(cache, ...); op_webhooks.send(EndpointUpdated)",
+        "edges": [
+          "core/permissions.rs permissions::Application extractor (secure_find app by org+id, check_app_is_permitted) + v1/endpoints/v1/endpoints/endpoint/secrets.rs:115"
+        ]
+      },
+      "entity": "Endpoint",
+      "_binds": {
+        "app_id": "Application.id",
+        "endpoint_id": "Endpoint.id",
+        "key": "Endpoint.key"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Application",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "app_id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "precondition": "No application with that id exists.",
+          "not_found": "No endpoint with that id in this application."
+        },
+        "required": [
+          "app_id",
+          "endpoint_id",
+          "key"
+        ]
+      },
+      "_defaulted": [
+        "argument invented from the write column",
+        "fields"
+      ],
+      "description": "Rotate an endpoint's signing secret: sets a new current key and moves the previous one to old_keys so it keeps working for a grace period. Fails if too many old keys are already pending."
+    },
+    {
+      "tool": "endpoint_get_headers",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Endpoint",
+        "lookup_by": {
+          "id": {
+            "$arg": "endpoint_id"
+          }
+        }
+      },
+      "input_schema": {
+        "app_id": {
+          "type": "int",
+          "description": "Id of the application this belongs to."
+        },
+        "endpoint_id": {
+          "type": "int",
+          "description": "Id of the endpoint."
+        }
+      },
+      "_evidence": {
+        "locator": "server/svix-server/src/v1/endpoints/endpoint/headers.rs:19",
+        "id_local": "Endpoint.get_headers",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v1/app/{app_id}/endpoint/{endpoint_id}/headers",
+          "locator": "server/svix-server/src/v1/endpoints/endpoint/mod.rs:944"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "match endp.headers { Some(h) => Ok(Json(h.into())), None => Ok(Json(EndpointHeadersOut::default())) }",
+        "edges": [
+          "core/permissions.rs permissions::Application extractor (secure_find app by org+id, check_app_is_permitted) + v1/endpoints/v1/endpoints/endpoint/headers.rs:19"
+        ]
+      },
+      "entity": "Endpoint",
+      "_binds": {
+        "app_id": "Application.id",
+        "endpoint_id": "Endpoint.id"
+      },
+      "_output_schema": {
+        "headers": "map of header->value",
+        "sensitive": "set of sensitive header names omitted"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Application",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "app_id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "precondition": "No application with that id exists.",
+          "not_found": "No endpoint with that id in this application."
+        },
+        "required": [
+          "app_id",
+          "endpoint_id"
+        ]
+      },
+      "description": "Fetch the custom HTTP headers that will be attached to every webhook delivery to this endpoint."
+    },
+    {
+      "tool": "endpoint_update_headers",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Endpoint",
+        "row_key": {
+          "id": {
+            "$arg": "endpoint_id"
+          }
+        },
+        "fields": [
+          "headers"
+        ],
+        "set": {
+          "headers": {
+            "$arg": "headers"
+          }
+        }
+      },
+      "input_schema": {
+        "app_id": {
+          "type": "int",
+          "description": "Id of the application this belongs to."
+        },
+        "endpoint_id": {
+          "type": "int",
+          "description": "Id of the endpoint."
+        },
+        "headers": {
+          "type": "json",
+          "description": "A map of custom HTTP header name to value to attach to deliveries."
+        },
+        "key": {
+          "type": "text",
+          "description": "The signing secret (whsec) or key value."
+        },
+        "url": {
+          "type": "text",
+          "description": "The destination URL that will receive webhook deliveries."
+        },
+        "description": {
+          "type": "text",
+          "description": "A human-readable description."
+        },
+        "event_types_ids": {
+          "type": "json"
+        },
+        "version": {
+          "type": "int"
+        },
+        "rate_limit": {
+          "type": "int"
+        },
+        "deleted": {
+          "type": "bool"
+        },
+        "disabled": {
+          "type": "bool"
+        },
+        "first_failure_at": {
+          "type": "datetime"
+        },
+        "uid": {
+          "type": "text",
+          "description": "Optional unique key (must be unique within the org/app)."
+        },
+        "old_keys": {
+          "type": "json"
+        },
+        "channels": {
+          "type": "json"
+        }
+      },
+      "_evidence": {
+        "locator": "server/svix-server/src/v1/endpoints/endpoint/headers.rs:37",
+        "id_local": "Endpoint.update_headers",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /api/v1/app/{app_id}/endpoint/{endpoint_id}/headers",
+          "locator": "server/svix-server/src/v1/endpoints/endpoint/mod.rs:944"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "let mut endp: endpoint::ActiveModel = endp.into();\ndata.update_model(&mut endp); // sets model.headers = Some(header map)\nendp.update(db).await?;",
+        "edges": [
+          "core/permissions.rs permissions::Application extractor (secure_find app by org+id, check_app_is_permitted) + v1/endpoints/v1/endpoints/endpoint/headers.rs:37"
+        ]
+      },
+      "entity": "Endpoint",
+      "_binds": {
+        "app_id": "Application.id",
+        "endpoint_id": "Endpoint.id",
+        "headers": "Endpoint.headers"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Application",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "app_id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "precondition": "No application with that id exists.",
+          "not_found": "No endpoint with that id in this application."
+        },
+        "required": [
+          "app_id",
+          "endpoint_id",
+          "headers"
+        ]
+      },
+      "_defaulted": [
+        "argument invented from the write column",
+        "fields"
+      ],
+      "description": "Replace the custom HTTP headers attached to deliveries to this endpoint."
+    },
+    {
+      "tool": "endpoint_patch_headers",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Endpoint",
+        "row_key": {
+          "id": {
+            "$arg": "endpoint_id"
+          }
+        },
+        "fields": [
+          "headers"
+        ],
+        "set": {
+          "headers": {
+            "$arg": "headers"
+          }
+        }
+      },
+      "input_schema": {
+        "app_id": {
+          "type": "int",
+          "description": "Id of the application this belongs to."
+        },
+        "endpoint_id": {
+          "type": "int",
+          "description": "Id of the endpoint."
+        },
+        "headers": {
+          "type": "json",
+          "description": "A map of custom HTTP header name to value to attach to deliveries."
+        },
+        "key": {
+          "type": "text",
+          "description": "The signing secret (whsec) or key value."
+        },
+        "url": {
+          "type": "text",
+          "description": "The destination URL that will receive webhook deliveries."
+        },
+        "description": {
+          "type": "text",
+          "description": "A human-readable description."
+        },
+        "event_types_ids": {
+          "type": "json"
+        },
+        "version": {
+          "type": "int"
+        },
+        "rate_limit": {
+          "type": "int"
+        },
+        "deleted": {
+          "type": "bool"
+        },
+        "disabled": {
+          "type": "bool"
+        },
+        "first_failure_at": {
+          "type": "datetime"
+        },
+        "uid": {
+          "type": "text",
+          "description": "Optional unique key (must be unique within the org/app)."
+        },
+        "old_keys": {
+          "type": "json"
+        },
+        "channels": {
+          "type": "json"
+        }
+      },
+      "_evidence": {
+        "locator": "server/svix-server/src/v1/endpoints/endpoint/headers.rs:57",
+        "id_local": "Endpoint.patch_headers",
+        "entry": {
+          "kind": "http",
+          "route": "PATCH /api/v1/app/{app_id}/endpoint/{endpoint_id}/headers",
+          "locator": "server/svix-server/src/v1/endpoints/endpoint/mod.rs:944"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "data.update_model(&mut endp); // merges into existing headers, value None removes a header\nendp.update(db).await?;",
+        "edges": [
+          "core/permissions.rs permissions::Application extractor (secure_find app by org+id, check_app_is_permitted) + v1/endpoints/v1/endpoints/endpoint/headers.rs:57"
+        ]
+      },
+      "entity": "Endpoint",
+      "_binds": {
+        "app_id": "Application.id",
+        "endpoint_id": "Endpoint.id",
+        "headers": "Endpoint.headers"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Application",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "app_id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "precondition": "No application with that id exists.",
+          "not_found": "No endpoint with that id in this application."
+        },
+        "required": [
+          "app_id",
+          "endpoint_id",
+          "headers"
+        ]
+      },
+      "_defaulted": [
+        "argument invented from the write column",
+        "fields"
+      ],
+      "description": "Merge additional custom HTTP headers into an endpoint's header map (passing a null value removes that header)."
+    },
+    {
+      "tool": "endpoint_get_stats",
+      "op": "read",
+      "family": "search.aggregate",
+      "exec_spec": {
+        "entity": "MessageAttempt",
+        "scope": {
+          "where": {
+            "endp_id": {
+              "$arg": "endpoint_id"
+            }
+          }
+        },
+        "group_by": [
+          "status"
+        ],
+        "aggregate": [
+          {
+            "fn": "count",
+            "as": "count"
+          }
+        ]
+      },
+      "input_schema": {
+        "app_id": {
+          "type": "int",
+          "description": "Id of the application this belongs to."
+        },
+        "endpoint_id": {
+          "type": "int",
+          "description": "Id of the endpoint."
+        },
+        "since": {
+          "type": "datetime"
+        },
+        "until": {
+          "type": "datetime"
+        }
+      },
+      "_evidence": {
+        "locator": "server/svix-server/src/v1/endpoints/endpoint/mod.rs:775",
+        "id_local": "Endpoint.get_stats",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v1/app/{app_id}/endpoint/{endpoint_id}/stats",
+          "locator": "server/svix-server/src/v1/endpoints/endpoint/mod.rs:924"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "let query_out = messageattempt::Entity::secure_find_by_endpoint(endpoint).after(since).before(until)\n  .select_only().column(Status).column_as(Status.count(), \"count\").group_by(Status).into_model()...;\nOk(Json(EndpointStatsOut { success, pending, fail, sending, canceled: 0 }))",
+        "edges": [
+          "core/permissions.rs permissions::Application extractor (secure_find app by org+id, check_app_is_permitted) + v1/endpoints/v1/endpoints/endpoint/mod.rs:775"
+        ]
+      },
+      "entity": "MessageAttempt",
+      "_binds": {
+        "app_id": "Application.id",
+        "endpoint_id": "Endpoint.id"
+      },
+      "_output_schema": {
+        "success": "int",
+        "pending": "int",
+        "sending": "int",
+        "fail": "int",
+        "canceled": "int"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Application",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "app_id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "precondition": "No application with that id exists.",
+          "not_found": "No endpoint with that id in this application, or the application does not exist."
+        },
+        "required": [
+          "app_id",
+          "endpoint_id"
+        ]
+      },
+      "description": "Count this endpoint's message attempts grouped by delivery status (success, pending, fail, sending)."
+    },
+    {
+      "tool": "endpoint_send_example",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Message",
+        "fields": {
+          "app_id": {
+            "$arg": "app_id"
+          },
+          "event_type": {
+            "$arg": "event_type"
+          }
+        },
+        "set_on_create": {
+          "org_id": {
+            "$const": 1
+          },
+          "expiration": {
+            "$const": "2027-01-01"
+          }
+        },
+        "side_inserts": [
+          {
+            "entity": "MessageContent",
+            "fields": {
+              "payload": {
+                "$const": "SVIX_PING example payload"
+              }
+            },
+            "link_col": "msg_id"
+          }
+        ]
+      },
+      "input_schema": {
+        "app_id": {
+          "type": "int",
+          "description": "Id of the application this belongs to."
+        },
+        "endpoint_id": {
+          "type": "int",
+          "description": "Id of the endpoint."
+        },
+        "event_type": {
+          "type": "text",
+          "description": "The name of the event type this message belongs to."
+        }
+      },
+      "_evidence": {
+        "locator": "server/svix-server/src/v1/endpoints/endpoint/mod.rs:828",
+        "id_local": "Endpoint.send_example",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/v1/app/{app_id}/endpoint/{endpoint_id}/send-example",
+          "locator": "server/svix-server/src/v1/endpoints/endpoint/mod.rs:930"
+        },
+        "entity_why": "primary effect spawn lands on this table",
+        "ref_code": "// builds an example payload from the event type's schema, then delegates to create_message_inner with force_endpoint=Some(endpoint.id)\nlet example = if data.event_type == svix.ping { SVIX_PING_PAYLOAD } else { event_type.schemas.example()... };\ncreate_message_inner(db, queue_tx, cache, false, Some(endpoint.id), msg_in, app.org_id, ApplicationIdOrUid(app.id.0))",
+        "edges": [
+          "core/permissions.rs OrganizationWithApplication extractor (Organization token + app lookup) + v1/endpoints/v1/endpoints/endpoint/mod.rs:828"
+        ],
+        "_unified_org": "org_id is pinned to $const 1: this open-source single-instance build has no user/account table (the collector found no account entity); Svix is a multi-tenant saas but self-hosted deployments run a single organization, so org scoping collapses to the implicit org. Auth for all tools is the org-level JWT, modeled implicitly here."
+      },
+      "entity": "Message",
+      "_binds": {
+        "app_id": "Application.id",
+        "endpoint_id": "Endpoint.id",
+        "event_type": "Message.event_type"
+      },
+      "_output_schema": {
+        "message": "the created example Message"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Application",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "app_id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "app_id",
+          "endpoint_id",
+          "event_type"
+        ],
+        "messages": {
+          "precondition": "No application with that id exists.",
+          "not_found": "No endpoint with that id in this application."
+        }
+      },
+      "_defaulted": [
+        "row_key"
+      ],
+      "description": "Send a synthetic example message to a single endpoint right away, so you can see the exact webhook payload it will receive. Fails if the application or endpoint does not exist."
+    },
+    {
+      "tool": "endpoint_recover_failed_webhooks",
+      "op": "action",
+      "family": "action.emit",
+      "exec_spec": {
+        "channel": "recover",
+        "record": {
+          "set": {
+            "endpoint_id": {
+              "$arg": "endpoint_id"
+            },
+            "since": {
+              "$arg": "since"
+            },
+            "action": "recover"
+          }
+        }
+      },
+      "input_schema": {
+        "app_id": {
+          "type": "int",
+          "description": "Id of the application this belongs to."
+        },
+        "endpoint_id": {
+          "type": "int",
+          "description": "Id of the endpoint."
+        },
+        "since": {
+          "type": "datetime"
+        },
+        "until": {
+          "type": "datetime"
+        }
+      },
+      "_evidence": {
+        "locator": "server/svix-server/src/v1/endpoints/endpoint/recovery.rs:112",
+        "id_local": "Endpoint.recover_failed_webhooks",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/v1/app/{app_id}/endpoint/{endpoint_id}/recover",
+          "locator": "server/svix-server/src/v1/endpoints/endpoint/mod.rs:936"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "if since < until - 14days { return Err(unprocessable_entity) }\nlet endp = secure_find_by_id_or_uid(app.id, endpoint_id).one(db)?.ok_or(not_found)?;\ntokio::spawn(bulk_recover_failed_messages(db, queue_tx, app, endp, since, until));\n// bulk_recover enqueues a Manual MessageTask per failed message (status==Fail)",
+        "edges": [
+          "core/permissions.rs permissions::Application extractor + v1/endpoints/endpoint/recovery.rs:112"
+        ]
+      },
+      "entity": "Endpoint",
+      "_binds": {
+        "app_id": "Application.id",
+        "endpoint_id": "Endpoint.id"
+      },
+      "_output_schema": {
+        "id": "background task id",
+        "status": "Running",
+        "task": "endpoint.recover",
+        "updated_at": "datetime"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Application",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "app_id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "app_id",
+          "endpoint_id",
+          "since"
+        ],
+        "messages": {
+          "precondition": "No application with that id exists.",
+          "not_found": "No endpoint with that id in this application."
+        }
+      },
+      "description": "Re-queue all failed (delivery-unsuccessful) attempts for an endpoint within a time window, retrying them in the background."
+    },
+    {
+      "tool": "eventtype_create",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "EventType",
+        "fields": {
+          "name": {
+            "$arg": "name"
+          },
+          "description": {
+            "$arg": "description"
+          },
+          "deleted": {
+            "$arg": "archived"
+          },
+          "deprecated": {
+            "$arg": "deprecated"
+          },
+          "schemas": {
+            "$arg": "schemas"
+          },
+          "feature_flag": {
+            "$arg": "feature_flag"
+          }
+        },
+        "set_on_create": {
+          "org_id": {
+            "$const": 1
+          }
+        },
+        "unique_on": [
+          "org_id",
+          "name"
+        ]
+      },
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "description": "A name for the resource."
+        },
+        "description": {
+          "type": "text",
+          "description": "A human-readable description."
+        },
+        "archived": {
+          "type": "bool"
+        },
+        "deprecated": {
+          "type": "bool"
+        },
+        "schemas": {
+          "type": "json"
+        },
+        "feature_flag": {
+          "type": "text"
+        }
+      },
+      "_evidence": {
+        "locator": "server/svix-server/src/v1/endpoints/event_type.rs:292",
+        "id_local": "EventType.create",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/v1/event-type",
+          "locator": "server/svix-server/src/v1/endpoints/event_type.rs:446"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "// unarchives if archived (deleted=true) exists, else conflicts if active exists\nlet evtype = secure_find_by_name(org_id, data.name).one(db)?;\nmatch evtype {\n  Some(evtype) if evtype.deleted => { evtype.deleted = Set(false); data.update_model(&mut evtype); evtype.update(db)? }\n  Some(_) => Err(conflict \"An event_type with this name already exists\"),\n  None => { evtype::ActiveModel { org_id: Set(org_id), ..data.into() }.insert(db)? } }",
+        "edges": [
+          "creates unarchives an archived event type; conflicts if an active one with the name exists (event_type.rs:292)"
+        ],
+        "_unified_org": "org_id is pinned to $const 1: this open-source single-instance build has no user/account table (the collector found no account entity); Svix is a multi-tenant saas but self-hosted deployments run a single organization, so org scoping collapses to the implicit org. Auth for all tools is the org-level JWT, modeled implicitly here."
+      },
+      "entity": "EventType",
+      "_binds": {
+        "name": "EventType.name",
+        "description": "EventType.description",
+        "archived": "EventType.deleted",
+        "deprecated": "EventType.deprecated",
+        "schemas": "EventType.schemas",
+        "feature_flag": "EventType.feature_flag"
+      },
+      "_output_schema": {
+        "event_type": "the created EventType row"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "EventType",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "name",
+                      "op": "eq",
+                      "value": {
+                        "arg": "name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "deleted",
+                      "op": "eq",
+                      "value": false
+                    }
+                  ]
+                }
+              },
+              "op": "eq",
+              "n": 0
+            }
+          ]
+        ],
+        "required": [
+          "name",
+          "description"
+        ],
+        "messages": {
+          "unique": "An event type with this name already exists for the organization.",
+          "precondition": "An event type with this name already exists.",
+          "not_found": "No event type with that name exists.",
+          "fk_missing": "A required parent (application/event type) is missing.",
+          "fk": "That parent (application/event type) does not exist."
+        }
+      },
+      "_defaulted": [
+        "fields (mapped to the real parameter names via binds)"
+      ],
+      "description": "Create an event type (the named category a message belongs to, e.g. user.created). Fails if an active event type with the same name already exists; un-archives an archived one instead."
+    },
+    {
+      "tool": "eventtype_list",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "EventType",
+        "rank": {
+          "method": "exact"
+        },
+        "pagination": {
+          "default_limit": 20
+        }
+      },
+      "input_schema": {
+        "limit": {
+          "type": "int"
+        },
+        "iterator": {
+          "type": "text"
+        },
+        "include_archived": {
+          "type": "bool"
+        },
+        "with_content": {
+          "type": "bool"
+        }
+      },
+      "_evidence": {
+        "locator": "server/svix-server/src/v1/endpoints/event_type.rs:234",
+        "id_local": "EventType.list",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v1/event-type",
+          "locator": "server/svix-server/src/v1/endpoints/event_type.rs:446"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "let mut query = eventtype::Entity::secure_find(org_id);\nif !include_archived { query = query.filter(Deleted.eq(false)); }\nif let Some(flags) = feature_flags { query = filter_feature_flags(query, flags); }\napply_pagination(query, Column::Name, limit, iterator, Ascending)"
+      },
+      "entity": "EventType",
+      "_output_schema": {
+        "data": "list of EventType rows",
+        "iterator": "next cursor",
+        "done": "bool"
+      },
+      "description": "List the event types defined in the organization.",
+      "guards": {
+        "messages": {
+          "not_found": "No event type with that name exists."
+        }
+      }
+    },
+    {
+      "tool": "eventtype_get",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "EventType",
+        "lookup_by": {
+          "name": {
+            "$arg": "event_type_name"
+          }
+        }
+      },
+      "input_schema": {
+        "event_type_name": {
+          "type": "text",
+          "description": "The event type's name (its unique key within the org)."
+        }
+      },
+      "_evidence": {
+        "locator": "server/svix-server/src/v1/endpoints/event_type.rs:328",
+        "id_local": "EventType.get",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v1/event-type/{event_type_name}",
+          "locator": "server/svix-server/src/v1/endpoints/event_type.rs:452"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "let query = secure_find_by_name(org_id, event_type_name); if let Some(flags)=feature_flags { query=filter_feature_flags(query,flags) }\nlet evtype = query.one(db)?.ok_or(not_found)?;"
+      },
+      "entity": "EventType",
+      "_binds": {
+        "event_type_name": "EventType.name"
+      },
+      "_output_schema": {
+        "event_type": "the EventType row"
+      },
+      "guards": {
+        "required": [
+          "event_type_name"
+        ],
+        "messages": {
+          "not_found": "No event type with that name exists."
+        }
+      },
+      "description": "Fetch a single event type by name."
+    },
+    {
+      "tool": "eventtype_update",
+      "op": "update",
+      "family": "crud.upsert",
+      "exec_spec": {
+        "entity": "EventType",
+        "key": {
+          "name": {
+            "$arg": "event_type_name"
+          }
+        },
+        "insert_fields": {
+          "description": {
+            "$arg": "description"
+          },
+          "deleted": {
+            "$arg": "archived"
+          },
+          "deprecated": {
+            "$arg": "deprecated"
+          },
+          "schemas": {
+            "$arg": "schemas"
+          },
+          "feature_flag": {
+            "$arg": "feature_flag"
+          }
+        },
+        "set_on_exists": {
+          "description": {
+            "$arg": "description"
+          },
+          "deleted": {
+            "$arg": "archived"
+          },
+          "deprecated": {
+            "$arg": "deprecated"
+          },
+          "schemas": {
+            "$arg": "schemas"
+          },
+          "feature_flag": {
+            "$arg": "feature_flag"
+          }
+        }
+      },
+      "input_schema": {
+        "event_type_name": {
+          "type": "text",
+          "description": "The event type's name (its unique key within the org)."
+        },
+        "description": {
+          "type": "text",
+          "description": "A human-readable description."
+        },
+        "archived": {
+          "type": "bool"
+        },
+        "deprecated": {
+          "type": "bool"
+        },
+        "schemas": {
+          "type": "json"
+        },
+        "feature_flag": {
+          "type": "text"
+        }
+      },
+      "_evidence": {
+        "locator": "server/svix-server/src/v1/endpoints/event_type.rs:351",
+        "id_local": "EventType.update",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /api/v1/event-type/{event_type_name}",
+          "locator": "server/svix-server/src/v1/endpoints/event_type.rs:452"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "match secure_find_by_name(org_id, event_type_name).one(db)? {\n  Some(evtype) => { data.update_model(&mut evtype); evtype.update(db) => Updated }\n  None => { evtype::ActiveModel { org_id: Set(org_id), name: Set(event_type_name), ..data.into() }.insert(db) => Created } }",
+        "_unified_org": "org_id is pinned to $const 1: this open-source single-instance build has no user/account table (the collector found no account entity); Svix is a multi-tenant saas but self-hosted deployments run a single organization, so org scoping collapses to the implicit org. Auth for all tools is the org-level JWT, modeled implicitly here."
+      },
+      "entity": "EventType",
+      "_binds": {
+        "event_type_name": "EventType.name",
+        "description": "EventType.description",
+        "archived": "EventType.deleted",
+        "deprecated": "EventType.deprecated",
+        "schemas": "EventType.schemas",
+        "feature_flag": "EventType.feature_flag"
+      },
+      "_output_schema": {
+        "event_type": "the upserted EventType row"
+      },
+      "guards": {
+        "required": [
+          "event_type_name"
+        ]
+      },
+      "_defaulted": [
+        "family corrected to crud.upsert: ref_code match secure_find_by_name { Some->update, None->insert } proves upsert semantics, not row_insert create; removed the false unique_on that made legit updates conflict"
+      ],
+      "description": "Create, or fully replace if it already exists, an event type's description, deprecation, archival and schema. Fails if the new name collides with another active event type."
+    },
+    {
+      "tool": "eventtype_patch",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "EventType",
+        "row_key": {
+          "name": {
+            "$arg": "event_type_name"
+          }
+        },
+        "fields": {
+          "description": {
+            "$arg": "description"
+          },
+          "deleted": {
+            "$arg": "archived"
+          },
+          "deprecated": {
+            "$arg": "deprecated"
+          },
+          "schemas": {
+            "$arg": "schemas"
+          },
+          "feature_flag": {
+            "$arg": "feature_flag"
+          }
+        },
+        "set": {
+          "updated_at": "2026-01-01T00:00:00"
+        }
+      },
+      "input_schema": {
+        "event_type_name": {
+          "type": "text",
+          "description": "The event type's name (its unique key within the org)."
+        },
+        "description": {
+          "type": "text",
+          "description": "A human-readable description."
+        },
+        "archived": {
+          "type": "bool"
+        },
+        "deprecated": {
+          "type": "bool"
+        },
+        "schemas": {
+          "type": "json"
+        },
+        "feature_flag": {
+          "type": "text"
+        }
+      },
+      "_evidence": {
+        "locator": "server/svix-server/src/v1/endpoints/event_type.rs:386",
+        "id_local": "EventType.patch",
+        "entry": {
+          "kind": "http",
+          "route": "PATCH /api/v1/event-type/{event_type_name}",
+          "locator": "server/svix-server/src/v1/endpoints/event_type.rs:452"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "let evtype = secure_find_by_name(org_id, event_type_name).one(db)?.ok_or(not_found)?;\ndata.update_model(&mut evtype); evtype.update(db)",
+        "edges": [
+          "secure_find_by_name within org; 404 if missing (v1/endpoints/event_type.rs)"
+        ]
+      },
+      "entity": "EventType",
+      "_binds": {
+        "event_type_name": "EventType.name",
+        "description": "EventType.description",
+        "archived": "EventType.deleted",
+        "deprecated": "EventType.deprecated",
+        "schemas": "EventType.schemas",
+        "feature_flag": "EventType.feature_flag"
+      },
+      "_output_schema": {
+        "event_type": "the patched EventType row"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "EventType",
+                "where": {
+                  "node": "field",
+                  "col": "name",
+                  "op": "eq",
+                  "value": {
+                    "arg": "event_type_name"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "precondition": "No event type with that name exists.",
+          "not_found": "No event type with that name exists."
+        },
+        "required": [
+          "event_type_name"
+        ]
+      },
+      "_defaulted": [
+        "fields (mapped to the real parameter names via binds)"
+      ],
+      "description": "Partially update an event type's description, deprecation, archival or schema. Only passed fields change."
+    },
+    {
+      "tool": "eventtype_delete",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "EventType",
+        "lookup_by": {
+          "name": {
+            "$arg": "event_type_name"
+          }
+        }
+      },
+      "input_schema": {
+        "event_type_name": {
+          "type": "text",
+          "description": "The event type's name (its unique key within the org)."
+        },
+        "expunge": {
+          "type": "bool"
+        }
+      },
+      "_evidence": {
+        "locator": "server/svix-server/src/v1/endpoints/event_type.rs:419",
+        "id_local": "EventType.delete",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/v1/event-type/{event_type_name}",
+          "locator": "server/svix-server/src/v1/endpoints/event_type.rs:452"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "let mut evtype = secure_find_by_name(org_id, event_type_name).one(db)?.ok_or(not_found)?;\nif expunge { evtype.delete(db).await? } else { evtype.deleted = Set(true); evtype.update(db).await? }",
+        "edges": [
+          "secure_find_by_name within org; 404 if missing (v1/endpoints/event_type.rs)"
+        ]
+      },
+      "entity": "EventType",
+      "_binds": {
+        "event_type_name": "EventType.name"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "EventType",
+                "where": {
+                  "node": "field",
+                  "col": "name",
+                  "op": "eq",
+                  "value": {
+                    "arg": "event_type_name"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "precondition": "No event type with that name exists.",
+          "not_found": "No event type with that name exists."
+        },
+        "required": [
+          "event_type_name"
+        ]
+      },
+      "description": "Archive or permanently delete an event type. Without expunge it soft-deletes (archives); with expunge it hard-deletes the row."
+    },
+    {
+      "tool": "message_create",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Message",
+        "fields": {
+          "app_id": {
+            "$arg": "app_id"
+          },
+          "event_type": {
+            "$arg": "event_type"
+          },
+          "uid": {
+            "$arg": "eventId"
+          }
+        },
+        "set_on_create": {
+          "org_id": {
+            "$const": 1
+          },
+          "expiration": {
+            "$const": "2027-01-01"
+          }
+        },
+        "unique_on": [
+          "app_id",
+          "uid"
+        ],
+        "side_inserts": [
+          {
+            "entity": "MessageContent",
+            "fields": {
+              "payload": {
+                "$arg": "payload"
+              }
+            },
+            "link_col": "msg_id"
+          }
+        ]
+      },
+      "input_schema": {
+        "app_id": {
+          "type": "int",
+          "description": "Id of the application this belongs to."
+        },
+        "event_type": {
+          "type": "text",
+          "description": "The name of the event type this message belongs to."
+        },
+        "payload": {
+          "type": "json",
+          "description": "The JSON payload to deliver to endpoints. Only sent to endpoints subscribed to matching event types and channels."
+        },
+        "eventId": {
+          "type": "text",
+          "description": "Optional unique event id (uid) for the message; used for idempotency/dedup."
+        },
+        "channels": {
+          "type": "json"
+        },
+        "payload_retention_period": {
+          "type": "int"
+        },
+        "application": {
+          "type": "json"
+        }
+      },
+      "_evidence": {
+        "locator": "server/svix-server/src/v1/endpoints/message.rs:343",
+        "id_local": "Message.create",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/v1/app/{app_id}/msg",
+          "locator": "server/svix-server/src/v1/endpoints/message.rs:666"
+        },
+        "entity_why": "primary effect spawn lands on this table",
+        "ref_code": "let create_message_app = CreateMessageApp::layered_fetch(...)?;\nlet (msg, msg_content) = db.transaction(|txn| { let msg = msg.insert(txn)...; let content = messagecontent::ActiveModel::new(msg.id, payload, msg.expiration).insert(txn)...; (msg, content) });\nif !create_message_app.filtered_endpoints(Scheduled, &msg.event_type, channels).is_empty() {\n  queue_tx.send(&MessageTaskBatch::new_task(msg.id, app.id, force_endpoint, Scheduled), None).await?;\n}",
+        "edges": [
+          "app must exist unless an ApplicationIn body is supplied to create it implicitly (message.rs:373)"
+        ],
+        "_unified_org": "org_id is pinned to $const 1: this open-source single-instance build has no user/account table (the collector found no account entity); Svix is a multi-tenant saas but self-hosted deployments run a single organization, so org scoping collapses to the implicit org. Auth for all tools is the org-level JWT, modeled implicitly here."
+      },
+      "entity": "Message",
+      "_binds": {
+        "app_id": "Application.id",
+        "event_type": "Message.event_type",
+        "payload": "MessageContent.payload",
+        "eventId": "Message.uid",
+        "channels": "Message.channels"
+      },
+      "_output_schema": {
+        "message": "the created Message and payload"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Application",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "app_id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "precondition": "No application with that id exists.",
+          "fk_missing": "A message must belong to an existing application and event type.",
+          "unique": "A message with this event id already exists.",
+          "not_found": "No message with that id in this application, or the application does not exist.",
+          "fk": "That parent (application/event type) does not exist."
+        },
+        "required": [
+          "app_id",
+          "event_type",
+          "payload"
+        ]
+      },
+      "_defaulted": [
+        "row_key"
+      ],
+      "description": "Send a webhook Message for an application: stores the payload and queues delivery to the application's matching endpoints. Fails if the application does not exist, or if an event id is passed that already exists."
+    },
+    {
+      "tool": "message_list",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Message",
+        "scope": {
+          "where": {
+            "app_id": {
+              "$arg": "app_id"
+            }
+          }
+        },
+        "rank": {
+          "method": "exact"
+        },
+        "pagination": {
+          "default_limit": 20
+        }
+      },
+      "input_schema": {
+        "app_id": {
+          "type": "int",
+          "description": "Id of the application this belongs to."
+        },
+        "limit": {
+          "type": "int"
+        },
+        "iterator": {
+          "type": "text"
+        },
+        "event_types": {
+          "type": "json"
+        },
+        "channel": {
+          "type": "text"
+        },
+        "with_content": {
+          "type": "bool"
+        },
+        "before": {
+          "type": "datetime"
+        },
+        "after": {
+          "type": "datetime"
+        }
+      },
+      "_evidence": {
+        "locator": "server/svix-server/src/v1/endpoints/message.rs:279",
+        "id_local": "Message.list",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v1/app/{app_id}/msg",
+          "locator": "server/svix-server/src/v1/endpoints/message.rs:666"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "let mut query = message::Entity::secure_find(app.id);\nif let Some(event_types) { query = query.filter(EventType.is_in(event_types)) }\nif let Some(channel) { query = query.filter(Expr::cust_with_values(\"channels @> $1\", [channel.jsonb()])) }\nfilter_and_paginate_time_limited(query, Column::Id, limit, iterator, before, after)\n  .find_also_related(messagecontent::Entity).all(db)",
+        "edges": [
+          "core/permissions.rs permissions::Application extractor (secure_find app by org+id, check_app_is_permitted) + v1/endpoints/v1/endpoints/message.rs:279"
+        ]
+      },
+      "entity": "Message",
+      "_binds": {
+        "app_id": "Application.id"
+      },
+      "_output_schema": {
+        "data": "list of Messages",
+        "iterator": "next cursor",
+        "done": "bool"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Application",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "app_id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "precondition": "No application with that id exists."
+        },
+        "required": [
+          "app_id"
+        ]
+      },
+      "description": "List the messages sent to an application, optionally filtered by event type, channel or time window."
+    },
+    {
+      "tool": "message_get",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Message",
+        "lookup_by": {
+          "id": {
+            "$arg": "msg_id"
+          }
+        }
+      },
+      "input_schema": {
+        "app_id": {
+          "type": "int",
+          "description": "Id of the application this belongs to."
+        },
+        "msg_id": {
+          "type": "int",
+          "description": "Id (or event id) of the message."
+        },
+        "with_content": {
+          "type": "bool"
+        }
+      },
+      "_evidence": {
+        "locator": "server/svix-server/src/v1/endpoints/message.rs:509",
+        "id_local": "Message.get",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v1/app/{app_id}/msg/{msg_id}",
+          "locator": "server/svix-server/src/v1/endpoints/message.rs:672"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "let (msg, msg_content) = message::Entity::secure_find_by_id_or_uid(app.id, msg_id).find_also_related(messagecontent::Entity).one(db)?.ok_or(not_found)?;\nlet out = MessageOut::from_msg_and_payload(msg, content.map(|c| c.payload), with_content);",
+        "edges": [
+          "core/permissions.rs permissions::Application extractor (secure_find app by org+id, check_app_is_permitted) + v1/endpoints/v1/endpoints/message.rs:509"
+        ]
+      },
+      "entity": "Message",
+      "_binds": {
+        "app_id": "Application.id",
+        "msg_id": "Message.id"
+      },
+      "_output_schema": {
+        "message": "the Message and payload"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Application",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "app_id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "precondition": "No application with that id exists.",
+          "not_found": "No message with that id in this application."
+        },
+        "required": [
+          "app_id",
+          "msg_id"
+        ]
+      },
+      "description": "Fetch a single message and its payload by id or event id within an application."
+    },
+    {
+      "tool": "message_expunge_content",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "MessageContent",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "input_schema": {
+        "app_id": {
+          "type": "int",
+          "description": "Id of the application this belongs to."
+        },
+        "msg_id": {
+          "type": "int",
+          "description": "Id (or event id) of the message."
+        },
+        "id": {
+          "type": "int"
+        }
+      },
+      "_evidence": {
+        "locator": "server/svix-server/src/v1/endpoints/message.rs:529",
+        "id_local": "Message.expunge_content",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/v1/app/{app_id}/msg/{msg_id}/content",
+          "locator": "server/svix-server/src/v1/endpoints/message.rs:677"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "let msg = secure_find_by_id_or_uid(app.id, msg_id).one(db)?.ok_or(not_found)?;\nlet mut msg = msg.into_active_model(); msg.legacy_payload = Set(None); msg.update(db)?;\nmessagecontent::Entity::delete_by_id(msg_id).exec(db)?;\n// message can no longer be replayed/resent once payload deleted",
+        "edges": [
+          "core/permissions.rs OrganizationWithApplication extractor (Organization token + app lookup) + v1/endpoints/v1/endpoints/message.rs:529"
+        ]
+      },
+      "entity": "MessageContent",
+      "_binds": {
+        "app_id": "Application.id",
+        "msg_id": "Message.id"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Application",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "app_id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "precondition": "No application with that id exists.",
+          "not_found": "No message with that id in this application."
+        },
+        "required": [
+          "app_id",
+          "msg_id"
+        ]
+      },
+      "_defaulted": [],
+      "description": "Permanently delete a message's payload (both the stored content and the legacy payload). The message can no longer be replayed or resent."
+    },
+    {
+      "tool": "message_bulk_expunge_content",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "MessageContent",
+        "lookup_by": {
+          "id": {
+            "$arg": "ids"
+          }
+        }
+      },
+      "input_schema": {
+        "app_id": {
+          "type": "int",
+          "description": "Id of the application this belongs to."
+        },
+        "ids": {
+          "type": "json"
+        }
+      },
+      "_evidence": {
+        "locator": "server/svix-server/src/v1/endpoints/message.rs:587",
+        "id_local": "Message.bulk_expunge_content",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/v1/app/{app_id}/msg/bulk-expunge",
+          "locator": "server/svix-server/src/v1/endpoints/message.rs:682"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "let found = message::Entity::secure_find_by_ids_or_uids(app.id, ids).find_also_related(messagecontent::Entity).all(&txn)?;\nmessage::Entity::update_many().col_expr(LegacyPayload, Expr::value(None)).filter(Id.is_in(found_ksuids)).exec(&txn)?;\nmessagecontent::Entity::delete_many().filter(Id.is_in(found_ksuids)).exec(&txn)?;\n// returns BulkExpungeStatus::{Expunged, NotFound} per id",
+        "edges": [
+          "core/permissions.rs OrganizationWithApplication extractor (Organization token + app lookup) + v1/endpoints/v1/endpoints/message.rs:587"
+        ]
+      },
+      "entity": "MessageContent",
+      "_binds": {
+        "app_id": "Application.id"
+      },
+      "_output_schema": {
+        "results": "map of id/uid -> 'expunged'|'not_found'"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Application",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "app_id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "precondition": "No application with that id exists.",
+          "not_found": "No message with that id in this application, or the application does not exist."
+        },
+        "required": [
+          "app_id",
+          "ids"
+        ]
+      },
+      "description": "Permanently delete the payloads of several messages at once. Reports per-id whether each was expunged."
+    },
+    {
+      "tool": "messageattempt_list_by_msg",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "MessageAttempt",
+        "scope": {
+          "where": {
+            "msg_id": {
+              "$arg": "msg_id"
+            }
+          }
+        },
+        "rank": {
+          "method": "exact"
+        },
+        "pagination": {
+          "default_limit": 20
+        }
+      },
+      "input_schema": {
+        "app_id": {
+          "type": "int",
+          "description": "Id of the application this belongs to."
+        },
+        "msg_id": {
+          "type": "int",
+          "description": "Id (or event id) of the message."
+        },
+        "endpoint_id": {
+          "type": "int",
+          "description": "Id of the endpoint."
+        },
+        "channel": {
+          "type": "text"
+        },
+        "status": {
+          "type": "int"
+        },
+        "event_types": {
+          "type": "json"
+        },
+        "before": {
+          "type": "datetime"
+        },
+        "after": {
+          "type": "datetime"
+        }
+      },
+      "_evidence": {
+        "locator": "server/svix-server/src/v1/endpoints/attempt.rs:898",
+        "id_local": "MessageAttempt.list_by_msg",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v1/app/{app_id}/msg/{msg_id}/attempt",
+          "locator": "server/svix-server/src/v1/endpoints/attempt.rs:1063"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "let msg = message::Entity::secure_find_by_id_or_uid(app.id, msg_id).one(db)?.ok_or(not_found)?;\nlet mut query = messageattempt::Entity::secure_find_by_msg(msg.id);\nif let Some(endpoint_id) { query = query.filter(EndpId.eq(endp.id)) }\nif let Some(status) { query = query.filter(Status.eq(status)) }\nif let Some(channel) { query = query.filter(\"channels @> $1\") }",
+        "edges": [
+          "core/permissions.rs permissions::Application extractor (secure_find app by org+id, check_app_is_permitted) + v1/endpoints/v1/endpoints/attempt.rs:898"
+        ]
+      },
+      "entity": "MessageAttempt",
+      "_binds": {
+        "app_id": "Application.id",
+        "msg_id": "Message.id",
+        "endpoint_id": "Endpoint.id"
+      },
+      "_output_schema": {
+        "data": "list of MessageAttempt rows",
+        "iterator": "next cursor",
+        "done": "bool"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Application",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "app_id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "precondition": "No application with that id exists.",
+          "not_found": "No message or endpoint with that id in this application."
+        },
+        "required": [
+          "app_id"
+        ]
+      },
+      "description": "List the delivery attempts made for a single message (optionally filtered by endpoint or status)."
+    },
+    {
+      "tool": "messageattempt_get",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "MessageAttempt",
+        "lookup_by": {
+          "id": {
+            "$arg": "attempt_id"
+          }
+        }
+      },
+      "input_schema": {
+        "app_id": {
+          "type": "int",
+          "description": "Id of the application this belongs to."
+        },
+        "msg_id": {
+          "type": "int",
+          "description": "Id (or event id) of the message."
+        },
+        "attempt_id": {
+          "type": "int",
+          "description": "Id of the delivery attempt."
+        }
+      },
+      "_evidence": {
+        "locator": "server/svix-server/src/v1/endpoints/attempt.rs:961",
+        "id_local": "MessageAttempt.get",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v1/app/{app_id}/msg/{msg_id}/attempt/{attempt_id}",
+          "locator": "server/svix-server/src/v1/endpoints/attempt.rs:1067"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "let msg = secure_find_by_id_or_uid(app.id, msg_id).one(db)?.ok_or(not_found)?;\nlet attempt = secure_find_by_msg(msg.id).filter(Id.eq(attempt_id)).one(db)?.ok_or(not_found)?;",
+        "edges": [
+          "core/permissions.rs permissions::Application extractor (secure_find app by org+id, check_app_is_permitted) + v1/endpoints/v1/endpoints/attempt.rs:961"
+        ]
+      },
+      "entity": "MessageAttempt",
+      "_binds": {
+        "app_id": "Application.id",
+        "msg_id": "Message.id",
+        "attempt_id": "MessageAttempt.id"
+      },
+      "_output_schema": {
+        "message_attempt": "the MessageAttempt row"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Application",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "app_id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "precondition": "No application with that id exists.",
+          "not_found": "No message or endpoint with that id in this application."
+        },
+        "required": [
+          "app_id"
+        ]
+      },
+      "description": "Fetch a single delivery attempt by id within a message."
+    },
+    {
+      "tool": "messageattempt_list_attempted_destinations",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "MessageAttempt",
+        "scope": {
+          "where": {
+            "msg_id": {
+              "$arg": "msg_id"
+            }
+          }
+        },
+        "rank": {
+          "method": "exact"
+        },
+        "pagination": {
+          "default_limit": 20
+        }
+      },
+      "input_schema": {
+        "app_id": {
+          "type": "int",
+          "description": "Id of the application this belongs to."
+        },
+        "msg_id": {
+          "type": "int",
+          "description": "Id (or event id) of the message."
+        },
+        "limit": {
+          "type": "int"
+        },
+        "iterator": {
+          "type": "text"
+        }
+      },
+      "_evidence": {
+        "locator": "server/svix-server/src/v1/endpoints/attempt.rs:714",
+        "id_local": "MessageAttempt.list_attempted_destinations",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v1/app/{app_id}/msg/{msg_id}/endpoint",
+          "locator": "server/svix-server/src/v1/endpoints/attempt.rs:1077"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "let msg_id = if let Some(message) = secure_find_by_id_or_uid(app.id, msg_id).one(db)? { message.id } else { not_found };\nlet q = secure_find_by_msg(msg_id).distinct_on([EndpId]).limit(limit);",
+        "edges": [
+          "core/permissions.rs permissions::Application extractor (secure_find app by org+id, check_app_is_permitted) + v1/endpoints/v1/endpoints/attempt.rs:714"
+        ]
+      },
+      "entity": "MessageAttempt",
+      "_binds": {
+        "app_id": "Application.id",
+        "msg_id": "Message.id"
+      },
+      "_output_schema": {
+        "data": "list of endpoint destinations for the msg (MessageEndpointOut)",
+        "iterator": "next cursor",
+        "done": "bool"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Application",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "app_id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "precondition": "No application with that id exists.",
+          "not_found": "No message or endpoint with that id in this application."
+        },
+        "required": [
+          "app_id"
+        ]
+      },
+      "description": "List the distinct endpoints a message was delivered to."
+    },
+    {
+      "tool": "messageattempt_list_attempted_messages",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "MessageAttempt",
+        "scope": {
+          "where": {
+            "endp_id": {
+              "$arg": "endpoint_id"
+            }
+          }
+        },
+        "rank": {
+          "method": "exact"
+        },
+        "pagination": {
+          "default_limit": 20
+        }
+      },
+      "input_schema": {
+        "app_id": {
+          "type": "int",
+          "description": "Id of the application this belongs to."
+        },
+        "endpoint_id": {
+          "type": "int",
+          "description": "Id of the endpoint."
+        },
+        "channel": {
+          "type": "text"
+        },
+        "status": {
+          "type": "int"
+        },
+        "with_content": {
+          "type": "bool"
+        },
+        "before": {
+          "type": "datetime"
+        },
+        "after": {
+          "type": "datetime"
+        }
+      },
+      "_evidence": {
+        "locator": "server/svix-server/src/v1/endpoints/attempt.rs:243",
+        "id_local": "MessageAttempt.list_attempted_messages",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v1/app/{app_id}/endpoint/{endpoint_id}/msg",
+          "locator": "server/svix-server/src/v1/endpoints/attempt.rs:1085"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "let mut msgs_and_dests = message::Entity::secure_find(endp.app_id).inner_join(messageattempt::Entity).filter(EndpId.eq(endp.id)).distinct_on([Id.as_column_ref()]);\nexpensive status derivation via next_attempt/status subqueries",
+        "edges": [
+          "core/permissions.rs permissions::Application extractor (secure_find app by org+id, check_app_is_permitted) + v1/endpoints/v1/endpoints/attempt.rs:243"
+        ]
+      },
+      "entity": "MessageAttempt",
+      "_binds": {
+        "app_id": "Application.id",
+        "endpoint_id": "Endpoint.id"
+      },
+      "_output_schema": {
+        "data": "list of messages attempted by endpoint (EndpointMessageOut)",
+        "iterator": "next cursor",
+        "done": "bool"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Application",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "app_id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "precondition": "No application with that id exists.",
+          "not_found": "No message, endpoint or attempt with that id in this application."
+        },
+        "required": [
+          "app_id"
+        ]
+      },
+      "description": "List the messages an endpoint has attempted, with the derived delivery status of each."
+    },
+    {
+      "tool": "messageattempt_list_by_endpoint",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "MessageAttempt",
+        "scope": {
+          "where": {
+            "endp_id": {
+              "$arg": "endpoint_id"
+            }
+          }
+        },
+        "rank": {
+          "method": "exact"
+        },
+        "pagination": {
+          "default_limit": 20
+        }
+      },
+      "input_schema": {
+        "app_id": {
+          "type": "int",
+          "description": "Id of the application this belongs to."
+        },
+        "endpoint_id": {
+          "type": "int",
+          "description": "Id of the endpoint."
+        },
+        "status": {
+          "type": "int"
+        },
+        "status_code_class": {
+          "type": "int"
+        },
+        "channel": {
+          "type": "text"
+        },
+        "event_types": {
+          "type": "json"
+        },
+        "with_content": {
+          "type": "bool"
+        },
+        "before": {
+          "type": "datetime"
+        },
+        "after": {
+          "type": "datetime"
+        }
+      },
+      "_evidence": {
+        "locator": "server/svix-server/src/v1/endpoints/attempt.rs:532",
+        "id_local": "MessageAttempt.list_by_endpoint",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v1/app/{app_id}/attempt/endpoint/{endpoint_id}",
+          "locator": "server/svix-server/src/v1/endpoints/attempt.rs:1095"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "let endp = secure_find_by_id_or_uid(app.id, endpoint_id).one(db)?.ok_or(not_found)?;\nlist_attempts_by_endpoint_or_message_filters(secure_find_by_endpoint(endp.id), status, status_code_class, event_types, channel);\nfilter_and_paginate_time_limited(query, Id, limit, iterator, before, after)",
+        "edges": [
+          "core/permissions.rs permissions::Application extractor (secure_find app by org+id, check_app_is_permitted) + v1/endpoints/v1/endpoints/attempt.rs:532"
+        ]
+      },
+      "entity": "MessageAttempt",
+      "_binds": {
+        "app_id": "Application.id",
+        "endpoint_id": "Endpoint.id"
+      },
+      "_output_schema": {
+        "data": "list of MessageAttempt rows",
+        "iterator": "next cursor",
+        "done": "bool"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Application",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "app_id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "precondition": "No application with that id exists.",
+          "not_found": "No message or endpoint with that id in this application."
+        },
+        "required": [
+          "app_id"
+        ]
+      },
+      "description": "List the delivery attempts made by a single endpoint, optionally filtered by status class, channel or time window."
+    },
+    {
+      "tool": "messageattempt_list_by_msg_general",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "MessageAttempt",
+        "scope": {
+          "where": {
+            "msg_id": {
+              "$arg": "msg_id"
+            }
+          }
+        },
+        "rank": {
+          "method": "exact"
+        },
+        "pagination": {
+          "default_limit": 20
+        }
+      },
+      "input_schema": {
+        "app_id": {
+          "type": "int",
+          "description": "Id of the application this belongs to."
+        },
+        "msg_id": {
+          "type": "int",
+          "description": "Id (or event id) of the message."
+        },
+        "endpoint_id": {
+          "type": "int",
+          "description": "Id of the endpoint."
+        },
+        "status": {
+          "type": "int"
+        },
+        "status_code_class": {
+          "type": "int"
+        },
+        "channel": {
+          "type": "text"
+        }
+      },
+      "_evidence": {
+        "locator": "server/svix-server/src/v1/endpoints/attempt.rs:618",
+        "id_local": "MessageAttempt.list_by_msg_general",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v1/app/{app_id}/attempt/msg/{msg_id}",
+          "locator": "server/svix-server/src/v1/endpoints/attempt.rs:1108"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "list_attempts_by_endpoint_or_message_filters(secure_find_by_msg(msg_id), status, status_code_class, event_types, channel)",
+        "edges": [
+          "core/permissions.rs permissions::Application extractor (secure_find app by org+id, check_app_is_permitted) + v1/endpoints/v1/endpoints/attempt.rs:618"
+        ]
+      },
+      "entity": "MessageAttempt",
+      "_binds": {
+        "app_id": "Application.id",
+        "msg_id": "Message.id",
+        "endpoint_id": "Endpoint.id"
+      },
+      "_output_schema": {
+        "data": "list of MessageAttempt rows",
+        "iterator": "next cursor",
+        "done": "bool"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Application",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "app_id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "precondition": "No application with that id exists.",
+          "not_found": "No message or endpoint with that id in this application."
+        },
+        "required": [
+          "app_id"
+        ]
+      },
+      "description": "List the delivery attempts for a message by message id, optionally filtered by endpoint, status or status class."
+    },
+    {
+      "tool": "messageattempt_resend",
+      "op": "create",
+      "family": "action.emit",
+      "exec_spec": {
+        "channel": "resend",
+        "record": {
+          "set": {
+            "msg_id": {
+              "$arg": "msg_id"
+            },
+            "endpoint_id": {
+              "$arg": "endpoint_id"
+            },
+            "action": "manual_resend"
+          }
+        }
+      },
+      "input_schema": {
+        "app_id": {
+          "type": "int",
+          "description": "Id of the application this belongs to."
+        },
+        "msg_id": {
+          "type": "int",
+          "description": "Id (or event id) of the message."
+        },
+        "endpoint_id": {
+          "type": "int",
+          "description": "Id of the endpoint."
+        }
+      },
+      "_evidence": {
+        "locator": "server/svix-server/src/v1/endpoints/attempt.rs:983",
+        "id_local": "MessageAttempt.resend",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/v1/app/{app_id}/msg/{msg_id}/endpoint/{endpoint_id}/resend",
+          "locator": "server/svix-server/src/v1/endpoints/attempt.rs:1091"
+        },
+        "entity_why": "primary effect spawn lands on this table",
+        "ref_code": "// manual-trigger resend; fails if payload already expunged/expired\nlet msg_content = msg_content.map(parse).or(msg.legacy_payload); if msg_content.is_none() { return Err(bad_request \"Payload is missing (probably expired)\") }\nqueue_tx.send(&MessageTask::new_task(msg.id, app.id, endp.id, TriggerType::Manual), None).await?;",
+        "edges": [
+          "core/permissions.rs permissions::Application extractor (secure_find app by org+id, check_app_is_permitted) + v1/endpoints/v1/endpoints/attempt.rs:983",
+          "400 'Payload is missing (probably expired)' when MessageContent row absent (attempt.rs:983)"
+        ]
+      },
+      "entity": null,
+      "_binds": {
+        "app_id": "Application.id",
+        "msg_id": "Message.id",
+        "endpoint_id": "Endpoint.id"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Application",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "app_id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "MessageContent",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "msg_id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "precondition": "The message payload is missing (message was expunged or expired) so it cannot be resent.",
+          "not_found": "No message or endpoint with that id."
+        },
+        "required": [
+          "app_id",
+          "msg_id",
+          "endpoint_id"
+        ]
+      },
+      "_defaulted": [
+        "row_key"
+      ],
+      "description": "Re-queue a message for manual redelivery to a specific endpoint. Fails with \"payload missing\" if the message's payload has been expunged or expired."
+    },
+    {
+      "tool": "messageattempt_expunge_content",
+      "op": "delete",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "MessageAttempt",
+        "row_key": {
+          "id": {
+            "$arg": "attempt_id"
+          }
+        },
+        "fields": [
+          "response"
+        ],
+        "set": {
+          "response": "EXPUNGED"
+        }
+      },
+      "input_schema": {
+        "app_id": {
+          "type": "int",
+          "description": "Id of the application this belongs to."
+        },
+        "msg_id": {
+          "type": "int",
+          "description": "Id (or event id) of the message."
+        },
+        "attempt_id": {
+          "type": "int",
+          "description": "Id of the delivery attempt."
+        },
+        "url": {
+          "type": "text",
+          "description": "The destination URL that will receive webhook deliveries."
+        },
+        "status": {
+          "type": "int"
+        },
+        "response_status_code": {
+          "type": "int"
+        },
+        "ended_at": {
+          "type": "datetime"
+        },
+        "trigger_type": {
+          "type": "int"
+        },
+        "response_duration_ms": {
+          "type": "int"
+        },
+        "next_attempt": {
+          "type": "datetime"
+        },
+        "attempt_number": {
+          "type": "int"
+        }
+      },
+      "_evidence": {
+        "locator": "server/svix-server/src/v1/endpoints/attempt.rs:1034",
+        "id_local": "MessageAttempt.expunge_content",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/v1/app/{app_id}/msg/{msg_id}/attempt/{attempt_id}/content",
+          "locator": "server/svix-server/src/v1/endpoints/attempt.rs:1072"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "let mut attempt = secure_find_by_msg(msg.id).filter(Id.eq(attempt_id)).one(db)?.ok_or(not_found)?.into_active_model();\nattempt.response = Set(\"EXPUNGED\".to_string()); attempt.update(db)?;",
+        "edges": [
+          "core/permissions.rs OrganizationWithApplication extractor + v1/endpoints/attempt.rs:1034"
+        ]
+      },
+      "entity": "MessageAttempt",
+      "_binds": {
+        "app_id": "Application.id",
+        "msg_id": "Message.id",
+        "attempt_id": "MessageAttempt.id"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Application",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "app_id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "precondition": "No application with that id exists.",
+          "not_found": "No attempt with that id in this message."
+        },
+        "required": [
+          "app_id",
+          "msg_id",
+          "attempt_id"
+        ]
+      },
+      "_defaulted": [
+        "argument invented from the write column",
+        "fields"
+      ],
+      "description": "Redact an individual attempt's stored response by replacing it with \"EXPUNGED\"."
+    },
+    {
+      "tool": "queue_redrive_dlq",
+      "op": "action",
+      "family": "action.emit",
+      "exec_spec": {
+        "channel": "event",
+        "record": {
+          "set": {
+            "action": "redrive_dlq"
+          }
+        }
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "server/svix-server/src/v1/endpoints/admin.rs:18",
+        "id_local": "Queue.redrive_dlq",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/v1/admin/redrive-dlq",
+          "locator": "server/svix-server/src/v1/endpoints/admin.rs:24"
+        },
+        "entity_why": "cannot determine the entity",
+        "ref_code": "async fn redrive_dlq(State(AppState { queue_tx, .. }): ..., _: permissions::Organization) -> Result<NoContent> {\n  if let Err(e) = queue_tx.redrive_dlq().await { tracing::warn!(...) }\n  Ok(NoContent)\n}"
+      },
+      "_output_schema": {},
+      "description": "Redrive this message queue's dead-letter queue, retrying messages that previously failed to be handled internally.",
+      "guards": {
+        "messages": {}
+      }
+    },
+    {
+      "tool": "health_ping",
+      "op": "action",
+      "family": "action.emit",
+      "exec_spec": {
+        "channel": "event",
+        "record": {
+          "set": {
+            "status": "ok"
+          }
+        }
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "server/svix-server/src/v1/endpoints/health.rs:132",
+        "id_local": "Health.ping",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/v1/health/ping",
+          "locator": "server/svix-server/src/v1/endpoints/health.rs:136"
+        },
+        "entity_why": "cannot determine the entity",
+        "ref_code": "// liveness probe; no auth, no DB"
+      },
+      "_output_schema": {},
+      "description": "Liveness probe: confirm the server is up. No auth required, no state changes.",
+      "guards": {
+        "messages": {}
+      }
+    }
+  ],
+  "seed_state": {
+    "Application": [
+      {
+        "id": 1,
+        "org_id": 1,
+        "uid": "main-app",
+        "name": "Main Application",
+        "deleted": false,
+        "created_at": "2026-01-01T00:00:00Z",
+        "updated_at": "2026-01-01T00:00:00Z"
+      },
+      {
+        "id": 2,
+        "org_id": 1,
+        "uid": "billing-app",
+        "name": "Billing Service",
+        "deleted": false,
+        "created_at": "2026-01-01T00:00:00Z",
+        "updated_at": "2026-01-01T00:00:00Z"
+      },
+      {
+        "id": 3,
+        "org_id": 1,
+        "uid": "webhooks-app",
+        "name": "Webhooks Relay",
+        "deleted": false,
+        "created_at": "2026-01-01T00:00:00Z",
+        "updated_at": "2026-01-01T00:00:00Z"
+      }
+    ],
+    "ApplicationMetadata": [
+      {
+        "id": 1,
+        "data": {
+          "tier": "pro"
+        },
+        "created_at": "2026-01-01T00:00:00Z",
+        "updated_at": "2026-01-01T00:00:00Z"
+      },
+      {
+        "id": 2,
+        "data": {
+          "tier": "free"
+        },
+        "created_at": "2026-01-01T00:00:00Z",
+        "updated_at": "2026-01-01T00:00:00Z"
+      },
+      {
+        "id": 3,
+        "data": {
+          "tier": "pro"
+        },
+        "created_at": "2026-01-01T00:00:00Z",
+        "updated_at": "2026-01-01T00:00:00Z"
+      }
+    ],
+    "EventType": [
+      {
+        "id": 1,
+        "org_id": 1,
+        "name": "user.created",
+        "description": "A user was created",
+        "deleted": false,
+        "deprecated": false,
+        "created_at": "2026-01-01T00:00:00Z",
+        "updated_at": "2026-01-01T00:00:00Z"
+      },
+      {
+        "id": 2,
+        "org_id": 1,
+        "name": "user.updated",
+        "description": "A user was updated",
+        "deleted": false,
+        "deprecated": false,
+        "created_at": "2026-01-01T00:00:00Z",
+        "updated_at": "2026-01-01T00:00:00Z"
+      },
+      {
+        "id": 3,
+        "org_id": 1,
+        "name": "invoice.paid",
+        "description": "An invoice was paid",
+        "deleted": false,
+        "deprecated": false,
+        "created_at": "2026-01-01T00:00:00Z",
+        "updated_at": "2026-01-01T00:00:00Z"
+      }
+    ],
+    "Endpoint": [
+      {
+        "id": 1,
+        "app_id": 1,
+        "key": "whsec_1",
+        "url": "https://hooks.example.com/svix/user",
+        "description": "Primary user events",
+        "deleted": false,
+        "disabled": false,
+        "version": 1,
+        "channels": null,
+        "headers": null,
+        "created_at": "2026-01-01T00:00:00Z",
+        "updated_at": "2026-01-01T00:00:00Z"
+      },
+      {
+        "id": 2,
+        "app_id": 1,
+        "key": "whsec_2",
+        "url": "https://hooks.example.com/svix/audit",
+        "description": "Audit log stream",
+        "deleted": false,
+        "disabled": false,
+        "version": 1,
+        "channels": null,
+        "headers": {
+          "X-Token": "abc"
+        },
+        "created_at": "2026-01-01T00:00:00Z",
+        "updated_at": "2026-01-01T00:00:00Z"
+      }
+    ],
+    "EndpointMetadata": [
+      {
+        "id": 1,
+        "data": {},
+        "created_at": "2026-01-01T00:00:00Z",
+        "updated_at": "2026-01-01T00:00:00Z"
+      },
+      {
+        "id": 2,
+        "data": {
+          "retention": "30d"
+        },
+        "created_at": "2026-01-01T00:00:00Z",
+        "updated_at": "2026-01-01T00:00:00Z"
+      }
+    ],
+    "Message": [
+      {
+        "id": 1,
+        "org_id": 1,
+        "app_id": 1,
+        "event_type": "user.created",
+        "uid": "msg-1",
+        "expiration": "2026-12-31T00:00:00Z",
+        "created_at": "2026-01-01T00:00:00Z",
+        "updated_at": "2026-01-01T00:00:00Z"
+      },
+      {
+        "id": 2,
+        "org_id": 1,
+        "app_id": 1,
+        "event_type": "user.updated",
+        "uid": "msg-2",
+        "expiration": "2026-12-31T00:00:00Z",
+        "created_at": "2026-01-01T00:00:00Z",
+        "updated_at": "2026-01-01T00:00:00Z"
+      }
+    ],
+    "MessageContent": [
+      {
+        "id": 1,
+        "msg_id": 1,
+        "payload": "{\"user_id\":42,\"name\":\"Ada\"}",
+        "expiration": "2026-12-31T00:00:00Z",
+        "created_at": "2026-01-01T00:00:00Z",
+        "updated_at": "2026-01-01T00:00:00Z"
+      },
+      {
+        "id": 2,
+        "msg_id": 2,
+        "payload": "{\"user_id\":42,\"name\":\"Ada\"}",
+        "expiration": "2026-12-31T00:00:00Z",
+        "created_at": "2026-01-01T00:00:00Z",
+        "updated_at": "2026-01-01T00:00:00Z"
+      }
+    ],
+    "MessageDestination": [
+      {
+        "id": 1,
+        "msg_id": 1,
+        "endp_id": 1,
+        "status": 0,
+        "next_attempt": null,
+        "created_at": "2026-01-01T00:00:00Z",
+        "updated_at": "2026-01-01T00:00:00Z"
+      },
+      {
+        "id": 2,
+        "msg_id": 1,
+        "endp_id": 2,
+        "status": 0,
+        "next_attempt": null,
+        "created_at": "2026-01-01T00:00:00Z",
+        "updated_at": "2026-01-01T00:00:00Z"
+      }
+    ],
+    "MessageAttempt": [
+      {
+        "id": 1,
+        "msg_id": 1,
+        "msg_dest_id": 1,
+        "endp_id": 1,
+        "url": "https://hooks.example.com/svix/user",
+        "status": 0,
+        "response_status_code": 200,
+        "response": "OK",
+        "ended_at": "2026-01-02T00:00:00Z",
+        "trigger_type": 0,
+        "response_duration_ms": 12,
+        "next_attempt": null,
+        "attempt_number": 1,
+        "created_at": "2026-01-01T00:00:00Z",
+        "updated_at": "2026-01-01T00:00:00Z"
+      },
+      {
+        "id": 2,
+        "msg_id": 1,
+        "msg_dest_id": 2,
+        "endp_id": 2,
+        "url": "https://hooks.example.com/svix/audit",
+        "status": 0,
+        "response_status_code": 200,
+        "response": "OK",
+        "ended_at": "2026-01-02T00:00:01Z",
+        "trigger_type": 0,
+        "response_duration_ms": 9,
+        "next_attempt": null,
+        "attempt_number": 1,
+        "created_at": "2026-01-01T00:00:00Z",
+        "updated_at": "2026-01-01T00:00:00Z"
+      }
+    ]
+  },
+  "summary": "Svix is a self-hosted webhook delivery platform: an HTTP API (under /api/v1) for modeling Organizations as Applications, Endpoints, EventTypes and Messages, a background worker that dispatches each Message to its Application's matching Endpoints over HTTP and records delivery MessageAttempts with retry, plus app-portal/login JWT auth. Persisted in PostgreSQL via SeaORM (9 tables) with Redis cache/queue.",
+  "_no_edges": [
+    {
+      "id_local": "Application.create",
+      "why": "org-scoped POST /app guarded only by org-level JWT (permissions::Organization), which touches no DB credential entity; checks uid uniqueness (409) but has no requires/triggers edge (v1/endpoints/application.rs:178)"
+    },
+    {
+      "id_local": "Application.update",
+      "why": "org-scoped PUT upsert (creates app if missing); no Application-row guard, no requires, no trigger (v1/endpoints/application.rs:262)"
+    },
+    {
+      "id_local": "Application.app_portal_access",
+      "why": "org-scoped action that may create an app; no DB-entity wall, calls no other op (v1/endpoints/auth.rs:44)"
+    },
+    {
+      "id_local": "EventType.update",
+      "why": "org-scoped PUT upsert; org-JWT only, no requires, no trigger (v1/endpoints/event_type.rs:351)"
+    },
+    {
+      "id_local": "MessageAttempt.dispatch",
+      "why": "queue-consumer worker op (job); no HTTP route and no wall; terminal webhook HTTP delivery (worker.rs:732)"
+    },
+    {
+      "id_local": "Queue.redrive_dlq",
+      "why": "org-scoped admin action, hidden route; org-JWT only, calls queue.redrive_dlq externally with no persisted effect (v1/endpoints/admin.rs:18)"
+    },
+    {
+      "id_local": "Health.ping",
+      "why": "public stateless liveness probe, no auth, reads no DB row, calls nothing (v1/endpoints/health.rs:132)"
+    }
+  ]
+}

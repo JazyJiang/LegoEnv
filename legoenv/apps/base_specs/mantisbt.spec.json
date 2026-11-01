@@ -1,0 +1,7330 @@
+{
+ "env_id": "mantisbt",
+ "_prep_version": 3,
+ "entities": [
+  {
+   "name": "User",
+   "columns": [
+    {
+     "name": "id",
+     "type": "id",
+     "pk": true
+    },
+    {
+     "name": "username",
+     "type": "text",
+     "nullable": false
+    },
+    {
+     "name": "realname",
+     "type": "text",
+     "nullable": false
+    },
+    {
+     "name": "email",
+     "type": "text",
+     "nullable": false
+    },
+    {
+     "name": "password",
+     "type": "text",
+     "nullable": false
+    },
+    {
+     "name": "date_created",
+     "type": "datetime",
+     "audit": true,
+     "default": "db_null_date"
+    },
+    {
+     "name": "last_visit",
+     "type": "datetime",
+     "audit": true,
+     "default": "db_null_date"
+    },
+    {
+     "name": "enabled",
+     "type": "bool",
+     "default": true
+    },
+    {
+     "name": "protected",
+     "type": "bool",
+     "default": false
+    },
+    {
+     "name": "access_level",
+     "type": "int",
+     "default": 10
+    },
+    {
+     "name": "login_count",
+     "type": "int",
+     "default": 0
+    },
+    {
+     "name": "lost_password_request_count",
+     "type": "int",
+     "default": 0
+    },
+    {
+     "name": "failed_login_count",
+     "type": "int",
+     "default": 0
+    },
+    {
+     "name": "cookie_string",
+     "type": "text",
+     "nullable": false
+    }
+   ],
+   "constraints": [
+    {
+     "kind": "unique",
+     "cols": [
+      "username"
+     ]
+    },
+    {
+     "kind": "unique",
+     "cols": [
+      "cookie_string"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "ApiToken",
+   "columns": [
+    {
+     "name": "id",
+     "type": "id",
+     "pk": true
+    },
+    {
+     "name": "user_id",
+     "type": "id",
+     "nullable": false,
+     "fk_to": "User.id"
+    },
+    {
+     "name": "name",
+     "type": "text",
+     "nullable": false
+    },
+    {
+     "name": "hash",
+     "type": "text",
+     "nullable": false
+    },
+    {
+     "name": "date_created",
+     "type": "datetime",
+     "audit": true,
+     "immutable": true,
+     "default": 1
+    },
+    {
+     "name": "date_used",
+     "type": "datetime",
+     "audit": true,
+     "default": 1
+    }
+   ],
+   "constraints": [
+    {
+     "kind": "unique",
+     "cols": [
+      "user_id",
+      "name"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Project",
+   "columns": [
+    {
+     "name": "id",
+     "type": "id",
+     "pk": true
+    },
+    {
+     "name": "name",
+     "type": "text",
+     "nullable": false
+    },
+    {
+     "name": "status",
+     "type": "int",
+     "enum": [
+      10,
+      30,
+      40,
+      50,
+      70,
+      90
+     ],
+     "default": 10
+    },
+    {
+     "name": "enabled",
+     "type": "bool",
+     "default": true
+    },
+    {
+     "name": "view_state",
+     "type": "int",
+     "enum": [
+      10,
+      50
+     ],
+     "default": 10
+    },
+    {
+     "name": "access_min",
+     "type": "int",
+     "default": 10
+    },
+    {
+     "name": "file_path",
+     "type": "text",
+     "nullable": false
+    },
+    {
+     "name": "description",
+     "type": "text",
+     "nullable": false
+    },
+    {
+     "name": "category_id",
+     "type": "id",
+     "fk_to": "Category.id",
+     "default": 1,
+     "nullable": true
+    },
+    {
+     "name": "inherit_global",
+     "type": "bool",
+     "default": false
+    },
+    {
+     "name": "key",
+     "type": "text",
+     "nullable": true
+    }
+   ],
+   "constraints": [
+    {
+     "kind": "unique",
+     "cols": [
+      "name"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Category",
+   "columns": [
+    {
+     "name": "id",
+     "type": "id",
+     "pk": true
+    },
+    {
+     "name": "project_id",
+     "type": "id",
+     "nullable": false,
+     "fk_to": "Project.id",
+     "on_delete": "cascade"
+    },
+    {
+     "name": "user_id",
+     "type": "id",
+     "nullable": false,
+     "fk_to": "User.id"
+    },
+    {
+     "name": "name",
+     "type": "text",
+     "nullable": false
+    },
+    {
+     "name": "status",
+     "type": "int",
+     "enum": [
+      0,
+      1
+     ],
+     "default": 1
+    }
+   ],
+   "constraints": [
+    {
+     "kind": "unique",
+     "cols": [
+      "project_id",
+      "name"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "ProjectVersion",
+   "columns": [
+    {
+     "name": "id",
+     "type": "id",
+     "pk": true
+    },
+    {
+     "name": "project_id",
+     "type": "id",
+     "nullable": false,
+     "fk_to": "Project.id",
+     "on_delete": "cascade"
+    },
+    {
+     "name": "version",
+     "type": "text",
+     "nullable": false
+    },
+    {
+     "name": "date_order",
+     "type": "datetime",
+     "default": "db_null_date"
+    },
+    {
+     "name": "description",
+     "type": "text",
+     "nullable": false
+    },
+    {
+     "name": "released",
+     "type": "bool",
+     "default": true
+    },
+    {
+     "name": "obsolete",
+     "type": "bool",
+     "default": false
+    }
+   ],
+   "constraints": [
+    {
+     "kind": "unique",
+     "cols": [
+      "project_id",
+      "version"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "ProjectHierarchy",
+   "columns": [
+    {
+     "name": "child_id",
+     "type": "id",
+     "pk": true,
+     "nullable": false,
+     "fk_to": "Project.id",
+     "on_delete": "cascade"
+    },
+    {
+     "name": "parent_id",
+     "type": "id",
+     "pk": true,
+     "nullable": false,
+     "fk_to": "Project.id",
+     "on_delete": "cascade"
+    },
+    {
+     "name": "inherit_parent",
+     "type": "bool",
+     "default": false
+    }
+   ],
+   "constraints": [
+    {
+     "kind": "unique",
+     "cols": [
+      "child_id",
+      "parent_id"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "ProjectUserList",
+   "columns": [
+    {
+     "name": "project_id",
+     "type": "id",
+     "pk": true,
+     "fk_to": "Project.id",
+     "on_delete": "cascade"
+    },
+    {
+     "name": "user_id",
+     "type": "id",
+     "pk": true,
+     "fk_to": "User.id",
+     "on_delete": "cascade"
+    },
+    {
+     "name": "access_level",
+     "type": "int",
+     "default": 10
+    }
+   ]
+  },
+  {
+   "name": "ProjectFile",
+   "columns": [
+    {
+     "name": "id",
+     "type": "id",
+     "pk": true
+    },
+    {
+     "name": "project_id",
+     "type": "id",
+     "nullable": false,
+     "fk_to": "Project.id"
+    },
+    {
+     "name": "user_id",
+     "type": "id",
+     "nullable": false,
+     "fk_to": "User.id"
+    },
+    {
+     "name": "title",
+     "type": "text",
+     "nullable": false
+    },
+    {
+     "name": "description",
+     "type": "text",
+     "nullable": false
+    },
+    {
+     "name": "diskfile",
+     "type": "text",
+     "nullable": false
+    },
+    {
+     "name": "filename",
+     "type": "text",
+     "nullable": false
+    },
+    {
+     "name": "folder",
+     "type": "text",
+     "nullable": false
+    },
+    {
+     "name": "filesize",
+     "type": "int",
+     "nullable": false,
+     "default": 0
+    },
+    {
+     "name": "file_type",
+     "type": "text",
+     "nullable": false
+    },
+    {
+     "name": "date_added",
+     "type": "datetime",
+     "audit": true
+    },
+    {
+     "name": "content",
+     "type": "text",
+     "nullable": true
+    }
+   ]
+  },
+  {
+   "name": "CustomField",
+   "columns": [
+    {
+     "name": "id",
+     "type": "id",
+     "pk": true
+    },
+    {
+     "name": "name",
+     "type": "text",
+     "nullable": false
+    },
+    {
+     "name": "type",
+     "type": "int",
+     "default": 0
+    },
+    {
+     "name": "possible_values",
+     "type": "text",
+     "nullable": false
+    },
+    {
+     "name": "default_value",
+     "type": "text",
+     "nullable": false
+    },
+    {
+     "name": "valid_regexp",
+     "type": "text",
+     "nullable": false
+    },
+    {
+     "name": "access_level_r",
+     "type": "int",
+     "default": 0
+    },
+    {
+     "name": "access_level_rw",
+     "type": "int",
+     "default": 0
+    },
+    {
+     "name": "length_min",
+     "type": "int",
+     "default": 0
+    },
+    {
+     "name": "length_max",
+     "type": "int",
+     "default": 0
+    },
+    {
+     "name": "require_report",
+     "type": "bool",
+     "default": false
+    },
+    {
+     "name": "require_update",
+     "type": "bool",
+     "default": false
+    },
+    {
+     "name": "display_report",
+     "type": "bool",
+     "default": false
+    },
+    {
+     "name": "display_update",
+     "type": "bool",
+     "default": true
+    },
+    {
+     "name": "require_resolved",
+     "type": "bool",
+     "default": false
+    },
+    {
+     "name": "display_resolved",
+     "type": "bool",
+     "default": false
+    },
+    {
+     "name": "display_closed",
+     "type": "bool",
+     "default": false
+    },
+    {
+     "name": "require_closed",
+     "type": "bool",
+     "default": false
+    },
+    {
+     "name": "filter_by",
+     "type": "bool",
+     "default": true
+    }
+   ],
+   "constraints": [
+    {
+     "kind": "unique",
+     "cols": [
+      "name"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "CustomFieldProject",
+   "columns": [
+    {
+     "name": "field_id",
+     "type": "id",
+     "pk": true,
+     "fk_to": "CustomField.id",
+     "on_delete": "cascade"
+    },
+    {
+     "name": "project_id",
+     "type": "id",
+     "pk": true,
+     "fk_to": "Project.id",
+     "on_delete": "cascade"
+    },
+    {
+     "name": "sequence",
+     "type": "int",
+     "nullable": false,
+     "default": 0
+    }
+   ]
+  },
+  {
+   "name": "CustomFieldString",
+   "columns": [
+    {
+     "name": "field_id",
+     "type": "id",
+     "pk": true,
+     "fk_to": "CustomField.id"
+    },
+    {
+     "name": "bug_id",
+     "type": "id",
+     "pk": true,
+     "fk_to": "Bug.id"
+    },
+    {
+     "name": "value",
+     "type": "text",
+     "nullable": false
+    },
+    {
+     "name": "text",
+     "type": "text",
+     "nullable": true
+    }
+   ]
+  },
+  {
+   "name": "Bug",
+   "columns": [
+    {
+     "name": "id",
+     "type": "id",
+     "pk": true
+    },
+    {
+     "name": "project_id",
+     "type": "text",
+     "nullable": false,
+     "fk_to": "Project.id"
+    },
+    {
+     "name": "reporter_id",
+     "type": "id",
+     "nullable": false,
+     "fk_to": "User.id"
+    },
+    {
+     "name": "handler_id",
+     "type": "text",
+     "nullable": true,
+     "fk_to": "User.id",
+     "default": 0
+    },
+    {
+     "name": "duplicate_id",
+     "type": "id",
+     "nullable": true,
+     "fk_to": "Bug.id",
+     "default": 0
+    },
+    {
+     "name": "priority",
+     "type": "int",
+     "default": 30
+    },
+    {
+     "name": "severity",
+     "type": "int",
+     "default": 50
+    },
+    {
+     "name": "reproducibility",
+     "type": "int",
+     "default": 10
+    },
+    {
+     "name": "status",
+     "type": "int",
+     "enum": [
+      "10",
+      "20",
+      "30",
+      "40",
+      "50",
+      "80",
+      "90"
+     ],
+     "default": 10
+    },
+    {
+     "name": "resolution",
+     "type": "int",
+     "default": 10
+    },
+    {
+     "name": "projection",
+     "type": "int",
+     "default": 10
+    },
+    {
+     "name": "category_id",
+     "type": "text",
+     "nullable": true,
+     "fk_to": "Category.id",
+     "on_delete": "restrict"
+    },
+    {
+     "name": "date_submitted",
+     "type": "datetime",
+     "audit": true,
+     "default": "db_null_date"
+    },
+    {
+     "name": "last_updated",
+     "type": "datetime",
+     "audit": true,
+     "default": "db_null_date"
+    },
+    {
+     "name": "eta",
+     "type": "int",
+     "default": 10
+    },
+    {
+     "name": "bug_text_id",
+     "type": "id",
+     "nullable": true,
+     "fk_to": "BugText.id",
+     "default": 0
+    },
+    {
+     "name": "os",
+     "type": "text",
+     "nullable": true
+    },
+    {
+     "name": "os_build",
+     "type": "text",
+     "nullable": true
+    },
+    {
+     "name": "platform",
+     "type": "text",
+     "nullable": true
+    },
+    {
+     "name": "version",
+     "type": "text",
+     "nullable": true
+    },
+    {
+     "name": "fixed_in_version",
+     "type": "text",
+     "nullable": true
+    },
+    {
+     "name": "build",
+     "type": "text",
+     "nullable": true
+    },
+    {
+     "name": "profile_id",
+     "type": "id",
+     "nullable": true,
+     "fk_to": "UserProfile.id",
+     "default": 0
+    },
+    {
+     "name": "view_state",
+     "type": "int",
+     "enum": [
+      10,
+      50
+     ],
+     "default": 10
+    },
+    {
+     "name": "summary",
+     "type": "text",
+     "nullable": false
+    },
+    {
+     "name": "sponsorship_total",
+     "type": "int",
+     "default": 0
+    },
+    {
+     "name": "sticky",
+     "type": "bool",
+     "default": false
+    },
+    {
+     "name": "target_version",
+     "type": "text",
+     "nullable": true
+    },
+    {
+     "name": "due_date",
+     "type": "datetime",
+     "default": "db_null_date"
+    },
+    {
+     "name": "description",
+     "type": "text",
+     "nullable": true
+    },
+    {
+     "name": "issue_type",
+     "type": "text",
+     "nullable": true
+    }
+   ]
+  },
+  {
+   "name": "BugText",
+   "columns": [
+    {
+     "name": "id",
+     "type": "id",
+     "pk": true
+    },
+    {
+     "name": "description",
+     "type": "text",
+     "nullable": false
+    },
+    {
+     "name": "steps_to_reproduce",
+     "type": "text",
+     "nullable": false
+    },
+    {
+     "name": "additional_information",
+     "type": "text",
+     "nullable": false
+    }
+   ]
+  },
+  {
+   "name": "BugHistory",
+   "columns": [
+    {
+     "name": "id",
+     "type": "id",
+     "pk": true
+    },
+    {
+     "name": "user_id",
+     "type": "id",
+     "nullable": false,
+     "fk_to": "User.id"
+    },
+    {
+     "name": "bug_id",
+     "type": "id",
+     "nullable": false,
+     "fk_to": "Bug.id"
+    },
+    {
+     "name": "date_modified",
+     "type": "datetime",
+     "audit": true
+    },
+    {
+     "name": "field_name",
+     "type": "text",
+     "nullable": false
+    },
+    {
+     "name": "old_value",
+     "type": "text",
+     "nullable": false
+    },
+    {
+     "name": "new_value",
+     "type": "text",
+     "nullable": false
+    },
+    {
+     "name": "type",
+     "type": "int",
+     "nullable": false,
+     "default": 0
+    }
+   ]
+  },
+  {
+   "name": "Bugnote",
+   "columns": [
+    {
+     "name": "id",
+     "type": "id",
+     "pk": true
+    },
+    {
+     "name": "bug_id",
+     "type": "id",
+     "nullable": false,
+     "fk_to": "Bug.id",
+     "on_delete": "cascade"
+    },
+    {
+     "name": "reporter_id",
+     "type": "id",
+     "nullable": false,
+     "fk_to": "User.id"
+    },
+    {
+     "name": "bugnote_text_id",
+     "type": "id",
+     "nullable": true,
+     "fk_to": "BugnoteText.id"
+    },
+    {
+     "name": "view_state",
+     "type": "int",
+     "enum": [
+      10,
+      50
+     ],
+     "default": 10
+    },
+    {
+     "name": "date_submitted",
+     "type": "datetime",
+     "audit": true
+    },
+    {
+     "name": "last_modified",
+     "type": "datetime",
+     "audit": true
+    },
+    {
+     "name": "note_type",
+     "type": "int",
+     "default": 0
+    },
+    {
+     "name": "note_attr",
+     "type": "text",
+     "default": ""
+    },
+    {
+     "name": "time_tracking",
+     "type": "int",
+     "default": 0
+    },
+    {
+     "name": "note",
+     "type": "text",
+     "nullable": true
+    }
+   ]
+  },
+  {
+   "name": "BugnoteText",
+   "columns": [
+    {
+     "name": "id",
+     "type": "id",
+     "pk": true
+    },
+    {
+     "name": "note",
+     "type": "text",
+     "nullable": false
+    }
+   ]
+  },
+  {
+   "name": "BugFile",
+   "columns": [
+    {
+     "name": "id",
+     "type": "id",
+     "pk": true
+    },
+    {
+     "name": "bug_id",
+     "type": "id",
+     "nullable": false,
+     "fk_to": "Bug.id",
+     "on_delete": "cascade"
+    },
+    {
+     "name": "bugnote_id",
+     "type": "id",
+     "fk_to": "Bugnote.id",
+     "default": 0
+    },
+    {
+     "name": "user_id",
+     "type": "id",
+     "nullable": false,
+     "fk_to": "User.id"
+    },
+    {
+     "name": "title",
+     "type": "text",
+     "nullable": false
+    },
+    {
+     "name": "description",
+     "type": "text",
+     "nullable": false
+    },
+    {
+     "name": "diskfile",
+     "type": "text",
+     "nullable": false
+    },
+    {
+     "name": "filename",
+     "type": "text",
+     "nullable": false
+    },
+    {
+     "name": "folder",
+     "type": "text",
+     "nullable": false
+    },
+    {
+     "name": "filesize",
+     "type": "int",
+     "nullable": false,
+     "default": 0
+    },
+    {
+     "name": "file_type",
+     "type": "text",
+     "nullable": false
+    },
+    {
+     "name": "date_added",
+     "type": "datetime",
+     "audit": true
+    },
+    {
+     "name": "content",
+     "type": "text",
+     "nullable": true
+    }
+   ]
+  },
+  {
+   "name": "BugRelationship",
+   "columns": [
+    {
+     "name": "id",
+     "type": "id",
+     "pk": true
+    },
+    {
+     "name": "source_bug_id",
+     "type": "id",
+     "nullable": false,
+     "fk_to": "Bug.id",
+     "on_delete": "cascade"
+    },
+    {
+     "name": "destination_bug_id",
+     "type": "id",
+     "nullable": false,
+     "fk_to": "Bug.id",
+     "on_delete": "cascade"
+    },
+    {
+     "name": "relationship_type",
+     "type": "int",
+     "nullable": false,
+     "default": 0
+    }
+   ]
+  },
+  {
+   "name": "BugMonitor",
+   "columns": [
+    {
+     "name": "user_id",
+     "type": "id",
+     "pk": true,
+     "fk_to": "User.id",
+     "on_delete": "cascade"
+    },
+    {
+     "name": "bug_id",
+     "type": "id",
+     "pk": true,
+     "fk_to": "Bug.id",
+     "on_delete": "cascade"
+    }
+   ]
+  },
+  {
+   "name": "BugTag",
+   "columns": [
+    {
+     "name": "bug_id",
+     "type": "id",
+     "pk": true,
+     "fk_to": "Bug.id",
+     "on_delete": "cascade"
+    },
+    {
+     "name": "tag_id",
+     "type": "id",
+     "pk": true,
+     "fk_to": "Tag.id",
+     "on_delete": "cascade"
+    },
+    {
+     "name": "user_id",
+     "type": "id",
+     "nullable": false,
+     "fk_to": "User.id"
+    },
+    {
+     "name": "date_attached",
+     "type": "datetime",
+     "audit": true
+    }
+   ]
+  },
+  {
+   "name": "Tag",
+   "columns": [
+    {
+     "name": "id",
+     "type": "id",
+     "pk": true
+    },
+    {
+     "name": "user_id",
+     "type": "id",
+     "nullable": false,
+     "fk_to": "User.id"
+    },
+    {
+     "name": "name",
+     "type": "text",
+     "nullable": false
+    },
+    {
+     "name": "description",
+     "type": "text",
+     "nullable": false
+    },
+    {
+     "name": "date_created",
+     "type": "datetime",
+     "audit": true
+    },
+    {
+     "name": "date_updated",
+     "type": "datetime",
+     "audit": true
+    }
+   ],
+   "constraints": [
+    {
+     "kind": "unique",
+     "cols": [
+      "name"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "BugRevision",
+   "columns": [
+    {
+     "name": "id",
+     "type": "id",
+     "pk": true
+    },
+    {
+     "name": "bug_id",
+     "type": "id",
+     "nullable": false,
+     "fk_to": "Bug.id",
+     "on_delete": "cascade"
+    },
+    {
+     "name": "bugnote_id",
+     "type": "id",
+     "nullable": false,
+     "fk_to": "Bugnote.id"
+    },
+    {
+     "name": "user_id",
+     "type": "id",
+     "nullable": false,
+     "fk_to": "User.id"
+    },
+    {
+     "name": "timestamp",
+     "type": "datetime",
+     "audit": true
+    },
+    {
+     "name": "type",
+     "type": "int",
+     "nullable": false
+    },
+    {
+     "name": "value",
+     "type": "text",
+     "nullable": false
+    }
+   ]
+  },
+  {
+   "name": "Sponsorship",
+   "columns": [
+    {
+     "name": "id",
+     "type": "id",
+     "pk": true
+    },
+    {
+     "name": "bug_id",
+     "type": "id",
+     "nullable": false,
+     "fk_to": "Bug.id"
+    },
+    {
+     "name": "user_id",
+     "type": "id",
+     "nullable": false,
+     "fk_to": "User.id"
+    },
+    {
+     "name": "amount",
+     "type": "int",
+     "nullable": false,
+     "default": 0
+    },
+    {
+     "name": "logo",
+     "type": "text",
+     "nullable": false
+    },
+    {
+     "name": "url",
+     "type": "text",
+     "nullable": false
+    },
+    {
+     "name": "paid",
+     "type": "bool",
+     "default": false
+    },
+    {
+     "name": "date_submitted",
+     "type": "datetime",
+     "audit": true
+    },
+    {
+     "name": "last_updated",
+     "type": "datetime",
+     "audit": true
+    }
+   ]
+  },
+  {
+   "name": "Config",
+   "columns": [
+    {
+     "name": "config_id",
+     "type": "text",
+     "pk": true
+    },
+    {
+     "name": "project_id",
+     "type": "id",
+     "pk": true
+    },
+    {
+     "name": "user_id",
+     "type": "id",
+     "pk": true
+    },
+    {
+     "name": "access_reqd",
+     "type": "int",
+     "default": 0
+    },
+    {
+     "name": "type",
+     "type": "int",
+     "default": 90
+    },
+    {
+     "name": "value",
+     "type": "text",
+     "nullable": false
+    }
+   ]
+  },
+  {
+   "name": "Filters",
+   "columns": [
+    {
+     "name": "id",
+     "type": "id",
+     "pk": true
+    },
+    {
+     "name": "user_id",
+     "type": "id",
+     "nullable": false,
+     "fk_to": "User.id"
+    },
+    {
+     "name": "project_id",
+     "type": "id",
+     "nullable": false,
+     "fk_to": "Project.id"
+    },
+    {
+     "name": "is_public",
+     "type": "bool",
+     "nullable": true
+    },
+    {
+     "name": "name",
+     "type": "text",
+     "nullable": false
+    },
+    {
+     "name": "filter_string",
+     "type": "text",
+     "nullable": false
+    }
+   ]
+  },
+  {
+   "name": "News",
+   "columns": [
+    {
+     "name": "id",
+     "type": "id",
+     "pk": true
+    },
+    {
+     "name": "project_id",
+     "type": "id",
+     "nullable": false,
+     "fk_to": "Project.id"
+    },
+    {
+     "name": "poster_id",
+     "type": "id",
+     "nullable": false,
+     "fk_to": "User.id"
+    },
+    {
+     "name": "date_posted",
+     "type": "datetime",
+     "audit": true
+    },
+    {
+     "name": "last_modified",
+     "type": "datetime",
+     "audit": true
+    },
+    {
+     "name": "view_state",
+     "type": "int",
+     "enum": [
+      10,
+      50
+     ],
+     "default": 10
+    },
+    {
+     "name": "announcement",
+     "type": "bool",
+     "default": false
+    },
+    {
+     "name": "headline",
+     "type": "text",
+     "nullable": false
+    },
+    {
+     "name": "body",
+     "type": "text",
+     "nullable": false
+    }
+   ]
+  },
+  {
+   "name": "Email",
+   "columns": [
+    {
+     "name": "email_id",
+     "type": "id",
+     "pk": true
+    },
+    {
+     "name": "email",
+     "type": "text",
+     "nullable": false
+    },
+    {
+     "name": "subject",
+     "type": "text",
+     "nullable": false
+    },
+    {
+     "name": "submitted",
+     "type": "datetime",
+     "audit": true
+    },
+    {
+     "name": "metadata",
+     "type": "text",
+     "nullable": false
+    },
+    {
+     "name": "body",
+     "type": "text",
+     "nullable": false
+    }
+   ]
+  },
+  {
+   "name": "Token",
+   "columns": [
+    {
+     "name": "id",
+     "type": "id",
+     "pk": true
+    },
+    {
+     "name": "owner",
+     "type": "id",
+     "nullable": false,
+     "fk_to": "User.id"
+    },
+    {
+     "name": "type",
+     "type": "int",
+     "nullable": false
+    },
+    {
+     "name": "timestamp",
+     "type": "datetime",
+     "nullable": false,
+     "audit": true
+    },
+    {
+     "name": "expiry",
+     "type": "datetime",
+     "nullable": true
+    },
+    {
+     "name": "value",
+     "type": "text",
+     "nullable": false
+    }
+   ]
+  },
+  {
+   "name": "UserPref",
+   "columns": [
+    {
+     "name": "id",
+     "type": "id",
+     "pk": true
+    },
+    {
+     "name": "user_id",
+     "type": "id",
+     "nullable": false,
+     "fk_to": "User.id",
+     "on_delete": "cascade"
+    },
+    {
+     "name": "project_id",
+     "type": "id",
+     "nullable": false,
+     "fk_to": "Project.id"
+    },
+    {
+     "name": "default_profile",
+     "type": "id",
+     "nullable": false,
+     "fk_to": "UserProfile.id"
+    },
+    {
+     "name": "default_project",
+     "type": "id",
+     "nullable": false,
+     "fk_to": "Project.id"
+    },
+    {
+     "name": "refresh_delay",
+     "type": "int",
+     "nullable": false,
+     "default": 0
+    },
+    {
+     "name": "redirect_delay",
+     "type": "int",
+     "nullable": false,
+     "default": 0
+    },
+    {
+     "name": "bugnote_order",
+     "type": "text",
+     "nullable": false,
+     "enum": [
+      "ASC",
+      "DESC"
+     ],
+     "default": "ASC"
+    },
+    {
+     "name": "email_on_new",
+     "type": "bool",
+     "default": false
+    },
+    {
+     "name": "email_on_assigned",
+     "type": "bool",
+     "default": false
+    },
+    {
+     "name": "email_on_feedback",
+     "type": "bool",
+     "default": false
+    },
+    {
+     "name": "email_on_resolved",
+     "type": "bool",
+     "default": false
+    },
+    {
+     "name": "email_on_closed",
+     "type": "bool",
+     "default": false
+    },
+    {
+     "name": "email_on_reopened",
+     "type": "bool",
+     "default": false
+    },
+    {
+     "name": "email_on_bugnote",
+     "type": "bool",
+     "default": false
+    },
+    {
+     "name": "email_on_status",
+     "type": "bool",
+     "default": false
+    },
+    {
+     "name": "email_on_priority",
+     "type": "bool",
+     "default": false
+    },
+    {
+     "name": "email_on_priority_min_severity",
+     "type": "int",
+     "default": 10
+    },
+    {
+     "name": "email_on_status_min_severity",
+     "type": "int",
+     "default": 10
+    },
+    {
+     "name": "email_on_bugnote_min_severity",
+     "type": "int",
+     "default": 10
+    },
+    {
+     "name": "email_on_reopened_min_severity",
+     "type": "int",
+     "default": 10
+    },
+    {
+     "name": "email_on_closed_min_severity",
+     "type": "int",
+     "default": 10
+    },
+    {
+     "name": "email_on_resolved_min_severity",
+     "type": "int",
+     "default": 10
+    },
+    {
+     "name": "email_on_feedback_min_severity",
+     "type": "int",
+     "default": 10
+    },
+    {
+     "name": "email_on_assigned_min_severity",
+     "type": "int",
+     "default": 10
+    },
+    {
+     "name": "email_on_new_min_severity",
+     "type": "int",
+     "default": 10
+    },
+    {
+     "name": "email_bugnote_limit",
+     "type": "int",
+     "default": 0
+    },
+    {
+     "name": "language",
+     "type": "text",
+     "nullable": false,
+     "default": "english"
+    },
+    {
+     "name": "timezone",
+     "type": "text",
+     "nullable": false,
+     "default": ""
+    }
+   ]
+  },
+  {
+   "name": "UserProfile",
+   "columns": [
+    {
+     "name": "id",
+     "type": "id",
+     "pk": true
+    },
+    {
+     "name": "user_id",
+     "type": "id",
+     "nullable": false,
+     "fk_to": "User.id"
+    },
+    {
+     "name": "platform",
+     "type": "text",
+     "nullable": false
+    },
+    {
+     "name": "os",
+     "type": "text",
+     "nullable": false
+    },
+    {
+     "name": "os_build",
+     "type": "text",
+     "nullable": false
+    },
+    {
+     "name": "description",
+     "type": "text",
+     "nullable": false
+    }
+   ]
+  },
+  {
+   "name": "Plugin",
+   "columns": [
+    {
+     "name": "basename",
+     "type": "text",
+     "pk": true
+    },
+    {
+     "name": "enabled",
+     "type": "bool",
+     "default": false
+    },
+    {
+     "name": "protected",
+     "type": "bool",
+     "default": false
+    },
+    {
+     "name": "priority",
+     "type": "int",
+     "default": 3
+    }
+   ]
+  }
+ ],
+ "tools": [
+  {
+   "tool": "bug_add",
+   "op": "create",
+   "family": "crud.insert",
+   "exec_spec": {
+    "entity": "Bug",
+    "fields": {
+     "project_id": {
+      "$arg": "project"
+     },
+     "summary": {
+      "$arg": "summary"
+     },
+     "handler_id": {
+      "$arg": "handler"
+     },
+     "category_id": {
+      "$arg": "category"
+     },
+     "priority": {
+      "$arg": "priority"
+     },
+     "severity": {
+      "$arg": "severity"
+     },
+     "status": {
+      "$arg": "status"
+     },
+     "view_state": {
+      "$arg": "view_state"
+     },
+     "os": {
+      "$arg": "os"
+     },
+     "os_build": {
+      "$arg": "os_build"
+     },
+     "platform": {
+      "$arg": "platform"
+     },
+     "build": {
+      "$arg": "build"
+     },
+     "version": {
+      "$arg": "version"
+     },
+     "target_version": {
+      "$arg": "target_version"
+     },
+     "due_date": {
+      "$arg": "due_date"
+     },
+     "description": {
+      "$arg": "description"
+     },
+     "issue_type": {
+      "$arg": "issue_type"
+     }
+    },
+    "set_on_create": {
+     "reporter_id": {
+      "$session": "account_id"
+     },
+     "status": 10,
+     "date_submitted": "2026-01-05T09:00:00",
+     "last_updated": "2026-01-05T09:00:00"
+    },
+    "side_inserts": [
+     {
+      "entity": "BugText",
+      "link_col": "bug_text_id",
+      "fields": {
+       "description": {
+        "$arg": "description"
+       }
+      }
+     }
+    ]
+   },
+   "input_schema": {
+    "summary": {
+     "type": "text",
+     "required": true,
+     "description": "One-line summary."
+    },
+    "description": {
+     "type": "text",
+     "description": "Full issue description."
+    },
+    "steps_to_reproduce": {
+     "type": "text",
+     "description": "How to reproduce the issue."
+    },
+    "additional_information": {
+     "type": "text",
+     "description": "Extra context."
+    },
+    "project": {
+     "type": "id",
+     "required": true,
+     "description": "Project id (see project_search)."
+    },
+    "category": {
+     "type": "id",
+     "description": "Category within the project."
+    },
+    "handler": {
+     "type": "id",
+     "required": false,
+     "description": "Assignee user id (see user_list)."
+    },
+    "priority": {
+     "type": "int",
+     "description": "Priority enum value."
+    },
+    "severity": {
+     "type": "int",
+     "description": "Severity enum value."
+    },
+    "status": {
+     "type": "int",
+     "description": "Initial status enum value."
+    },
+    "view_state": {
+     "type": "int",
+     "description": "10 = public, 50 = private."
+    },
+    "os": {
+     "type": "text",
+     "description": "Operating system string."
+    },
+    "os_build": {
+     "type": "text",
+     "description": "OS build string."
+    },
+    "platform": {
+     "type": "text",
+     "description": "Platform string."
+    },
+    "build": "text",
+    "version": {
+     "type": "id",
+     "description": "Version the issue applies to."
+    },
+    "target_version": {
+     "type": "id",
+     "description": "Version the issue should be fixed in."
+    },
+    "due_date": {
+     "type": "datetime",
+     "description": "Optional due date."
+    },
+    "issue_type": {
+     "type": "text",
+     "required": false,
+     "description": "Issue type, e.g. Bug, Task, Incident, Story (optional)."
+    }
+   },
+   "_evidence": {
+    "locator": "core/commands/IssueAddCommand.php:238",
+    "id_local": "Bug.Add",
+    "entry": {
+     "kind": "http",
+     "route": "POST /issues",
+     "locator": "api/rest/restcore/issues_rest.php:175"
+    },
+    "entity_why": "primary effect row_insert lands on this table",
+    "ref_code": "if( !access_has_project_level( config_get( 'report_bug_threshold' ), $t_project_id, $this->user_id ) ) {\n\tthrow new ClientException( 'User does not have access right to report issues', ERROR_ACCESS_DENIED );\n}\n$this->issue = new BugData;\n...\n$t_issue_id = $this->issue->create();",
+    "edges": [
+     "core/commands/IssueAddCommand.php:167 report_bug_threshold (access check)"
+    ]
+   },
+   "entity": "Bug",
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "User",
+        "where": {
+         "node": "field",
+         "col": "id",
+         "op": "eq",
+         "value": {
+          "actor": "id"
+         }
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "requires_auth": true,
+    "required": [
+     "project",
+     "summary"
+    ],
+    "messages": {
+     "auth": "You must sign in before reporting an issue.",
+     "required": "A summary, description and project are required.",
+     "fk": "That project, category, or assigned user does not exist.",
+     "precondition": "Your account does not have permission to report issues in this project (needs report-bug access)."
+    }
+   },
+   "description": "Report an issue in a project: project (id), summary, description, optional issue_type, category (id, see category_list), handler (assignee user id), priority, severity, due_date. Codes: priority: 10 none, 20 low, 30 normal, 40 high, 50 urgent, 60 immediate; severity: 10 feature, 20 trivial, 30 text, 40 tweak, 50 minor, 60 major, 70 crash, 80 block; status: 10 new, 20 feedback, 30 acknowledged, 40 confirmed, 50 assigned, 80 resolved, 90 closed. Returns the issue id."
+  },
+  {
+   "tool": "bug_update",
+   "op": "update",
+   "family": "update.field_set",
+   "exec_spec": {
+    "entity": "Bug",
+    "row_key": {
+     "id": {
+      "$arg": "id"
+     }
+    },
+    "fields": {
+     "summary": {
+      "$arg": "summary"
+     },
+     "category_id": {
+      "$arg": "category"
+     },
+     "handler_id": {
+      "$arg": "handler"
+     },
+     "priority": {
+      "$arg": "priority"
+     },
+     "severity": {
+      "$arg": "severity"
+     },
+     "reproducibility": {
+      "$arg": "reproducibility"
+     },
+     "projection": {
+      "$arg": "projection"
+     },
+     "eta": {
+      "$arg": "eta"
+     },
+     "view_state": {
+      "$arg": "view_state"
+     },
+     "os": {
+      "$arg": "os"
+     },
+     "os_build": {
+      "$arg": "os_build"
+     },
+     "build": {
+      "$arg": "build"
+     },
+     "platform": {
+      "$arg": "platform"
+     },
+     "version": {
+      "$arg": "version"
+     },
+     "fixed_in_version": {
+      "$arg": "fixed_in_version"
+     },
+     "target_version": {
+      "$arg": "target_version"
+     },
+     "due_date": {
+      "$arg": "due_date"
+     },
+     "status": {
+      "$arg": "status"
+     },
+     "resolution": {
+      "$arg": "resolution"
+     },
+     "description": {
+      "$arg": "description"
+     }
+    },
+    "set": {
+     "last_updated": "2026-01-01T00:00:00",
+     "category_id": {
+      "$arg": "category"
+     },
+     "handler_id": {
+      "$arg": "handler"
+     }
+    }
+   },
+   "input_schema": {
+    "id": "id",
+    "summary": "text",
+    "status": "int",
+    "resolution": "int",
+    "handler": "id",
+    "priority": "int",
+    "severity": "int",
+    "category": "id",
+    "view_state": "int",
+    "platform": "text",
+    "os": "text",
+    "os_build": "text",
+    "build": "text",
+    "version": "id",
+    "fixed_in_version": "id",
+    "target_version": "id",
+    "due_date": "datetime",
+    "description": "text",
+    "steps_to_reproduce": "text",
+    "additional_information": "text",
+    "reproducibility": "int",
+    "projection": "int",
+    "eta": "int"
+   },
+   "_evidence": {
+    "locator": "api/soap/mc_issue_api.php:1083",
+    "id_local": "Bug.Update",
+    "entry": {
+     "kind": "http",
+     "route": "PATCH /issues/{id}",
+     "locator": "api/rest/restcore/issues_rest.php:418"
+    },
+    "entity_why": "primary effect row_update lands on this table",
+    "ref_code": "if( isset( $p_issue['status'] ) ) {\n\t$t_old_status = $t_bug_data->status; $t_new_status = mci_get_status_id( $p_issue['status'] );\n\tif( $t_old_status != $t_new_status ) {\n\t\t$t_update_status_threshold = config_get( 'update_bug_status_threshold', $t_bug_data->project_id, $t_user_id );\n\t\tif( !access_has_project_level( $t_update_status_threshold, $t_bug_data->project_id, $t_user_id ) ){ return mci_fault_access_denied(...); }\n\t\tif( !bug_check_workflow( $t_old_status, $t_new_status ) ) { return ...not allowed; }\n\t\t$t_bug_data->status = $t_new_status;\n\t}\n}\n$t_bug_data->update( /* update extended */ t",
+    "edges": [
+     "api/soap/mc_issue_api.php:1089 update_bug_threshold (access check)"
+    ]
+   },
+   "entity": "Bug",
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "User",
+        "where": {
+         "node": "field",
+         "col": "id",
+         "op": "eq",
+         "value": {
+          "actor": "id"
+         }
+        }
+       },
+       "op": "gte",
+       "n": 1,
+       "_msg": "You do not have permission to update this issue."
+      }
+     ]
+    ],
+    "requires_auth": true,
+    "required": [
+     "id"
+    ]
+   },
+   "description": "Update an issue by id: summary, description, status, resolution, handler (assignee), priority, severity, category, due_date. Codes: priority: 10 none, 20 low, 30 normal, 40 high, 50 urgent, 60 immediate; severity: 10 feature, 20 trivial, 30 text, 40 tweak, 50 minor, 60 major, 70 crash, 80 block; status: 10 new, 20 feedback, 30 acknowledged, 40 confirmed, 50 assigned, 80 resolved, 90 closed."
+  },
+  {
+   "tool": "bug_delete",
+   "op": "delete",
+   "family": "crud.delete",
+   "exec_spec": {
+    "entity": "Bug",
+    "lookup_by": {
+     "id": {
+      "$arg": "id"
+     }
+    }
+   },
+   "input_schema": {
+    "id": "id"
+   },
+   "_evidence": {
+    "locator": "core/commands/IssueDeleteCommand.php:77",
+    "id_local": "Bug.Delete",
+    "entry": {
+     "kind": "http",
+     "route": "DELETE /issues/{id}",
+     "locator": "api/rest/restcore/issues_rest.php:214"
+    },
+    "entity_why": "primary effect row_delete lands on this table",
+    "ref_code": "if( !access_has_bug_level( config_get( 'delete_bug_threshold' ), $this->id ) ) {\n\tthrow new ClientException( 'Access denied to delete issue', ERROR_ACCESS_DENIED );\n}\nbug_delete( $this->id );\nreturn [];",
+    "edges": [
+     "core/commands/IssueDeleteCommand.php:62 delete_bug_threshold (access check)"
+    ]
+   },
+   "entity": "Bug",
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "User",
+        "where": {
+         "node": "field",
+         "col": "id",
+         "op": "eq",
+         "value": {
+          "actor": "id"
+         }
+        }
+       },
+       "op": "gte",
+       "n": 1,
+       "_msg": "Access denied to delete this issue."
+      }
+     ]
+    ],
+    "requires_auth": true,
+    "required": [
+     "id"
+    ]
+   },
+   "description": "Permanently delete an issue, its notes, files and history. Requires delete-bug access. Fails if the issue does not exist or is referenced by children that block deletion."
+  },
+  {
+   "tool": "bug_read",
+   "op": "read",
+   "family": "crud.fetch",
+   "exec_spec": {
+    "entity": "Bug",
+    "lookup_by": {
+     "id": {
+      "$arg": "id"
+     }
+    }
+   },
+   "input_schema": {
+    "id": "id",
+    "select": "text"
+   },
+   "_evidence": {
+    "locator": "api/rest/restcore/issues_rest.php:107",
+    "id_local": "Bug.Read",
+    "entry": {
+     "kind": "http",
+     "route": "GET /issues/{id}",
+     "locator": "api/rest/restcore/issues_rest.php:98"
+    },
+    "entity_why": "primary effect row_read lands on this table",
+    "ref_code": "if( !is_blank( $t_issue_id ) ) {\n\t$t_issue = mc_issue_get( '', '', $t_issue_id, $t_select );\n\tApiObjectFactory::throwIfFault( $t_issue );\n\t$t_result = array( 'issues' => array( $t_issue ) );\n}"
+   },
+   "entity": "Bug",
+   "guards": {
+    "required": [
+     "id"
+    ]
+   },
+   "description": "Fetch a single issue by id, with its described fields and relationships. Fails (not found) if no issue has that id."
+  },
+  {
+   "tool": "bug_search",
+   "op": "search",
+   "family": "search",
+   "exec_spec": {
+    "entity": "Bug",
+    "filter": {
+     "op": "and",
+     "clauses": [
+      {
+       "col": "project_id",
+       "mode": "exact",
+       "val": {
+        "$arg": "project_id"
+       },
+       "optional": true
+      },
+      {
+       "col": "summary",
+       "mode": "substring",
+       "val": {
+        "$arg": "q"
+       },
+       "optional": true
+      },
+      {
+       "col": "status",
+       "mode": "exact",
+       "val": {
+        "$arg": "status"
+       },
+       "optional": true
+      },
+      {
+       "col": "handler_id",
+       "mode": "exact",
+       "val": {
+        "$arg": "handler"
+       },
+       "optional": true
+      }
+     ]
+    },
+    "rank": {
+     "method": "exact"
+    }
+   },
+   "input_schema": {
+    "project_id": {
+     "type": "id",
+     "required": false,
+     "description": "Project id (optional)."
+    },
+    "q": {
+     "type": "text",
+     "required": false,
+     "description": "Substring of the summary (optional)."
+    },
+    "status": {
+     "type": "int",
+     "required": false,
+     "description": "Status code (optional)."
+    },
+    "handler": {
+     "type": "id",
+     "required": false,
+     "description": "Assignee user id (optional)."
+    }
+   },
+   "_evidence": {
+    "locator": "api/rest/restcore/issues_rest.php:120",
+    "id_local": "Bug.Search",
+    "entry": {
+     "kind": "http",
+     "route": "GET /issues",
+     "locator": "api/rest/restcore/issues_rest.php:98"
+    },
+    "entity_why": "primary effect row_search lands on this table",
+    "ref_code": "$t_project_id = (int)$p_request->getParam( 'project_id', ALL_PROJECTS );\nif( $t_project_id != ALL_PROJECTS ) {\n\t$t_user_id = auth_get_current_user_id();\n\tif( !access_has_project_level( VIEWER, $t_project_id, $t_user_id ) ) { return ... 404; }\n}\n$t_issues = mc_filter_get_issues( '', '', $t_project_id, FILTER_STANDARD_ANY, $t_page_number, $t_page_size, $t_select );"
+   },
+   "entity": "Bug",
+   "description": "List issues with every field (id, project_id, summary, description, issue_type, status, priority, severity, handler_id, due_date). Optional filters: project_id, q (summary substring), status, handler.",
+   "guards": {
+    "requires_auth": true,
+    "messages": {
+     "auth": "Sign in first."
+    }
+   }
+  },
+  {
+   "tool": "bugnote_add",
+   "op": "create",
+   "family": "crud.insert",
+   "exec_spec": {
+    "entity": "Bugnote",
+    "fields": [
+     "view_state",
+     "time_tracking"
+    ],
+    "set_on_create": {
+     "reporter_id": {
+      "$session": "account_id"
+     },
+     "note_type": "BUGNOTE",
+     "bug_id": {
+      "$arg": "id"
+     },
+     "note": {
+      "$arg": "text"
+     },
+     "date_submitted": "2026-01-05T09:00:00"
+    },
+    "side_inserts": [
+     {
+      "entity": "BugnoteText",
+      "link_col": "bugnote_text_id",
+      "fields": {
+       "note": {
+        "$arg": "text"
+       }
+      }
+     }
+    ]
+   },
+   "input_schema": {
+    "id": {
+     "type": "id",
+     "required": true,
+     "description": "Issue id."
+    },
+    "text": {
+     "type": "text",
+     "required": true,
+     "description": "Note text."
+    }
+   },
+   "_evidence": {
+    "locator": "core/commands/IssueNoteAddCommand.php:184",
+    "id_local": "Bugnote.Add",
+    "entry": {
+     "kind": "http",
+     "route": "POST /issues/{id}/notes",
+     "locator": "api/rest/restcore/issues_rest.php:278"
+    },
+    "entity_why": "primary effect row_insert lands on this table",
+    "ref_code": "if( !access_has_bug_level( config_get( 'add_bugnote_threshold' ), $t_issue_id, $this->reporterId ) ) {\n\tthrow new ClientException( \"Reporter can't add notes\", ERROR_ACCESS_DENIED );\n}\n$t_note_id = bugnote_add( $this->issue->id, $this->text, $this->time_tracking, $this->private, BUGNOTE, '', $this->reporterId, false, 0, 0, false, true, false );",
+    "edges": [
+     "core/commands/IssueNoteAddCommand.php:184 add_bugnote_threshold (access check)"
+    ]
+   },
+   "entity": "Bugnote",
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "User",
+        "where": {
+         "node": "field",
+         "col": "id",
+         "op": "eq",
+         "value": {
+          "actor": "id"
+         }
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "requires_auth": true,
+    "required": [
+     "id",
+     "text"
+    ],
+    "messages": {
+     "auth": "You must sign in before adding a note.",
+     "required": "An issue id and note text are required.",
+     "fk_missing": "The issue this note belongs to does not exist.",
+     "precondition": "Your account does not have permission to add notes to issues (needs add-note access)."
+    }
+   },
+   "description": "Add a note (comment) to an issue: id = issue id, text = note."
+  },
+  {
+   "tool": "bugnote_delete",
+   "op": "delete",
+   "family": "crud.delete",
+   "exec_spec": {
+    "entity": "Bugnote",
+    "lookup_by": {
+     "id": {
+      "$arg": "id"
+     }
+    }
+   },
+   "input_schema": {
+    "id": "id",
+    "note_id": "id"
+   },
+   "_evidence": {
+    "locator": "core/commands/IssueNoteDeleteCommand.php:86",
+    "id_local": "Bugnote.Delete",
+    "entry": {
+     "kind": "http",
+     "route": "DELETE /issues/{id}/notes/{note_id}",
+     "locator": "api/rest/restcore/issues_rest.php:327"
+    },
+    "entity_why": "primary effect row_delete lands on this table",
+    "ref_code": "if( $t_user_id == $t_reporter_id ) { $t_threshold_config_name = 'bugnote_user_delete_threshold'; }\nelse { $t_threshold_config_name = 'delete_bugnote_threshold'; }\nif( !access_has_bugnote_level( config_get( $t_threshold_config_name ), $this->id ) ) { throw ...Access denied...; }",
+    "edges": [
+     "core/commands/IssueNoteDeleteCommand.php:86 delete_bugnote_threshold (access check)"
+    ]
+   },
+   "entity": "Bugnote",
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "User",
+        "where": {
+         "node": "field",
+         "col": "id",
+         "op": "eq",
+         "value": {
+          "actor": "id"
+         }
+        }
+       },
+       "op": "gte",
+       "n": 1,
+       "_msg": "You cannot delete this note; only its author (or a user with delete-note rights) may remove it."
+      }
+     ]
+    ],
+    "requires_auth": true,
+    "required": [
+     "id",
+     "note_id"
+    ]
+   },
+   "description": "Delete an issue note by id. Users may delete their own notes above the user threshold; others need delete-bugnote access. Fails if the note does not exist."
+  },
+  {
+   "tool": "bug_sponsor",
+   "op": "create",
+   "family": "crud.insert",
+   "exec_spec": {
+    "entity": "Sponsorship",
+    "fields": {
+     "bug_id": {
+      "$arg": "bug_id"
+     },
+     "amount": {
+      "$arg": "amount"
+     }
+    },
+    "set_on_create": {
+     "user_id": {
+      "$session": "account_id"
+     }
+    }
+   },
+   "input_schema": {
+    "bug_id": "id",
+    "amount": "int"
+   },
+   "_evidence": {
+    "locator": "bug_set_sponsorship.php:85",
+    "id_local": "Bug.Sponsor",
+    "entry": {
+     "kind": "http",
+     "route": "bug_set_sponsorship.php",
+     "locator": "bug_set_sponsorship.php:65"
+    },
+    "entity_why": "primary effect row_insert lands on this table",
+    "ref_code": "if( $f_amount == 0 ) { $t_sponsorship_id = sponsorship_get_id( $f_bug_id ); if( $t_sponsorship_id !== false ) { sponsorship_delete( $t_sponsorship_id ); } }\nelse { $t_user = auth_get_current_user_id(); ... sponsorship_set( $t_sponsorship ); }",
+    "edges": [
+     "bug_set_sponsorship.php:61 sponsor_threshold (access check)"
+    ]
+   },
+   "entity": "Sponsorship",
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "User",
+        "where": {
+         "node": "field",
+         "col": "id",
+         "op": "eq",
+         "value": {
+          "actor": "id"
+         }
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "requires_auth": true,
+    "required": [
+     "bug_id",
+     "amount"
+    ],
+    "messages": {
+     "auth": "You must sign in to sponsor an issue.",
+     "required": "An issue id and amount are required.",
+     "fk": "That issue does not exist.",
+     "precondition": "Your account does not have permission to sponsor issues in this project."
+    }
+   },
+   "description": "Set a sponsorship amount on an issue, credited to you. Passing amount 0 removes any existing sponsorship. Fails if you lack sponsor access."
+  },
+  {
+   "tool": "project_add",
+   "op": "create",
+   "family": "crud.insert",
+   "exec_spec": {
+    "entity": "Project",
+    "fields": [
+     "name",
+     "description",
+     "status",
+     "view_state",
+     "enabled",
+     "file_path",
+     "inherit_global"
+    ],
+    "unique_on": [
+     "name"
+    ]
+   },
+   "input_schema": {
+    "name": "text",
+    "description": "text",
+    "status": "int",
+    "view_state": "int",
+    "enabled": "bool",
+    "file_path": "text",
+    "inherit_global": "bool"
+   },
+   "_evidence": {
+    "locator": "core/commands/ProjectAddCommand.php:151",
+    "id_local": "Project.Add",
+    "entry": {
+     "kind": "http",
+     "route": "POST /projects",
+     "locator": "api/rest/restcore/projects_rest.php:604"
+    },
+    "entity_why": "primary effect row_insert lands on this table",
+    "ref_code": "function process() {\n\t$t_project_id = project_create( $this->name, $this->description, $this->status, $this->view_state, $this->file_path, $this->enabled, $this->inherit_global );\n\t$t_user_id = auth_get_current_user_id();\n\t$t_manage_project_access_level = config_get( 'manage_project_threshold', null, $t_user_id, $t_project_id );\n\tif( !access_has_project_level( $t_manage_project_access_level, $t_project_id, $t_user_id ) ) { project_add_user( $t_project_id, $t_user_id, $t_access_level ); }",
+    "edges": [
+     "core/commands/ProjectAddCommand.php:87 manage_project_threshold (access check)"
+    ]
+   },
+   "entity": "Project",
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "User",
+        "where": {
+         "node": "field",
+         "col": "id",
+         "op": "eq",
+         "value": {
+          "actor": "id"
+         }
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "requires_auth": true,
+    "required": [
+     "name"
+    ],
+    "messages": {
+     "auth": "You must sign in with project-management rights.",
+     "required": "A project name is required.",
+     "unique": "A project with that name already exists.",
+     "fk_missing": "A default category could not be created; check project setup.",
+     "precondition": "Your account does not have permission to create projects (needs manage-project access)."
+    }
+   },
+   "description": "Create a new project. Returns the created project. Fails if a project with that name already exists or you lack admin rights."
+  },
+  {
+   "tool": "project_update",
+   "op": "update",
+   "family": "update.field_set",
+   "exec_spec": {
+    "entity": "Project",
+    "row_key": {
+     "id": {
+      "$arg": "id"
+     }
+    },
+    "fields": [
+     "name",
+     "description",
+     "status",
+     "enabled"
+    ]
+   },
+   "input_schema": {
+    "id": "id",
+    "name": "text",
+    "description": "text",
+    "status": "int",
+    "enabled": "bool"
+   },
+   "_evidence": {
+    "locator": "core/commands/ProjectUpdateCommand.php:180",
+    "id_local": "Project.Update",
+    "entry": {
+     "kind": "http",
+     "route": "PATCH /projects/{id}",
+     "locator": "api/rest/restcore/projects_rest.php:634"
+    },
+    "entity_why": "primary effect row_update lands on this table",
+    "ref_code": "protected function process() {\n\tproject_update( $this->id, $this->name, $this->description, $this->status, $this->view_state, $this->file_path, $this->enabled, $this->inherit_global );\n\tproject_clear_cache( $this->id );\n\tevent_signal( 'EVENT_MANAGE_PROJECT_UPDATE', array( $this->id ) );",
+    "edges": [
+     "core/commands/ProjectUpdateCommand.php:139 manage_project_threshold (access check)"
+    ]
+   },
+   "entity": "Project",
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "User",
+        "where": {
+         "node": "field",
+         "col": "id",
+         "op": "eq",
+         "value": {
+          "actor": "id"
+         }
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "requires_auth": true,
+    "required": [
+     "id"
+    ],
+    "messages": {
+     "auth": "You must be a project manager.",
+     "not_found": "No project has that id.",
+     "precondition": "Your account does not have permission to manage this project (needs manage-project access)."
+    }
+   },
+   "description": "Modify a project's name, description, status or enabled flag. Fails if the project does not exist."
+  },
+  {
+   "tool": "project_delete",
+   "op": "delete",
+   "family": "crud.delete",
+   "exec_spec": {
+    "entity": "Project",
+    "lookup_by": {
+     "id": {
+      "$arg": "id"
+     }
+    }
+   },
+   "input_schema": {
+    "id": "id"
+   },
+   "_evidence": {
+    "locator": "core/commands/ProjectDeleteCommand.php:70",
+    "id_local": "Project.Delete",
+    "entry": {
+     "kind": "http",
+     "route": "DELETE /projects/{id}",
+     "locator": "api/rest/restcore/projects_rest.php:673"
+    },
+    "entity_why": "primary effect row_delete lands on this table",
+    "ref_code": "protected function process() {\n\tglobal $g_project_override;\n\t$g_project_override = $this->id;\n\tproject_delete( $this->id );\n\treturn [];\n}",
+    "edges": [
+     "core/commands/ProjectDeleteCommand.php:50 manage_project_threshold (access check)"
+    ]
+   },
+   "entity": "Project",
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "User",
+        "where": {
+         "node": "field",
+         "col": "id",
+         "op": "eq",
+         "value": {
+          "actor": "id"
+         }
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "requires_auth": true,
+    "required": [
+     "id"
+    ],
+    "messages": {
+     "auth": "You must be a project manager.",
+     "not_found": "No project has that id.",
+     "on_child": "This project still has categories, versions or issues and cannot be deleted.",
+     "precondition": "Your account does not have permission to delete this project (needs manage-project access)."
+    }
+   },
+   "description": "Delete a project and its categories, versions and issues. Fails if the project does not exist."
+  },
+  {
+   "tool": "project_search",
+   "op": "search",
+   "family": "search",
+   "exec_spec": {
+    "entity": "Project",
+    "filter": {
+     "op": "and",
+     "clauses": [
+      {
+       "col": "id",
+       "mode": "exact",
+       "val": {
+        "$arg": "id"
+       },
+       "optional": true
+      },
+      {
+       "col": "name",
+       "mode": "substring",
+       "val": {
+        "$arg": "q"
+       },
+       "optional": true
+      }
+     ]
+    },
+    "rank": {
+     "method": "exact"
+    }
+   },
+   "input_schema": {
+    "id": {
+     "type": "id",
+     "required": false,
+     "description": "Project id (optional)."
+    },
+    "q": {
+     "type": "text",
+     "required": false,
+     "description": "Substring of the project name (optional)."
+    }
+   },
+   "_evidence": {
+    "locator": "api/rest/restcore/projects_rest.php:241",
+    "id_local": "Project.Search",
+    "entry": {
+     "kind": "http",
+     "route": "GET /projects",
+     "locator": "api/rest/restcore/projects_rest.php:231"
+    },
+    "entity_why": "primary effect row_search lands on this table",
+    "ref_code": "$t_project_ids = user_get_all_accessible_projects( $t_user_id, $t_project_id );\n$t_projects = array();\nforeach( $t_project_ids as $t_project_id ) { $t_project = mci_project_get( $t_project_id, $t_lang, true ); ... }"
+   },
+   "entity": "Project",
+   "description": "List projects: id, name, key, description. Optional id / q (name substring).",
+   "guards": {
+    "messages": {
+     "auth": "You must sign in to list projects."
+    }
+   }
+  },
+  {
+   "tool": "version_add",
+   "op": "create",
+   "family": "crud.insert",
+   "exec_spec": {
+    "entity": "ProjectVersion",
+    "fields": {
+     "project_id": {
+      "$arg": "id"
+     },
+     "version": {
+      "$arg": "name"
+     },
+     "released": {
+      "$arg": "released"
+     },
+     "description": {
+      "$arg": "description"
+     },
+     "obsolete": {
+      "$arg": "obsolete"
+     }
+    },
+    "unique_on": [
+     "project_id",
+     "version"
+    ]
+   },
+   "input_schema": {
+    "id": "id",
+    "name": "text",
+    "released": "bool",
+    "obsolete": "bool",
+    "description": "text"
+   },
+   "_evidence": {
+    "locator": "core/commands/VersionAddCommand.php:92",
+    "id_local": "Version.Add",
+    "entry": {
+     "kind": "http",
+     "route": "POST /projects/{id}/versions",
+     "locator": "api/rest/restcore/projects_rest.php:318"
+    },
+    "entity_why": "primary effect row_insert lands on this table",
+    "ref_code": "$t_version_id = version_add( $this->project_id, $t_name, $t_released ? VERSION_RELEASED : VERSION_FUTURE, $this->payload( 'description', '' ), $this->timestamp, $t_obsolete );",
+    "edges": [
+     "core/commands/VersionAddCommand.php:63 manage_project_threshold (access check)"
+    ]
+   },
+   "entity": "ProjectVersion",
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "User",
+        "where": {
+         "node": "field",
+         "col": "id",
+         "op": "eq",
+         "value": {
+          "actor": "id"
+         }
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "requires_auth": true,
+    "required": [
+     "id",
+     "name"
+    ],
+    "messages": {
+     "auth": "You must be a project manager to add a version.",
+     "required": "A project and version name are required.",
+     "unique": "That version name is already used in the project.",
+     "fk": "That project does not exist.",
+     "precondition": "Your account does not have permission to add versions to this project (needs manage-project access)."
+    }
+   },
+   "description": "Add a named release version to a project. A version name must be unique within its project. Fails on duplicates or missing project."
+  },
+  {
+   "tool": "version_update",
+   "op": "update",
+   "family": "update.field_set",
+   "exec_spec": {
+    "entity": "ProjectVersion",
+    "row_key": {
+     "id": {
+      "$arg": "version_id"
+     }
+    },
+    "fields": {
+     "version": {
+      "$arg": "name"
+     },
+     "released": {
+      "$arg": "released"
+     },
+     "obsolete": {
+      "$arg": "obsolete"
+     }
+    },
+    "set": {
+     "description": "",
+     "version": {
+      "$arg": "name"
+     }
+    }
+   },
+   "input_schema": {
+    "version_id": "id",
+    "name": "text",
+    "released": "bool",
+    "obsolete": "bool"
+   },
+   "_evidence": {
+    "locator": "core/commands/VersionUpdateCommand.php:114",
+    "id_local": "Version.Update",
+    "entry": {
+     "kind": "http",
+     "route": "PATCH /projects/{id}/versions/{version_id}",
+     "locator": "api/rest/restcore/projects_rest.php:351"
+    },
+    "entity_why": "primary effect row_update lands on this table",
+    "ref_code": "$t_name = $this->payload( 'name' );\nif( !is_null( $t_name ) ) { $t_version->version = trim( $t_name ); if( !version_is_unique( $t_name, $this->project_id ) ) { throw ...ERROR_VERSION_DUPLICATE; } }\n... version_update( $t_version );",
+    "edges": [
+     "core/commands/VersionUpdateCommand.php:75 manage_project_threshold (access check)"
+    ]
+   },
+   "entity": "ProjectVersion",
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "User",
+        "where": {
+         "node": "field",
+         "col": "id",
+         "op": "eq",
+         "value": {
+          "actor": "id"
+         }
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "requires_auth": true,
+    "required": [
+     "version_id"
+    ],
+    "messages": {
+     "auth": "You must be a project manager.",
+     "not_found": "No version has that id.",
+     "unique": "That version name is already used in the project.",
+     "precondition": "Your account does not have permission to manage versions in this project (needs manage-project access)."
+    }
+   },
+   "description": "Rename a project version or change its released/obsolete flags. Rename is refused if the new name is already used in the project."
+  },
+  {
+   "tool": "version_delete",
+   "op": "delete",
+   "family": "crud.delete",
+   "exec_spec": {
+    "entity": "ProjectVersion",
+    "lookup_by": {
+     "id": {
+      "$arg": "version_id"
+     }
+    }
+   },
+   "input_schema": {
+    "version_id": "id"
+   },
+   "_evidence": {
+    "locator": "core/commands/VersionDeleteCommand.php:97",
+    "id_local": "Version.Delete",
+    "entry": {
+     "kind": "http",
+     "route": "DELETE /projects/{id}/versions/{version_id}",
+     "locator": "api/rest/restcore/projects_rest.php:385"
+    },
+    "entity_why": "primary effect row_delete lands on this table",
+    "ref_code": "version_remove( $this->version_id, '' );\nreturn [];",
+    "edges": [
+     "core/commands/VersionDeleteCommand.php:76 manage_project_threshold (access check)"
+    ]
+   },
+   "entity": "ProjectVersion",
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "User",
+        "where": {
+         "node": "field",
+         "col": "id",
+         "op": "eq",
+         "value": {
+          "actor": "id"
+         }
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "requires_auth": true,
+    "required": [
+     "version_id"
+    ],
+    "messages": {
+     "auth": "You must be a project manager.",
+     "not_found": "No version has that id.",
+     "precondition": "Your account does not have permission to remove versions in this project (needs manage-project access)."
+    }
+   },
+   "description": "Remove a version from a project. Fails if the version does not exist."
+  },
+  {
+   "tool": "category_add",
+   "op": "create",
+   "family": "crud.insert",
+   "exec_spec": {
+    "entity": "Category",
+    "fields": {
+     "project_id": {
+      "$arg": "id"
+     },
+     "name": {
+      "$arg": "name"
+     }
+    },
+    "unique_on": [
+     "project_id",
+     "name"
+    ],
+    "set_on_create": {
+     "user_id": {
+      "$session": "account_id"
+     }
+    }
+   },
+   "input_schema": {
+    "id": {
+     "type": "id",
+     "required": true,
+     "description": "Project to add the category to."
+    },
+    "name": {
+     "type": "text",
+     "required": true,
+     "description": "Category name."
+    },
+    "handler": {
+     "type": "id",
+     "required": false,
+     "description": "Optional category handler/owner."
+    }
+   },
+   "_evidence": {
+    "locator": "core/commands/CategoryAddCommand.php:77",
+    "id_local": "Category.Add",
+    "entry": {
+     "kind": "http",
+     "route": "POST /projects/{id}/categories",
+     "locator": "api/rest/restcore/projects_rest.php:435"
+    },
+    "entity_why": "primary effect row_insert lands on this table",
+    "ref_code": "$t_id = category_add( $this->project_id, $this->name );\n... if( $this->handler_id !== NO_USER || !$t_enabled ) { category_update( $t_id, $this->name, $this->handler_id, category_enabled_to_status( $t_enabled ) ); }",
+    "edges": [
+     "core/commands/CategoryAddCommand.php:48 manage_project_threshold (access check)"
+    ]
+   },
+   "entity": "Category",
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "User",
+        "where": {
+         "node": "field",
+         "col": "id",
+         "op": "eq",
+         "value": {
+          "actor": "id"
+         }
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "requires_auth": true,
+    "required": [
+     "id",
+     "name"
+    ],
+    "messages": {
+     "auth": "You must be a project manager.",
+     "required": "A project and category name are required.",
+     "unique": "That category name is already used in the project.",
+     "fk": "That project does not exist.",
+     "precondition": "Your account does not have permission to add categories to this project (needs manage-project access)."
+    }
+   },
+   "description": "Add a category to a project (id = project id, name)."
+  },
+  {
+   "tool": "category_update",
+   "op": "update",
+   "family": "update.field_set",
+   "exec_spec": {
+    "entity": "Category",
+    "row_key": {
+     "id": {
+      "$arg": "category_id"
+     }
+    },
+    "fields": {
+     "name": {
+      "$arg": "name"
+     },
+     "user_id": {
+      "$arg": "handler"
+     },
+     "status": {
+      "$arg": "enabled"
+     }
+    },
+    "set": {
+     "user_id": {
+      "$arg": "handler"
+     },
+     "status": {
+      "$arg": "enabled"
+     }
+    }
+   },
+   "input_schema": {
+    "category_id": "id",
+    "name": "text",
+    "handler": "id",
+    "enabled": "bool"
+   },
+   "_evidence": {
+    "locator": "core/commands/CategoryUpdateCommand.php:90",
+    "id_local": "Category.Update",
+    "entry": {
+     "kind": "http",
+     "route": "PATCH /projects/{id}/categories/{category_id}",
+     "locator": "api/rest/restcore/projects_rest.php:455"
+    },
+    "entity_why": "primary effect row_update lands on this table",
+    "ref_code": "category_update( $this->category_id, $t_name, $this->handler_id, $t_status );\ncategory_cache_flush( $this->project_id );",
+    "edges": [
+     "core/commands/CategoryUpdateCommand.php:55 manage_project_threshold (access check)"
+    ]
+   },
+   "entity": "Category",
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "User",
+        "where": {
+         "node": "field",
+         "col": "id",
+         "op": "eq",
+         "value": {
+          "actor": "id"
+         }
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "requires_auth": true,
+    "required": [
+     "category_id"
+    ],
+    "messages": {
+     "auth": "You must be a project manager.",
+     "not_found": "No category has that id.",
+     "unique": "That category name is already used in the project.",
+     "precondition": "Your account does not have permission to manage categories in this project (needs manage-project access)."
+    }
+   },
+   "description": "Rename a category or change its handler/disabled status. Fails if the category does not exist."
+  },
+  {
+   "tool": "category_delete",
+   "op": "delete",
+   "family": "crud.delete",
+   "exec_spec": {
+    "entity": "Category",
+    "lookup_by": {
+     "id": {
+      "$arg": "category_id"
+     }
+    }
+   },
+   "input_schema": {
+    "category_id": "id"
+   },
+   "_evidence": {
+    "locator": "core/commands/CategoryDeleteCommand.php:73",
+    "id_local": "Category.Delete",
+    "entry": {
+     "kind": "http",
+     "route": "DELETE /projects/{id}/categories/{category_id}",
+     "locator": "api/rest/restcore/projects_rest.php:478"
+    },
+    "entity_why": "primary effect row_delete lands on this table",
+    "ref_code": "category_remove( $this->category_id, $this->option( 'new_category_id', 0 ) );\ncategory_cache_flush( $this->project_id );\nreturn [];",
+    "edges": [
+     "core/commands/CategoryDeleteCommand.php:48 manage_project_threshold (access check)"
+    ]
+   },
+   "entity": "Category",
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "User",
+        "where": {
+         "node": "field",
+         "col": "id",
+         "op": "eq",
+         "value": {
+          "actor": "id"
+         }
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "requires_auth": true,
+    "required": [
+     "category_id"
+    ],
+    "messages": {
+     "auth": "You must be a project manager.",
+     "not_found": "No category has that id.",
+     "precondition": "Your account does not have permission to delete categories in this project (needs manage-project access)."
+    }
+   },
+   "description": "Delete a category, optionally moving its issues to another category. Fails if the category does not exist."
+  },
+  {
+   "tool": "projecthierarchy_add",
+   "op": "create",
+   "family": "crud.insert",
+   "exec_spec": {
+    "entity": "ProjectHierarchy",
+    "fields": {
+     "child_id": {
+      "$arg": "subproject_id"
+     },
+     "parent_id": {
+      "$arg": "id"
+     },
+     "inherit_parent": {
+      "$arg": "inherit_parent"
+     }
+    },
+    "unique_on": [
+     "child_id",
+     "parent_id"
+    ]
+   },
+   "input_schema": {
+    "id": "id",
+    "project": "json",
+    "inherit_parent": "bool"
+   },
+   "_evidence": {
+    "locator": "core/commands/ProjectHierarchyAddCommand.php:124",
+    "id_local": "ProjectHierarchy.Add",
+    "entry": {
+     "kind": "http",
+     "route": "POST /projects/{id}/subprojects",
+     "locator": "api/rest/restcore/projects_rest.php:498"
+    },
+    "entity_why": "primary effect row_insert lands on this table",
+    "ref_code": "project_hierarchy_add( $this->subproject_id, $this->project_id, $this->payload( 'inherit_parent', true ) );\nreturn array();",
+    "edges": [
+     "core/commands/ProjectHierarchyAddCommand.php:98 manage_project_threshold (access check)"
+    ]
+   },
+   "entity": "ProjectHierarchy",
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "User",
+        "where": {
+         "node": "field",
+         "col": "id",
+         "op": "eq",
+         "value": {
+          "actor": "id"
+         }
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "requires_auth": true,
+    "required": [
+     "id",
+     "subproject_id"
+    ],
+    "messages": {
+     "auth": "You must be a project manager.",
+     "required": "Both the parent and the subproject are required.",
+     "unique": "That project is already a subproject of this one.",
+     "fk": "One of those projects does not exist.",
+     "precondition": "Your account does not have permission to set up subprojects (needs manage-project access)."
+    }
+   },
+   "description": "Make a project a subproject of a parent project. Fails if the child/parent link already exists."
+  },
+  {
+   "tool": "projecthierarchy_update",
+   "op": "update",
+   "family": "update.field_set",
+   "exec_spec": {
+    "entity": "ProjectHierarchy",
+    "row_key": {
+     "child_id": {
+      "$arg": "subproject_id"
+     },
+     "parent_id": {
+      "$arg": "id"
+     }
+    },
+    "fields": [
+     "inherit_parent"
+    ]
+   },
+   "input_schema": {
+    "id": "id",
+    "subproject_id": "id",
+    "inherit_parent": "bool"
+   },
+   "_evidence": {
+    "locator": "core/commands/ProjectHierarchyUpdateCommand.php:113",
+    "id_local": "ProjectHierarchy.Update",
+    "entry": {
+     "kind": "http",
+     "route": "PATCH /projects/{id}/subprojects/{subproject_id}",
+     "locator": "api/rest/restcore/projects_rest.php:528"
+    },
+    "entity_why": "primary effect row_update lands on this table",
+    "ref_code": "project_hierarchy_update( $this->subproject_id, $this->project_id, $this->inherit_parent );\nreturn array();",
+    "edges": [
+     "core/commands/ProjectHierarchyUpdateCommand.php:86 manage_project_threshold (access check)"
+    ]
+   },
+   "entity": "ProjectHierarchy",
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "User",
+        "where": {
+         "node": "field",
+         "col": "id",
+         "op": "eq",
+         "value": {
+          "actor": "id"
+         }
+        }
+       },
+       "op": "gte",
+       "n": 1,
+       "_msg": "You must be a project manager to change the project hierarchy."
+      }
+     ]
+    ],
+    "requires_auth": true,
+    "required": [
+     "id",
+     "subproject_id",
+     "inherit_parent"
+    ],
+    "messages": {
+     "precondition": "Your account does not have permission to manage project hierarchy (needs manage-project access)."
+    }
+   },
+   "description": "Change whether a subproject inherits its parent's settings.",
+   "_binds": {
+    "inherit_parent": "ProjectHierarchy.inherit_parent"
+   }
+  },
+  {
+   "tool": "projecthierarchy_delete",
+   "op": "delete",
+   "family": "crud.delete",
+   "exec_spec": {
+    "entity": "ProjectHierarchy",
+    "lookup_by": {
+     "child_id": {
+      "$arg": "subproject_id"
+     },
+     "parent_id": {
+      "$arg": "id"
+     }
+    }
+   },
+   "input_schema": {
+    "id": "id",
+    "subproject_id": "id"
+   },
+   "_evidence": {
+    "locator": "core/commands/ProjectHierarchyDeleteCommand.php:99",
+    "id_local": "ProjectHierarchy.Delete",
+    "entry": {
+     "kind": "http",
+     "route": "DELETE /projects/{id}/subprojects/{subproject_id}",
+     "locator": "api/rest/restcore/projects_rest.php:566"
+    },
+    "entity_why": "primary effect row_delete lands on this table",
+    "ref_code": "project_hierarchy_remove( $this->subproject_id, $this->project_id );\nreturn array();",
+    "edges": [
+     "core/commands/ProjectHierarchyDeleteCommand.php:79 manage_project_threshold (access check)"
+    ]
+   },
+   "entity": "ProjectHierarchy",
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "User",
+        "where": {
+         "node": "field",
+         "col": "id",
+         "op": "eq",
+         "value": {
+          "actor": "id"
+         }
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "requires_auth": true,
+    "required": [
+     "id",
+     "subproject_id"
+    ],
+    "messages": {
+     "auth": "You must be a project manager.",
+     "not_found": "No such subproject link exists.",
+     "precondition": "Your account does not have permission to remove the subproject link (needs manage-project access)."
+    }
+   },
+   "description": "Remove a subproject relationship between two projects."
+  },
+  {
+   "tool": "projectusers_add",
+   "op": "create",
+   "family": "crud.upsert",
+   "exec_spec": {
+    "entity": "ProjectUserList",
+    "key": {
+     "project_id": {
+      "$arg": "project"
+     },
+     "user_id": {
+      "$arg": "user"
+     }
+    },
+    "insert_fields": [
+     "access_level"
+    ],
+    "set_on_exists": {}
+   },
+   "input_schema": {
+    "project": {
+     "type": "id",
+     "required": true,
+     "description": "Project id."
+    },
+    "user": {
+     "type": "id",
+     "required": true,
+     "description": "User id to add/remove."
+    },
+    "access_level": {
+     "type": "int",
+     "required": true,
+     "description": "Access level to grant in the project."
+    }
+   },
+   "_evidence": {
+    "locator": "core/commands/ProjectUsersAddCommand.php:133",
+    "id_local": "ProjectUsers.Add",
+    "entry": {
+     "kind": "http",
+     "route": "POST /projects/{id}/users",
+     "locator": "api/rest/restcore/projects_rest.php:167"
+    },
+    "entity_why": "primary effect row_upsert lands on this table",
+    "ref_code": "project_add_user( $this->project_id, $this->user_id, $this->access_level );  # upsert",
+    "edges": [
+     "core/commands/ProjectUsersAddCommand.php:107 manage_user_threshold (access check)"
+    ]
+   },
+   "entity": "ProjectUserList",
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "User",
+        "where": {
+         "node": "field",
+         "col": "id",
+         "op": "eq",
+         "value": {
+          "actor": "id"
+         }
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "requires_auth": true,
+    "required": [
+     "user",
+     "access_level",
+     "project"
+    ],
+    "messages": {
+     "auth": "You must be a project manager to add users.",
+     "required": "A user and access level are required.",
+     "fk": "That user or project does not exist.",
+     "precondition": "Your account does not have permission to add members to this project (needs manage-membership access)."
+    }
+   },
+   "description": "Add a user to a project (or update their access level if already present) with the given access level."
+  },
+  {
+   "tool": "projectusers_delete",
+   "op": "delete",
+   "family": "crud.delete",
+   "exec_spec": {
+    "entity": "ProjectUserList",
+    "lookup_by": {
+     "project_id": {
+      "$arg": "project"
+     },
+     "user_id": {
+      "$arg": "user"
+     }
+    }
+   },
+   "input_schema": {
+    "project": {
+     "type": "id",
+     "required": true,
+     "description": "Project id."
+    },
+    "user": {
+     "type": "id",
+     "required": true,
+     "description": "User id to add/remove."
+    }
+   },
+   "_evidence": {
+    "locator": "core/commands/ProjectUsersDeleteCommand.php:125",
+    "id_local": "ProjectUsers.Delete",
+    "entry": {
+     "kind": "http",
+     "route": "DELETE /projects/{id}/users/{user_id}",
+     "locator": "api/rest/restcore/projects_rest.php:198"
+    },
+    "entity_why": "primary effect row_delete lands on this table",
+    "ref_code": "if( $this->user_id === ALL_USERS ) { project_remove_all_users( $this->project_id, access_get_project_level( ... ) ); }\nelse { project_remove_user( $this->project_id, $this->user_id ); }",
+    "edges": [
+     "core/commands/ProjectUsersDeleteCommand.php:101 manage_user_threshold (access check)"
+    ]
+   },
+   "entity": "ProjectUserList",
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "User",
+        "where": {
+         "node": "field",
+         "col": "id",
+         "op": "eq",
+         "value": {
+          "actor": "id"
+         }
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "requires_auth": true,
+    "required": [
+     "project",
+     "user"
+    ],
+    "messages": {
+     "auth": "You must be a project manager.",
+     "not_found": "That user is not a member of this project.",
+     "precondition": "Your account does not have permission to remove members from this project (needs manage-membership access)."
+    }
+   },
+   "description": "Remove a user from a project. Fails if the membership does not exist."
+  },
+  {
+   "tool": "projectfield_link",
+   "op": "create",
+   "family": "crud.insert",
+   "exec_spec": {
+    "entity": "CustomFieldProject",
+    "fields": {
+     "field_id": {
+      "$arg": "field_id"
+     },
+     "project_id": {
+      "$arg": "project_id"
+     },
+     "sequence": {
+      "$arg": "sequence"
+     }
+    }
+   },
+   "input_schema": {
+    "project_id": "id",
+    "field_id": "id",
+    "sequence": "int"
+   },
+   "_evidence": {
+    "locator": "core/commands/ProjectFieldLinkCommand.php:72",
+    "id_local": "ProjectField.Link",
+    "entry": {
+     "kind": "http",
+     "route": "POST /projects/{id}/fields/{field_id}",
+     "locator": "api/rest/restcore/projects_rest.php:692"
+    },
+    "entity_why": "primary effect row_insert lands on this table",
+    "ref_code": "if( !custom_field_is_linked( $this->field_id, $this->project_id ) ) { custom_field_link( $this->field_id, $this->project_id ); }\ncustom_field_set_sequence( $this->field_id, $this->project_id, $this->sequence );",
+    "edges": [
+     "core/commands/ProjectFieldLinkCommand.php:48 manage_custom_fields_threshold (access check)"
+    ]
+   },
+   "entity": "CustomFieldProject",
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "User",
+        "where": {
+         "node": "field",
+         "col": "id",
+         "op": "eq",
+         "value": {
+          "actor": "id"
+         }
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "requires_auth": true,
+    "required": [
+     "project_id",
+     "field_id"
+    ],
+    "messages": {
+     "auth": "You must manage custom fields.",
+     "required": "A project and a custom field are required.",
+     "fk": "That custom field or project does not exist.",
+     "precondition": "Your account does not have permission to manage custom fields (needs manage-custom-field access)."
+    }
+   },
+   "description": "Link a custom field to a project so it appears on that project's issues."
+  },
+  {
+   "tool": "projectfield_unlink",
+   "op": "delete",
+   "family": "crud.delete",
+   "exec_spec": {
+    "entity": "CustomFieldProject",
+    "lookup_by": {
+     "field_id": {
+      "$arg": "field_id"
+     },
+     "project_id": {
+      "$arg": "id"
+     }
+    }
+   },
+   "input_schema": {
+    "id": "id",
+    "field_id": "id"
+   },
+   "_evidence": {
+    "locator": "core/commands/ProjectFieldUnlinkCommand.php:59",
+    "id_local": "ProjectField.Unlink",
+    "entry": {
+     "kind": "http",
+     "route": "DELETE /projects/{id}/fields/{field_id}",
+     "locator": "api/rest/restcore/projects_rest.php:715"
+    },
+    "entity_why": "primary effect row_delete lands on this table",
+    "ref_code": "custom_field_unlink( $this->field_id, $this->project_id );\nreturn [];",
+    "edges": [
+     "core/commands/ProjectFieldUnlinkCommand.php:45 manage_custom_fields_threshold (access check)"
+    ]
+   },
+   "entity": "CustomFieldProject",
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "User",
+        "where": {
+         "node": "field",
+         "col": "id",
+         "op": "eq",
+         "value": {
+          "actor": "id"
+         }
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "requires_auth": true,
+    "required": [
+     "id",
+     "field_id"
+    ],
+    "messages": {
+     "auth": "You must manage custom fields.",
+     "not_found": "That custom field is not linked to this project.",
+     "precondition": "Your account does not have permission to manage custom fields (needs manage-custom-field access)."
+    }
+   },
+   "description": "Remove a custom field from a project. Fails if the link does not exist."
+  },
+  {
+   "tool": "user_create",
+   "op": "create",
+   "family": "crud.insert",
+   "exec_spec": {
+    "entity": "User",
+    "fields": {
+     "username": {
+      "$arg": "username"
+     },
+     "password": {
+      "$arg": "password"
+     },
+     "email": {
+      "$arg": "email"
+     },
+     "access_level": {
+      "$arg": "access_level"
+     },
+     "protected": {
+      "$arg": "protected"
+     },
+     "enabled": {
+      "$arg": "enabled"
+     },
+     "realname": {
+      "$arg": "real_name"
+     }
+    },
+    "unique_on": [
+     "username"
+    ]
+   },
+   "input_schema": {
+    "username": {
+     "type": "text",
+     "required": true,
+     "description": "The new account username (must be unique)."
+    },
+    "real_name": {
+     "type": "text",
+     "required": false,
+     "description": "Display name."
+    },
+    "email": {
+     "type": "text",
+     "required": true,
+     "description": "Account email."
+    },
+    "password": {
+     "type": "text",
+     "required": true,
+     "description": "Account password."
+    },
+    "access_level": {
+     "type": "int",
+     "required": true,
+     "description": "Access level (e.g. 25 reporter, 90 admin)."
+    },
+    "enabled": {
+     "type": "bool",
+     "required": false,
+     "description": "Whether the account starts enabled."
+    },
+    "protected": {
+     "type": "bool",
+     "required": false,
+     "description": "Protected accounts cannot be deleted."
+    }
+   },
+   "_evidence": {
+    "locator": "core/commands/UserCreateCommand.php:144",
+    "id_local": "User.Create",
+    "entry": {
+     "kind": "http",
+     "route": "POST /users",
+     "locator": "api/rest/restcore/users_rest.php:156"
+    },
+    "entity_why": "primary effect row_insert lands on this table",
+    "ref_code": "if( !access_has_global_level( config_get( 'manage_user_threshold' ) ) ) { throw new ClientException( 'Access denied to create users', ERROR_ACCESS_DENIED ); }\nuser_create( $this->username, $this->password, $this->email, $this->access_level, $this->protected, $this->enabled, $this->realname, $t_admin_name );",
+    "edges": [
+     "core/commands/UserCreateCommand.php:91 manage_user_threshold (access check)"
+    ]
+   },
+   "entity": "User",
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "User",
+        "where": {
+         "node": "field",
+         "col": "id",
+         "op": "eq",
+         "value": {
+          "actor": "id"
+         }
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "requires_auth": true,
+    "required": [
+     "username",
+     "email",
+     "password",
+     "access_level"
+    ],
+    "messages": {
+     "auth": "You must have user-management rights.",
+     "required": "Username, email, password and access level are required.",
+     "unique": "That username is already taken.",
+     "fk": "The default profile reference is invalid.",
+     "precondition": "Your account does not have permission to create users (needs manage-users access)."
+    }
+   },
+   "description": "Create a user account with username, email, password and access level. Fails if the username is already taken or you lack user-management rights."
+  },
+  {
+   "tool": "user_update",
+   "op": "update",
+   "family": "update.field_set",
+   "exec_spec": {
+    "entity": "User",
+    "row_key": {
+     "id": {
+      "$arg": "user_id"
+     }
+    },
+    "fields": {
+     "username": {
+      "$arg": "name"
+     },
+     "realname": {
+      "$arg": "real_name"
+     },
+     "email": {
+      "$arg": "email"
+     },
+     "access_level": {
+      "$arg": "access_level"
+     },
+     "enabled": {
+      "$arg": "enabled"
+     },
+     "protected": {
+      "$arg": "protected"
+     }
+    },
+    "set": {
+     "username": {
+      "$arg": "name"
+     },
+     "realname": {
+      "$arg": "real_name"
+     }
+    }
+   },
+   "input_schema": {
+    "user_id": "id",
+    "name": "text",
+    "real_name": "text",
+    "email": "text",
+    "access_level": "int",
+    "enabled": "bool",
+    "protected": "bool"
+   },
+   "_evidence": {
+    "locator": "core/commands/UserUpdateCommand.php:362",
+    "id_local": "User.Update",
+    "entry": {
+     "kind": "http",
+     "route": "PATCH /users/{id}",
+     "locator": "api/rest/restcore/users_rest.php:182"
+    },
+    "entity_why": "primary effect row_update lands on this table",
+    "ref_code": "$t_query = new DbQuery( 'UPDATE {user} SET ' );\nforeach( $p_user as $t_col => $t_value ) { $t_sql_columns[] = $t_col . ' = ' . $t_query->param( $t_value ); }\n$t_query->append_sql( implode( ', ', $t_sql_columns ) . ' WHERE id=' . $t_query->param( $t_user_id ) ); $t_query->execute();",
+    "edges": [
+     "core/commands/UserUpdateCommand.php:222 manage_user_threshold (access check)"
+    ]
+   },
+   "entity": "User",
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "User",
+        "where": {
+         "node": "field",
+         "col": "id",
+         "op": "eq",
+         "value": {
+          "actor": "id"
+         }
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "requires_auth": true,
+    "required": [
+     "user_id"
+    ],
+    "messages": {
+     "auth": "You must have user-management rights.",
+     "not_found": "No user has that id.",
+     "unique": "That username is already taken.",
+     "precondition": "Your account does not have permission to edit users (needs manage-users access)."
+    }
+   },
+   "description": "Modify a user's profile fields (username, realname, email, access level, enabled, protected). Fails if the user does not exist."
+  },
+  {
+   "tool": "user_delete",
+   "op": "delete",
+   "family": "crud.delete",
+   "exec_spec": {
+    "entity": "User",
+    "lookup_by": {
+     "id": {
+      "$arg": "id"
+     }
+    }
+   },
+   "input_schema": {
+    "id": "id"
+   },
+   "_evidence": {
+    "locator": "core/commands/UserDeleteCommand.php:93",
+    "id_local": "User.Delete",
+    "entry": {
+     "kind": "http",
+     "route": "DELETE /users/{id}",
+     "locator": "api/rest/restcore/users_rest.php:339"
+    },
+    "entity_why": "primary effect row_delete lands on this table",
+    "ref_code": "user_ensure_exists( $this->user_id_to_delete );\nuser_ensure_unprotected( $this->user_id_to_delete );\n... process: user_delete( $this->user_id_to_delete );",
+    "edges": [
+     "core/commands/UserDeleteCommand.php:52 manage_user_threshold (access check)"
+    ]
+   },
+   "entity": "User",
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "User",
+        "where": {
+         "node": "field",
+         "col": "id",
+         "op": "eq",
+         "value": {
+          "actor": "id"
+         }
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "requires_auth": true,
+    "required": [
+     "id"
+    ],
+    "messages": {
+     "auth": "You must have user-management rights.",
+     "not_found": "No user has that id.",
+     "on_child": "This user still owns projects or open issues; delete those first.",
+     "precondition": "Your account does not have permission to delete users (needs manage-users access)."
+    }
+   },
+   "description": "Delete a user account. Protected administrator accounts cannot be deleted."
+  },
+  {
+   "tool": "user_resetpassword",
+   "op": "update",
+   "family": "update.field_set",
+   "exec_spec": {
+    "entity": "User",
+    "row_key": {
+     "id": {
+      "$arg": "id"
+     }
+    },
+    "fields": [
+     "password",
+     "failed_login_count",
+     "lost_password_request_count",
+     "login_count"
+    ],
+    "set": {
+     "password": "",
+     "failed_login_count": 0
+    }
+   },
+   "input_schema": {
+    "id": {
+     "type": "id",
+     "required": true,
+     "description": "User whose credentials to reset."
+    },
+    "action": {
+     "type": "text",
+     "required": true,
+     "description": "reset (new password) | unlock | clear-failed-logins."
+    },
+    "password": {
+     "type": "text",
+     "required": false,
+     "description": "New password, for the reset action."
+    }
+   },
+   "_evidence": {
+    "locator": "core/commands/UserResetPasswordCommand.php:124",
+    "id_local": "User.ResetPassword",
+    "entry": {
+     "kind": "http",
+     "route": "PUT /users/{id}/reset",
+     "locator": "api/rest/restcore/users_rest.php:363"
+    },
+    "entity_why": "primary effect row_update lands on this table",
+    "ref_code": "if( $this->action == self::RESET && auth_can_set_password( $this->user_id_reset ) && user_reset_password( $this->user_id_reset ) ) { return array( 'action' => self::RESET ); }\nuser_reset_failed_login_count_to_zero( $this->user_id_reset );",
+    "edges": [
+     "core/commands/UserResetPasswordCommand.php:70 manage_user_threshold (access check)"
+    ]
+   },
+   "entity": "User",
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "User",
+        "where": {
+         "node": "field",
+         "col": "id",
+         "op": "eq",
+         "value": {
+          "actor": "id"
+         }
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "requires_auth": true,
+    "required": [
+     "id"
+    ],
+    "messages": {
+     "auth": "You must have user-management rights.",
+     "required": "A target user id and action are required.",
+     "not_found": "No user has that id.",
+     "precondition": "Your account does not have permission to reset this user's credentials (needs manage-users access)."
+    }
+   },
+   "description": "Reset a user's password and/or clear their failed-login counter, locking, or both. Fails if the user does not exist or the action is not allowed."
+  },
+  {
+   "tool": "sign_in",
+   "op": "action",
+   "family": "guard.auth",
+   "exec_spec": {
+    "verify": {
+     "entity": "User",
+     "username_col": "username",
+     "password_col": "password"
+    }
+   },
+   "input_schema": {
+    "username": {
+     "type": "text",
+     "required": true,
+     "description": "The account username to sign in with."
+    },
+    "password": {
+     "type": "text",
+     "required": true,
+     "description": "The account password."
+    }
+   },
+   "_evidence": {
+    "locator": "login.php:72",
+    "id_local": "User.Login",
+    "entry": {
+     "kind": "http",
+     "route": "login.php",
+     "locator": "login.php:46"
+    },
+    "entity_why": "primary effect auth lands on this table",
+    "ref_code": "$t_user_id = auth_get_user_id_from_login_name( $f_username );\nif( auth_attempt_login( $f_username, $f_password, $f_perm_login ) ) { session_set( 'secure_session', $f_secure_session ); ... }",
+    "edges": [
+     "core/authentication_api.php auth_attempt_login (password verified against User.password)"
+    ]
+   },
+   "entity": "User",
+   "guards": {
+    "preconditions": [],
+    "required": [
+     "username",
+     "password"
+    ],
+    "messages": {
+     "required": "A username and password are required.",
+     "auth": "You are already signed in; sign out first."
+    }
+   },
+   "description": "Sign in with a username and password. Opens the session that everything else keys off; the authenticated user becomes $actor. Fails on unknown account or wrong password.",
+   "_binds": {
+    "username": "User.username"
+   }
+  },
+  {
+   "tool": "user_logout",
+   "op": "action",
+   "family": "guard.logout",
+   "exec_spec": {
+    "entity": "User"
+   },
+   "input_schema": {},
+   "_evidence": {
+    "locator": "logout_page.php:38",
+    "id_local": "User.Logout",
+    "entry": {
+     "kind": "http",
+     "route": "logout_page.php",
+     "locator": "logout_page.php:36"
+    },
+    "entity_why": "primary effect auth lands on this table",
+    "ref_code": "$t_logout_redirect = auth_logout_redirect_page();\nauth_logout();\nprint_header_redirect( $t_logout_redirect );",
+    "edges": [
+     "core/authentication_api.php auth_logout; requires authenticated session"
+    ]
+   },
+   "entity": "User",
+   "guards": {
+    "preconditions": [],
+    "requires_auth": true,
+    "messages": {
+     "auth": "You are not signed in."
+    }
+   },
+   "description": "End the current session and sign the user out."
+  },
+  {
+   "tool": "user_signup",
+   "op": "create",
+   "family": "auth.register",
+   "exec_spec": {
+    "entity": "User",
+    "fields": {
+     "username": {
+      "$arg": "username"
+     },
+     "email": {
+      "$arg": "email"
+     }
+    },
+    "prechecks": [
+     {
+      "entity": "User",
+      "where": {
+       "username": {
+        "$arg": "username"
+       }
+      },
+      "negate": true,
+      "message": "That username is already taken."
+     },
+     {
+      "entity": "User",
+      "where": {
+       "email": {
+        "$arg": "email"
+       }
+      },
+      "negate": true,
+      "message": "That email is already registered."
+     }
+    ]
+   },
+   "input_schema": {
+    "username": {
+     "type": "text",
+     "description": "Desired account username."
+    },
+    "email": {
+     "type": "text",
+     "description": "Account email address."
+    },
+    "captcha": "text"
+   },
+   "_evidence": {
+    "locator": "signup.php:85",
+    "id_local": "User.Signup",
+    "entry": {
+     "kind": "http",
+     "route": "signup.php",
+     "locator": "signup.php:53"
+    },
+    "entity_why": "primary effect row_insert lands on this table",
+    "ref_code": "if( auth_is_user_authenticated() ) { auth_logout(); }\nif( user_signup( $f_username, $f_email ) ) { email_notify_new_account( $f_username, $f_email ); }",
+    "edges": [
+     "signup.php:71 signup must be enabled"
+    ]
+   },
+   "entity": "User",
+   "guards": {
+    "preconditions": [],
+    "required": [
+     "username",
+     "email"
+    ],
+    "messages": {
+     "register": "That username or email is already in use.",
+     "required": "A username and email are required."
+    }
+   },
+   "description": "Create a self-registered account from a username and email. Fails if the username or email is already registered."
+  },
+  {
+   "tool": "user_get",
+   "op": "read",
+   "family": "crud.fetch",
+   "exec_spec": {
+    "entity": "User",
+    "lookup_by": {
+     "id": {
+      "$arg": "user_id"
+     }
+    }
+   },
+   "input_schema": {
+    "user_id": "id",
+    "username": "text",
+    "select": "text"
+   },
+   "_evidence": {
+    "locator": "core/commands/UserGetCommand.php:147",
+    "id_local": "User.Get",
+    "entry": {
+     "kind": "http",
+     "route": "GET /users/{user_id}",
+     "locator": "api/rest/restcore/users_rest.php:113"
+    },
+    "entity_why": "primary effect row_read lands on this table",
+    "ref_code": "$t_command = new UserGetCommand( $t_data ); $t_result = $t_command->execute();\nreturn $p_response->withStatus( HTTP_STATUS_SUCCESS )->withJson( $t_result );"
+   },
+   "entity": "User",
+   "guards": {
+    "required": [
+     "user_id"
+    ],
+    "messages": {
+     "not_found": "No user has that id."
+    }
+   },
+   "description": "Fetch a single user by id. Fails if the user does not exist."
+  },
+  {
+   "tool": "user_getme",
+   "op": "read",
+   "family": "crud.fetch",
+   "exec_spec": {
+    "entity": "User",
+    "lookup_by": {
+     "id": {
+      "$session": "account_id"
+     }
+    }
+   },
+   "input_schema": {
+    "select": "text"
+   },
+   "_evidence": {
+    "locator": "api/rest/restcore/users_rest.php:98",
+    "id_local": "User.GetMe",
+    "entry": {
+     "kind": "http",
+     "route": "GET /users/me",
+     "locator": "api/rest/restcore/users_rest.php:74"
+    },
+    "entity_why": "primary effect row_read lands on this table",
+    "ref_code": "$t_data = array( 'query' => array( 'user_id' => auth_get_current_user_id(), 'select' => $t_select ), 'options' => array( 'return_as_users' => false ) );\n$t_command = new UserGetCommand( $t_data ); $t_result = $t_command->execute();"
+   },
+   "entity": "User",
+   "description": "Fetch the signed-in user's own account details.",
+   "guards": {
+    "messages": {
+     "auth": "You must sign in to read your own account."
+    }
+   }
+  },
+  {
+   "tool": "apitoken_create",
+   "op": "create",
+   "family": "crud.insert",
+   "exec_spec": {
+    "entity": "ApiToken",
+    "fields": [
+     "user_id",
+     "name"
+    ],
+    "set_on_create": {
+     "date_created": "2026-01-01T00:00:00",
+     "hash": ""
+    },
+    "unique_on": [
+     "user_id",
+     "name"
+    ]
+   },
+   "input_schema": {
+    "user_id": "id",
+    "name": "text"
+   },
+   "_evidence": {
+    "locator": "core/commands/UserTokenCreateCommand.php:131",
+    "id_local": "ApiToken.Create",
+    "entry": {
+     "kind": "http",
+     "route": "POST /users/{user_id}/token",
+     "locator": "api/rest/restcore/users_rest.php:220"
+    },
+    "entity_why": "primary effect row_insert lands on this table",
+    "ref_code": "$t_token_result = api_token_create( $this->name, $this->user_id, true );\n$t_result = array( 'id' => $t_token_result['id'], 'name' => $this->name, 'token' => $t_token_result['token'], 'user' => mci_account_get_array_by_id( $this->user_id ) );",
+    "edges": [
+     "core/commands/UserTokenCreateCommand.php:62 impersonate_user_threshold (access check)"
+    ]
+   },
+   "entity": "ApiToken",
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "User",
+        "where": {
+         "node": "field",
+         "col": "id",
+         "op": "eq",
+         "value": {
+          "actor": "id"
+         }
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "requires_auth": true,
+    "required": [
+     "user_id",
+     "name"
+    ],
+    "messages": {
+     "auth": "You must be able to manage the target user.",
+     "required": "A user id and token name are required.",
+     "unique": "That token name is already in use for this user.",
+     "fk": "That user does not exist.",
+     "precondition": "Your account does not have permission to create API tokens for this user."
+    }
+   },
+   "description": "Create an API token for a user, returning the raw token value. Token names must be unique per user."
+  },
+  {
+   "tool": "apitoken_createme",
+   "op": "create",
+   "family": "crud.insert",
+   "exec_spec": {
+    "entity": "ApiToken",
+    "fields": [
+     "name"
+    ],
+    "set_on_create": {
+     "user_id": {
+      "$session": "account_id"
+     },
+     "date_created": "2026-01-01T00:00:00",
+     "hash": ""
+    },
+    "unique_on": [
+     "user_id",
+     "name"
+    ]
+   },
+   "input_schema": {
+    "name": "text"
+   },
+   "_evidence": {
+    "locator": "api/rest/restcore/users_rest.php:237",
+    "id_local": "ApiToken.CreateMe",
+    "entry": {
+     "kind": "http",
+     "route": "POST /users/me/token",
+     "locator": "api/rest/restcore/users_rest.php:236"
+    },
+    "entity_why": "primary effect row_insert lands on this table",
+    "ref_code": "$t_user_id = auth_get_current_user_id();\nreturn execute_create_token_command( $p_request, $p_response, $t_user_id );",
+    "edges": [
+     "api/rest/restcore/users_rest.php:236 token for self; name unique per user (api_token_api.php)"
+    ]
+   },
+   "entity": "ApiToken",
+   "guards": {
+    "preconditions": [],
+    "requires_auth": true,
+    "required": [
+     "name"
+    ],
+    "messages": {
+     "auth": "You must sign in first.",
+     "required": "A token name is required.",
+     "unique": "That token name is already in use for your account."
+    }
+   },
+   "description": "Create an API token for your own account, returning the raw token value. Token names must be unique per user."
+  },
+  {
+   "tool": "apitoken_delete",
+   "op": "delete",
+   "family": "crud.delete",
+   "exec_spec": {
+    "entity": "ApiToken",
+    "lookup_by": {
+     "id": {
+      "$arg": "token_id"
+     }
+    }
+   },
+   "input_schema": {
+    "user_id": "id",
+    "token_id": "id"
+   },
+   "_evidence": {
+    "locator": "core/commands/UserTokenDeleteCommand.php:95",
+    "id_local": "ApiToken.Delete",
+    "entry": {
+     "kind": "http",
+     "route": "DELETE /users/{user_id}/token/{token_id}",
+     "locator": "api/rest/restcore/users_rest.php:282"
+    },
+    "entity_why": "primary effect row_delete lands on this table",
+    "ref_code": "$t_row = api_token_get( $t_token_id );\nif( $t_row === false || (int)$t_row['user_id'] != $this->user_id ) { throw ...ERROR_USER_TOKEN_NOT_FOUND; }\napi_token_revoke( $t_token_id, $this->user_id );",
+    "edges": [
+     "core/commands/UserTokenDeleteCommand.php:69 impersonate_user_threshold (access check)"
+    ]
+   },
+   "entity": "ApiToken",
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "User",
+        "where": {
+         "node": "field",
+         "col": "id",
+         "op": "eq",
+         "value": {
+          "actor": "id"
+         }
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "requires_auth": true,
+    "required": [
+     "user_id",
+     "token_id"
+    ],
+    "messages": {
+     "auth": "You must be able to manage the target user.",
+     "required": "A user id and token id are required.",
+     "not_found": "That token does not exist or does not belong to that user.",
+     "precondition": "Your account does not have permission to revoke this API token."
+    }
+   },
+   "description": "Revoke an API token that belongs to a given user. Fails if the token does not belong to that user."
+  },
+  {
+   "tool": "apitoken_deleteme",
+   "op": "delete",
+   "family": "crud.delete",
+   "exec_spec": {
+    "entity": "ApiToken",
+    "lookup_by": {
+     "id": {
+      "$arg": "token_id"
+     }
+    }
+   },
+   "input_schema": {
+    "token_id": "id"
+   },
+   "_evidence": {
+    "locator": "api/rest/restcore/users_rest.php:300",
+    "id_local": "ApiToken.DeleteMe",
+    "entry": {
+     "kind": "http",
+     "route": "DELETE /users/me/token/{token_id}",
+     "locator": "api/rest/restcore/users_rest.php:299"
+    },
+    "entity_why": "primary effect row_delete lands on this table",
+    "ref_code": "$t_token_id = $p_args['token_id']; $t_user_id = auth_get_current_user_id();\nreturn execute_delete_token_command( $p_request, $p_response, $t_user_id, $t_token_id );",
+    "edges": [
+     "api/rest/restcore/users_rest.php:299 token must belong to current user"
+    ]
+   },
+   "entity": "ApiToken",
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "ApiToken",
+        "where": {
+         "node": "and",
+         "args": [
+          {
+           "node": "field",
+           "col": "id",
+           "op": "eq",
+           "value": {
+            "arg": "token_id"
+           }
+          },
+          {
+           "node": "field",
+           "col": "user_id",
+           "op": "eq",
+           "value": {
+            "actor": "id"
+           }
+          }
+         ]
+        }
+       },
+       "op": "gte",
+       "n": 1,
+       "_msg": "That API token is not yours or does not exist; you can only revoke your own tokens."
+      }
+     ]
+    ],
+    "requires_auth": true,
+    "required": [
+     "token_id"
+    ],
+    "messages": {
+     "auth": "You must sign in first.",
+     "required": "A token id is required.",
+     "not_found": "That token is not yours."
+    }
+   },
+   "description": "Revoke one of your own API tokens. Fails if the token is not yours."
+  },
+  {
+   "tool": "userprofile_add",
+   "op": "create",
+   "family": "crud.insert",
+   "exec_spec": {
+    "entity": "UserProfile",
+    "fields": [
+     "platform",
+     "os",
+     "os_build",
+     "description"
+    ],
+    "set_on_create": {
+     "user_id": {
+      "$session": "account_id"
+     }
+    }
+   },
+   "input_schema": {
+    "action": {
+     "type": "text",
+     "required": false,
+     "description": "Form submit action (add/update/delete); ignored by the domain model."
+    },
+    "platform": "text",
+    "os": "text",
+    "os_build": "text",
+    "description": "text"
+   },
+   "_evidence": {
+    "locator": "account_prof_update.php:89",
+    "id_local": "UserProfile.Add",
+    "entry": {
+     "kind": "http",
+     "route": "account_prof_update.php",
+     "locator": "account_prof_update.php:74"
+    },
+    "entity_why": "primary effect row_insert lands on this table",
+    "ref_code": "if( ALL_USERS == $t_user_id ) { access_ensure_global_level( config_get( 'manage_global_profile_threshold' ) ); }\nelse { $t_user_id = auth_get_current_user_id(); access_ensure_global_level( config_get( 'add_profile_threshold' ), $t_user_id ); }\nprofile_create( $t_user_id, $f_platform, $f_os, $f_os_build, $f_description );",
+    "edges": [
+     "account_prof_update.php:82 add_profile_threshold (access check)"
+    ]
+   },
+   "entity": "UserProfile",
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "User",
+        "where": {
+         "node": "field",
+         "col": "id",
+         "op": "eq",
+         "value": {
+          "actor": "id"
+         }
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "requires_auth": true,
+    "required": [],
+    "messages": {
+     "auth": "You must sign in first.",
+     "fk_missing": "Could not attach this profile to your account.",
+     "precondition": "Your account does not have permission to add machine profiles (needs add-profile access)."
+    }
+   },
+   "description": "Create a machine profile (platform/os/os_build/description) on your account."
+  },
+  {
+   "tool": "userprofile_update",
+   "op": "update",
+   "family": "update.field_set",
+   "exec_spec": {
+    "entity": "UserProfile",
+    "row_key": {
+     "id": {
+      "$arg": "profile_id"
+     }
+    },
+    "fields": [
+     "platform",
+     "os",
+     "os_build",
+     "description"
+    ]
+   },
+   "input_schema": {
+    "action": {
+     "type": "text",
+     "required": false,
+     "description": "Form submit action (add/update/delete); ignored by the domain model."
+    },
+    "profile_id": "id",
+    "platform": "text",
+    "os": "text",
+    "os_build": "text",
+    "description": "text"
+   },
+   "_evidence": {
+    "locator": "account_prof_update.php:99",
+    "id_local": "UserProfile.Update",
+    "entry": {
+     "kind": "http",
+     "route": "account_prof_update.php",
+     "locator": "account_prof_update.php:92"
+    },
+    "entity_why": "primary effect row_update lands on this table",
+    "ref_code": "$t_profile = new ProfileData( $f_profile_id ); $t_profile->ensure_can_update();\nprofile_update( $t_user_id, $f_profile_id, $f_platform, $f_os, $f_os_build, $f_description );",
+    "edges": [
+     "account_prof_update.php:99 ProfileData::ensure_can_update (owner or global)"
+    ]
+   },
+   "entity": "UserProfile",
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "UserProfile",
+        "where": {
+         "node": "and",
+         "args": [
+          {
+           "node": "field",
+           "col": "id",
+           "op": "eq",
+           "value": {
+            "arg": "profile_id"
+           }
+          },
+          {
+           "node": "field",
+           "col": "user_id",
+           "op": "eq",
+           "value": {
+            "actor": "id"
+           }
+          }
+         ]
+        }
+       },
+       "op": "gte",
+       "n": 1,
+       "_msg": "That profile is not yours or does not exist; you can only edit your own profiles."
+      }
+     ]
+    ],
+    "requires_auth": true,
+    "required": [
+     "profile_id"
+    ],
+    "messages": {
+     "auth": "You must sign in first.",
+     "required": "A profile id is required.",
+     "not_found": "No profile has that id."
+    }
+   },
+   "description": "Update one of your machine profiles. Fails if the profile does not belong to you."
+  },
+  {
+   "tool": "userprofile_delete",
+   "op": "delete",
+   "family": "crud.delete",
+   "exec_spec": {
+    "entity": "UserProfile",
+    "lookup_by": {
+     "id": {
+      "$arg": "profile_id"
+     }
+    }
+   },
+   "input_schema": {
+    "action": {
+     "type": "text",
+     "required": false,
+     "description": "Form submit action (add/update/delete); ignored by the domain model."
+    },
+    "profile_id": "id"
+   },
+   "_evidence": {
+    "locator": "account_prof_update.php:112",
+    "id_local": "UserProfile.Delete",
+    "entry": {
+     "kind": "http",
+     "route": "account_prof_update.php",
+     "locator": "account_prof_update.php:102"
+    },
+    "entity_why": "primary effect row_delete lands on this table",
+    "ref_code": "helper_ensure_confirmed( sprintf( lang_get( 'delete_profile_confirm_msg' ), ... ) );\nprofile_delete( $t_user_id, $f_profile_id );",
+    "edges": [
+     "account_prof_update.php:102 ensure_can_update + confirm"
+    ]
+   },
+   "entity": "UserProfile",
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "UserProfile",
+        "where": {
+         "node": "and",
+         "args": [
+          {
+           "node": "field",
+           "col": "id",
+           "op": "eq",
+           "value": {
+            "arg": "profile_id"
+           }
+          },
+          {
+           "node": "field",
+           "col": "user_id",
+           "op": "eq",
+           "value": {
+            "actor": "id"
+           }
+          }
+         ]
+        }
+       },
+       "op": "gte",
+       "n": 1,
+       "_msg": "That profile is not yours or does not exist; you can only edit your own profiles."
+      }
+     ]
+    ],
+    "requires_auth": true,
+    "required": [
+     "profile_id"
+    ],
+    "messages": {
+     "auth": "You must sign in first.",
+     "required": "A profile id is required.",
+     "not_found": "No profile has that id."
+    }
+   },
+   "description": "Delete one of your machine profiles. Fails if the profile is not yours."
+  },
+  {
+   "tool": "userpref_update",
+   "op": "update",
+   "family": "update.field_set",
+   "exec_spec": {
+    "entity": "UserPref",
+    "row_key": {
+     "user_id": {
+      "$arg": "user_id"
+     }
+    },
+    "fields": [
+     "language",
+     "timezone",
+     "bugnote_order",
+     "email_on_new"
+    ]
+   },
+   "input_schema": {
+    "user_id": "id",
+    "language": "text",
+    "timezone": "text",
+    "bugnote_order": "text",
+    "email_on_new": "bool"
+   },
+   "_evidence": {
+    "locator": "account_prefs_update.php:78",
+    "id_local": "UserPref.Update",
+    "entry": {
+     "kind": "http",
+     "route": "account_prefs_update.php",
+     "locator": "account_prefs_update.php:54"
+    },
+    "entity_why": "primary effect row_update lands on this table",
+    "ref_code": "$t_prefs = user_pref_get( $f_user_id );\n$t_prefs->redirect_delay = gpc_get_int( 'redirect_delay' );\n... user_pref_set( $f_user_id, $t_prefs, ALL_PROJECTS );",
+    "edges": [
+     "account_prefs_update.php:68 self prefs require non-protected user"
+    ]
+   },
+   "entity": "UserPref",
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "User",
+        "where": {
+         "node": "field",
+         "col": "id",
+         "op": "eq",
+         "value": {
+          "actor": "id"
+         }
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "requires_auth": true,
+    "required": [
+     "user_id"
+    ],
+    "messages": {
+     "auth": "You must sign in first.",
+     "required": "A user id is required.",
+     "not_found": "This user has no saved preferences yet; saving creates them.",
+     "precondition": "Your account does not have permission to update preferences for this user."
+    }
+   },
+   "description": "Update your account preferences (language, timezone, bugnote order, email-on-new)."
+  },
+  {
+   "tool": "tag_create",
+   "op": "create",
+   "family": "crud.insert",
+   "exec_spec": {
+    "entity": "Tag",
+    "fields": [
+     "name",
+     "description"
+    ],
+    "set_on_create": {
+     "user_id": {
+      "$session": "account_id"
+     }
+    },
+    "unique_on": [
+     "name"
+    ]
+   },
+   "input_schema": {
+    "name": "text",
+    "description": "text"
+   },
+   "_evidence": {
+    "locator": "tag_create.php:42",
+    "id_local": "Tag.Create",
+    "entry": {
+     "kind": "http",
+     "route": "tag_create.php",
+     "locator": "tag_create.php:40"
+    },
+    "entity_why": "primary effect row_insert lands on this table",
+    "ref_code": "$t_tags = tag_parse_string( $f_tag_name );\nforeach ( $t_tags as $t_tag_row ) { switch( $t_tag_row['id'] ) { case -1: tag_create( $t_tag_row['name'], $t_tag_user, $f_tag_description ); ... } }",
+    "edges": [
+     "tag_create.php:42 tag_create_threshold (access check)"
+    ]
+   },
+   "entity": "Tag",
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "User",
+        "where": {
+         "node": "field",
+         "col": "id",
+         "op": "eq",
+         "value": {
+          "actor": "id"
+         }
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "requires_auth": true,
+    "required": [
+     "name"
+    ],
+    "messages": {
+     "auth": "You must be able to create tags.",
+     "required": "A tag name is required.",
+     "unique": "A tag with that name already exists.",
+     "precondition": "Your account does not have permission to create tags (needs tag-create access)."
+    }
+   },
+   "description": "Create a tag with a name and description. Fails if the tag name is already taken."
+  },
+  {
+   "tool": "tag_update",
+   "op": "update",
+   "family": "update.field_set",
+   "exec_spec": {
+    "entity": "Tag",
+    "row_key": {
+     "id": {
+      "$arg": "tag_id"
+     }
+    },
+    "fields": [
+     "name",
+     "user_id",
+     "description"
+    ]
+   },
+   "input_schema": {
+    "tag_id": "id",
+    "name": "text",
+    "user_id": "id",
+    "description": "text"
+   },
+   "_evidence": {
+    "locator": "tag_update.php:51",
+    "id_local": "Tag.Update",
+    "entry": {
+     "kind": "http",
+     "route": "tag_update.php",
+     "locator": "tag_update.php:47"
+    },
+    "entity_why": "primary effect row_update lands on this table",
+    "ref_code": "$t_can_edit = access_has_global_level( config_get( 'tag_edit_threshold' ) );\nif( $t_can_edit ) { $f_new_user_id = gpc_get_int( 'user_id', $t_tag_row['user_id'] ); } else { $f_new_user_id = $t_tag_row['user_id']; }\ntag_update( $f_tag_id, $f_new_name, $f_new_user_id, $f_new_description );",
+    "edges": [
+     "tag_update.php:51 tag_edit_threshold (access check)"
+    ]
+   },
+   "entity": "Tag",
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "User",
+        "where": {
+         "node": "field",
+         "col": "id",
+         "op": "eq",
+         "value": {
+          "actor": "id"
+         }
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "requires_auth": true,
+    "required": [
+     "tag_id"
+    ],
+    "messages": {
+     "auth": "You must be able to edit tags.",
+     "required": "A tag id is required.",
+     "not_found": "No tag has that id.",
+     "unique": "A tag with that name already exists.",
+     "precondition": "Your account does not have permission to edit tags (needs tag-edit access)."
+    }
+   },
+   "description": "Rename a tag or change its owner/description. Fails if the tag does not exist."
+  },
+  {
+   "tool": "tag_delete",
+   "op": "delete",
+   "family": "crud.delete",
+   "exec_spec": {
+    "entity": "Tag",
+    "lookup_by": {
+     "id": {
+      "$arg": "tag_id"
+     }
+    }
+   },
+   "input_schema": {
+    "tag_id": "id"
+   },
+   "_evidence": {
+    "locator": "tag_delete.php:47",
+    "id_local": "Tag.Delete",
+    "entry": {
+     "kind": "http",
+     "route": "tag_delete.php",
+     "locator": "tag_delete.php:45"
+    },
+    "entity_why": "primary effect row_delete lands on this table",
+    "ref_code": "access_ensure_global_level( config_get( 'tag_edit_threshold' ) );\ntag_ensure_exists( $f_tag_id );\n... tag_delete( $f_tag_id );",
+    "edges": [
+     "tag_delete.php:47 tag_edit_threshold (access check)"
+    ]
+   },
+   "entity": "Tag",
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "User",
+        "where": {
+         "node": "field",
+         "col": "id",
+         "op": "eq",
+         "value": {
+          "actor": "id"
+         }
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "requires_auth": true,
+    "required": [
+     "tag_id"
+    ],
+    "messages": {
+     "auth": "You must be able to edit tags.",
+     "required": "A tag id is required.",
+     "not_found": "No tag has that id.",
+     "precondition": "Your account does not have permission to delete tags (needs tag-edit access)."
+    }
+   },
+   "description": "Delete a tag system-wide. Fails if the tag does not exist."
+  },
+  {
+   "tool": "tag_attach",
+   "op": "create",
+   "family": "crud.insert",
+   "exec_spec": {
+    "entity": "BugTag",
+    "fields": {
+     "bug_id": {
+      "$arg": "bug_id"
+     },
+     "user_id": {
+      "$session": "account_id"
+     }
+    },
+    "set_on_create": {
+     "tag_id": {
+      "$arg": "tag_select"
+     },
+     "user_id": {
+      "$session": "account_id"
+     }
+    }
+   },
+   "input_schema": {
+    "bug_id": "id",
+    "tag_select": "id",
+    "tag_string": "text"
+   },
+   "_evidence": {
+    "locator": "tag_attach.php:66",
+    "id_local": "Tag.Attach",
+    "entry": {
+     "kind": "http",
+     "route": "tag_attach.php",
+     "locator": "tag_attach.php:48"
+    },
+    "entity_why": "primary effect row_insert lands on this table",
+    "ref_code": "$t_tags[] = array( 'id' => tag_get( $f_tag_select ) );\n$t_data = array( 'query' => array( 'issue_id' => $f_bug_id ), 'payload' => array( 'tags' => $t_tags ) );\n( new TagAttachCommand( $t_data ) )->execute();",
+    "edges": [
+     "core/commands/TagAttachCommand.php:85 tag_attach_threshold (access check)"
+    ]
+   },
+   "entity": "BugTag",
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "User",
+        "where": {
+         "node": "field",
+         "col": "id",
+         "op": "eq",
+         "value": {
+          "actor": "id"
+         }
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "requires_auth": true,
+    "required": [
+     "bug_id"
+    ],
+    "messages": {
+     "auth": "You must be able to attach tags.",
+     "required": "An issue id and a tag are required.",
+     "fk": "That tag or issue does not exist.",
+     "precondition": "Your account does not have permission to attach tags to issues."
+    }
+   },
+   "description": "Attach an existing tag to an issue."
+  },
+  {
+   "tool": "tag_detach",
+   "op": "delete",
+   "family": "crud.delete",
+   "exec_spec": {
+    "entity": "BugTag",
+    "lookup_by": {
+     "bug_id": {
+      "$arg": "bug_id"
+     },
+     "tag_id": {
+      "$arg": "tag_id"
+     }
+    }
+   },
+   "input_schema": {
+    "tag_id": "id",
+    "bug_id": "id"
+   },
+   "_evidence": {
+    "locator": "tag_detach.php:42",
+    "id_local": "Tag.Detach",
+    "entry": {
+     "kind": "http",
+     "route": "tag_detach.php",
+     "locator": "tag_detach.php:37"
+    },
+    "entity_why": "primary effect row_delete lands on this table",
+    "ref_code": "$t_data = array( 'query' => array( 'issue_id' => $f_bug_id, 'tag_id' => $f_tag_id ) );\n( new TagDetachCommand( $t_data ) )->execute();",
+    "edges": [
+     "core/commands/TagDetachCommand.php:67 tag_detach_threshold (access check)"
+    ]
+   },
+   "entity": "BugTag",
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "User",
+        "where": {
+         "node": "field",
+         "col": "id",
+         "op": "eq",
+         "value": {
+          "actor": "id"
+         }
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "requires_auth": true,
+    "required": [
+     "tag_id",
+     "bug_id"
+    ],
+    "messages": {
+     "auth": "You must be able to attach tags.",
+     "required": "A tag id and an issue id are required.",
+     "not_found": "That tag is not attached to that issue.",
+     "precondition": "Your account does not have permission to remove tags from issues."
+    }
+   },
+   "description": "Remove a tag from an issue."
+  },
+  {
+   "tool": "tag_search",
+   "op": "search",
+   "family": "search",
+   "exec_spec": {
+    "entity": "Tag",
+    "search_fields": [
+     "name"
+    ],
+    "rank": {
+     "method": "keyword",
+     "fields": [
+      "name"
+     ]
+    },
+    "pagination": {}
+   },
+   "input_schema": {
+    "q": {
+     "type": "text",
+     "required": false,
+     "description": "Name fragment to match against tag names."
+    },
+    "page_number": {
+     "type": "int",
+     "required": false,
+     "description": "Page number for the result list."
+    }
+   },
+   "_evidence": {
+    "locator": "manage_tags_page.php:106",
+    "id_local": "Tag.Search",
+    "entry": {
+     "kind": "http",
+     "route": "manage_tags_page.php",
+     "locator": "manage_tags_page.php:53"
+    },
+    "entity_why": "primary effect row_search lands on this table",
+    "ref_code": "if( $f_filter == TAGS_UNUSED ) { $t_result = tag_get_unused( $t_name_filter, $t_per_page, $t_offset ); }\nelse { $t_result = tag_get_all( $t_name_filter, $t_per_page, $t_offset ); }"
+   },
+   "entity": "Tag",
+   "description": "Search tags by name prefix; can list unused tags. Returns a paged tag list.",
+   "guards": {
+    "messages": {
+     "auth": "You must be able to manage tags."
+    }
+   }
+  },
+  {
+   "tool": "news_create",
+   "op": "create",
+   "family": "crud.insert",
+   "exec_spec": {
+    "entity": "News",
+    "fields": [
+     "headline",
+     "body",
+     "announcement",
+     "view_state"
+    ],
+    "set_on_create": {
+     "project_id": {
+      "$arg": "project_id"
+     },
+     "poster_id": {
+      "$session": "account_id"
+     }
+    }
+   },
+   "input_schema": {
+    "headline": "text",
+    "body": "text",
+    "announcement": "bool",
+    "view_state": "int",
+    "project_id": {
+     "type": "id",
+     "required": true,
+     "description": "Project the news item belongs to."
+    }
+   },
+   "_evidence": {
+    "locator": "news_add.php:50",
+    "id_local": "News.Create",
+    "entry": {
+     "kind": "http",
+     "route": "news_add.php",
+     "locator": "news_add.php:50"
+    },
+    "entity_why": "primary effect row_insert lands on this table",
+    "ref_code": "news_ensure_enabled();\nform_security_validate( 'news_add' );\naccess_ensure_project_level( config_get( 'manage_news_threshold' ) );\n$t_news_id = news_create( helper_get_current_project(), auth_get_current_user_id(), $f_view_state, $f_announcement, $f_headline, $f_body );",
+    "edges": [
+     "news_add.php:50 manage_news_threshold (access check)"
+    ]
+   },
+   "entity": "News",
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "User",
+        "where": {
+         "node": "field",
+         "col": "id",
+         "op": "eq",
+         "value": {
+          "actor": "id"
+         }
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "requires_auth": true,
+    "required": [
+     "headline",
+     "body",
+     "project_id"
+    ],
+    "messages": {
+     "auth": "You must sign in to post news.",
+     "required": "A headline and body are required.",
+     "fk_missing": "Cannot post news: no project context.",
+     "precondition": "Your account does not have permission to post news (needs manage-news access)."
+    }
+   },
+   "description": "Post a news item (headline + body) to a project, optionally as an announcement and/or private."
+  },
+  {
+   "tool": "news_update",
+   "op": "update",
+   "family": "update.field_set",
+   "exec_spec": {
+    "entity": "News",
+    "row_key": {
+     "id": {
+      "$arg": "news_id"
+     }
+    },
+    "fields": [
+     "project_id",
+     "headline",
+     "body",
+     "announcement",
+     "view_state"
+    ]
+   },
+   "input_schema": {
+    "news_id": "id",
+    "headline": "text",
+    "body": "text",
+    "announcement": "bool",
+    "view_state": "int",
+    "project_id": "id"
+   },
+   "_evidence": {
+    "locator": "news_update.php:59",
+    "id_local": "News.Update",
+    "entry": {
+     "kind": "http",
+     "route": "news_update.php",
+     "locator": "news_update.php:45"
+    },
+    "entity_why": "primary effect row_update lands on this table",
+    "ref_code": "access_ensure_project_level( config_get( 'manage_news_threshold' ), $t_row['project_id'] );\naccess_ensure_project_level( config_get( 'manage_news_threshold' ), $f_project_id );\nnews_update( $f_news_id, $f_project_id, $f_view_state, $f_announcement, $f_headline, $f_body );",
+    "edges": [
+     "news_update.php:59 manage_news_threshold (access check)"
+    ]
+   },
+   "entity": "News",
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "User",
+        "where": {
+         "node": "field",
+         "col": "id",
+         "op": "eq",
+         "value": {
+          "actor": "id"
+         }
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "requires_auth": true,
+    "required": [
+     "news_id",
+     "headline",
+     "announcement",
+     "view_state",
+     "project_id"
+    ],
+    "messages": {
+     "auth": "You must sign in to edit news.",
+     "not_found": "No news item has that id.",
+     "required": "A news id, headline, body, announcement flag and view state are required.",
+     "fk": "That project does not exist.",
+     "precondition": "Your account does not have permission to edit news (needs manage-news access)."
+    }
+   },
+   "description": "Edit a news item's headline, body, announcement flag, view state or project."
+  },
+  {
+   "tool": "news_delete",
+   "op": "delete",
+   "family": "crud.delete",
+   "exec_spec": {
+    "entity": "News",
+    "lookup_by": {
+     "id": {
+      "$arg": "news_id"
+     }
+    }
+   },
+   "input_schema": {
+    "news_id": "id",
+    "action": "text"
+   },
+   "_evidence": {
+    "locator": "news_edit_page.php:59",
+    "id_local": "News.Delete",
+    "entry": {
+     "kind": "http",
+     "route": "news_edit_page.php",
+     "locator": "news_edit_page.php:59"
+    },
+    "entity_why": "primary effect row_delete lands on this table",
+    "ref_code": "if( 'delete' == $f_action ) {\n\tform_security_validate( 'news_delete' );\n\t$t_row = news_get_row( $f_news_id );\n\tif( project_exists( $t_row['project_id'] ) ) { access_ensure_project_level( config_get( 'manage_news_threshold' ), $t_row['project_id'] ); }\n\thelper_ensure_confirmed( ... ); news_delete( $f_news_id );",
+    "edges": [
+     "news_edit_page.php:65 manage_news_threshold (access check)"
+    ]
+   },
+   "entity": "News",
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "User",
+        "where": {
+         "node": "field",
+         "col": "id",
+         "op": "eq",
+         "value": {
+          "actor": "id"
+         }
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "requires_auth": true,
+    "required": [
+     "news_id"
+    ],
+    "messages": {
+     "auth": "You must sign in to delete news.",
+     "required": "A news id is required.",
+     "not_found": "No news item has that id.",
+     "precondition": "Your account does not have permission to delete news (needs manage-news access)."
+    }
+   },
+   "description": "Delete a news item by id. Fails if the news item does not exist."
+  },
+  {
+   "tool": "filters_create",
+   "op": "create",
+   "family": "crud.insert",
+   "exec_spec": {
+    "entity": "Filters",
+    "fields": {
+     "name": {
+      "$arg": "query_name"
+     },
+     "is_public": {
+      "$arg": "is_public"
+     }
+    },
+    "set_on_create": {
+     "user_id": {
+      "$session": "account_id"
+     },
+     "project_id": {
+      "$arg": "project_id"
+     },
+     "filter_string": "serialized"
+    }
+   },
+   "input_schema": {
+    "query_name": "text",
+    "is_public": "bool",
+    "project_id": {
+     "type": "id",
+     "required": true,
+     "description": "Project the filter belongs to."
+    }
+   },
+   "_evidence": {
+    "locator": "query_store.php:100",
+    "id_local": "Filters.Create",
+    "entry": {
+     "kind": "http",
+     "route": "query_store.php",
+     "locator": "query_store.php:50"
+    },
+    "entity_why": "primary effect row_insert lands on this table",
+    "ref_code": "if( !access_has_project_level( config_get( 'stored_query_create_threshold' ) ) ) { access_denied(); }\n$t_new_row_id = filter_db_create_filter( $t_filter_string, auth_get_current_user_id(), $t_project_id, $f_query_name , $f_is_public );",
+    "edges": [
+     "query_store.php:100 stored_query_create_threshold (access check)"
+    ]
+   },
+   "entity": "Filters",
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "User",
+        "where": {
+         "node": "field",
+         "col": "id",
+         "op": "eq",
+         "value": {
+          "actor": "id"
+         }
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "requires_auth": true,
+    "required": [
+     "query_name",
+     "project_id"
+    ],
+    "messages": {
+     "auth": "You must sign in to save filters.",
+     "required": "A query name is required.",
+     "fk_missing": "Could not save the filter for the current project.",
+     "precondition": "Your account does not have permission to save search filters (needs stored-query access)."
+    }
+   },
+   "description": "Save a named search filter for yourself, optionally public."
+  },
+  {
+   "tool": "filters_delete",
+   "op": "delete",
+   "family": "crud.delete",
+   "exec_spec": {
+    "entity": "Filters",
+    "lookup_by": {
+     "id": {
+      "$arg": "filter_id"
+     }
+    }
+   },
+   "input_schema": {
+    "filter_id": "id"
+   },
+   "_evidence": {
+    "locator": "manage_filter_delete.php:54",
+    "id_local": "Filters.Delete",
+    "entry": {
+     "kind": "http",
+     "route": "manage_filter_delete.php",
+     "locator": "manage_filter_delete.php:47"
+    },
+    "entity_why": "primary effect row_delete lands on this table",
+    "ref_code": "if( !filter_db_can_delete_filter( $f_filter_id ) ) { print_header_redirect( $t_redirect_url ); }\n... filter_db_delete_filter( $f_filter_id );",
+    "edges": [
+     "manage_filter_delete.php:54 stored_query_create_threshold (access check)"
+    ]
+   },
+   "entity": "Filters",
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "User",
+        "where": {
+         "node": "field",
+         "col": "id",
+         "op": "eq",
+         "value": {
+          "actor": "id"
+         }
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "requires_auth": true,
+    "required": [
+     "filter_id"
+    ],
+    "messages": {
+     "auth": "You must sign in to delete filters.",
+     "required": "A filter id is required.",
+     "not_found": "No filter has that id.",
+     "precondition": "Your account does not have permission to delete this saved filter."
+    }
+   },
+   "description": "Delete one of your saved filters. Fails if the filter does not exist."
+  },
+  {
+   "tool": "filters_update",
+   "op": "update",
+   "family": "update.field_set",
+   "exec_spec": {
+    "entity": "Filters",
+    "row_key": {
+     "id": {
+      "$arg": "filter_id"
+     }
+    },
+    "fields": {
+     "name": {
+      "$arg": "filter_name"
+     },
+     "is_public": {
+      "$arg": "is_public"
+     }
+    },
+    "set": {
+     "filter_string": "serialized",
+     "name": {
+      "$arg": "filter_name"
+     }
+    }
+   },
+   "input_schema": {
+    "filter_id": "id",
+    "filter_name": "text",
+    "is_public": "bool"
+   },
+   "_evidence": {
+    "locator": "manage_filter_edit_update.php:84",
+    "id_local": "Filters.Update",
+    "entry": {
+     "kind": "http",
+     "route": "manage_filter_edit_update.php",
+     "locator": "manage_filter_edit_update.php:31"
+    },
+    "entity_why": "primary effect row_update lands on this table",
+    "ref_code": "$t_editable = filter_db_can_delete_filter( $f_filter_id );\nif( !$t_editable ) { access_denied(); }\nfilter_db_update_filter( $f_filter_id, filter_serialize( $t_filter ), $f_project_id, $f_is_public, $f_filter_name );",
+    "edges": [
+     "manage_filter_edit_update.php:84 stored_query_create_threshold (access check)"
+    ]
+   },
+   "entity": "Filters",
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "User",
+        "where": {
+         "node": "field",
+         "col": "id",
+         "op": "eq",
+         "value": {
+          "actor": "id"
+         }
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "requires_auth": true,
+    "required": [
+     "filter_id"
+    ],
+    "messages": {
+     "auth": "You must sign in to edit filters.",
+     "required": "A filter id is required.",
+     "not_found": "No filter has that id.",
+     "precondition": "Your account does not have permission to edit this saved filter."
+    }
+   },
+   "description": "Rename or change publicity of one of your saved filters."
+  },
+  {
+   "tool": "customfield_create",
+   "op": "create",
+   "family": "crud.insert",
+   "exec_spec": {
+    "entity": "CustomField",
+    "fields": [
+     "name"
+    ],
+    "unique_on": [
+     "name"
+    ]
+   },
+   "input_schema": {
+    "name": "text"
+   },
+   "_evidence": {
+    "locator": "manage_custom_field_create.php:52",
+    "id_local": "CustomField.Create",
+    "entry": {
+     "kind": "http",
+     "route": "manage_custom_field_create.php",
+     "locator": "manage_custom_field_create.php:50"
+    },
+    "entity_why": "primary effect row_insert lands on this table",
+    "ref_code": "auth_reauthenticate();\naccess_ensure_global_level( config_get( 'manage_custom_fields_threshold' ) );\n$t_field_id = custom_field_create( $f_name );",
+    "edges": [
+     "manage_custom_field_create.php:52 manage_custom_fields_threshold (access check)"
+    ]
+   },
+   "entity": "CustomField",
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "User",
+        "where": {
+         "node": "field",
+         "col": "id",
+         "op": "eq",
+         "value": {
+          "actor": "id"
+         }
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "requires_auth": true,
+    "required": [
+     "name"
+    ],
+    "messages": {
+     "auth": "You must manage custom fields.",
+     "required": "A field name is required.",
+     "unique": "A custom field with that name exists.",
+     "precondition": "Your account does not have permission to create custom fields (needs manage-custom-field access)."
+    }
+   },
+   "description": "Create a custom field definition. Fails if a field with that name exists."
+  },
+  {
+   "tool": "customfield_update",
+   "op": "update",
+   "family": "update.field_set",
+   "exec_spec": {
+    "entity": "CustomField",
+    "row_key": {
+     "id": {
+      "$arg": "field_id"
+     }
+    },
+    "fields": [
+     "name",
+     "type",
+     "possible_values",
+     "default_value",
+     "valid_regexp",
+     "access_level_r",
+     "access_level_rw",
+     "length_min",
+     "length_max",
+     "display_report",
+     "display_update",
+     "display_resolved",
+     "display_closed",
+     "require_report",
+     "require_update",
+     "require_resolved",
+     "require_closed",
+     "filter_by"
+    ]
+   },
+   "input_schema": {
+    "field_id": "id",
+    "name": "text",
+    "type": "int",
+    "possible_values": "text",
+    "valid_regexp": "text",
+    "access_level_r": "int",
+    "default_value": "text",
+    "access_level_rw": "text",
+    "length_min": "text",
+    "length_max": "text",
+    "display_report": "text",
+    "display_update": "text",
+    "display_resolved": "text",
+    "display_closed": "text",
+    "require_report": "text",
+    "require_update": "text",
+    "require_resolved": "text",
+    "require_closed": "text",
+    "filter_by": "text"
+   },
+   "_evidence": {
+    "locator": "manage_custom_field_update.php:74",
+    "id_local": "CustomField.Update",
+    "entry": {
+     "kind": "http",
+     "route": "manage_custom_field_update.php",
+     "locator": "manage_custom_field_update.php:48"
+    },
+    "entity_why": "primary effect row_update lands on this table",
+    "ref_code": "$t_def = custom_field_get_definition( $f_field_id );\nif( $t_def['type'] != $t_values['type'] && custom_field_has_data( $f_field_id ) ) { helper_ensure_confirmed( ... ); }\ncustom_field_update( $f_field_id, $t_values );",
+    "edges": [
+     "manage_custom_field_update.php:48 manage_custom_fields_threshold (access check)"
+    ]
+   },
+   "entity": "CustomField",
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "User",
+        "where": {
+         "node": "field",
+         "col": "id",
+         "op": "eq",
+         "value": {
+          "actor": "id"
+         }
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "requires_auth": true,
+    "required": [
+     "field_id"
+    ],
+    "messages": {
+     "auth": "You must manage custom fields.",
+     "required": "A field id and name are required.",
+     "not_found": "No custom field has that id.",
+     "unique": "A custom field with that name exists.",
+     "precondition": "Your account does not have permission to edit custom fields (needs manage-custom-field access)."
+    }
+   },
+   "description": "Edit a custom field's definition (type, possible values, access requirements, display/require flags)."
+  },
+  {
+   "tool": "customfield_delete",
+   "op": "delete",
+   "family": "crud.delete",
+   "exec_spec": {
+    "entity": "CustomField",
+    "lookup_by": {
+     "id": {
+      "$arg": "field_id"
+     }
+    }
+   },
+   "input_schema": {
+    "field_id": "id"
+   },
+   "_evidence": {
+    "locator": "manage_custom_field_delete.php:67",
+    "id_local": "CustomField.Delete",
+    "entry": {
+     "kind": "http",
+     "route": "manage_custom_field_delete.php",
+     "locator": "manage_custom_field_delete.php:52"
+    },
+    "entity_why": "primary effect row_delete lands on this table",
+    "ref_code": "helper_ensure_confirmed( sprintf( $t_msg, ... ) );\ncustom_field_destroy( $f_field_id );",
+    "edges": [
+     "manage_custom_field_delete.php:52 manage_custom_fields_threshold (access check)"
+    ]
+   },
+   "entity": "CustomField",
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "User",
+        "where": {
+         "node": "field",
+         "col": "id",
+         "op": "eq",
+         "value": {
+          "actor": "id"
+         }
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "requires_auth": true,
+    "required": [
+     "field_id"
+    ],
+    "messages": {
+     "auth": "You must manage custom fields.",
+     "not_found": "No custom field has that id.",
+     "precondition": "Your account does not have permission to delete custom fields (needs manage-custom-field access)."
+    }
+   },
+   "description": "Delete a custom field definition. Fails if the field does not exist."
+  },
+  {
+   "tool": "bugrelationship_add",
+   "op": "create",
+   "family": "crud.upsert",
+   "exec_spec": {
+    "entity": "BugRelationship",
+    "key": {
+     "source_bug_id": {
+      "$arg": "id"
+     },
+     "destination_bug_id": {
+      "$arg": "issue"
+     }
+    },
+    "insert_fields": {
+     "source_bug_id": {
+      "$arg": "id"
+     },
+     "destination_bug_id": {
+      "$arg": "issue"
+     },
+     "relationship_type": {
+      "$arg": "type"
+     }
+    },
+    "set_on_exists": {}
+   },
+   "input_schema": {
+    "id": {
+     "type": "id",
+     "required": true,
+     "description": "Source issue id."
+    },
+    "issue": {
+     "type": "id",
+     "required": true,
+     "description": "Destination issue id."
+    },
+    "type": {
+     "type": "int",
+     "required": false,
+     "description": "Relationship type code."
+    }
+   },
+   "_evidence": {
+    "locator": "core/commands/IssueRelationshipAddCommand.php:156",
+    "id_local": "BugRelationship.Add",
+    "entry": {
+     "kind": "http",
+     "route": "POST /issues/{id}/relationships",
+     "locator": "api/rest/restcore/issues_rest.php:355"
+    },
+    "entity_why": "primary effect row_upsert lands on this table",
+    "ref_code": "$t_relationship_id = relationship_upsert( $this->sourceIssue->id, $this->targetIssue->id, $this->typeId );\nreturn array( 'id' => $t_relationship_id );",
+    "edges": [
+     "core/commands/IssueRelationshipAddCommand.php:103 update_bug_threshold (access check)"
+    ]
+   },
+   "entity": "BugRelationship",
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "User",
+        "where": {
+         "node": "field",
+         "col": "id",
+         "op": "eq",
+         "value": {
+          "actor": "id"
+         }
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "requires_auth": true,
+    "required": [
+     "id",
+     "issue"
+    ],
+    "messages": {
+     "auth": "You must be able to edit issues.",
+     "required": "The source and destination issue are required.",
+     "fk": "One of those issues does not exist.",
+     "precondition": "Your account does not have permission to add relationships between issues."
+    }
+   },
+   "description": "Create a relationship (e.g. parent/duplicate-of) between two issues."
+  },
+  {
+   "tool": "bugrelationship_delete",
+   "op": "delete",
+   "family": "crud.delete",
+   "exec_spec": {
+    "entity": "BugRelationship",
+    "lookup_by": {
+     "id": {
+      "$arg": "relationship_id"
+     }
+    }
+   },
+   "input_schema": {
+    "relationship_id": "id"
+   },
+   "_evidence": {
+    "locator": "core/commands/IssueRelationshipDeleteCommand.php:106",
+    "id_local": "BugRelationship.Delete",
+    "entry": {
+     "kind": "http",
+     "route": "DELETE /issues/{id}/relationships/{relationship_id}",
+     "locator": "api/rest/restcore/issues_rest.php:388"
+    },
+    "entity_why": "primary effect row_delete lands on this table",
+    "ref_code": "$t_relationship_id = helper_parse_id( $this->query( 'relationship_id' ), 'relationship_id' );\nrelationship_delete( $t_relationship_id );\nreturn array();",
+    "edges": [
+     "core/commands/IssueRelationshipDeleteCommand.php:69 update_bug_threshold (access check)"
+    ]
+   },
+   "entity": "BugRelationship",
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "User",
+        "where": {
+         "node": "field",
+         "col": "id",
+         "op": "eq",
+         "value": {
+          "actor": "id"
+         }
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "requires_auth": true,
+    "required": [
+     "relationship_id"
+    ],
+    "messages": {
+     "auth": "You must be able to edit issues.",
+     "required": "A relationship id is required.",
+     "not_found": "No relationship has that id.",
+     "precondition": "Your account does not have permission to remove issue relationships."
+    }
+   },
+   "description": "Remove a relationship between two issues by relationship id."
+  },
+  {
+   "tool": "bugmonitor_add",
+   "op": "create",
+   "family": "crud.insert",
+   "exec_spec": {
+    "entity": "BugMonitor",
+    "fields": {
+     "bug_id": {
+      "$arg": "id"
+     },
+     "user_id": {
+      "$session": "account_id"
+     }
+    },
+    "set_on_create": {
+     "user_id": {
+      "$session": "account_id"
+     }
+    }
+   },
+   "input_schema": {
+    "id": "id",
+    "users": "json"
+   },
+   "_evidence": {
+    "locator": "core/commands/MonitorAddCommand.php:124",
+    "id_local": "BugMonitor.Add",
+    "entry": {
+     "kind": "http",
+     "route": "POST /issues/{id}/monitors",
+     "locator": "api/rest/restcore/issues_rest.php:501"
+    },
+    "entity_why": "primary effect row_insert lands on this table",
+    "ref_code": "foreach( $this->userIdsToAdd as $t_user_id ) { bug_monitor( $this->query( 'issue_id' ), $t_user_id ); }\nreturn array();",
+    "edges": [
+     "core/commands/MonitorAddCommand.php:88 monitor_bug_threshold (access check)"
+    ]
+   },
+   "entity": "BugMonitor",
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "User",
+        "where": {
+         "node": "field",
+         "col": "id",
+         "op": "eq",
+         "value": {
+          "actor": "id"
+         }
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "requires_auth": true,
+    "required": [
+     "id"
+    ],
+    "messages": {
+     "auth": "You must sign in to monitor an issue.",
+     "required": "An issue id is required.",
+     "fk": "That issue does not exist.",
+     "precondition": "Your account does not have permission to monitor issues."
+    }
+   },
+   "description": "Start monitoring an issue so you receive notifications about it."
+  },
+  {
+   "tool": "bugmonitor_delete",
+   "op": "delete",
+   "family": "crud.delete",
+   "exec_spec": {
+    "entity": "BugMonitor",
+    "lookup_by": {
+     "bug_id": {
+      "$arg": "bug_id"
+     },
+     "user_id": {
+      "$session": "account_id"
+     }
+    }
+   },
+   "input_schema": {
+    "bug_id": "id",
+    "user_id": "id"
+   },
+   "_evidence": {
+    "locator": "bug_monitor_delete.php:83",
+    "id_local": "BugMonitor.Delete",
+    "entry": {
+     "kind": "http",
+     "route": "bug_monitor_delete.php",
+     "locator": "bug_monitor_delete.php:50"
+    },
+    "entity_why": "primary effect row_delete lands on this table",
+    "ref_code": "if( $t_logged_in_user_id == $t_user_id ) { access_ensure_bug_level( config_get( 'monitor_bug_threshold' ), $f_bug_id ); }\nelse { access_ensure_bug_level( config_get( 'monitor_delete_others_bug_threshold' ), $f_bug_id ); }\nbug_unmonitor( $f_bug_id, $t_user_id );",
+    "edges": [
+     "bug_monitor_delete.php:77 monitor_bug_threshold (access check)"
+    ]
+   },
+   "entity": "BugMonitor",
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "User",
+        "where": {
+         "node": "field",
+         "col": "id",
+         "op": "eq",
+         "value": {
+          "actor": "id"
+         }
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "requires_auth": true,
+    "required": [
+     "bug_id"
+    ],
+    "messages": {
+     "auth": "You must sign in to stop monitoring.",
+     "required": "An issue id is required.",
+     "not_found": "You are not monitoring that issue.",
+     "precondition": "Your account does not have permission to stop monitoring issues."
+    }
+   },
+   "description": "Stop monitoring an issue."
+  },
+  {
+   "tool": "config_set",
+   "op": "update",
+   "family": "crud.upsert",
+   "exec_spec": {
+    "entity": "Config",
+    "key": {
+     "config_id": {
+      "$arg": "config_option"
+     },
+     "project_id": {
+      "$arg": "project_id"
+     },
+     "user_id": {
+      "$arg": "user_id"
+     }
+    },
+    "insert_fields": [
+     "value",
+     "type"
+    ],
+    "set_on_exists": {}
+   },
+   "input_schema": {
+    "config_option": "text",
+    "user_id": "int",
+    "project_id": "int",
+    "type": "text",
+    "value": "text",
+    "config_id": "text"
+   },
+   "_evidence": {
+    "locator": "adm_config_set.php:119",
+    "id_local": "Config.Set",
+    "entry": {
+     "kind": "http",
+     "route": "adm_config_set.php",
+     "locator": "adm_config_set.php:119"
+    },
+    "entity_why": "primary effect row_upsert lands on this table",
+    "ref_code": "$t_command = new ConfigsSetCommand( $t_data ); $t_command->execute();",
+    "edges": [
+     "core/commands/ConfigsSetCommand.php:63 set_configuration_threshold (access check)"
+    ]
+   },
+   "entity": "Config",
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "User",
+        "where": {
+         "node": "field",
+         "col": "id",
+         "op": "eq",
+         "value": {
+          "actor": "id"
+         }
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "requires_auth": true,
+    "required": [
+     "config_option",
+     "user_id",
+     "project_id",
+     "type",
+     "value"
+    ],
+    "messages": {
+     "auth": "You must sign in to change configuration.",
+     "required": "A config option, type, value, project and user are required.",
+     "precondition": "Your account does not have permission to change configuration."
+    }
+   },
+   "description": "Set a configuration option value, scoped to a config name, project and user (0 = global)."
+  },
+  {
+   "tool": "config_delete",
+   "op": "delete",
+   "family": "crud.delete",
+   "exec_spec": {
+    "entity": "Config",
+    "lookup_by": {
+     "config_id": {
+      "$arg": "config_option"
+     },
+     "project_id": {
+      "$arg": "project_id"
+     },
+     "user_id": {
+      "$arg": "user_id"
+     }
+    }
+   },
+   "input_schema": {
+    "config_option": "text",
+    "user_id": "int",
+    "project_id": "int"
+   },
+   "_evidence": {
+    "locator": "adm_config_delete.php:64",
+    "id_local": "Config.Delete",
+    "entry": {
+     "kind": "http",
+     "route": "adm_config_delete.php",
+     "locator": "adm_config_delete.php:64"
+    },
+    "entity_why": "primary effect row_delete lands on this table",
+    "ref_code": "helper_ensure_confirmed( ..., lang_get( 'delete' ) );\n$t_command = new ConfigsSetCommand( $t_data ); $t_command->execute();",
+    "edges": [
+     "core/commands/ConfigsSetCommand.php:63 set_configuration_threshold (access check)"
+    ]
+   },
+   "entity": "Config",
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "User",
+        "where": {
+         "node": "field",
+         "col": "id",
+         "op": "eq",
+         "value": {
+          "actor": "id"
+         }
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "requires_auth": true,
+    "required": [
+     "config_option",
+     "user_id",
+     "project_id"
+    ],
+    "messages": {
+     "auth": "You must sign in to change configuration.",
+     "required": "A config option, project and user are required.",
+     "not_found": "No such configuration value exists.",
+     "precondition": "Your account does not have permission to delete configuration values."
+    }
+   },
+   "description": "Remove a configuration option value. Fails if the option does not exist."
+  },
+  {
+   "tool": "config_get",
+   "op": "read",
+   "family": "crud.fetch",
+   "exec_spec": {
+    "entity": "Config",
+    "lookup_by": {
+     "config_id": {
+      "$arg": "config_option"
+     }
+    }
+   },
+   "input_schema": {
+    "config_option": "text",
+    "user_id": "int",
+    "project_id": "int"
+   },
+   "_evidence": {
+    "locator": "adm_config_page.php:99",
+    "id_local": "Config.Get",
+    "entry": {
+     "kind": "http",
+     "route": "adm_config_page.php",
+     "locator": "adm_config_page.php:99"
+    },
+    "entity_why": "primary effect row_read lands on this table",
+    "ref_code": "$t_query = new DbQuery( 'SELECT * FROM {config} WHERE config_id = :config AND user_id = :user AND project_id = :project' );\n$t_config_row = $t_query->fetch();",
+    "edges": [
+     "adm_config_page.php:53 view_configuration_threshold (access check)"
+    ]
+   },
+   "entity": "Config",
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "User",
+        "where": {
+         "node": "field",
+         "col": "id",
+         "op": "eq",
+         "value": {
+          "actor": "id"
+         }
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "requires_auth": true,
+    "required": [
+     "config_option"
+    ],
+    "messages": {
+     "auth": "You must sign in to read configuration.",
+     "required": "A config option is required.",
+     "not_found": "No such configuration value exists.",
+     "precondition": "Your account does not have permission to read this configuration value."
+    }
+   },
+   "description": "Read a configuration option value by its config name."
+  },
+  {
+   "tool": "user_managelogin",
+   "op": "read",
+   "family": "search",
+   "exec_spec": {
+    "entity": "User",
+    "search_fields": [
+     "username",
+     "realname",
+     "email"
+    ],
+    "rank": {
+     "method": "keyword",
+     "fields": [
+      "username",
+      "realname",
+      "email"
+     ]
+    },
+    "pagination": {}
+   },
+   "input_schema": {
+    "q": {
+     "type": "text",
+     "required": false,
+     "description": "Fragment to match against username, real name or email."
+    },
+    "hideinactive": {
+     "type": "bool",
+     "required": false,
+     "description": "Hide inactive/search for active users only."
+    },
+    "showdisabled": {
+     "type": "bool",
+     "required": false,
+     "description": "Include disabled accounts."
+    },
+    "page_number": {
+     "type": "int",
+     "required": false,
+     "description": "Page number."
+    }
+   },
+   "_evidence": {
+    "locator": "manage_user_page.php:58",
+    "id_local": "User.ManageLogin",
+    "entry": {
+     "kind": "http",
+     "route": "manage_user_page.php",
+     "locator": "manage_user_page.php:58"
+    },
+    "entity_why": "primary effect row_search lands on this table",
+    "ref_code": "auth_reauthenticate();\naccess_ensure_global_level( config_get( 'manage_user_threshold' ) );\n$t_query = 'SELECT * FROM {user} WHERE ' . $t_where . ' ORDER BY ' . $c_sort . ' ' . $c_dir;\n$t_result = db_query( $t_query, $t_where_params, $p_per_page, $t_offset );",
+    "edges": [
+     "manage_user_page.php:58 manage_user_threshold (access check)"
+    ]
+   },
+   "entity": "User",
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "User",
+        "where": {
+         "node": "field",
+         "col": "id",
+         "op": "eq",
+         "value": {
+          "actor": "id"
+         }
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "requires_auth": true,
+    "messages": {
+     "auth": "You must have user-management rights.",
+     "precondition": "Your account does not have permission to use the user management console (needs manage-users access)."
+    }
+   },
+   "description": "Search/manage the user list by username, real name or email for the administration console."
+  },
+  {
+   "tool": "user_manageprojadd",
+   "op": "create",
+   "family": "crud.upsert",
+   "exec_spec": {
+    "entity": "ProjectUserList",
+    "key": {
+     "project_id": {
+      "$arg": "project_id"
+     },
+     "user_id": {
+      "$arg": "user_id"
+     }
+    },
+    "insert_fields": [
+     "access_level"
+    ],
+    "set_on_exists": {}
+   },
+   "input_schema": {
+    "user_id": {
+     "type": "id",
+     "required": true,
+     "description": "User to add."
+    },
+    "project_id": {
+     "type": "id",
+     "required": true,
+     "description": "Project to add them to."
+    },
+    "access_level": {
+     "type": "int",
+     "required": true,
+     "description": "Access level in the project."
+    }
+   },
+   "_evidence": {
+    "locator": "manage_user_proj_add.php:44",
+    "id_local": "User.ManageProjAdd",
+    "entry": {
+     "kind": "http",
+     "route": "manage_user_proj_add.php",
+     "locator": "manage_user_proj_add.php:44"
+    },
+    "entity_why": "primary effect row_upsert lands on this table",
+    "ref_code": "foreach ( $f_project_id as $t_proj_id ) { if( access_has_project_level( $t_manage_user_threshold, $t_proj_id ) && access_has_project_level( $f_access_level, $t_proj_id ) ) { ( new ProjectUsersAddCommand( $t_data ) )->execute(); } }",
+    "edges": [
+     "manage_user_proj_add.php:53 manage_user_threshold (access check)"
+    ]
+   },
+   "entity": "ProjectUserList",
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "User",
+        "where": {
+         "node": "field",
+         "col": "id",
+         "op": "eq",
+         "value": {
+          "actor": "id"
+         }
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "requires_auth": true,
+    "required": [
+     "user_id",
+     "access_level",
+     "project_id"
+    ],
+    "messages": {
+     "auth": "You must have user-management rights.",
+     "required": "A user and access level are required.",
+     "fk": "That user or project does not exist.",
+     "precondition": "Your account does not have permission to add users to projects (needs manage-users access)."
+    }
+   },
+   "description": "Add a user to a project (or update their access level) from the user management console."
+  },
+  {
+   "tool": "user_manageprojdelete",
+   "op": "delete",
+   "family": "crud.delete",
+   "exec_spec": {
+    "entity": "ProjectUserList",
+    "lookup_by": {
+     "project_id": {
+      "$arg": "project_id"
+     },
+     "user_id": {
+      "$arg": "user_id"
+     }
+    }
+   },
+   "input_schema": {
+    "user_id": "id",
+    "project_id": "json"
+   },
+   "_evidence": {
+    "locator": "manage_user_proj_delete.php:50",
+    "id_local": "User.ManageProjDelete",
+    "entry": {
+     "kind": "http",
+     "route": "manage_user_proj_delete.php",
+     "locator": "manage_user_proj_delete.php:50"
+    },
+    "entity_why": "primary effect row_delete lands on this table",
+    "ref_code": "foreach( $f_projects as $t_project_id ) { access_ensure_project_level( config_get( 'project_user_threshold' ), $t_project_id ); ... ( new ProjectUsersDeleteCommand( $t_data ) )->execute(); }",
+    "edges": [
+     "manage_user_proj_delete.php:57 project_user_threshold (access check)"
+    ]
+   },
+   "entity": "ProjectUserList",
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "User",
+        "where": {
+         "node": "field",
+         "col": "id",
+         "op": "eq",
+         "value": {
+          "actor": "id"
+         }
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "requires_auth": true,
+    "required": [
+     "user_id",
+     "project_id"
+    ],
+    "messages": {
+     "auth": "You must have user-management rights.",
+     "required": "A user and project are required.",
+     "not_found": "That user is not a member of this project.",
+     "precondition": "Your account does not have permission to remove users from projects (needs manage-users access)."
+    }
+   },
+   "description": "Remove a user from a project from the user management console."
+  },
+  {
+   "tool": "bug_stick",
+   "op": "update",
+   "family": "update.field_set",
+   "exec_spec": {
+    "entity": "Bug",
+    "row_key": {
+     "id": {
+      "$arg": "bug_id"
+     }
+    },
+    "fields": [
+     "project_id",
+     "reporter_id",
+     "handler_id",
+     "duplicate_id",
+     "priority",
+     "severity",
+     "reproducibility",
+     "status",
+     "resolution",
+     "projection",
+     "category_id",
+     "eta",
+     "bug_text_id",
+     "os",
+     "os_build",
+     "platform",
+     "version",
+     "fixed_in_version",
+     "build",
+     "profile_id",
+     "view_state",
+     "summary",
+     "sponsorship_total",
+     "sticky",
+     "target_version",
+     "due_date"
+    ],
+    "set": {
+     "sticky": true
+    }
+   },
+   "input_schema": {
+    "bug_id": "int",
+    "action": "text",
+    "priority": "int",
+    "severity": "int",
+    "reproducibility": "int",
+    "status": "int",
+    "resolution": "int",
+    "projection": "int",
+    "eta": "int",
+    "os": "text",
+    "os_build": "text",
+    "platform": "text",
+    "version": "text",
+    "fixed_in_version": "text",
+    "build": "text",
+    "view_state": "int",
+    "summary": "text",
+    "sponsorship_total": "int",
+    "target_version": "text",
+    "due_date": "datetime"
+   },
+   "_evidence": {
+    "locator": "bug_stick.php:56",
+    "id_local": "Bug.Stick",
+    "entry": {
+     "kind": "http",
+     "route": "bug_stick.php",
+     "locator": "bug_stick.php:56"
+    },
+    "entity_why": "primary effect row_update lands on this table",
+    "ref_code": "access_ensure_bug_level( config_get( 'set_bug_sticky_threshold' ), $f_bug_id );\nbug_set_field( $f_bug_id, 'sticky', 'stick' == $f_action );\nform_security_purge( 'bug_stick' );",
+    "edges": [
+     "bug_stick.php:44 set_bug_sticky_threshold (access check)"
+    ]
+   },
+   "entity": "Bug",
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "User",
+        "where": {
+         "node": "field",
+         "col": "id",
+         "op": "eq",
+         "value": {
+          "actor": "id"
+         }
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "requires_auth": true,
+    "required": [
+     "bug_id",
+     "action"
+    ],
+    "messages": {
+     "auth": "You must be able to set sticky issues.",
+     "required": "An issue id and action are required.",
+     "not_found": "No issue has that id.",
+     "precondition": "Your account does not have permission to mark issues as sticky (needs set-sticky access)."
+    }
+   },
+   "description": "Mark an issue as sticky (kept at the top of the list)."
+  },
+  {
+   "tool": "bug_reminder_send",
+   "op": "action",
+   "family": "action.emit",
+   "exec_spec": {
+    "channel": "event",
+    "record": {
+     "table": "Email"
+    }
+   },
+   "input_schema": {
+    "bug_id": "id",
+    "to": "json",
+    "bugnote_text": "text"
+   },
+   "_evidence": {
+    "locator": "bug_reminder.php:104",
+    "id_local": "Bug.Reminder.Send",
+    "entry": {
+     "kind": "http",
+     "route": "bug_reminder.php",
+     "locator": "bug_reminder.php:58"
+    },
+    "entity_why": "primary effect external lands on this table",
+    "ref_code": "$t_result = email_bug_reminder( $f_to, $f_bug_id, $f_body );\nif( ON == config_get( 'store_reminders' ) ) { bugnote_add( $f_bug_id, $f_body, 0, $f_view_state == VS_PRIVATE, REMINDER, $t_attr, null, false ); }",
+    "edges": [
+     "bug_reminder.php:78 bug_reminder_threshold (access check)"
+    ]
+   },
+   "entity": "Email",
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "User",
+        "where": {
+         "node": "field",
+         "col": "id",
+         "op": "eq",
+         "value": {
+          "actor": "id"
+         }
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "requires_auth": true,
+    "required": [
+     "bug_id",
+     "to",
+     "bugnote_text"
+    ],
+    "messages": {
+     "auth": "You must sign in to send reminders.",
+     "required": "An issue id, recipients and a note are required.",
+     "fk": "That issue does not exist.",
+     "precondition": "Your account does not have permission to send reminders about this issue."
+    }
+   },
+   "description": "Send a reminder about an issue to chosen users; a note is recorded."
+  },
+  {
+   "tool": "bugrevision_drop",
+   "op": "delete",
+   "family": "crud.delete",
+   "exec_spec": {
+    "entity": "BugRevision",
+    "lookup_by": {
+     "id": {
+      "$arg": "id"
+     }
+    }
+   },
+   "input_schema": {
+    "id": "id"
+   },
+   "_evidence": {
+    "locator": "bug_revision_drop.php:48",
+    "id_local": "BugRevision.Drop",
+    "entry": {
+     "kind": "http",
+     "route": "bug_revision_drop.php",
+     "locator": "bug_revision_drop.php:46"
+    },
+    "entity_why": "primary effect row_delete lands on this table",
+    "ref_code": "$t_revision = bug_revision_get( $f_revision_id );\naccess_ensure_bug_level( config_get( 'bug_revision_drop_threshold' ), $t_revision['bug_id'] );\n... bug_revision_drop( $f_revision_id );",
+    "edges": [
+     "bug_revision_drop.php:48 bug_revision_drop_threshold (access check)"
+    ]
+   },
+   "entity": "BugRevision",
+   "guards": {
+    "preconditions": [
+     [
+      {
+       "node": "count",
+       "select": {
+        "node": "select",
+        "entity": "User",
+        "where": {
+         "node": "field",
+         "col": "id",
+         "op": "eq",
+         "value": {
+          "actor": "id"
+         }
+        }
+       },
+       "op": "gte",
+       "n": 1
+      }
+     ]
+    ],
+    "requires_auth": true,
+    "required": [
+     "id"
+    ],
+    "messages": {
+     "auth": "You must be able to manage revisions.",
+     "required": "A revision id is required.",
+     "not_found": "No revision has that id.",
+     "precondition": "Your account does not have permission to delete issue revisions."
+    }
+   },
+   "description": "Delete an issue revision record."
+  },
+  {
+   "tool": "category_list",
+   "op": "search",
+   "family": "search",
+   "entity": "Category",
+   "exec_spec": {
+    "entity": "Category",
+    "rank": {
+     "method": "exact"
+    },
+    "filter": {
+     "col": "project_id",
+     "mode": "exact",
+     "val": {
+      "$arg": "project_id"
+     },
+     "optional": true
+    }
+   },
+   "input_schema": {
+    "project_id": {
+     "type": "id",
+     "required": false,
+     "description": "Project id (optional)."
+    }
+   },
+   "guards": {
+    "requires_auth": true,
+    "messages": {
+     "auth": "Sign in first."
+    }
+   },
+   "description": "List issue categories (id, project_id, name)."
+  },
+  {
+   "tool": "bugnote_list",
+   "op": "search",
+   "family": "search",
+   "entity": "Bugnote",
+   "exec_spec": {
+    "entity": "Bugnote",
+    "rank": {
+     "method": "exact"
+    },
+    "filter": {
+     "col": "bug_id",
+     "mode": "exact",
+     "val": {
+      "$arg": "bug_id"
+     },
+     "optional": true
+    }
+   },
+   "input_schema": {
+    "bug_id": {
+     "type": "id",
+     "required": false,
+     "description": "Issue id (optional)."
+    }
+   },
+   "guards": {
+    "requires_auth": true,
+    "messages": {
+     "auth": "Sign in first."
+    }
+   },
+   "description": "List notes on issues: id, bug_id, reporter_id, note."
+  },
+  {
+   "tool": "user_list",
+   "op": "search",
+   "family": "search",
+   "entity": "User",
+   "exec_spec": {
+    "entity": "User",
+    "rank": {
+     "method": "exact"
+    },
+    "filter": {
+     "op": "or",
+     "clauses": [
+      {
+       "col": "username",
+       "mode": "substring",
+       "val": {
+        "$arg": "q"
+       },
+       "optional": true
+      },
+      {
+       "col": "realname",
+       "mode": "substring",
+       "val": {
+        "$arg": "q"
+       },
+       "optional": true
+      },
+      {
+       "col": "email",
+       "mode": "substring",
+       "val": {
+        "$arg": "q"
+       },
+       "optional": true
+      }
+     ]
+    }
+   },
+   "input_schema": {
+    "q": {
+     "type": "text",
+     "required": false,
+     "description": "Substring of username / real name / email (optional)."
+    }
+   },
+   "guards": {
+    "requires_auth": true,
+    "messages": {
+     "auth": "Sign in first."
+    }
+   },
+   "description": "List users (for assignment): id, username, realname, email, access_level."
+  },
+  {
+   "tool": "tag_list",
+   "op": "search",
+   "family": "search",
+   "entity": "Tag",
+   "exec_spec": {
+    "entity": "Tag",
+    "rank": {
+     "method": "exact"
+    },
+    "filter": {
+     "col": "name",
+     "mode": "substring",
+     "val": {
+      "$arg": "q"
+     },
+     "optional": true
+    }
+   },
+   "input_schema": {
+    "q": {
+     "type": "text",
+     "required": false,
+     "description": "Substring of the tag name (optional)."
+    }
+   },
+   "guards": {
+    "requires_auth": true,
+    "messages": {
+     "auth": "Sign in first."
+    }
+   },
+   "description": "List tags (id, name)."
+  }
+ ],
+ "seed_state": {
+  "User": [
+   {
+    "id": 1,
+    "username": "operations@company.example.com",
+    "realname": "Operations",
+    "email": "operations@company.example.com",
+    "password": "pw-operations",
+    "cookie_string": "ck-1",
+    "enabled": true,
+    "protected": false,
+    "access_level": 90
+   }
+  ],
+  "Project": [],
+  "Category": [],
+  "ProjectVersion": [],
+  "ProjectHierarchy": [],
+  "ProjectUserList": [],
+  "BugText": [],
+  "BugnoteText": [],
+  "Bug": [],
+  "Bugnote": [],
+  "Tag": [],
+  "BugTag": [],
+  "BugMonitor": [],
+  "CustomField": [],
+  "CustomFieldProject": [],
+  "UserProfile": [],
+  "UserPref": [
+   {
+    "id": 1,
+    "user_id": 1,
+    "project_id": 1,
+    "default_profile": 1,
+    "default_project": 1,
+    "refresh_delay": 30,
+    "redirect_delay": 0,
+    "bugnote_order": "ASC",
+    "email_on_new": true,
+    "language": "english",
+    "timezone": ""
+   }
+  ],
+  "ApiToken": [],
+  "Filters": [],
+  "News": [],
+  "Config": [
+   {
+    "config_id": "bug_link_tag",
+    "project_id": 0,
+    "user_id": 0,
+    "type": 90,
+    "value": "link"
+   }
+  ],
+  "Sponsorship": [],
+  "ProjectFile": [],
+  "CustomFieldString": [],
+  "BugHistory": [],
+  "BugFile": [],
+  "BugRelationship": [],
+  "BugRevision": [],
+  "Email": [],
+  "Token": []
+ },
+ "summary": "MantisBT is a self-hosted PHP issue/bug tracker: ADOdb DB layer, admin/schema.php migrations, Command-class business layer under a Slim REST API plus XML-RPC/SOAP API and procedural web action pages. Persisted CRUD entities: issues (Bug), bugnotes, users, projects, categories, versions, tags, custom fields, files, saved filters, config, news, API tokens, relationships, monitoring, sponsorship, revisions, tokens.",
+ "_auth_candidates": [
+  {
+   "entity": "User",
+   "username_col": "username",
+   "password_col": "password"
+  }
+ ],
+ "_fk_gravity": {
+  "entity": "User",
+  "fk_count": 19
+ },
+ "_read_denied": "not_found",
+ "auth": {
+  "account_entity": "User",
+  "username_col": "username",
+  "password_col": "password"
+ },
+ "now": "2026-01-05T09:00:00"
+}

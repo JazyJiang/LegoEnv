@@ -1,0 +1,88 @@
+{
+  "app": "openfire",
+  "role": "XMPP group membership and room scalar administration",
+  "domains": [
+    "operations",
+    "support",
+    "it_ops"
+  ],
+  "kinds": {
+    "create_record": [
+      "group_create",
+      "group_addmember",
+      "mucroom_create"
+    ],
+    "update_record": [
+      "group_update",
+      "group_setmemberadministrator",
+      "mucroom_changesubject"
+    ],
+    "delete_or_archive_row": [
+      "group_delete",
+      "group_removemember"
+    ]
+  },
+  "check_kinds": [
+    "record_exists",
+    "record_not_exists",
+    "record_field_equals",
+    "record_field_contains",
+    "record_field_unchanged"
+  ],
+  "carriers": {
+    "notes_field": {
+      "entity": "MucRoom",
+      "field": "description"
+    }
+  },
+  "login": {
+    "tool": "sign_in",
+    "user_field": "username",
+    "persona_entity": "User"
+  },
+  "content_entities": [
+    "MucRoom",
+    "Group",
+    "GroupUser",
+    "RosterItem",
+    "PrivacyList"
+  ],
+  "seed_helpers": [
+    "rooms",
+    "groups"
+  ],
+  "tool_families_to_keep": [
+    ""
+  ],
+  "obs_reads": [
+    "mucroom_search",
+    "mucroom_listaffiliations",
+    "rosteritem_getroster"
+  ],
+  "known_patches": [
+    "Neutral openfire env_id",
+    "Integer identity schemas and integer internal seeds; preserve text username PK",
+    "Synthetic User1/2 and session.account_name normalization for existing username/JID owner predicates",
+    "Actual room/roster/affiliation filters; remove default truncation"
+  ],
+  "missing_tools": [
+    "Chat/channel message send tool",
+    "Direct-message send tool",
+    "Group read/list tool"
+  ],
+  "limitations": [
+    "All 39 original tools remain; only eight declared group/room metadata writes are certified. No post_channel/send_dm capability is claimed.",
+    "Source has no chat send interface or Group read/list interface; room description is the readable carrier, and group operations need known names.",
+    "Many group operations lack authentication/admin guards; MUC/PubSub affiliation checks may find privileges in unrelated rooms/nodes. No general ACL isolation claim.",
+    "New mucroom_create omits operational permission/default flags and initial owner affiliation; existing canChangeSubject=true rooms support subject writes. This is scalar metadata, not a complete channel provisioning workflow.",
+    "PubSub item/storage operations, privacy enforcement, account lockout enforcement and message delivery are not certified; metadata writes do not prove runtime network effects.",
+    "New MucRoom.roomID can differ from returned internal id because the source auto expression adds an extra offset; use mucroom_search metadata for the actual roomID."
+  ],
+  "smoke": {
+    "passed": true,
+    "date": "2026-10-24",
+    "report": "ok"
+  },
+  "register_file": "pack/newspecs3/openfire/register.py",
+  "base_spec": "pack/base_specs/openfire.spec.json"
+}

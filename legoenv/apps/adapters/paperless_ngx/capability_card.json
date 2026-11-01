@@ -1,0 +1,99 @@
+{
+  "app": "paperless_ngx",
+  "role": "document management system (paperless style; stand-in for Dropbox Business / M-Files / DocuWare)",
+  "domains": [
+    "operations",
+    "legal",
+    "finance",
+    "it_ops"
+  ],
+  "kinds": {
+    "update_record": [
+      "document_update"
+    ],
+    "create_record": [
+      "correspondent_create",
+      "documenttype_create",
+      "customfield_create"
+    ],
+    "attach_note_or_task": [
+      "document_note_create"
+    ],
+    "other:create_metadata": [
+      "tag_create"
+    ]
+  },
+  "check_kinds": [
+    "record_exists",
+    "record_field_equals",
+    "record_field_contains",
+    "note_or_task_exists",
+    "note_or_task_not_exists",
+    "row_count",
+    "action_done",
+    "action_not_done"
+  ],
+  "carriers": {
+    "policy_doc": {
+      "entity": "Document",
+      "field": "content"
+    }
+  },
+  "login": {
+    "tool": "sign_in",
+    "user_field": "username",
+    "persona_entity": "User"
+  },
+  "content_entities": [
+    "Document",
+    "Note",
+    "Correspondent",
+    "Tag",
+    "DocumentType",
+    "StoragePath",
+    "CustomField"
+  ],
+  "seed_helpers": [
+    "seed_documents",
+    "seed_metadata",
+    "seed_notes"
+  ],
+  "tool_families_to_keep": [
+    "document",
+    "correspondent",
+    "tag",
+    "documenttype",
+    "storagepath",
+    "customfield",
+    "note",
+    "workflow",
+    "workflowtrigger",
+    "workflowaction",
+    "mailrule",
+    "sharelink",
+    "tasks",
+    "trash",
+    "sign_in"
+  ],
+  "obs_reads": [
+    "paperless_ngx document_list",
+    "paperless_ngx tag_list",
+    "paperless_ngx correspondent_list"
+  ],
+  "known_patches": [
+    "persona account id 1 with known password; placeholder pw value that the World persona-rename cannot corrupt",
+    "env_id -> paperless_ngx_ab so the merged prefix is paperless_ngx_ab",
+    "FK columns Document.correspondent_id/document_type_id/storage_path_id/root_document_id/owner_id, Note.document_id/user_id, CustomFieldInstance.document_id/field_id, PaperlessTask.owner_id retyped id->text (runtime never writes type=id columns on update)",
+    "owner scope + default page caps removed from all read/search tools (shared world; colleagues' rows and table tails must be visible)",
+    "document_list rewritten as a filtered list (title_search/q substring, archive_serial_number, correspondent) instead of a keyword search, so agents can list + narrow without page_size under the 12k observation cap",
+    "renamed update args (correspondent->correspondent_id, document_type->document_type_id, storage_path->storage_path_id, owner->owner_id, parent->tn_parent) copied into exec_spec.set (field_set ignores dict-form fields)",
+    "login tool already named sign_in (no rename needed)"
+  ],
+  "smoke": {
+    "passed": true,
+    "date": "2026-10-24",
+    "report": "ok"
+  },
+  "register_file": "pack/newspecs3/paperless_ngx/register.py",
+  "base_spec": "pack/base_specs/paperless_ngx.spec.json"
+}

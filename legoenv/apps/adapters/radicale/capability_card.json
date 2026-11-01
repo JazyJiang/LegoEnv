@@ -1,0 +1,89 @@
+{
+  "app": "radicale",
+  "role": "Calendar and collection raw-text/scalar storage",
+  "domains": [
+    "operations",
+    "coordination"
+  ],
+  "kinds": {
+    "create_record": [
+      "collection_create",
+      "collection_create_calendar",
+      "calendaritem_upload",
+      "share_create_map"
+    ],
+    "update_record": [
+      "collection_set_meta",
+      "share_update",
+      "calendaritem_move"
+    ],
+    "record_status_change": [
+      "share_toggle"
+    ],
+    "delete_or_archive_row": [
+      "collection_delete",
+      "calendaritem_delete",
+      "share_delete"
+    ]
+  },
+  "check_kinds": [
+    "record_exists",
+    "record_not_exists",
+    "record_field_equals",
+    "record_field_contains",
+    "record_field_unchanged"
+  ],
+  "carriers": {
+    "notes_field": {
+      "entity": "CalendarItem",
+      "field": "serialized"
+    }
+  },
+  "login": {
+    "tool": "sign_in",
+    "user_field": "login",
+    "persona_entity": "HtpasswdAccount"
+  },
+  "content_entities": [
+    "Collection",
+    "CalendarItem",
+    "Share",
+    "SyncToken"
+  ],
+  "seed_helpers": [
+    "collections",
+    "items"
+  ],
+  "tool_families_to_keep": [
+    ""
+  ],
+  "obs_reads": [
+    "calendaritem_search",
+    "calendaritem_propfind",
+    "share_list"
+  ],
+  "known_patches": [
+    "Neutral prefix",
+    "Integer internal seed ids and synthetic account1/2",
+    "Text account_name owner relations",
+    "Share exact filters",
+    "Constant calendar tag represented as runtime-compatible scalar"
+  ],
+  "missing_tools": [
+    "Collection read/list"
+  ],
+  "limitations": [
+    "All 18 source tools retained. Raw text and scalar metadata only; no DAV transport, serialized-content parsing, UID/etag derivation, recurrence evaluation or notification delivery certified.",
+    "Source guards check authentication and row existence, not collection/share owner authorization; owner-scoped share_list does not imply comprehensive ACLs.",
+    "calendaritem_move changes collection_path but does not implement overwrite or destination collision semantics; collection_delete does not cascade calendar items.",
+    "share_toggle requires explicit EnabledByUser/HiddenByUser values; action string itself does not select the state. Fixed token share identifier supports one token; no secure token generation or share permission execution claimed.",
+    "calendaritem_sync creates empty SyncToken metadata; no incremental delta semantics claimed."
+  ],
+  "smoke": {
+    "passed": true,
+    "date": "2026-10-24",
+    "report": "ok"
+  },
+  "register_file": "pack/newspecs3/radicale/register.py",
+  "base_spec": "pack/base_specs/radicale.spec.json"
+}

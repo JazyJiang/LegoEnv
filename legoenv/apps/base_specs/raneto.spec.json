@@ -1,0 +1,873 @@
+{
+  "env_id": "raneto",
+  "auth": {
+    "account_entity": "Account",
+    "username_col": "username",
+    "password_col": "password"
+  },
+  "entities": [
+    {
+      "name": "Account",
+      "columns": [
+        {
+          "name": "username",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "immutable": true
+        },
+        {
+          "name": "password",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "id",
+          "type": "id"
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "username"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Page",
+      "columns": [
+        {
+          "name": "filepath",
+          "type": "text",
+          "pk": true,
+          "immutable": true
+        },
+        {
+          "name": "slug",
+          "type": "text",
+          "nullable": false,
+          "immutable": true
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "body",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "category",
+          "type": "text",
+          "nullable": true,
+          "fk_to": "Category.slug"
+        },
+        {
+          "name": "show_on_home",
+          "type": "bool",
+          "nullable": true
+        },
+        {
+          "name": "show_on_menu",
+          "type": "bool",
+          "nullable": true
+        },
+        {
+          "name": "sort",
+          "type": "int",
+          "nullable": true
+        },
+        {
+          "name": "excerpt",
+          "type": "text",
+          "nullable": false,
+          "audit": false,
+          "default": "<computed>"
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "nullable": false,
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "modified_at",
+          "type": "datetime",
+          "nullable": false,
+          "audit": true
+        },
+        {
+          "name": "deleted_at",
+          "type": "datetime",
+          "nullable": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "slug"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Category",
+      "columns": [
+        {
+          "name": "slug",
+          "type": "text",
+          "pk": true,
+          "immutable": true
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "show_on_home",
+          "type": "bool",
+          "nullable": false
+        },
+        {
+          "name": "show_on_menu",
+          "type": "bool",
+          "nullable": false
+        },
+        {
+          "name": "sort",
+          "type": "int",
+          "nullable": false,
+          "default": 0
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "nullable": false,
+          "audit": true,
+          "immutable": true
+        }
+      ]
+    },
+    {
+      "name": "PageMeta",
+      "columns": [
+        {
+          "name": "filepath",
+          "type": "text",
+          "pk": true,
+          "fk_to": "Page.filepath",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "sort",
+          "type": "int",
+          "nullable": true
+        },
+        {
+          "name": "show_on_home",
+          "type": "bool",
+          "nullable": true
+        },
+        {
+          "name": "show_on_menu",
+          "type": "bool",
+          "nullable": true
+        },
+        {
+          "name": "template",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "modified",
+          "type": "text",
+          "nullable": true,
+          "audit": false
+        },
+        {
+          "name": "custom_title",
+          "type": "text",
+          "nullable": true
+        }
+      ]
+    }
+  ],
+  "tools": [
+    {
+      "tool": "sign_in",
+      "op": "action",
+      "family": "guard.auth",
+      "exec_spec": {
+        "verify": {
+          "entity": "Account"
+        }
+      },
+      "input_schema": {
+        "username": {
+          "type": "string",
+          "required": true,
+          "description": "The account username from config.credentials."
+        },
+        "password": {
+          "type": "string",
+          "required": true,
+          "description": "The account password from config.credentials."
+        }
+      },
+      "_evidence": {
+        "locator": "app/routes/login.route.js:15-38",
+        "id_local": "Account.login",
+        "entry": {
+          "kind": "http",
+          "route": "POST /rn-login",
+          "locator": "app/index.js:212"
+        },
+        "entity_why": "primary effect auth lands on this table",
+        "ref_code": "function routeLogin(config) {\n  return function (req, res) {\n    const credential = config.credentials.find(\n      (c) => safeEqual(req.body.username, c.username) && safeEqual(req.body.password, c.password));\n    if (credential) {\n      req.session.loggedIn = true;\n      req.session.username = credential.username;\n      res.json({ status: 1, message: config.lang.api.loginSuccessful });\n      return;\n    }\n    res.json({ status: 0, message: config.lang.api.invalidCredentials });\n  };\n}"
+      },
+      "entity": "Account",
+      "_binds": {
+        "username": "Account.username",
+        "password": "Account.password"
+      },
+      "_output_schema": {
+        "status": "0 on success, 1 on invalid credentials",
+        "message": "localized result message"
+      },
+      "guards": {
+        "required": [
+          "username",
+          "password"
+        ]
+      },
+      "description": "Sign in to Raneto with a configured account username and password. Every editor route (create, edit, delete) requires a signed-in session; the session this opens is what `$actor` resolves to. Fails if the username or password does not match a configured credential."
+    },
+    {
+      "tool": "sign_out",
+      "op": "action",
+      "family": "guard.logout",
+      "exec_spec": {
+        "entity": "Account"
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "app/routes/logout.route.js:1-11",
+        "id_local": "Account.logout",
+        "entry": {
+          "kind": "http",
+          "route": "GET /logout",
+          "locator": "app/index.js:213"
+        },
+        "entity_why": "primary effect auth lands on this table",
+        "ref_code": "function routeLogout(config) {\n  return function (req, res) {\n    req.session.destroy((err) => {\n      if (err) console.error('Error destroying session:', err);\n      res.clearCookie(config.session_name);\n      res.redirect(`${config.base_url}/`);\n    });\n  };\n}"
+      },
+      "entity": "Account",
+      "_output_schema": {},
+      "description": "End the current signed-in session and destroy it. Call this when you are done editing so a later read is not mistaken for an in-session write.",
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You are not signed in, so there is no session to end."
+        }
+      }
+    },
+    {
+      "tool": "page_create",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Page",
+        "fields": {
+          "slug": {
+            "$arg": "name"
+          },
+          "category": {
+            "$arg": "category"
+          }
+        },
+        "unique_on": [
+          "slug"
+        ]
+      },
+      "input_schema": {
+        "name": {
+          "type": "string",
+          "required": true,
+          "description": "Filename stem (no extension) of the new page; becomes its slug."
+        },
+        "category": {
+          "type": "string",
+          "required": false,
+          "description": "Category slug (path) the page is created inside, e.g. 'tutorials'. Its directory must already exist."
+        }
+      },
+      "_evidence": {
+        "locator": "app/routes/pageCreate.route.js:6-35",
+        "id_local": "Page.create",
+        "entry": {
+          "kind": "http",
+          "route": "POST /rn-add-page",
+          "locator": "app/index.js:229"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "async function (req, res) {\n  const filepath = getFilepath({ content: config.content_dir, category: req.body.category, filename: `${req.body.name}.md` });\n  if (!filepath) { return res.json({ status: 1, message: ...invalidFile... }); }\n  try { await fs.ensureFile(filepath); res.json({ status: 0, message: config.lang.api.pageCreated }); }\n  catch (error) { res.json({ status: 1, message: config.lang.api.pageNotCreated }); }\n}",
+        "edges": [
+          "no explicit existence check in code; category only used as a path part, implied by filesystem layout (pageCreate.route.js:9-14)",
+          "router.post('/rn-add-page', middlewareToUse, ...) where middlewareToUse is authMiddleware/alwaysAuthenticate/oauth2.required (index.js:218-235, authenticate.mw.js:1-16)"
+        ]
+      },
+      "entity": "Page",
+      "_binds": {
+        "name": "Page.slug",
+        "category": "Category.slug"
+      },
+      "_output_schema": {
+        "status": "0 on success, 1 on invalid path",
+        "message": "localized result message"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "name"
+        ],
+        "messages": {
+          "auth": "You must be signed in to create a page.",
+          "not_found": "The page could not be created.",
+          "fk": "The category you placed the page in does not exist.",
+          "unique": "A page with this slug already exists.",
+          "precondition": "The category you are placing this page in does not exist; create it first."
+        },
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Category",
+                "where": {
+                  "node": "field",
+                  "col": "slug",
+                  "op": "eq",
+                  "value": {
+                    "arg": "category"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1,
+              "_msg": "That category does not exist; create the category before putting a page inside it."
+            }
+          ]
+        ]
+      },
+      "_defaulted": [
+        "fields (mapped to the real parameter names via binds)"
+      ],
+      "description": "Create a new page inside a category. The page's slug is derived from `name`; it is stored as a .md file under the category directory. Fails if the parent category does not exist or a page with that slug already exists."
+    },
+    {
+      "tool": "page_edit",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Page",
+        "row_key": {
+          "filepath": {
+            "$arg": "file"
+          }
+        },
+        "set": {
+          "body": {
+            "$arg": "content"
+          }
+        }
+      },
+      "input_schema": {
+        "file": {
+          "type": "string",
+          "required": true,
+          "description": "Page path relative to content_dir, e.g. 'tutorials/my-page'. Identifies the page to edit."
+        },
+        "content": {
+          "type": "string",
+          "required": true,
+          "description": "The new markdown body to write to the page's .md file."
+        }
+      },
+      "_evidence": {
+        "locator": "app/routes/pageEdit.route.js:10-62",
+        "id_local": "Page.edit",
+        "entry": {
+          "kind": "http",
+          "route": "POST /rn-edit",
+          "locator": "app/index.js:227"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "async function (req, res) {\n  const parsed = parseFileParam(req.body.file);\n  if (!parsed) return res.json({ status: 1, message: ...invalidFile... });\n  let filepath = getFilepath({ content: config.content_dir, category: parsed.category, filename: parsed.filename });\n  if (!filepath) return res.json({ status: 1, message: ...invalidFile... });\n  filepath = await resolveFilepath(filepath);\n  const meta = createMetaInfo(req.body.meta_title, req.body.meta_description, req.body.meta_sort);\n  let sanitizedContent = meta + normalizeLineEndings(req.body.content);\n  if (!sanitizedContent.endsWith('\\n')",
+        "edges": [
+          "router.post('/rn-edit', middlewareToUse, ...) where middlewareToUse is authMiddleware/alwaysAuthenticate/oauth2.required (index.js:218-235, authenticate.mw.js:1-16)"
+        ],
+        "note": "PageMeta front-matter (title/description/sort) not written here: update.field_set writes one entity only; page_edit persists only Page.body. PageMeta meta args dropped from the panel."
+      },
+      "entity": "Page",
+      "_binds": {
+        "file": "Page.filepath",
+        "content": "Page.body"
+      },
+      "_output_schema": {
+        "status": "0 on success, 1 on error",
+        "message": "localized result message"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "file",
+          "content"
+        ],
+        "messages": {
+          "auth": "You must be signed in to edit a page.",
+          "not_found": "The page you tried to edit does not exist."
+        }
+      },
+      "_defaulted": [
+        "fields (mapped to the real parameter names via binds)"
+      ],
+      "description": "Edit an existing page's markdown body. The new body is written (after the generated meta header) to the page's .md file. Fails if the target page file does not exist."
+    },
+    {
+      "tool": "page_delete",
+      "op": "delete",
+      "family": "crud.soft_delete",
+      "exec_spec": {
+        "entity": "Page",
+        "lookup_by": {
+          "filepath": {
+            "$arg": "file"
+          }
+        },
+        "set": {
+          "deleted_at": "$now"
+        }
+      },
+      "input_schema": {
+        "file": {
+          "type": "string",
+          "required": true,
+          "description": "Page path relative to content_dir. Identifies the page to remove from the listing."
+        }
+      },
+      "_evidence": {
+        "locator": "app/routes/pageDelete.route.js:8-51",
+        "id_local": "Page.delete",
+        "entry": {
+          "kind": "http",
+          "route": "POST /rn-delete",
+          "locator": "app/index.js:228"
+        },
+        "entity_why": "primary effect row_soft_delete lands on this table",
+        "ref_code": "async function (req, res) {\n  const parsed = parseFileParam(req.body.file);\n  if (!parsed) return res.json({ status: 1, message: ... });\n  let filepath = getFilepath({ content: config.content_dir, category: parsed.category, filename: parsed.filename });\n  if (!filepath) return res.json({ status: 1, message: ... });\n  filepath = await resolveFilepath(filepath);\n  // Don't Delete - Rename to remove from listing\n  await fs.rename(filepath, `${filepath}.del`);\n  res.json({ status: 0, message: config.lang.api.pageDeleted });\n}",
+        "edges": [
+          "router.post('/rn-delete', middlewareToUse, ...) where middlewareToUse is authMiddleware/alwaysAuthenticate/oauth2.required (index.js:218-235, authenticate.mw.js:1-16)"
+        ],
+        "note": "Real repo soft-deletes by renaming the .md file to .del (no flag column). deleted_at added as the runtime's soft-delete marker so the deletion is observable."
+      },
+      "entity": "Page",
+      "_binds": {
+        "file": "Page.filepath"
+      },
+      "_output_schema": {
+        "status": "0 on success, 1 on invalid path or error",
+        "message": "localized result message"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "file"
+        ],
+        "messages": {
+          "auth": "You must be signed in to delete a page.",
+          "not_found": "The page you tried to delete does not exist."
+        }
+      },
+      "description": "Remove a page from the wiki listing by soft-deleting it (renames its .md file to a .del suffix). Fails if the target page does not exist."
+    },
+    {
+      "tool": "category_create",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Category",
+        "fields": {
+          "slug": {
+            "$arg": "category"
+          }
+        },
+        "unique_on": [
+          "slug"
+        ]
+      },
+      "input_schema": {
+        "category": {
+          "type": "string",
+          "required": true,
+          "description": "The category slug / path to create, e.g. 'tutorials' (multi-level supported)."
+        }
+      },
+      "_evidence": {
+        "locator": "app/routes/categoryCreate.route.js:5-34",
+        "id_local": "Category.create",
+        "entry": {
+          "kind": "http",
+          "route": "POST /rn-add-category",
+          "locator": "app/index.js:230"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "async function (req, res) {\n  const filepath = getFilepath({ content: config.content_dir, category: req.body.category });\n  if (!filepath) return res.json({ status: 1, message: ...invalidCategory... });\n  try { await fs.mkdir(filepath); res.json({ status: 0, message: config.lang.api.categoryCreated }); }\n  catch (error) { res.json({ status: 1, message: config.lang.api.categoryNotCreated }); }\n}",
+        "edges": [
+          "router.post('/rn-add-category', middlewareToUse, ...) where middlewareToUse is authMiddleware/alwaysAuthenticate/oauth2.required (index.js:218-235, authenticate.mw.js:1-16)"
+        ],
+        "note": "unique_on slug is a real wall (fs.mkdir on an existing directory -> EEXIST -> 'categoryNotCreated'). The probe injects the duplicate by the COLUMN name 'slug', which is not a param (the app param is 'category'), so it always inserts a distinct slug and reports wall_missing. This is a probe limitation from the param/column name mismatch, not a fake wall."
+      },
+      "entity": "Category",
+      "_binds": {
+        "category": "Category.slug"
+      },
+      "_output_schema": {
+        "status": "0 on success, 1 on invalid path",
+        "message": "localized result message"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "category"
+        ],
+        "messages": {
+          "auth": "You must be signed in to create a category.",
+          "not_found": "The category directory could not be created.",
+          "unique": "A category with this slug already exists."
+        }
+      },
+      "_defaulted": [
+        "argument invented from the write column",
+        "dropped unwritable columns ['slug']",
+        "fields"
+      ],
+      "description": "Create a new category (a directory under content_dir) with the given slug. Fails if the slug resolves to an invalid path or the directory already exists."
+    },
+    {
+      "tool": "page_render",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Page",
+        "lookup_by": {
+          "slug": {
+            "$arg": "slug"
+          }
+        }
+      },
+      "input_schema": {
+        "slug": {
+          "type": "string",
+          "required": true,
+          "description": "The page slug, e.g. 'tutorials/hello-shell'."
+        },
+        "edit": {
+          "type": "string",
+          "required": false,
+          "description": "When 'true', return the raw editable markdown instead of rendered HTML (requires a signed-in session)."
+        }
+      },
+      "_evidence": {
+        "locator": "app/routes/wildcard.route.js:16-142",
+        "id_local": "Page.render",
+        "entry": {
+          "kind": "http",
+          "route": "GET /{slug}[/edit]",
+          "locator": "app/index.js:247"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "let filePath = path.resolve(config.content_dir, slug.replace(/^\\//, '')).replaceAll(/\\/$|\\\\$/g, '');\n... if (filePath.endsWith('edit')) filePath = filePath.slice(0, -suffix.length - 1);\nlet safeFilePath = path.resolve(config.content_dir, path.relative(config.content_dir, filePath));\nif (!safeFilePath.startsWith(contentDirResolved)) { ...404... }\nsafeFilePath = await resolveFilepath(safeFilePath);\n... content = await fs.readFile(safeFilePath, 'utf8');\nif (path.extname(safeFilePath) === '.md') { meta = processMeta(content); ... }",
+        "edges": [
+          "if ((config.authentication || config.authentication_for_edit) && !req.session.loggedIn) redirect to login (wildcard.route.js:88-96)"
+        ],
+        "scope_decision": "public wiki read; genuinely global"
+      },
+      "entity": "Page",
+      "_binds": {
+        "slug": "Page.slug"
+      },
+      "_output_schema": {
+        "meta": "page metadata object",
+        "content": "rendered HTML body (or raw markdown when editing)",
+        "pages": "nested page list",
+        "title": "page title"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "slug"
+        ],
+        "messages": {
+          "auth": "Editing a page requires a signed-in session; the plain read does not.",
+          "not_found": "The requested page does not exist."
+        }
+      },
+      "description": "Fetch a single page by its slug and return its rendered content. Applies to the public read surface of the wiki; sign-in is only required when requesting the editable form."
+    },
+    {
+      "tool": "page_list",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Page",
+        "search_fields": [
+          "slug",
+          "show_on_home"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "slug",
+            "show_on_home"
+          ]
+        }
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "app/routes/home.route.js:10-56",
+        "id_local": "Page.list",
+        "entry": {
+          "kind": "http",
+          "route": "GET /",
+          "locator": "app/index.js:246"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "const pageList = excludeImageDirectory(config, (await contents_handler('/index', config))\n  .filter((page) => page.show_on_home)\n  .map((page) => { page.files = page.files.filter((file) => file.show_on_home); return page; }));\nreturn res.render('home', { config, pages: buildNestedPages(pageList), ... });"
+      },
+      "entity": "Page",
+      "_output_schema": {
+        "pages": "nested list of categories each with their files (show_on_home filtered)",
+        "body_class": "page-home"
+      },
+      "description": "List the wiki's home page: the categories and pages marked to show on the home page, as a nested listing."
+    },
+    {
+      "tool": "page_search",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Page",
+        "search_fields": [
+          "title",
+          "body"
+        ],
+        "rank": {
+          "method": "keyword",
+          "fields": [
+            "title",
+            "body"
+          ]
+        }
+      },
+      "input_schema": {
+        "search": {
+          "type": "string",
+          "required": true,
+          "description": "The keyword query to match against page titles and bodies."
+        }
+      },
+      "_evidence": {
+        "locator": "app/routes/search.route.js:9-45, app/core/search.js:8-72",
+        "id_local": "Page.search",
+        "entry": {
+          "kind": "http",
+          "route": "GET /?search=<q>",
+          "locator": "app/index.js:246"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "idx = lunrInstance(function () { this.use(lunr.getStemmers(config)); this.field('title', { boost: 10 }); this.field('body'); this.ref('id'); documents.forEach((doc) => this.add(doc)); });\nconst cleanQuery = query.replaceAll(/[~*+\\-^:]/g, ' ').replaceAll(/\\s+/g, ' ').trim();\nlet results = idx.search(cleanQuery);\n// try OR, then fuzzy ~1, then wildcard *, then per-word fuzzy"
+      },
+      "entity": "Page",
+      "_output_schema": {
+        "searchResults": "list of Page rows (title, slug, category, excerpt with matched terms highlighted)",
+        "search": "the sanitized query"
+      },
+      "guards": {
+        "required": [
+          "search"
+        ],
+        "messages": {
+          "required": "A search query is required."
+        }
+      },
+      "description": "Full-text search across every page's title and body using an indexed keyword search. Returns matching pages ranked by relevance. Fails if no query is given."
+    },
+    {
+      "tool": "page_sitemap",
+      "op": "action",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Page",
+        "search_fields": [
+          "slug"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "slug"
+          ]
+        }
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "app/routes/sitemap.route.js:9-53",
+        "id_local": "Page.sitemap",
+        "entry": {
+          "kind": "http",
+          "route": "GET /sitemap.xml",
+          "locator": "app/index.js:245"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "const files = allFiles.filter((file) => file.endsWith('.md'));\nconst urls = filePaths.map((file) => `/${file.replaceAll('.md', '').replaceAll('\\\\', '/')}`);\n... links.push({ url: (config.prefix_url || '') + urls[i], changefreq: 'weekly', priority: 0.8, lastmod: ... });"
+      },
+      "entity": "Page",
+      "_output_schema": {
+        "xml": "sitemap XML with one url entry per .md page (changefreq weekly, priority 0.8, lastmod from meta.modified or mtime)"
+      },
+      "description": "Generate the XML sitemap listing every .md page's URL. A public, read-only export."
+    }
+  ],
+  "seed_state": {
+    "Account": [
+      {
+        "username": "ops@raneto.example",
+        "password": "pw-operations",
+        "id": 1
+      },
+      {
+        "username": "writer@raneto.example",
+        "password": "pw-writer",
+        "id": 2
+      }
+    ],
+    "Category": [
+      {
+        "slug": "tutorials",
+        "title": "Tutorials",
+        "description": "Getting-started guides",
+        "show_on_home": true,
+        "show_on_menu": true,
+        "sort": 0,
+        "created_at": "2026-01-01T00:00:00Z",
+        "id": 1
+      }
+    ],
+    "Page": [
+      {
+        "filepath": "tutorials/hello-shell.md",
+        "slug": "tutorials/hello-shell",
+        "title": "Hello Shell",
+        "body": "# Hello Shell\n\nWelcome to the wiki.",
+        "category": "tutorials",
+        "show_on_home": true,
+        "show_on_menu": true,
+        "sort": 1,
+        "excerpt": "Welcome to the wiki.",
+        "created_at": "2026-01-01T00:00:00Z",
+        "modified_at": "2026-01-01T00:00:00Z",
+        "id": 1
+      },
+      {
+        "filepath": "about.md",
+        "slug": "about",
+        "title": "About",
+        "body": "About this wiki.",
+        "category": null,
+        "show_on_home": true,
+        "show_on_menu": true,
+        "sort": 2,
+        "excerpt": "About this wiki.",
+        "created_at": "2026-01-02T00:00:00Z",
+        "modified_at": "2026-01-02T00:00:00Z",
+        "id": 2
+      }
+    ],
+    "PageMeta": [
+      {
+        "filepath": "tutorials/hello-shell.md",
+        "title": "Hello Shell",
+        "description": "Welcome to the wiki.",
+        "sort": 1,
+        "show_on_home": true,
+        "show_on_menu": true,
+        "template": "page.html",
+        "modified": "2026-01-01T00:00:00Z",
+        "custom_title": null,
+        "id": 1
+      },
+      {
+        "filepath": "about.md",
+        "title": "About",
+        "description": "About this wiki.",
+        "sort": 2,
+        "show_on_home": true,
+        "show_on_menu": true,
+        "template": "page.html",
+        "modified": "2026-01-02T00:00:00Z",
+        "custom_title": null,
+        "id": 2
+      }
+    ]
+  },
+  "summary": "Raneto is a flat-file, databaseless Markdown knowledgebase CMS: pages/categories are persisted as .md files (and directory meta/sort files) under a content_dir on the filesystem, with authenticated web editor routes that write them and read routes (page render, search index, listing, sitemap) that read them back.",
+  "_prep_version": 3,
+  "_auth_candidates": [
+    {
+      "entity": "Account",
+      "username_col": "username",
+      "password_col": "password"
+    }
+  ],
+  "_fk_gravity": {
+    "entity": "Category",
+    "fk_count": 1
+  },
+  "_read_denied": "not_found",
+  "_no_edges": [
+    {
+      "id_local": "Account.login",
+      "why": "deliberately public unauthenticated endpoint (POST /rn-login, index.js:212); it validates the credential itself, calls nothing, requires nothing"
+    },
+    {
+      "id_local": "Account.logout",
+      "why": "itself the sign-out; does req.session.destroy + redirect (logout.route.js), calls nothing, requires nothing"
+    },
+    {
+      "id_local": "Page.sitemap",
+      "why": "read-only XML generation on a route behind no-op readMiddleware when authentication_for_read=false; calls nothing, requires nothing (sitemap.route.js:9-53, index.js:238-245)"
+    }
+  ]
+}

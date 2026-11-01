@@ -1,0 +1,114 @@
+{
+  "app": "calibre",
+  "role": "E-book library scalar metadata, category-item notes and reading progress",
+  "domains": [
+    "media",
+    "operations",
+    "it_ops"
+  ],
+  "kinds": {
+    "create_record": [
+      "add_book"
+    ],
+    "update_record": [
+      "set_book_fields",
+      "set_last_read_position",
+      "set_book_cover"
+    ],
+    "attach_note_or_task": [
+      "set_note"
+    ],
+    "delete_or_archive_row": [
+      "delete_book"
+    ]
+  },
+  "check_kinds": [
+    "record_exists",
+    "record_not_exists",
+    "record_field_equals",
+    "record_field_contains",
+    "record_field_unchanged",
+    "note_or_task_exists",
+    "note_or_task_not_exists",
+    "action_done",
+    "action_not_done"
+  ],
+  "carriers": {
+    "notes_field": {
+      "entity": "Note",
+      "field": "doc"
+    }
+  },
+  "login": {
+    "tool": "sign_in",
+    "user_field": "name",
+    "persona_entity": "User"
+  },
+  "content_entities": [
+    "Book",
+    "Author",
+    "Note",
+    "LastReadPosition",
+    "Cover",
+    "Annotation"
+  ],
+  "seed_helpers": [
+    "books",
+    "authors",
+    "notes",
+    "reading_positions",
+    "covers",
+    "annotations"
+  ],
+  "tool_families_to_keep": [
+    "sign_in",
+    "add_book",
+    "delete_book",
+    "set_book_fields",
+    "set_book_cover",
+    "set_last_read_position",
+    "set_note",
+    "get_book",
+    "list_books",
+    "search_books",
+    "get_note",
+    "get_last_read_position",
+    "get_annotations",
+    "opds_catalog",
+    "recently_added_books"
+  ],
+  "obs_reads": [
+    "list_books",
+    "search_books",
+    "opds_catalog",
+    "recently_added_books",
+    "get_last_read_position",
+    "get_annotations",
+    "get_note"
+  ],
+  "known_patches": [
+    "env_id calibre",
+    "Integer identity schemas; scalar integer selectors for legacy CSV-only declarations",
+    "Writable persona id 1 and retained readonly account id 2",
+    "Existing sign_in accepts password argument used by packlib, preserving legacy pw alias",
+    "Four existing Book reads gain concrete substring filters and full scoped lists",
+    "Per-user reads scope by session.name and support explicit book_id/fmt filters",
+    "Existing reading-progress/cover templates update their declared data; set_note uses source-required create-or-replace upsert"
+  ],
+  "smoke": {
+    "passed": true,
+    "date": "2026-10-24",
+    "report": "ok"
+  },
+  "limitations": [
+    "add_book creates only a scalar Book row; uploaded file formats, nested authors/tags and duplicate-file detection are not executed.",
+    "copy_book_to_library does not copy or move source books between libraries; file/index actions only emit events.",
+    "update_annotations does not merge a complete annotation map; no stable full annotation replacement interface is provided.",
+    "get_book/get_books_by_ids/get_book_content return scalar Book rows; UUID lookup, CSV batches and actual format/cover content delivery are unsupported.",
+    "set_book_cover changes Cover.data only, without Book.has_cover side effects.",
+    "No category/note listing or author/tag/link CRUD interfaces exist; tasks must supply category item ids for get_note/set_note.",
+    "Legacy encoded which selectors, full-text content search, category joins, OPDS rendering and virtual-library restrictions are unsupported."
+  ],
+  "register_file": "pack/newspecs3/calibre/register.py",
+  "base_spec": "pack/base_specs/calibre.spec.json"
+}

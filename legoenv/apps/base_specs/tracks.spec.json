@@ -1,0 +1,5165 @@
+{
+  "env_id": "tracks",
+  "_prep_version": 3,
+  "entities": [
+    {
+      "name": "User",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "login",
+          "type": "text",
+          "nullable": false,
+          "max": 80
+        },
+        {
+          "name": "crypted_password",
+          "type": "text",
+          "nullable": false,
+          "max": 60
+        },
+        {
+          "name": "token",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "is_admin",
+          "type": "bool",
+          "nullable": false,
+          "default": false
+        },
+        {
+          "name": "first_name",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "last_name",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "auth_type",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "database",
+            "open_id",
+            "cas"
+          ],
+          "default": "database"
+        },
+        {
+          "name": "open_id_url",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "remember_token",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "remember_token_expires_at",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "email",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "last_login_at",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "audit": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "login"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Preference",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "user_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "User.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "date_format",
+          "type": "text",
+          "nullable": false,
+          "default": "%d/%m/%Y",
+          "max": 40
+        },
+        {
+          "name": "week_starts",
+          "type": "int",
+          "nullable": false,
+          "enum": [
+            0,
+            1
+          ],
+          "default": 0
+        },
+        {
+          "name": "show_number_completed",
+          "type": "int",
+          "nullable": false,
+          "default": 5
+        },
+        {
+          "name": "staleness_starts",
+          "type": "int",
+          "nullable": false,
+          "default": 7
+        },
+        {
+          "name": "show_completed_projects_in_sidebar",
+          "type": "bool",
+          "nullable": false,
+          "default": true
+        },
+        {
+          "name": "show_hidden_contexts_in_sidebar",
+          "type": "bool",
+          "nullable": false,
+          "default": true
+        },
+        {
+          "name": "due_style",
+          "type": "int",
+          "nullable": false,
+          "enum": [
+            0,
+            1
+          ],
+          "default": 0
+        },
+        {
+          "name": "refresh",
+          "type": "int",
+          "nullable": false,
+          "default": 0
+        },
+        {
+          "name": "verbose_action_descriptors",
+          "type": "bool",
+          "nullable": false,
+          "default": false
+        },
+        {
+          "name": "show_hidden_projects_in_sidebar",
+          "type": "bool",
+          "nullable": false,
+          "default": true
+        },
+        {
+          "name": "time_zone",
+          "type": "text",
+          "nullable": false,
+          "default": "London",
+          "max": 255
+        },
+        {
+          "name": "show_project_on_todo_done",
+          "type": "bool",
+          "nullable": false,
+          "default": false
+        },
+        {
+          "name": "title_date_format",
+          "type": "text",
+          "nullable": false,
+          "default": "%A, %d %B %Y",
+          "max": 255
+        },
+        {
+          "name": "mobile_todos_per_page",
+          "type": "int",
+          "nullable": false,
+          "default": 6
+        },
+        {
+          "name": "sms_email",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "sms_context_id",
+          "type": "id",
+          "nullable": true,
+          "fk_to": "Context.id"
+        },
+        {
+          "name": "locale",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "review_period",
+          "type": "int",
+          "nullable": false,
+          "default": 14
+        },
+        {
+          "name": "theme",
+          "type": "text",
+          "nullable": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "user_id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Context",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false,
+          "max": 255
+        },
+        {
+          "name": "position",
+          "type": "int",
+          "nullable": true
+        },
+        {
+          "name": "user_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "User.id",
+          "default": 1,
+          "on_delete": "cascade"
+        },
+        {
+          "name": "state",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "active",
+            "closed",
+            "hidden"
+          ],
+          "default": "active"
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "audit": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "user_id",
+            "name"
+          ]
+        }
+      ],
+      "_lifecycle": {
+        "col": "state",
+        "initial": "active",
+        "states": [
+          "active",
+          "closed",
+          "hidden"
+        ],
+        "via": {
+          "Context.update": {
+            "col": "state",
+            "from": [
+              "active",
+              "hidden",
+              "closed"
+            ],
+            "to": "active"
+          }
+        }
+      }
+    },
+    {
+      "name": "Project",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false,
+          "max": 255
+        },
+        {
+          "name": "position",
+          "type": "int",
+          "nullable": true
+        },
+        {
+          "name": "user_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "User.id",
+          "default": 1,
+          "on_delete": "cascade"
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "state",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "active",
+            "hidden",
+            "completed"
+          ],
+          "default": "active"
+        },
+        {
+          "name": "default_context_id",
+          "type": "id",
+          "nullable": true,
+          "fk_to": "Context.id"
+        },
+        {
+          "name": "completed_at",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "default_tags",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "last_reviewed",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "audit": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "user_id",
+            "name"
+          ]
+        }
+      ],
+      "_lifecycle": {
+        "col": "state",
+        "initial": "active",
+        "states": [
+          "active",
+          "hidden",
+          "completed"
+        ],
+        "via": {
+          "Project.update": {
+            "col": "state",
+            "from": [
+              "active",
+              "completed",
+              "hidden"
+            ],
+            "to": "active"
+          }
+        }
+      }
+    },
+    {
+      "name": "Todo",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "context_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Context.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "project_id",
+          "type": "id",
+          "nullable": true,
+          "fk_to": "Project.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "user_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "User.id",
+          "default": 1,
+          "on_delete": "cascade"
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "nullable": false,
+          "max": 300
+        },
+        {
+          "name": "notes",
+          "type": "text",
+          "nullable": true,
+          "max": 60000
+        },
+        {
+          "name": "state",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "active",
+            "deferred",
+            "pending",
+            "completed"
+          ],
+          "default": "active"
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "due",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "completed_at",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "show_from",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "recurring_todo_id",
+          "type": "id",
+          "nullable": true,
+          "fk_to": "RecurringTodo.id"
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "audit": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "conditional",
+          "if": [
+            {
+              "col": "state",
+              "op": "eq",
+              "value": {
+                "lit": "deferred"
+              }
+            }
+          ],
+          "then": [
+            {
+              "col": "show_from",
+              "op": "is_not_null"
+            }
+          ]
+        }
+      ],
+      "_lifecycle": {
+        "col": "state",
+        "initial": "active",
+        "states": [
+          "active",
+          "deferred",
+          "pending",
+          "completed"
+        ],
+        "via": {
+          "Todo.defer": {
+            "col": "state",
+            "from": [
+              "active"
+            ],
+            "to": "deferred"
+          },
+          "Todo.add_predecessor": {
+            "col": "state",
+            "from": [
+              "active",
+              "deferred"
+            ],
+            "to": "pending"
+          },
+          "Todo.toggle_check": {
+            "col": "state",
+            "from": [
+              "active",
+              "deferred",
+              "pending",
+              "completed"
+            ],
+            "to": "active"
+          }
+        }
+      }
+    },
+    {
+      "name": "RecurringTodo",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "user_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "User.id",
+          "default": 1,
+          "on_delete": "cascade"
+        },
+        {
+          "name": "context_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Context.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "project_id",
+          "type": "id",
+          "nullable": true,
+          "fk_to": "Project.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "nullable": false,
+          "max": 100
+        },
+        {
+          "name": "notes",
+          "type": "text",
+          "nullable": true,
+          "max": 60000
+        },
+        {
+          "name": "state",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "active",
+            "completed"
+          ],
+          "default": "active"
+        },
+        {
+          "name": "start_from",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "ends_on",
+          "type": "text",
+          "nullable": true,
+          "enum": [
+            "no_end_date",
+            "ends_on_number_of_times",
+            "ends_on_end_date"
+          ]
+        },
+        {
+          "name": "end_date",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "number_of_occurrences",
+          "type": "int",
+          "nullable": true
+        },
+        {
+          "name": "occurrences_count",
+          "type": "int",
+          "nullable": true,
+          "default": 0
+        },
+        {
+          "name": "target",
+          "type": "text",
+          "nullable": true,
+          "enum": [
+            "due_date",
+            "show_from"
+          ]
+        },
+        {
+          "name": "show_from_delta",
+          "type": "int",
+          "nullable": true
+        },
+        {
+          "name": "recurring_period",
+          "type": "text",
+          "nullable": true,
+          "enum": [
+            "daily",
+            "weekly",
+            "monthly",
+            "yearly"
+          ]
+        },
+        {
+          "name": "recurrence_selector",
+          "type": "int",
+          "nullable": true,
+          "enum": [
+            0,
+            1
+          ]
+        },
+        {
+          "name": "every_other1",
+          "type": "int",
+          "nullable": true
+        },
+        {
+          "name": "every_other2",
+          "type": "int",
+          "nullable": true
+        },
+        {
+          "name": "every_other3",
+          "type": "int",
+          "nullable": true
+        },
+        {
+          "name": "every_day",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "only_work_days",
+          "type": "bool",
+          "nullable": true,
+          "default": false
+        },
+        {
+          "name": "every_count",
+          "type": "int",
+          "nullable": true
+        },
+        {
+          "name": "weekday",
+          "type": "int",
+          "nullable": true
+        },
+        {
+          "name": "completed_at",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "show_always",
+          "type": "bool",
+          "nullable": true
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "audit": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "conditional",
+          "if": [
+            {
+              "col": "recurring_period",
+              "op": "eq",
+              "value": {
+                "lit": "daily"
+              }
+            }
+          ],
+          "then": [
+            {
+              "col": "only_work_days",
+              "op": "is_not_null"
+            }
+          ]
+        }
+      ],
+      "_lifecycle": {
+        "col": "state",
+        "initial": "active",
+        "states": [
+          "active",
+          "completed"
+        ],
+        "via": {
+          "RecurringTodo.toggle_check": {
+            "col": "state",
+            "from": [
+              "active",
+              "completed"
+            ],
+            "to": null
+          }
+        }
+      }
+    },
+    {
+      "name": "Note",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "user_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "User.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "project_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Project.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "body",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "audit": true
+        }
+      ]
+    },
+    {
+      "name": "Tag",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "user_id",
+          "type": "id",
+          "nullable": true,
+          "fk_to": "User.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "audit": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "user_id",
+            "name"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Tagging",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "taggable_id",
+          "type": "id",
+          "nullable": true,
+          "fk_to": "Todo.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "tag_id",
+          "type": "id",
+          "nullable": true,
+          "fk_to": "Tag.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "taggable_type",
+          "type": "text",
+          "nullable": true,
+          "enum": [
+            "Todo",
+            "RecurringTodo"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Dependency",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "successor_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Todo.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "predecessor_id",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Todo.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "relationship_type",
+          "type": "text",
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "name": "Attachment",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "todo_id",
+          "type": "id",
+          "nullable": true,
+          "fk_to": "Todo.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "file_file_name",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "file_content_type",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "file_file_size",
+          "type": "int",
+          "nullable": true
+        },
+        {
+          "name": "file_updated_at",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "audit": true
+        }
+      ]
+    }
+  ],
+  "auth": {
+    "account_entity": "User",
+    "username_col": "login",
+    "password_col": "crypted_password"
+  },
+  "tools": [
+    {
+      "tool": "sign_in",
+      "family": "guard.auth",
+      "entity": "User",
+      "description": "Sign in with a Tracks login and password. Every operation in this app (todos, projects, contexts, notes, preferences) requires a session first; the session is what `$actor` resolves to. Fails if the login or password is wrong.",
+      "input_schema": {
+        "login": {
+          "type": "text",
+          "required": true,
+          "description": "The user's login name."
+        },
+        "password": {
+          "type": "text",
+          "required": true,
+          "description": "The user's password."
+        }
+      },
+      "exec_spec": {
+        "verify": {
+          "entity": "User",
+          "username_col": "login",
+          "password_col": "crypted_password"
+        }
+      },
+      "_evidence": {
+        "locator": "app/controllers/login_controller.rb:13",
+        "id_local": "User.login",
+        "ref_code": "def login\n  case request.method\n  when 'POST'\n    if (@user = User.authenticate(params['user_login'], params['user_password']))\n      @user.update_attribute(:last_login_at, Time.zone.now)\n      return handle_post_success\n    else\n      handle_post_failure\n    end\n",
+        "entry": {
+          "kind": "http",
+          "route": "POST /login",
+          "locator": "config/routes.rb:8"
+        },
+        "entity_why": "primary effect row_update lands on this table"
+      },
+      "_binds": {
+        "login": "User.login"
+      }
+    },
+    {
+      "tool": "user_create",
+      "family": "crud.insert",
+      "entity": "User",
+      "description": "Register a new account. Allowed only when no admin account exists yet (the first user is made admin), or when the signed-in actor is an admin. Creates a default Preference row for the new user. Fails if the login is taken.",
+      "exec_spec": {
+        "entity": "User",
+        "fields": [
+          "login",
+          "first_name",
+          "last_name",
+          "email",
+          "auth_type",
+          "open_id_url"
+        ],
+        "set_on_create": {
+          "is_admin": true
+        },
+        "unique_on": [
+          "login"
+        ]
+      },
+      "input_schema": {
+        "login": {
+          "type": "text",
+          "required": true,
+          "description": "The new account's unique login name."
+        },
+        "password": {
+          "type": "text",
+          "required": true,
+          "description": "The new account's password."
+        },
+        "password_confirmation": {
+          "type": "text",
+          "required": true,
+          "description": "Must match password."
+        },
+        "first_name": {
+          "type": "text",
+          "description": "The user's first name."
+        },
+        "last_name": {
+          "type": "text",
+          "description": "The user's last name."
+        },
+        "email": {
+          "type": "text",
+          "description": "The user's email address."
+        },
+        "auth_type": {
+          "type": "text",
+          "enum": [
+            "database",
+            "open_id",
+            "cas"
+          ],
+          "description": "How the user authenticates. Defaults to database."
+        },
+        "open_id_url": {
+          "type": "text",
+          "description": "OpenID identifier, when auth_type is open_id."
+        }
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "is_admin",
+                      "op": "eq",
+                      "value": true
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": null
+              },
+              "op": "eq",
+              "n": 0
+            }
+          ]
+        ],
+        "required": [
+          "login",
+          "password",
+          "password_confirmation"
+        ],
+        "messages": {
+          "precondition": "Signup is only allowed for a signed-in admin, or as the very first account (bootstrap).",
+          "unique": "That login is already taken."
+        }
+      },
+      "_evidence": {
+        "locator": "app/controllers/users_controller.rb:68",
+        "id_local": "User.create",
+        "ref_code": "user = User.new(user_params)\n...\nfirst_user_signing_up = User.no_users_yet?\nuser.is_admin = true if first_user_signing_up\nif user.save\n  @user = User.authenticate(user.login, params['user']['password'])\n  @user.create_preference(:locale => I18n.locale)\n  @user.save\n",
+        "entry": {
+          "kind": "http",
+          "route": "POST /users",
+          "locator": "config/routes.rb:154"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "edges": [
+          "users_controller.rb:2-5: create open when first user (User.no_users_yet?) OR admin OR SITE_CONFIG['open_signups']; new/create use login_optional"
+        ]
+      },
+      "_binds": {
+        "login": "User.login",
+        "first_name": "User.first_name",
+        "last_name": "User.last_name",
+        "email": "User.email",
+        "auth_type": "User.auth_type",
+        "open_id_url": "User.open_id_url"
+      }
+    },
+    {
+      "tool": "user_destroy",
+      "family": "crud.delete",
+      "entity": "User",
+      "description": "Delete a user account. Allowed only for an admin, or for a user deleting their own (non-admin) account. If you delete your own account you are logged out. Fails if the target does not exist or you lack permission.",
+      "exec_spec": {
+        "entity": "User",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the user account to delete."
+        }
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "is_admin",
+                      "op": "eq",
+                      "value": true
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "is_admin",
+                      "op": "eq",
+                      "value": false
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "precondition": "Only an admin, or a user deleting their own account, can delete a user.",
+          "not_found": "No user with that id exists."
+        }
+      },
+      "_evidence": {
+        "locator": "app/controllers/users_controller.rb:138",
+        "id_local": "User.destroy",
+        "ref_code": "def destroy\n  @deleted_user = User.find(params[:id])\n  @saved = @deleted_user.destroy\n  if @saved && current_user == @deleted_user\n    logout_user\n  end\n",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /users/:id",
+          "locator": "config/routes.rb:154"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "edges": [
+          "users_controller.rb:3 admin_or_self_login_required: admin OR session user_id == params id"
+        ]
+      },
+      "_binds": {
+        "id": "User.id"
+      }
+    },
+    {
+      "tool": "user_update_password",
+      "family": "update.field_set",
+      "entity": "User",
+      "description": "Change the signed-in user's password. Requires you to be signed in; the new password is written to the account. Fails if you are not signed in.",
+      "exec_spec": {
+        "entity": "User",
+        "row_key": {
+          "id": {
+            "$session": "account_id"
+          }
+        },
+        "fields": [
+          "crypted_password"
+        ],
+        "set": {
+          "crypted_password": {
+            "$arg": "password"
+          }
+        }
+      },
+      "input_schema": {
+        "password": {
+          "type": "text",
+          "required": true,
+          "description": "The new password."
+        },
+        "password_confirmation": {
+          "type": "text",
+          "required": true,
+          "description": "Must match the new password."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "password",
+          "password_confirmation"
+        ],
+        "messages": {
+          "auth": "You must sign in before changing your password.",
+          "not_found": "No logged-in account to update."
+        }
+      },
+      "_evidence": {
+        "locator": "app/controllers/users_controller.rb:171",
+        "id_local": "User.update_password",
+        "ref_code": "def update_password\n  current_user.change_password(user_params[:password], user_params[:password_confirmation])\n",
+        "entry": {
+          "kind": "http",
+          "route": "POST /users/:id/update_password",
+          "locator": "config/routes.rb:154"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "edges": [
+          "login_required (application_controller.rb:22)"
+        ]
+      },
+      "_defaulted": [
+        "argument invented from the write column",
+        "fields"
+      ]
+    },
+    {
+      "tool": "user_update_auth_type",
+      "family": "update.field_set",
+      "entity": "User",
+      "description": "Change how the signed-in user's login is authenticated (database, OpenID or CAS). Fails if you are not signed in.",
+      "exec_spec": {
+        "entity": "User",
+        "row_key": {
+          "id": {
+            "$session": "account_id"
+          }
+        },
+        "fields": [
+          "auth_type"
+        ],
+        "set": {
+          "auth_type": {
+            "$arg": "auth_type"
+          }
+        }
+      },
+      "input_schema": {
+        "auth_type": {
+          "type": "text",
+          "enum": [
+            "database",
+            "open_id",
+            "cas"
+          ],
+          "required": true,
+          "description": "The new authentication type."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "auth_type"
+        ],
+        "messages": {
+          "auth": "You must sign in before changing your login method.",
+          "not_found": "No logged-in account to update."
+        }
+      },
+      "_evidence": {
+        "locator": "app/controllers/users_controller.rb:178",
+        "id_local": "User.update_auth_type",
+        "ref_code": "def update_auth_type\n  current_user.auth_type = user_params[:auth_type]\n  if current_user.save\n",
+        "entry": {
+          "kind": "http",
+          "route": "POST /users/:id/update_auth_type",
+          "locator": "config/routes.rb:154"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "edges": [
+          "login_required (application_controller.rb:22)"
+        ]
+      },
+      "_binds": {
+        "auth_type": "User.auth_type"
+      },
+      "_defaulted": [
+        "argument invented from the write column",
+        "fields"
+      ]
+    },
+    {
+      "tool": "user_refresh_token",
+      "family": "update.field_set",
+      "entity": "User",
+      "description": "Generate a fresh internal API token for the signed-in user, replacing the previous one. Fails if you are not signed in.",
+      "exec_spec": {
+        "entity": "User",
+        "row_key": {
+          "id": {
+            "$session": "account_id"
+          }
+        },
+        "fields": [
+          "token"
+        ],
+        "set": {
+          "token": "generated-token"
+        }
+      },
+      "input_schema": {},
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in before refreshing your token.",
+          "not_found": "No logged-in account to update."
+        }
+      },
+      "_evidence": {
+        "locator": "app/controllers/users_controller.rb:184",
+        "id_local": "User.refresh_token",
+        "ref_code": "def refresh_token\n  current_user.generate_token\n  current_user.save!\n",
+        "entry": {
+          "kind": "http",
+          "route": "POST /users/:id/refresh_token",
+          "locator": "config/routes.rb:154"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "edges": [
+          "login_required (application_controller.rb:22)"
+        ]
+      },
+      "_defaulted": [
+        "argument invented from the write column",
+        "fields"
+      ]
+    },
+    {
+      "tool": "todo_create",
+      "family": "crud.insert",
+      "entity": "Todo",
+      "description": "Create a new action (todo) for the signed-in user, in a context and optionally a project. The user is set automatically; the todo starts active. Fails if the context does not exist.",
+      "exec_spec": {
+        "entity": "Todo",
+        "fields": [
+          "description",
+          "notes",
+          "context_id",
+          "project_id",
+          "due",
+          "show_from",
+          "state"
+        ],
+        "set_on_create": {
+          "user_id": {
+            "$session": "account_id"
+          },
+          "state": "active"
+        }
+      },
+      "input_schema": {
+        "description": {
+          "type": "text",
+          "required": true,
+          "description": "The action's description (what to do)."
+        },
+        "context_id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the context this action belongs to."
+        },
+        "project_id": {
+          "type": "int",
+          "description": "Optional id of the project this action belongs to."
+        },
+        "notes": {
+          "type": "text",
+          "description": "Optional longer notes about the action."
+        },
+        "due": {
+          "type": "datetime",
+          "description": "Optional due date for the action."
+        },
+        "show_from": {
+          "type": "datetime",
+          "description": "If set, the action is deferred (hidden) until this date."
+        },
+        "state": {
+          "type": "text",
+          "enum": [
+            "active",
+            "deferred",
+            "pending",
+            "completed"
+          ],
+          "description": "Initial state. Defaults to active."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "description",
+          "context_id"
+        ],
+        "messages": {
+          "auth": "You must sign in before creating an action.",
+          "fk": "The context (or project) does not exist."
+        }
+      },
+      "_evidence": {
+        "locator": "app/controllers/todos_controller.rb:86",
+        "id_local": "Todo.create",
+        "ref_code": "@todo = current_user.todos.build\n@todo.assign_attributes(p.attributes)\n...@todo.add_predecessor_list(p.predecessor_list)\n@todo.tag_with(tag_list) if @saved && tag_list.present?\n@todo.block! if @todo.uncompleted_predecessors?\n",
+        "entry": {
+          "kind": "http",
+          "route": "POST /todos",
+          "locator": "config/routes.rb:85"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "edges": [
+          "login_required; current_user.todos.build (controller)"
+        ]
+      },
+      "_binds": {
+        "description": "Todo.description",
+        "notes": "Todo.notes",
+        "context_id": "Todo.context_id",
+        "project_id": "Todo.project_id",
+        "due": "Todo.due",
+        "show_from": "Todo.show_from",
+        "state": "Todo.state"
+      }
+    },
+    {
+      "tool": "todo_update",
+      "family": "update.field_set",
+      "entity": "Todo",
+      "description": "Edit an existing action: its description, notes, context, project, dates or tags. You may only edit actions you own. Fails if the action is not yours or does not exist.",
+      "exec_spec": {
+        "entity": "Todo",
+        "row_key": {
+          "id": {
+            "$arg": "id"
+          }
+        },
+        "fields": [
+          "description",
+          "notes",
+          "context_id",
+          "project_id",
+          "due",
+          "show_from",
+          "state"
+        ]
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the action to edit."
+        },
+        "description": {
+          "type": "text",
+          "description": "The action's description."
+        },
+        "notes": {
+          "type": "text",
+          "description": "Longer notes about the action."
+        },
+        "context_id": {
+          "type": "int",
+          "description": "Id of the context this action belongs to."
+        },
+        "project_id": {
+          "type": "int",
+          "description": "Id of the project this action belongs to."
+        },
+        "due": {
+          "type": "datetime",
+          "description": "Due date."
+        },
+        "show_from": {
+          "type": "datetime",
+          "description": "Defer until date."
+        },
+        "state": {
+          "type": "text",
+          "enum": [
+            "active",
+            "deferred",
+            "pending",
+            "completed"
+          ],
+          "description": "Transition the action to this state."
+        }
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            },
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Todo",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must sign in before editing an action.",
+          "precondition": "You can only edit actions that belong to you.",
+          "not_found": "No action with that id exists."
+        }
+      },
+      "_evidence": {
+        "locator": "app/controllers/todos_controller.rb:421",
+        "id_local": "Todo.update",
+        "ref_code": "update_tags\nupdate_project\nupdate_context\nupdate_due_and_show_from_dates\nupdate_completed_state\nupdate_dependencies\nupdate_attributes_of_todo\n@todo.save!\n...\nupdate_dependency_state\n",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /todos/:id",
+          "locator": "config/routes.rb:85"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "edges": [
+          "login_required; ownership via current_user.todos.find(params[:id])"
+        ]
+      },
+      "_binds": {
+        "id": "Todo.id",
+        "description": "Todo.description",
+        "notes": "Todo.notes",
+        "context_id": "Todo.context_id",
+        "project_id": "Todo.project_id",
+        "due": "Todo.due",
+        "show_from": "Todo.show_from",
+        "state": "Todo.state"
+      }
+    },
+    {
+      "tool": "todo_toggle_check",
+      "family": "update.status_transition",
+      "entity": "Todo",
+      "description": "Toggle an action between completed and active. Completing it unblocks successors that were pending on it; reactivating it re-blocks successors that still depend on it. Fails if the action is not yours or does not exist.",
+      "exec_spec": {
+        "entity": "Todo",
+        "row_key": {
+          "id": {
+            "$arg": "id"
+          }
+        },
+        "status_col": "state",
+        "from": [
+          "active",
+          "deferred",
+          "pending",
+          "completed"
+        ],
+        "to": {
+          "$arg": "state"
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the action to toggle."
+        },
+        "state": {
+          "type": "text",
+          "enum": [
+            "active",
+            "completed"
+          ],
+          "description": "Target state.",
+          "required": true
+        }
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            },
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Todo",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "id",
+          "state"
+        ],
+        "messages": {
+          "auth": "You must sign in before toggling an action.",
+          "precondition": "You can only toggle actions that belong to you.",
+          "not_found": "No action with that id exists."
+        }
+      },
+      "_evidence": {
+        "locator": "app/controllers/todos_controller.rb:306",
+        "id_local": "Todo.toggle_check",
+        "ref_code": "@saved = @todo.toggle_completion!\n...\nif @saved\n  if @todo.completed?\n    @pending_to_activate = @todo.activate_pending_todos\n  else\n    @active_to_block = @todo.block_successors\n  end\nend\n",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /todos/:id/toggle_check",
+          "locator": "config/routes.rb:87"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "edges": [
+          "login_required; ownership"
+        ]
+      },
+      "_binds": {
+        "id": "Todo.id"
+      }
+    },
+    {
+      "tool": "todo_toggle_star",
+      "family": "update.relation_link",
+      "entity": "Tagging",
+      "description": "Star or unstar an action (starred actions are shown in the sidebar). Starring adds a special internal tag; unstarring removes it. Fails if the action is not yours or does not exist.",
+      "exec_spec": {
+        "entity": "Tagging",
+        "mode": "add",
+        "relation_type": "m2m",
+        "through_table": "Tagging",
+        "subject_key": {
+          "taggable_id": {
+            "$arg": "id"
+          },
+          "taggable_type": "Todo"
+        },
+        "object_key": {
+          "tag_id": "starred"
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the action to star/unstar."
+        }
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            },
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Todo",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must sign in before starring an action.",
+          "precondition": "You can only star actions that belong to you.",
+          "not_found": "No action with that id exists."
+        }
+      },
+      "_evidence": {
+        "locator": "app/controllers/todos_controller.rb:380",
+        "id_local": "Todo.toggle_star",
+        "ref_code": "def toggle_star!\n  self.starred = !starred?\nend\ndef starred=(starred)\n  if starred\n    _add_tags STARRED_TAG_NAME unless starred?\n  else\n    _remove_tags STARRED_TAG_NAME\n  end\nend\n",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /todos/:id/toggle_star",
+          "locator": "config/routes.rb:88"
+        },
+        "entity_why": "primary effect link lands on this table",
+        "edges": [
+          "login_required; ownership"
+        ]
+      },
+      "_binds": {
+        "id": "Todo.id"
+      }
+    },
+    {
+      "tool": "todo_defer",
+      "family": "update.field_set",
+      "entity": "Todo",
+      "description": "Defer an active action by a number of days: it is marked deferred and hidden until then. Fails if the action is not yours, is not active, or does not exist.",
+      "exec_spec": {
+        "entity": "Todo",
+        "row_key": {
+          "id": {
+            "$arg": "id"
+          }
+        },
+        "fields": [
+          "show_from",
+          "state"
+        ],
+        "set": {
+          "state": "deferred"
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the action to defer."
+        },
+        "days": {
+          "type": "int",
+          "required": true,
+          "description": "How many days to defer it."
+        }
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            },
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Todo",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "state",
+                      "op": "eq",
+                      "value": "active"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "id",
+          "days"
+        ],
+        "messages": {
+          "auth": "You must sign in before deferring an action.",
+          "precondition": "Only an active action you own can be deferred.",
+          "not_found": "No action with that id exists."
+        }
+      },
+      "_evidence": {
+        "locator": "app/controllers/todos_controller.rb:711",
+        "id_local": "Todo.defer",
+        "ref_code": "@todo.show_from = (@todo.show_from || @todo.user.date) + numdays.days\n@saved = @todo.save\n",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /todos/:id/defer",
+          "locator": "config/routes.rb:89"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "edges": [
+          "login_required; ownership"
+        ]
+      },
+      "_binds": {
+        "id": "Todo.id"
+      }
+    },
+    {
+      "tool": "todo_change_context",
+      "family": "update.field_set",
+      "entity": "Todo",
+      "description": "Move an action into a different context. Fails if the action is not yours, the target context does not exist, or the action does not exist.",
+      "exec_spec": {
+        "entity": "Todo",
+        "row_key": {
+          "id": {
+            "$arg": "id"
+          }
+        },
+        "fields": [
+          "context_id"
+        ],
+        "set": {
+          "context_id": {
+            "$arg": "context_id"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the action to move."
+        },
+        "context_id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the context to move the action into."
+        }
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            },
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Todo",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "id",
+          "context_id"
+        ],
+        "messages": {
+          "auth": "You must sign in before moving an action.",
+          "precondition": "You can only move actions that belong to you.",
+          "fk": "The target context does not exist.",
+          "not_found": "No action with that id exists."
+        }
+      },
+      "_evidence": {
+        "locator": "app/controllers/todos_controller.rb:402",
+        "id_local": "Todo.change_context",
+        "ref_code": "@context = current_user.contexts.find(params[:todo][:context_id])\n@todo.context = @context\n@saved = @todo.save\n",
+        "entry": {
+          "kind": "http",
+          "route": "POST /todos/:id/change_context",
+          "locator": "config/routes.rb:93"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "edges": [
+          "login_required; ownership"
+        ]
+      },
+      "_binds": {
+        "id": "Todo.id",
+        "context_id": "Todo.context_id"
+      },
+      "_defaulted": [
+        "argument invented from the write column",
+        "fields"
+      ]
+    },
+    {
+      "tool": "todo_destroy",
+      "family": "crud.delete",
+      "entity": "Todo",
+      "description": "Delete an action. Any successors that depended only on it return to active. Fails if the action is not yours or does not exist.",
+      "exec_spec": {
+        "entity": "Todo",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the action to delete."
+        }
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            },
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Todo",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must sign in before deleting an action.",
+          "precondition": "You can only delete actions that belong to you.",
+          "not_found": "No action with that id exists."
+        }
+      },
+      "_evidence": {
+        "locator": "app/controllers/todos_controller.rb:491",
+        "id_local": "Todo.destroy",
+        "ref_code": "@pending_to_activate = []\n@todo.pending_successors.each do |successor| ... end\n@saved = @todo.destroy\n",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /todos/:id",
+          "locator": "config/routes.rb:85"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "edges": [
+          "login_required; ownership"
+        ]
+      },
+      "_binds": {
+        "id": "Todo.id"
+      }
+    },
+    {
+      "tool": "todo_add_predecessor",
+      "family": "update.relation_link",
+      "entity": "Dependency",
+      "description": "Mark one action as a dependency of another: the successor cannot be completed until the predecessor is. Rejects a circular dependency. Fails if either action is not yours or does not exist.",
+      "exec_spec": {
+        "entity": "Dependency",
+        "mode": "add",
+        "relation_type": "m2m",
+        "through_table": "Dependency",
+        "subject_key": {
+          "successor_id": {
+            "$arg": "successor"
+          }
+        },
+        "object_key": {
+          "predecessor_id": {
+            "$arg": "predecessor"
+          }
+        }
+      },
+      "input_schema": {
+        "successor": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the successor action that depends on the predecessor."
+        },
+        "predecessor": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the predecessor action that must be completed first."
+        }
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Todo",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "successor"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            },
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Todo",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "predecessor"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "ne",
+                      "value": {
+                        "arg": "successor"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "successor",
+          "predecessor"
+        ],
+        "messages": {
+          "auth": "You must sign in before adding a dependency.",
+          "precondition": "An action cannot be a dependency of itself, and you can only link actions you own.",
+          "not_found": "One of the actions does not exist."
+        }
+      },
+      "_evidence": {
+        "locator": "app/controllers/todos_controller.rb:266",
+        "id_local": "Todo.add_predecessor",
+        "ref_code": "unless @predecessor.completed?\n  @todo.add_predecessor(@predecessor)\n  @todo.block! unless @todo.pending?\n  @saved = @todo.save\n",
+        "entry": {
+          "kind": "http",
+          "route": "POST /todos/add_predecessor",
+          "locator": "config/routes.rb:101"
+        },
+        "entity_why": "primary effect link lands on this table",
+        "edges": [
+          "dependency.rb:13 check_circular_dependencies: error if successor.is_successor?(predecessor)",
+          "login_required; @predecessor and @todo scoped to current_user (todos_controller.rb:266-270)"
+        ]
+      },
+      "_binds": {
+        "predecessor": "Todo.id",
+        "successor": "Todo.id"
+      }
+    },
+    {
+      "tool": "todo_remove_predecessor",
+      "family": "update.relation_link",
+      "entity": "Dependency",
+      "description": "Remove a dependency so the successor no longer waits on the predecessor; if it had no other pending predecessors it becomes active again. Fails if either action is not yours or does not exist.",
+      "exec_spec": {
+        "entity": "Dependency",
+        "mode": "remove",
+        "relation_type": "m2m",
+        "through_table": "Dependency",
+        "subject_key": {
+          "successor_id": {
+            "$arg": "id"
+          }
+        },
+        "object_key": {
+          "predecessor_id": {
+            "$arg": "predecessor"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the successor action whose dependency is removed."
+        },
+        "predecessor": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the predecessor action to stop depending on."
+        }
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            },
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Todo",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "id",
+          "predecessor"
+        ],
+        "messages": {
+          "auth": "You must sign in before removing a dependency.",
+          "precondition": "You can only remove dependencies on actions you own.",
+          "not_found": "The successor or predecessor does not exist."
+        }
+      },
+      "_evidence": {
+        "locator": "app/controllers/todos_controller.rb:291",
+        "id_local": "Todo.remove_predecessor",
+        "ref_code": "@successor = @todo\n@removed = @successor.remove_predecessor(@predecessor)\n\ndef remove_predecessor(predecessor)\n  predecessors.delete(predecessor)\n  if predecessors.empty?\n    reload\n    activate!\n  else\n    save!\n  end\nend\n",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /todos/:id/remove_predecessor",
+          "locator": "config/routes.rb:92"
+        },
+        "entity_why": "primary effect unlink lands on this table",
+        "edges": [
+          "login_required; ownership"
+        ]
+      },
+      "_binds": {
+        "id": "Todo.id",
+        "predecessor": "Todo.id"
+      }
+    },
+    {
+      "tool": "todo_convert_to_project",
+      "family": "crud.insert",
+      "entity": "Project",
+      "description": "Convert an action into a project, copying its description, notes, default context and tags, then delete the original action. Fails if the action is not yours or does not exist.",
+      "exec_spec": {
+        "entity": "Project",
+        "fields": [
+          "name",
+          "description",
+          "default_context_id",
+          "default_tags",
+          "position",
+          "state"
+        ],
+        "set_on_create": {
+          "name": {
+            "$arg": "name"
+          },
+          "description": {
+            "$arg": "description"
+          },
+          "default_context_id": {
+            "$arg": "context_id"
+          },
+          "user_id": {
+            "$session": "account_id"
+          }
+        },
+        "unique_on": [
+          "user_id",
+          "name"
+        ]
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the action to convert."
+        },
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "Name of the new project (usually the source action's description)."
+        },
+        "description": {
+          "type": "text",
+          "description": "Description of the new project (usually the source action's notes)."
+        },
+        "context_id": {
+          "type": "int",
+          "description": "Id of the context to make the project's default context."
+        }
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            },
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Todo",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "id",
+          "name"
+        ],
+        "messages": {
+          "auth": "You must sign in before converting an action.",
+          "precondition": "You can only convert actions that belong to you.",
+          "not_found": "No action with that id exists.",
+          "unique": "A project with that name already exists."
+        }
+      },
+      "_evidence": {
+        "locator": "app/controllers/todos_controller.rb:783",
+        "id_local": "Todo.convert_to_project",
+        "ref_code": "todo = current_user.todos.find(params[:id])\n@project = ProjectFromTodo.new(todo).create\n\ndef create\n  project = build_project\n  if project.valid?\n    todo.destroy\n    project.save!\n  end\n  project\nend\n",
+        "entry": {
+          "kind": "http",
+          "route": "GET /todos/:id/convert_to_project",
+          "locator": "config/routes.rb:91"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "edges": [
+          "login_required; ownership"
+        ]
+      },
+      "_binds": {
+        "id": "Todo.id"
+      },
+      "_defaulted": [
+        "argument invented from the write column",
+        "fields"
+      ]
+    },
+    {
+      "tool": "todo_check_deferred",
+      "family": "update.field_set",
+      "entity": "Todo",
+      "description": "Activate every deferred action of the signed-in user whose show-from date has arrived, returning them to the active list. Triggered by the app's periodic review. Fails if you are not signed in.",
+      "exec_spec": {
+        "entity": "Todo",
+        "row_key": {
+          "user_id": {
+            "$session": "account_id"
+          }
+        },
+        "fields": [
+          "state"
+        ],
+        "set": {
+          "state": "active"
+        }
+      },
+      "input_schema": {},
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in before activating deferred actions."
+        }
+      },
+      "_evidence": {
+        "locator": "app/controllers/todos_controller.rb:602",
+        "id_local": "Todo.check_deferred",
+        "ref_code": "@due_tickles = current_user.deferred_todos.find_and_activate_ready\n\ndef find_and_activate_ready\n  where('show_from <= ?', Time.current).collect { |t| t.activate! }\nend\n",
+        "entry": {
+          "kind": "http",
+          "route": "POST /todos/check_deferred",
+          "locator": "config/routes.rb:98"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "edges": [
+          "login_required"
+        ]
+      },
+      "_defaulted": [
+        "argument invented from the write column",
+        "fields"
+      ],
+      "_output_schema": {
+        "activated": "list of Todo rows activated"
+      }
+    },
+    {
+      "tool": "todo_search",
+      "family": "search",
+      "entity": "Todo",
+      "description": "Search the signed-in user's actions by keyword across description and notes. Returns matching actions. Fails if you are not signed in.",
+      "exec_spec": {
+        "entity": "Todo",
+        "scope": {
+          "owner_col": "user_id"
+        },
+        "search_fields": [
+          "description",
+          "notes"
+        ],
+        "rank": {
+          "method": "substring",
+          "fields": [
+            "description",
+            "notes"
+          ]
+        }
+      },
+      "input_schema": {
+        "search": {
+          "type": "text",
+          "required": true,
+          "description": "Free-text term to match against actions' description and notes."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "search"
+        ],
+        "messages": {
+          "auth": "You must sign in before searching."
+        }
+      },
+      "_evidence": {
+        "locator": "app/controllers/search_controller.rb:5",
+        "id_local": "Todo.search",
+        "ref_code": "searcher = Search::SearchResults.new(current_user, params[:search])\nsearcher.search\n\n# SearchResults.search\nresults[:not_complete_todos] = incomplete_todos(@terms)\nresults[:complete_todos]     = complete_todos(@terms)\nresults[:projects]           = @user.projects.with_name_or_description(@terms)\nresults[:notes]              = @user.notes.with_body(@terms)\nresults[:contexts]           = @user.contexts.with_name(@terms)\nresults[:tags]               = todo_tags_by_name(@terms)\n",
+        "entry": {
+          "kind": "http",
+          "route": "POST /search/results",
+          "locator": "config/routes.rb:20"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "scope_why": "search is scoped to the signed-in user's own todos via current_user (search_controller.rb:5)"
+      },
+      "_output_schema": {
+        "results": "hash of {not_complete_todos, complete_todos, todos, projects, notes, contexts, tags}",
+        "number_of_finds": "int"
+      }
+    },
+    {
+      "tool": "todo_tag_view",
+      "family": "search",
+      "entity": "Todo",
+      "description": "List the signed-in user's actions that carry a given tag name (or tag expression), active ones first. Fails if you are not signed in.",
+      "exec_spec": {
+        "entity": "Todo",
+        "scope": {
+          "owner_col": "user_id"
+        },
+        "search_fields": [
+          "id"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "id"
+          ]
+        }
+      },
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "Tag name (or tag expression) to filter the actions by."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "name"
+        ],
+        "messages": {
+          "auth": "You must sign in before viewing tagged actions."
+        }
+      },
+      "_evidence": {
+        "locator": "app/controllers/todos_controller.rb:621",
+        "id_local": "Todo.tag_view",
+        "ref_code": "todos_with_tag_ids = find_todos_with_tag_expr(@tag_expr)\n@not_done_todos = todos_with_tag_ids.active.not_hidden...\n",
+        "entry": {
+          "kind": "http",
+          "route": "GET /todos/tag/:name",
+          "locator": "config/routes.rb:108"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "scope_why": "owned via current_user scope"
+      }
+    },
+    {
+      "tool": "todo_csv_export",
+      "family": "search",
+      "entity": "Todo",
+      "description": "Export the signed-in user's actions as CSV (id, context, project, description, notes, dates and tags). Fails if you are not signed in.",
+      "exec_spec": {
+        "entity": "Todo",
+        "scope": {
+          "owner_col": "user_id"
+        },
+        "search_fields": [
+          "id"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "id"
+          ]
+        }
+      },
+      "input_schema": {},
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in before exporting actions."
+        }
+      },
+      "_evidence": {
+        "locator": "app/controllers/data_controller.rb:107",
+        "id_local": "Data.csv_actions",
+        "ref_code": "CSV.generate(result = \"\") do |csv|\n  csv << [\"id\", \"Context\", \"Project\", \"Description\", \"Notes\", ...]\n  current_user.todos.includes(:context, :project, :taggings, :tags).each do |todo| ... end\nend\nsend_data(result, :filename => \"todos.csv\", :type => content_type)",
+        "entry": {
+          "kind": "http",
+          "route": "GET /data/csv_actions",
+          "locator": "config/routes.rb:26"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "scope_why": "owned via current_user scope"
+      },
+      "_output_schema": {
+        "csv": "text/csv of the user's todos"
+      }
+    },
+    {
+      "tool": "stats_actions_done_last12months",
+      "family": "search",
+      "entity": "Todo",
+      "description": "Return the signed-in user's actions completed over the last 12 months with their creation and completion dates, for charting productivity. Fails if you are not signed in.",
+      "exec_spec": {
+        "entity": "Todo",
+        "scope": {
+          "owner_col": "user_id"
+        },
+        "search_fields": [
+          "completed_at",
+          "created_at"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "completed_at",
+            "created_at"
+          ]
+        }
+      },
+      "input_schema": {},
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in before viewing stats."
+        }
+      },
+      "_evidence": {
+        "locator": "app/controllers/stats_controller.rb:15",
+        "id_local": "Stats.actions_done_last12months",
+        "ref_code": "actions_last_months = current_user.todos.select(\"completed_at,created_at\")",
+        "entry": {
+          "kind": "http",
+          "route": "GET /stats/actions_done_last12months_data",
+          "locator": "config/routes.rb:42"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "scope_why": "owned via current_user scope"
+      },
+      "_output_schema": {
+        "data": "chart data over the user's todos"
+      }
+    },
+    {
+      "tool": "context_create",
+      "family": "crud.insert",
+      "entity": "Context",
+      "description": "Create a new context (a place where actions happen) for the signed-in user. Fails if you already have a context with that name or you are not signed in.",
+      "exec_spec": {
+        "entity": "Context",
+        "fields": [
+          "name",
+          "position"
+        ],
+        "set_on_create": {
+          "user_id": {
+            "$session": "account_id"
+          },
+          "state": "active"
+        },
+        "unique_on": [
+          "user_id",
+          "name"
+        ]
+      },
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "Name of the context (e.g. @office)."
+        },
+        "position": {
+          "type": "int",
+          "description": "Display order of the context."
+        },
+        "state": {
+          "type": "text",
+          "enum": [
+            "active",
+            "closed",
+            "hidden"
+          ],
+          "description": "Initial state; defaults to active."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "name"
+        ],
+        "messages": {
+          "auth": "You must sign in before creating a context.",
+          "unique": "You already have a context with that name."
+        }
+      },
+      "_evidence": {
+        "locator": "app/controllers/contexts_controller.rb:69",
+        "id_local": "Context.create",
+        "ref_code": "@context = current_user.contexts.build(context_params)\n@context.hide! if params['context_state'] && params['context_state']['hide'] == '1'\n@saved = @context.save\n",
+        "entry": {
+          "kind": "http",
+          "route": "POST /contexts",
+          "locator": "config/routes.rb:58"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "edges": [
+          "login_required"
+        ]
+      },
+      "_binds": {
+        "name": "Context.name",
+        "position": "Context.position"
+      }
+    },
+    {
+      "tool": "context_update",
+      "family": "update.status_transition",
+      "entity": "Context",
+      "description": "Rename, reorder, hide or close a context you own. Closing is refused while the context still has active actions in it. Fails if the context is not yours or does not exist.",
+      "exec_spec": {
+        "entity": "Context",
+        "row_key": {
+          "id": {
+            "$arg": "id"
+          }
+        },
+        "status_col": "state",
+        "from": [
+          "active",
+          "hidden",
+          "closed"
+        ],
+        "to": {
+          "$arg": "state"
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the context to update."
+        },
+        "name": {
+          "type": "text",
+          "description": "New name for the context."
+        },
+        "position": {
+          "type": "int",
+          "description": "New display position."
+        },
+        "state": {
+          "type": "text",
+          "enum": [
+            "active",
+            "closed",
+            "hidden"
+          ],
+          "description": "Target state.",
+          "required": true
+        }
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            },
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Context",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Todo",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "context_id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "state",
+                      "op": "eq",
+                      "value": "active"
+                    }
+                  ]
+                }
+              },
+              "op": "eq",
+              "n": 0
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "id",
+          "state"
+        ],
+        "messages": {
+          "auth": "You must sign in before updating a context.",
+          "precondition": "A context can only be closed when it has no active actions in it, and you can only edit contexts you own.",
+          "not_found": "No context with that id exists."
+        }
+      },
+      "_evidence": {
+        "locator": "app/controllers/contexts_controller.rb:95",
+        "id_local": "Context.update",
+        "ref_code": "@context.attributes = context_params\n@saved = @context.save\n@state_saved = set_state_for_update(@new_state)\n",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /contexts/:id",
+          "locator": "config/routes.rb:58"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "edges": [
+          "login_required; ownership",
+          "context.rb:21 event :close guard :no_active_todos?; set_state_for_update rescues AASM::InvalidTransition (contexts_controller.rb:254)"
+        ]
+      },
+      "_binds": {
+        "id": "Context.id",
+        "name": "Context.name",
+        "state": "Context.state",
+        "position": "Context.position"
+      }
+    },
+    {
+      "tool": "context_destroy",
+      "family": "crud.delete",
+      "entity": "Context",
+      "description": "Delete a context you own. All actions and recurring actions in that context are removed along with it. Fails if the context is not yours or does not exist.",
+      "exec_spec": {
+        "entity": "Context",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the context to delete."
+        }
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            },
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Context",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must sign in before deleting a context.",
+          "precondition": "You can only delete contexts that belong to you.",
+          "not_found": "No context with that id exists."
+        }
+      },
+      "_evidence": {
+        "locator": "app/controllers/contexts_controller.rb:133",
+        "id_local": "Context.destroy",
+        "ref_code": "@context.recurring_todos.each(&:clear_todos_association) unless @context.recurring_todos.nil?\n@context.destroy\n",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /contexts/:id",
+          "locator": "config/routes.rb:58"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "edges": [
+          "login_required; ownership"
+        ]
+      },
+      "_binds": {
+        "id": "Context.id"
+      }
+    },
+    {
+      "tool": "project_create",
+      "family": "crud.insert",
+      "entity": "Project",
+      "description": "Create a new project for the signed-in user. Fails if you already have a project with that name or you are not signed in.",
+      "exec_spec": {
+        "entity": "Project",
+        "fields": [
+          "name",
+          "description",
+          "position",
+          "state",
+          "default_context_id",
+          "default_tags"
+        ],
+        "set_on_create": {
+          "user_id": {
+            "$session": "account_id"
+          },
+          "state": "active"
+        },
+        "unique_on": [
+          "user_id",
+          "name"
+        ]
+      },
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "Name of the project."
+        },
+        "description": {
+          "type": "text",
+          "description": "Project description."
+        },
+        "position": {
+          "type": "int",
+          "description": "Display order of the project."
+        },
+        "state": {
+          "type": "text",
+          "enum": [
+            "active",
+            "hidden",
+            "completed"
+          ],
+          "description": "Initial state; defaults to active."
+        },
+        "default_context_id": {
+          "type": "int",
+          "description": "Default context new actions in this project are placed in."
+        },
+        "default_tags": {
+          "type": "text",
+          "description": "Tags applied to new actions in this project."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "name"
+        ],
+        "messages": {
+          "auth": "You must sign in before creating a project.",
+          "unique": "You already have a project with that name."
+        }
+      },
+      "_evidence": {
+        "locator": "app/controllers/projects_controller.rb:170",
+        "id_local": "Project.create",
+        "ref_code": "@project = current_user.projects.build(project_params)\n@saved = @project.save\n",
+        "entry": {
+          "kind": "http",
+          "route": "POST /projects",
+          "locator": "config/routes.rb:70"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "edges": [
+          "login_required"
+        ]
+      },
+      "_binds": {
+        "name": "Project.name",
+        "description": "Project.description",
+        "position": "Project.position",
+        "state": "Project.state",
+        "default_context_id": "Project.default_context_id",
+        "default_tags": "Project.default_tags"
+      }
+    },
+    {
+      "tool": "project_update",
+      "family": "update.status_transition",
+      "entity": "Project",
+      "description": "Edit a project you own: rename, redisplay, or transition between active, hidden and completed (completing it stamps completed_at). Fails if the project is not yours or does not exist.",
+      "exec_spec": {
+        "entity": "Project",
+        "row_key": {
+          "id": {
+            "$arg": "id"
+          }
+        },
+        "status_col": "state",
+        "from": [
+          "active",
+          "hidden",
+          "completed"
+        ],
+        "to": {
+          "$arg": "state"
+        },
+        "timestamp_col": "completed_at"
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the project to update."
+        },
+        "name": {
+          "type": "text",
+          "description": "New name of the project."
+        },
+        "description": {
+          "type": "text",
+          "description": "New description."
+        },
+        "state": {
+          "type": "text",
+          "enum": [
+            "active",
+            "hidden",
+            "completed"
+          ],
+          "description": "Target state.",
+          "required": true
+        },
+        "default_context_id": {
+          "type": "int",
+          "description": "Default context for new actions."
+        },
+        "default_tags": {
+          "type": "text",
+          "description": "Tags applied to new actions."
+        },
+        "position": {
+          "type": "int",
+          "description": "Display order."
+        }
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            },
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Project",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "id",
+          "state"
+        ],
+        "messages": {
+          "auth": "You must sign in before updating a project.",
+          "precondition": "You can only edit projects that belong to you.",
+          "not_found": "No project with that id exists."
+        }
+      },
+      "_evidence": {
+        "locator": "app/controllers/projects_controller.rb:199",
+        "id_local": "Project.update",
+        "ref_code": "@project.attributes = project_params\n@saved = @project.save\nif @saved\n  @project.transition_to(@new_state) if @state_changed\n",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /projects/:id",
+          "locator": "config/routes.rb:70"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "edges": [
+          "login_required; ownership"
+        ]
+      },
+      "_binds": {
+        "id": "Project.id",
+        "name": "Project.name",
+        "description": "Project.description",
+        "state": "Project.state",
+        "default_context_id": "Project.default_context_id",
+        "default_tags": "Project.default_tags",
+        "position": "Project.position"
+      }
+    },
+    {
+      "tool": "project_set_reviewed",
+      "family": "update.field_set",
+      "entity": "Project",
+      "description": "Mark a project you own as having been reviewed, recording the current time as its last review. Fails if the project is not yours or does not exist.",
+      "exec_spec": {
+        "entity": "Project",
+        "row_key": {
+          "id": {
+            "$arg": "id"
+          }
+        },
+        "fields": [
+          "last_reviewed"
+        ],
+        "set": {
+          "last_reviewed": {
+            "sym": "$now"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the project to mark reviewed."
+        }
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            },
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Project",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must sign in before reviewing a project.",
+          "precondition": "You can only review projects that belong to you.",
+          "not_found": "No project with that id exists."
+        }
+      },
+      "_evidence": {
+        "locator": "app/controllers/projects_controller.rb:96",
+        "id_local": "Project.set_reviewed",
+        "ref_code": "@project.last_reviewed = Time.zone.now\n@project.save\n",
+        "entry": {
+          "kind": "http",
+          "route": "GET /projects/:id/set_reviewed",
+          "locator": "config/routes.rb:74"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "edges": [
+          "login_required; ownership"
+        ]
+      },
+      "_binds": {
+        "id": "Project.id"
+      },
+      "_defaulted": [
+        "argument invented from the write column",
+        "fields"
+      ],
+      "_output_schema": {
+        "project": "the updated Project row"
+      }
+    },
+    {
+      "tool": "project_destroy",
+      "family": "crud.delete",
+      "entity": "Project",
+      "description": "Delete a project you own. Its actions, notes, recurring actions and their tags are removed along with it. Fails if the project is not yours or does not exist.",
+      "exec_spec": {
+        "entity": "Project",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the project to delete."
+        }
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            },
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Project",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must sign in before deleting a project.",
+          "precondition": "You can only delete projects that belong to you.",
+          "not_found": "No project with that id exists."
+        }
+      },
+      "_evidence": {
+        "locator": "app/controllers/projects_controller.rb:265",
+        "id_local": "Project.destroy",
+        "ref_code": "@project.recurring_todos.each(&:remove_from_project!)\n@project.destroy\n",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /projects/:id",
+          "locator": "config/routes.rb:70"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "edges": [
+          "login_required; ownership"
+        ]
+      },
+      "_binds": {
+        "id": "Project.id"
+      }
+    },
+    {
+      "tool": "project_order",
+      "family": "update.field_set",
+      "entity": "Project",
+      "description": "Reorder the signed-in user's projects by giving their ids in the desired order; each project's position is set to its index. Fails if you are not signed in or any listed id is not yours.",
+      "exec_spec": {
+        "entity": "Project",
+        "row_key": {
+          "user_id": {
+            "$session": "account_id"
+          }
+        },
+        "fields": [
+          "position"
+        ]
+      },
+      "input_schema": {
+        "position": {
+          "type": "json",
+          "required": true,
+          "description": "A list of the user's project ids in the desired display order."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "position"
+        ],
+        "messages": {
+          "auth": "You must sign in before reordering projects.",
+          "not_found": "One of the project ids does not exist."
+        }
+      },
+      "_evidence": {
+        "locator": "app/controllers/projects_controller.rb:278",
+        "id_local": "Project.order",
+        "ref_code": "project_ids = params[\"container_project\"]\n@projects = current_user.projects.update_positions(project_ids)\n",
+        "entry": {
+          "kind": "http",
+          "route": "POST /projects/order",
+          "locator": "config/routes.rb:78"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "edges": [
+          "login_required; update_positions raises I18n error if a submitted id is not the current user's project (user.rb:30-36)"
+        ]
+      },
+      "_defaulted": [
+        "argument invented from the write column",
+        "fields"
+      ]
+    },
+    {
+      "tool": "project_alphabetize",
+      "family": "update.field_set",
+      "entity": "Project",
+      "description": "Reorder the signed-in user's projects (in the given state) alphabetically by name, rewriting their display positions. Fails if you are not signed in.",
+      "exec_spec": {
+        "entity": "Project",
+        "row_key": {
+          "user_id": {
+            "$session": "account_id"
+          }
+        },
+        "fields": [
+          "position"
+        ]
+      },
+      "input_schema": {
+        "state": {
+          "type": "text",
+          "enum": [
+            "active",
+            "hidden",
+            "completed"
+          ],
+          "required": true,
+          "description": "Which project state to reorder."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "state"
+        ],
+        "messages": {
+          "auth": "You must sign in before reordering projects."
+        }
+      },
+      "_evidence": {
+        "locator": "app/controllers/projects_controller.rb:287",
+        "id_local": "Project.alphabetize",
+        "ref_code": "@projects = current_user.projects.alphabetize(:state => @state) if @state\n",
+        "entry": {
+          "kind": "http",
+          "route": "POST /projects/alphabetize",
+          "locator": "config/routes.rb:79"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "edges": [
+          "login_required (user.rb:30-36)"
+        ]
+      },
+      "_defaulted": [
+        "argument invented from the write column",
+        "fields"
+      ]
+    },
+    {
+      "tool": "project_actionize",
+      "family": "update.field_set",
+      "entity": "Project",
+      "description": "Reorder the signed-in user's projects (in the given state) by their number of active actions, rewriting their display positions. Fails if you are not signed in.",
+      "exec_spec": {
+        "entity": "Project",
+        "row_key": {
+          "user_id": {
+            "$session": "account_id"
+          }
+        },
+        "fields": [
+          "position"
+        ]
+      },
+      "input_schema": {
+        "state": {
+          "type": "text",
+          "enum": [
+            "active",
+            "hidden",
+            "completed"
+          ],
+          "required": true,
+          "description": "Which project state to reorder."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "state"
+        ],
+        "messages": {
+          "auth": "You must sign in before reordering projects."
+        }
+      },
+      "_evidence": {
+        "locator": "app/controllers/projects_controller.rb:295",
+        "id_local": "Project.actionize",
+        "ref_code": "@projects = current_user.projects.actionize(:state => @state) if @state\n",
+        "entry": {
+          "kind": "http",
+          "route": "POST /projects/actionize",
+          "locator": "config/routes.rb:80"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "edges": [
+          "login_required (user.rb:30-36)"
+        ]
+      },
+      "_defaulted": [
+        "argument invented from the write column",
+        "fields"
+      ]
+    },
+    {
+      "tool": "recurringtodo_create",
+      "family": "crud.insert",
+      "entity": "RecurringTodo",
+      "description": "Create a recurring action for the signed-in user, optionally generating its first concrete action. Fails if you are not signed in or the context does not exist.",
+      "exec_spec": {
+        "entity": "RecurringTodo",
+        "fields": [
+          "description",
+          "notes",
+          "context_id",
+          "project_id",
+          "recurring_period",
+          "ends_on",
+          "target",
+          "start_from",
+          "end_date",
+          "number_of_occurrences",
+          "show_from_delta",
+          "recurrence_selector",
+          "every_other1",
+          "every_other2",
+          "every_other3",
+          "every_day",
+          "only_work_days",
+          "every_count",
+          "weekday",
+          "show_always"
+        ],
+        "set_on_create": {
+          "user_id": {
+            "$session": "account_id"
+          },
+          "state": "active"
+        }
+      },
+      "input_schema": {
+        "description": {
+          "type": "text",
+          "required": true,
+          "description": "What the recurring action is."
+        },
+        "context_id": {
+          "type": "int",
+          "required": true,
+          "description": "Context the generated actions belong to."
+        },
+        "recurring_period": {
+          "type": "text",
+          "enum": [
+            "daily",
+            "weekly",
+            "monthly",
+            "yearly"
+          ],
+          "required": true,
+          "description": "How often it recurs."
+        },
+        "ends_on": {
+          "type": "text",
+          "enum": [
+            "no_end_date",
+            "ends_on_number_of_times",
+            "ends_on_end_date"
+          ],
+          "required": true,
+          "description": "Whether and how the recurrence ends."
+        },
+        "target": {
+          "type": "text",
+          "enum": [
+            "due_date",
+            "show_from"
+          ],
+          "required": true,
+          "description": "Which date drives the recurrence."
+        },
+        "project_id": {
+          "type": "int",
+          "description": "Project generated actions belong to."
+        },
+        "notes": {
+          "type": "text",
+          "description": "Longer notes."
+        },
+        "start_from": {
+          "type": "datetime",
+          "description": "First occurrence date."
+        },
+        "end_date": {
+          "type": "datetime",
+          "description": "Final occurrence date, when ends_on says so."
+        },
+        "number_of_occurrences": {
+          "type": "int",
+          "description": "Occurrence count, when ends_on is ends_on_number_of_times."
+        },
+        "show_from_delta": {
+          "type": "int",
+          "description": "Days before due that the action appears."
+        },
+        "only_work_days": {
+          "type": "bool",
+          "description": "Restrict daily recurrence to work days."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "description",
+          "context_id",
+          "recurring_period",
+          "ends_on",
+          "target"
+        ],
+        "messages": {
+          "auth": "You must sign in before creating a recurring action.",
+          "fk": "The context (or project) does not exist."
+        }
+      },
+      "_evidence": {
+        "locator": "app/controllers/recurring_todos_controller.rb:60",
+        "id_local": "RecurringTodo.create",
+        "ref_code": "builder = RecurringTodos::RecurringTodosBuilder.new(current_user, all_recurring_todo_params)\n@saved = builder.save\nif @saved\n  @recurring_todo = builder.saved_recurring_todo\n  todo_saved = TodoFromRecurringTodo.new(current_user, @recurring_todo).create.nil? == false\n",
+        "entry": {
+          "kind": "http",
+          "route": "POST /recurring_todos",
+          "locator": "config/routes.rb:126"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "edges": [
+          "login_required"
+        ]
+      },
+      "_binds": {
+        "description": "RecurringTodo.description",
+        "notes": "RecurringTodo.notes",
+        "context_id": "RecurringTodo.context_id",
+        "project_id": "RecurringTodo.project_id",
+        "recurring_period": "RecurringTodo.recurring_period",
+        "ends_on": "RecurringTodo.ends_on",
+        "target": "RecurringTodo.target",
+        "start_from": "RecurringTodo.start_from",
+        "end_date": "RecurringTodo.end_date",
+        "number_of_occurrences": "RecurringTodo.number_of_occurrences",
+        "show_from_delta": "RecurringTodo.show_from_delta",
+        "recurrence_selector": "RecurringTodo.recurrence_selector",
+        "every_other1": "RecurringTodo.every_other1",
+        "every_other2": "RecurringTodo.every_other2",
+        "every_other3": "RecurringTodo.every_other3",
+        "every_day": "RecurringTodo.every_day",
+        "only_work_days": "RecurringTodo.only_work_days",
+        "every_count": "RecurringTodo.every_count",
+        "weekday": "RecurringTodo.weekday",
+        "show_always": "RecurringTodo.show_always"
+      }
+    },
+    {
+      "tool": "recurringtodo_update",
+      "family": "update.field_set",
+      "entity": "RecurringTodo",
+      "description": "Edit a recurring action you own: its description, schedule or recurrence configuration (computed fields are regenerated by the recurrence builder). Fails if the recurring action is not yours or does not exist.",
+      "exec_spec": {
+        "entity": "RecurringTodo",
+        "row_key": {
+          "id": {
+            "$arg": "id"
+          }
+        },
+        "fields": [
+          "description",
+          "notes",
+          "context_id",
+          "project_id",
+          "recurring_period",
+          "ends_on",
+          "target",
+          "start_from",
+          "show_always"
+        ]
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the recurring action to edit."
+        },
+        "description": {
+          "type": "text",
+          "description": "What the recurring action is."
+        },
+        "notes": {
+          "type": "text",
+          "description": "Longer notes."
+        },
+        "context_id": {
+          "type": "int",
+          "description": "Context generated actions belong to."
+        },
+        "project_id": {
+          "type": "int",
+          "description": "Project generated actions belong to."
+        },
+        "recurring_period": {
+          "type": "text",
+          "enum": [
+            "daily",
+            "weekly",
+            "monthly",
+            "yearly"
+          ],
+          "description": "How often it recurs."
+        },
+        "ends_on": {
+          "type": "text",
+          "enum": [
+            "no_end_date",
+            "ends_on_number_of_times",
+            "ends_on_end_date"
+          ],
+          "description": "Whether and how the recurrence ends."
+        },
+        "target": {
+          "type": "text",
+          "enum": [
+            "due_date",
+            "show_from"
+          ],
+          "description": "Which date drives the recurrence."
+        },
+        "start_from": {
+          "type": "datetime",
+          "description": "First occurrence date."
+        },
+        "show_always": {
+          "type": "bool",
+          "description": "Whether to show the recurring action even when nothing is scheduled."
+        }
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            },
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "RecurringTodo",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must sign in before editing a recurring action.",
+          "precondition": "You can only edit recurring actions that belong to you.",
+          "not_found": "No recurring action with that id exists."
+        }
+      },
+      "_evidence": {
+        "locator": "app/controllers/recurring_todos_controller.rb:49",
+        "id_local": "RecurringTodo.update",
+        "ref_code": "updater = RecurringTodos::RecurringTodosBuilder.new(current_user, update_recurring_todo_params)\n@saved = updater.update(@recurring_todo)\n",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /recurring_todos/:id",
+          "locator": "config/routes.rb:126"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "edges": [
+          "login_required; ownership"
+        ]
+      },
+      "_binds": {
+        "id": "RecurringTodo.id"
+      },
+      "_defaulted": [
+        "argument invented from the write column",
+        "fields"
+      ]
+    },
+    {
+      "tool": "recurringtodo_toggle_check",
+      "family": "update.status_transition",
+      "entity": "RecurringTodo",
+      "description": "Toggle a recurring action between active and completed (completing it stamps completed_at and, if reactivated with no active actions left, generates the next concrete action). Fails if it is not yours or does not exist.",
+      "exec_spec": {
+        "entity": "RecurringTodo",
+        "row_key": {
+          "id": {
+            "$arg": "id"
+          }
+        },
+        "status_col": "state",
+        "from": [
+          "active",
+          "completed"
+        ],
+        "to": {
+          "$arg": "state"
+        },
+        "timestamp_col": "completed_at"
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the recurring action to toggle."
+        },
+        "state": {
+          "type": "text",
+          "enum": [
+            "active",
+            "completed"
+          ],
+          "description": "Target state.",
+          "required": true
+        }
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            },
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "RecurringTodo",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "id",
+          "state"
+        ],
+        "messages": {
+          "auth": "You must sign in before toggling a recurring action.",
+          "precondition": "You can only toggle recurring actions that belong to you.",
+          "not_found": "No recurring action with that id exists."
+        }
+      },
+      "_evidence": {
+        "locator": "app/controllers/recurring_todos_controller.rb:112",
+        "id_local": "RecurringTodo.toggle_check",
+        "ref_code": "@saved = @recurring_todo.toggle_completion!\nif @recurring_todo.active?\n  @active_todos = @recurring_todo.todos.active.count\n  @new_recurring_todo = TodoFromRecurringTodo.new(current_user, @recurring_todo).create if @active_todos == 0\nend\n",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /recurring_todos/:id/toggle_check",
+          "locator": "config/routes.rb:127"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "edges": [
+          "login_required; ownership"
+        ]
+      },
+      "_binds": {
+        "id": "RecurringTodo.id"
+      }
+    },
+    {
+      "tool": "recurringtodo_toggle_star",
+      "family": "update.relation_link",
+      "entity": "Tagging",
+      "description": "Star or unstar a recurring action. Fails if the recurring action is not yours or does not exist.",
+      "exec_spec": {
+        "entity": "Tagging",
+        "mode": "add",
+        "relation_type": "m2m",
+        "through_table": "Tagging",
+        "subject_key": {
+          "taggable_id": {
+            "$arg": "id"
+          },
+          "taggable_type": "RecurringTodo"
+        },
+        "object_key": {
+          "tag_id": "starred"
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the recurring action to star/unstar."
+        }
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            },
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "RecurringTodo",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must sign in before starring a recurring action.",
+          "precondition": "You can only star recurring actions that belong to you.",
+          "not_found": "No recurring action with that id exists."
+        }
+      },
+      "_evidence": {
+        "locator": "app/controllers/recurring_todos_controller.rb:134",
+        "id_local": "RecurringTodo.toggle_star",
+        "ref_code": "@recurring_todo.toggle_star!\n@saved = @recurring_todo.save!\n",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /recurring_todos/:id/toggle_star",
+          "locator": "config/routes.rb:128"
+        },
+        "entity_why": "primary effect link lands on this table",
+        "edges": [
+          "login_required; ownership"
+        ]
+      },
+      "_binds": {
+        "id": "RecurringTodo.id"
+      }
+    },
+    {
+      "tool": "recurringtodo_destroy",
+      "family": "crud.delete",
+      "entity": "RecurringTodo",
+      "description": "Delete a recurring action you own and detach it from its generated actions. Fails if the recurring action is not yours or does not exist.",
+      "exec_spec": {
+        "entity": "RecurringTodo",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the recurring action to delete."
+        }
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            },
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "RecurringTodo",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must sign in before deleting a recurring action.",
+          "precondition": "You can only delete recurring actions that belong to you.",
+          "not_found": "No recurring action with that id exists."
+        }
+      },
+      "_evidence": {
+        "locator": "app/controllers/recurring_todos_controller.rb:84",
+        "id_local": "RecurringTodo.destroy",
+        "ref_code": "@recurring_todo.clear_todos_association\n@saved = @recurring_todo.destroy\n",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /recurring_todos/:id",
+          "locator": "config/routes.rb:126"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "edges": [
+          "login_required; ownership"
+        ]
+      },
+      "_binds": {
+        "id": "RecurringTodo.id"
+      }
+    },
+    {
+      "tool": "note_create",
+      "family": "crud.insert",
+      "entity": "Note",
+      "description": "Add a note to a project you own. The project is set on the note; the note belongs to the signed-in user. Fails if you are not signed in or the project does not exist.",
+      "exec_spec": {
+        "entity": "Note",
+        "fields": [
+          "project_id",
+          "body"
+        ],
+        "set_on_create": {
+          "user_id": {
+            "$session": "account_id"
+          }
+        }
+      },
+      "input_schema": {
+        "project_id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the project the note belongs to."
+        },
+        "body": {
+          "type": "text",
+          "required": true,
+          "description": "The note's content."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "project_id",
+          "body"
+        ],
+        "messages": {
+          "auth": "You must sign in before adding a note.",
+          "fk": "The project does not exist."
+        }
+      },
+      "_evidence": {
+        "locator": "app/controllers/notes_controller.rb:24",
+        "id_local": "Note.create",
+        "ref_code": "@note = current_user.notes.build\n@note.attributes = note_params\n@saved = @note.save\n",
+        "entry": {
+          "kind": "http",
+          "route": "POST /notes",
+          "locator": "config/routes.rb:157"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "edges": [
+          "login_required"
+        ]
+      },
+      "_binds": {
+        "project_id": "Note.project_id",
+        "body": "Note.body"
+      }
+    },
+    {
+      "tool": "note_update",
+      "family": "update.field_set",
+      "entity": "Note",
+      "description": "Edit a note you own, or move it to another project you own. Fails if the note is not yours or does not exist.",
+      "exec_spec": {
+        "entity": "Note",
+        "row_key": {
+          "id": {
+            "$arg": "id"
+          }
+        },
+        "fields": [
+          "project_id",
+          "body"
+        ]
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the note to edit."
+        },
+        "project_id": {
+          "type": "int",
+          "description": "Id of the project the note belongs to."
+        },
+        "body": {
+          "type": "text",
+          "description": "The note's content."
+        }
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            },
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Note",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must sign in before editing a note.",
+          "precondition": "You can only edit notes that belong to you.",
+          "not_found": "No note with that id exists."
+        }
+      },
+      "_evidence": {
+        "locator": "app/controllers/notes_controller.rb:45",
+        "id_local": "Note.update",
+        "ref_code": "@note = current_user.notes.find(params['id'])\n@note.attributes = note_params\n@saved = @note.save\n",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /notes/:id",
+          "locator": "config/routes.rb:157"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "edges": [
+          "login_required; ownership"
+        ]
+      },
+      "_binds": {
+        "id": "Note.id",
+        "project_id": "Note.project_id",
+        "body": "Note.body"
+      }
+    },
+    {
+      "tool": "note_destroy",
+      "family": "crud.delete",
+      "entity": "Note",
+      "description": "Delete a note you own. Fails if the note is not yours or does not exist.",
+      "exec_spec": {
+        "entity": "Note",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the note to delete."
+        }
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            },
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Note",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "user_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must sign in before deleting a note.",
+          "precondition": "You can only delete notes that belong to you.",
+          "not_found": "No note with that id exists."
+        }
+      },
+      "_evidence": {
+        "locator": "app/controllers/notes_controller.rb:55",
+        "id_local": "Note.destroy",
+        "ref_code": "@note = current_user.notes.find(params['id'])\n@note.destroy\n",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /notes/:id",
+          "locator": "config/routes.rb:157"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "edges": [
+          "login_required; ownership"
+        ]
+      },
+      "_binds": {
+        "id": "Note.id"
+      }
+    },
+    {
+      "tool": "preference_update",
+      "family": "update.field_set",
+      "entity": "Preference",
+      "description": "Update the signed-in user's preferences (date format, time zone, sidebar options, etc.). Fails if you are not signed in.",
+      "exec_spec": {
+        "entity": "Preference",
+        "row_key": {
+          "user_id": {
+            "$session": "account_id"
+          }
+        },
+        "fields": [
+          "date_format",
+          "week_starts",
+          "show_number_completed",
+          "show_completed_projects_in_sidebar",
+          "show_hidden_contexts_in_sidebar",
+          "staleness_starts",
+          "due_style",
+          "locale",
+          "title_date_format",
+          "time_zone",
+          "show_hidden_projects_in_sidebar",
+          "show_project_on_todo_done",
+          "review_period",
+          "refresh",
+          "verbose_action_descriptors",
+          "mobile_todos_per_page",
+          "sms_email",
+          "sms_context_id",
+          "theme"
+        ]
+      },
+      "input_schema": {
+        "date_format": {
+          "type": "text",
+          "description": "Date display format, e.g. %d/%m/%Y."
+        },
+        "time_zone": {
+          "type": "text",
+          "description": "The user's time zone, e.g. London."
+        },
+        "locale": {
+          "type": "text",
+          "description": "Interface locale."
+        },
+        "week_starts": {
+          "type": "int",
+          "enum": [
+            0,
+            1
+          ],
+          "description": "First day of the week (0=Sunday, 1=Monday)."
+        },
+        "due_style": {
+          "type": "int",
+          "enum": [
+            0,
+            1
+          ],
+          "description": "How due actions are emphasised."
+        },
+        "show_number_completed": {
+          "type": "int",
+          "description": "How many completed actions to show."
+        },
+        "staleness_starts": {
+          "type": "int",
+          "description": "Days after which an action counts as stale."
+        },
+        "review_period": {
+          "type": "int",
+          "description": "Review period in days."
+        },
+        "show_completed_projects_in_sidebar": {
+          "type": "bool",
+          "description": "Show completed projects in the sidebar."
+        },
+        "show_hidden_contexts_in_sidebar": {
+          "type": "bool",
+          "description": "Show hidden contexts in the sidebar."
+        },
+        "show_hidden_projects_in_sidebar": {
+          "type": "bool",
+          "description": "Show hidden projects in the sidebar."
+        },
+        "show_project_on_todo_done": {
+          "type": "bool",
+          "description": "Show the project when an action is completed."
+        },
+        "title_date_format": {
+          "type": "text",
+          "description": "Format for dates in titles."
+        },
+        "verbose_action_descriptors": {
+          "type": "bool",
+          "description": "Use verbose action descriptors."
+        },
+        "refresh": {
+          "type": "int",
+          "description": "Auto-refresh interval in seconds (0=off)."
+        },
+        "mobile_todos_per_page": {
+          "type": "int",
+          "description": "Actions shown per page on mobile."
+        },
+        "sms_email": {
+          "type": "text",
+          "description": "Email address for sms-to-email receipts."
+        },
+        "sms_context_id": {
+          "type": "int",
+          "description": "Default context for actions created by SMS."
+        },
+        "theme": {
+          "type": "text",
+          "description": "Interface theme."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in before changing preferences.",
+          "not_found": "No preferences exist for this account."
+        }
+      },
+      "_evidence": {
+        "locator": "app/controllers/preferences_controller.rb:8",
+        "id_local": "Preference.update",
+        "ref_code": "user_updated = current_user.update(user_params)\nprefs_updated = current_user.preference.update(prefs_params)\n",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /preferences/:id",
+          "locator": "config/routes.rb:158"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "edges": [
+          "login_required"
+        ]
+      },
+      "_binds": {
+        "date_format": "Preference.date_format",
+        "week_starts": "Preference.week_starts",
+        "show_number_completed": "Preference.show_number_completed",
+        "show_completed_projects_in_sidebar": "Preference.show_completed_projects_in_sidebar",
+        "show_hidden_contexts_in_sidebar": "Preference.show_hidden_contexts_in_sidebar",
+        "staleness_starts": "Preference.staleness_starts",
+        "due_style": "Preference.due_style",
+        "locale": "Preference.locale",
+        "title_date_format": "Preference.title_date_format",
+        "time_zone": "Preference.time_zone",
+        "show_hidden_projects_in_sidebar": "Preference.show_hidden_projects_in_sidebar",
+        "show_project_on_todo_done": "Preference.show_project_on_todo_done",
+        "review_period": "Preference.review_period",
+        "refresh": "Preference.refresh",
+        "verbose_action_descriptors": "Preference.verbose_action_descriptors",
+        "mobile_todos_per_page": "Preference.mobile_todos_per_page",
+        "sms_email": "Preference.sms_email",
+        "sms_context_id": "Preference.sms_context_id",
+        "theme": "Preference.theme"
+      }
+    },
+    {
+      "tool": "data_csv_import",
+      "family": "crud.insert",
+      "entity": "Todo",
+      "description": "Import CSV action rows into the signed-in user's account, into the given context. Column indexes and dates come from the CSV data you provide. Fails if you are not signed in or the context does not exist.",
+      "exec_spec": {
+        "entity": "Todo",
+        "fields": [
+          "description",
+          "notes",
+          "context_id",
+          "project_id",
+          "due",
+          "completed_at",
+          "state"
+        ],
+        "set_on_create": {
+          "user_id": {
+            "$session": "account_id"
+          }
+        }
+      },
+      "input_schema": {
+        "import_to": {
+          "type": "text",
+          "enum": [
+            "todos",
+            "projects"
+          ],
+          "required": true,
+          "description": "What kind of rows to import: todos or projects."
+        },
+        "context_id": {
+          "type": "int",
+          "required": true,
+          "description": "Context id the imported actions are placed in."
+        },
+        "description": {
+          "type": "text",
+          "required": true,
+          "description": "CSV data for the action descriptions."
+        },
+        "notes": {
+          "type": "text",
+          "description": "CSV data for the action notes."
+        },
+        "project_id": {
+          "type": "int",
+          "description": "Project id the imported actions are placed in."
+        },
+        "due": {
+          "type": "datetime",
+          "description": "CSV data for the due dates."
+        },
+        "completed_at": {
+          "type": "datetime",
+          "description": "CSV data for the completion dates."
+        },
+        "state": {
+          "type": "text",
+          "enum": [
+            "active",
+            "completed"
+          ],
+          "description": "State for imported rows."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "import_to",
+          "context_id",
+          "description"
+        ],
+        "messages": {
+          "auth": "You must sign in before importing data.",
+          "fk": "The target context does not exist."
+        }
+      },
+      "_evidence": {
+        "locator": "app/controllers/data_controller.rb:59",
+        "id_local": "Data.csv_import",
+        "ref_code": "case params[:import_to]\nwhen 'projects'\n  count = Project.import path_and_file, params, current_user\nwhen 'todos'\n  count = Todo.import path_and_file, params, current_user\n",
+        "entry": {
+          "kind": "http",
+          "route": "POST /data/csv_import",
+          "locator": "config/routes.rb:165"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "edges": [
+          "login_required"
+        ]
+      },
+      "_defaulted": [
+        "argument invented from the write column",
+        "fields"
+      ],
+      "_output_schema": {
+        "count": "number of rows imported (false if no context)"
+      }
+    }
+  ],
+  "seed_state": {
+    "User": [
+      {
+        "id": 1,
+        "login": "ops@tracks.example",
+        "crypted_password": "pw-operations",
+        "is_admin": true,
+        "auth_type": "database",
+        "email": "alice@example.com",
+        "token": "tok-alice"
+      },
+      {
+        "id": 2,
+        "login": "peer1@tracks.example",
+        "crypted_password": "pw-peer",
+        "is_admin": false,
+        "auth_type": "database",
+        "email": "bob@example.com",
+        "token": "tok-bob"
+      }
+    ],
+    "Preference": [
+      {
+        "id": 1,
+        "user_id": 1,
+        "date_format": "%d/%m/%Y",
+        "time_zone": "London"
+      },
+      {
+        "id": 2,
+        "user_id": 2,
+        "date_format": "%d/%m/%Y",
+        "time_zone": "London"
+      }
+    ],
+    "Context": [
+      {
+        "id": 1,
+        "name": "@Office",
+        "user_id": 1,
+        "state": "active"
+      },
+      {
+        "id": 2,
+        "name": "@Home",
+        "user_id": 1,
+        "state": "active"
+      },
+      {
+        "id": 3,
+        "name": "@Errands",
+        "user_id": 2,
+        "state": "active"
+      }
+    ],
+    "Project": [
+      {
+        "id": 1,
+        "name": "Website",
+        "user_id": 1,
+        "state": "active",
+        "default_context_id": 1
+      },
+      {
+        "id": 2,
+        "name": "2026 Plan",
+        "user_id": 2,
+        "state": "active",
+        "default_context_id": 3
+      }
+    ],
+    "Todo": [
+      {
+        "id": 1,
+        "user_id": 1,
+        "context_id": 1,
+        "project_id": 1,
+        "description": "Write the homepage copy",
+        "notes": "",
+        "state": "active"
+      },
+      {
+        "id": 2,
+        "user_id": 1,
+        "context_id": 1,
+        "project_id": 1,
+        "description": "Fix the nav styling",
+        "notes": "",
+        "state": "completed",
+        "completed_at": "2026-08-20T10:00:00"
+      },
+      {
+        "id": 3,
+        "user_id": 2,
+        "context_id": 3,
+        "project_id": 2,
+        "description": "Renew the car insurance",
+        "notes": "",
+        "state": "active"
+      }
+    ]
+  },
+  "summary": "Tracks: a self-hosted GTD task manager; users create actions (todos) within contexts and projects, with due dates, deferred/tickler items, recurring actions, notes and tags per user",
+  "_auth_candidates": [
+    {
+      "entity": "User",
+      "username_col": "login",
+      "password_col": "crypted_password"
+    }
+  ],
+  "_fk_gravity": {
+    "entity": "User",
+    "fk_count": 7
+  },
+  "_read_denied": "not_found",
+  "_no_edges": [
+    {
+      "id_local": "User.remember_me",
+      "why": "internal User model helper (user.rb:187) called from login success and login_from_cookie; has no wall and triggers no other op"
+    },
+    {
+      "id_local": "User.login",
+      "why": "public login endpoint, no auth plug (login_controller.rb:3 skips login_required); login itself has no triggers/requires and no wall"
+    }
+  ]
+}

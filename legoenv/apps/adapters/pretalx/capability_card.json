@@ -1,0 +1,89 @@
+{
+  "app": "pretalx",
+  "role": "Conference speaker/room scalar records and known-code submission state",
+  "domains": [
+    "operations",
+    "support"
+  ],
+  "kinds": {
+    "create_record": [
+      "speakerprofile_create",
+      "room_create"
+    ],
+    "update_record": [
+      "speakerprofile_update_orga",
+      "room_update"
+    ],
+    "record_status_change": [
+      "speakerprofile_toggle_arrived",
+      "room_toggle_hidden",
+      "submission_accept"
+    ],
+    "delete_or_archive_row": [
+      "speakerprofile_delete",
+      "room_delete"
+    ]
+  },
+  "check_kinds": [
+    "record_exists",
+    "record_not_exists",
+    "record_field_equals",
+    "record_field_contains",
+    "record_field_unchanged"
+  ],
+  "carriers": {
+    "notes_field": {
+      "entity": "SpeakerProfile",
+      "field": "internal_notes"
+    }
+  },
+  "login": {
+    "tool": "user_login",
+    "user_field": "email",
+    "persona_entity": "User"
+  },
+  "content_entities": [
+    "SpeakerProfile",
+    "Room",
+    "Submission"
+  ],
+  "seed_helpers": [
+    "speakers",
+    "rooms",
+    "submissions"
+  ],
+  "tool_families_to_keep": [
+    ""
+  ],
+  "obs_reads": [
+    "speakerprofile_list"
+  ],
+  "known_patches": [
+    "Neutral pretalx env_id",
+    "Integer identity schemas and malformed description-as-type schemas repaired without argument-name changes",
+    "Synthetic User1/2/3 source flags retained",
+    "room_create uses the actual event slug to resolve Event.id",
+    "speaker list preserves event scope and adds real search filter",
+    "room_update event is a path selector, not a writable Room.event FK. Scope row_key by Event.slug resolved to Event.id, preserving the original event/pk arguments and update fields."
+  ],
+  "missing_tools": [
+    "Submission read/list interface",
+    "Room read/list interface",
+    "Usable ordinary-organiser submission-comment permission path"
+  ],
+  "limitations": [
+    "All 88 source tools remain; only nine declared write tools are effect-tested.",
+    "Source Team permission guards generally check any team globally, without a user-membership/event join; submission_accept lacks full authentication/organiser checks. No complete ACL claim.",
+    "speakerprofile_create inserts scalar profile but omits generated code/user linkage. Toggle-arrived sets true only; room_toggle_hidden only accepts a currently unhidden room.",
+    "Submission/Room read/list tools are absent. Writes require known codes/IDs; SpeakerProfile.internal_notes is the available readable carrier.",
+    "submissioncomment_create requires both a global team flag and administrator=true, so the original non-administrator persona cannot use it. No alternate tool or elevated persona is invented.",
+    "Room availability, scheduling constraints, invitation delivery, complete submission lifecycle and binary resources are not certified."
+  ],
+  "smoke": {
+    "passed": true,
+    "date": "2026-10-24",
+    "report": "ok"
+  },
+  "register_file": "pack/newspecs3/pretalx/register.py",
+  "base_spec": "pack/base_specs/pretalx.spec.json"
+}

@@ -1,0 +1,943 @@
+{
+  "env_id": "gollum",
+  "_prep_version": 3,
+  "entities": [
+    {
+      "name": "Page",
+      "columns": [
+        {
+          "name": "path",
+          "type": "text",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "content",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "format",
+          "type": "text",
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "name": "File",
+      "columns": [
+        {
+          "name": "path",
+          "type": "text",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "content",
+          "type": "text",
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "name": "Redirect",
+      "columns": [
+        {
+          "name": "source",
+          "type": "text",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "target",
+          "type": "text",
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "name": "Commit",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "message",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "authored_date",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "author",
+          "type": "json",
+          "nullable": true
+        },
+        {
+          "name": "note",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "parent",
+          "type": "text",
+          "nullable": true
+        }
+      ]
+    }
+  ],
+  "tools": [
+    {
+      "tool": "page_create",
+      "op": "create",
+      "family": "crud.insert",
+      "entity": "Page",
+      "exec_spec": {
+        "entity": "Page",
+        "fields": {
+          "path": {
+            "$arg": "page"
+          },
+          "content": {
+            "$arg": "content"
+          },
+          "format": {
+            "$arg": "format"
+          }
+        }
+      },
+      "input_schema": {
+        "page": {
+          "type": "text",
+          "required": true,
+          "description": "Full page path including any directory prefix and an extension, e.g. Home.md or Guides/Setup.md. Becomes the page's unique path key."
+        },
+        "format": {
+          "type": "text",
+          "required": true,
+          "description": "Markup format, e.g. markdown."
+        },
+        "content": {
+          "type": "text",
+          "required": false,
+          "description": "The page body in the given format."
+        },
+        "message": {
+          "type": "text",
+          "required": false,
+          "description": "Optional commit message describing the edit."
+        }
+      },
+      "guards": {
+        "messages": {
+          "required": "You must supply a page path and a format.",
+          "precondition": "A page already exists at this path. Edit it instead of creating a new one.",
+          "unique": "A page already exists at this path. Edit it instead of creating a new one."
+        },
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Page",
+                "where": {
+                  "node": "field",
+                  "col": "path",
+                  "op": "eq",
+                  "value": {
+                    "arg": "page"
+                  }
+                }
+              },
+              "op": "eq",
+              "n": 0
+            }
+          ]
+        ]
+      },
+      "description": "Create a new wiki page at the given path with the given markup format and body. Fails if a page already exists at that path (editing is assumed enabled for this wiki).",
+      "_evidence": {
+        "locator": "lib/gollum/app.rb:399",
+        "id_local": "Page.create",
+        "entry": {
+          "kind": "http",
+          "route": "POST /gollum/create",
+          "locator": "lib/gollum/app.rb:399"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "post '/create' do\n  name   = params[:page]\n  path   = sanitize_empty_params(params[:path]) || ''\n  format = params[:format].intern\n  wiki   = wiki_new\n  path.gsub!(/^\\//, '')\n  begin\n    wiki.write_page(::File.join(path, name), format, params[:content], commit_options)\n    redirect to(...)\n  rescue Gollum::DuplicatePageError, Gollum::IllegalDirectoryPath => e\n    mustache :error\n  end\nend",
+        "edges": [
+          "before-block: forbid unless @allow_editing || GET; forbid() -> 403 (app.rb:156, helpers.rb:51)",
+          "DuplicatePageError -> 409 via rescue (app.rb:404)"
+        ]
+      },
+      "_binds": {
+        "page": "Page.path",
+        "format": "Page.format",
+        "content": "Page.content",
+        "message": "Commit.message"
+      },
+      "_output_schema": {
+        "redirect": "to the newly created page"
+      },
+      "_scope_note": "wiki is not multi-user; no owner columns, reads are fully public, writes all gated by the global allow_editing switch (app.rb:156)"
+    },
+    {
+      "tool": "page_edit",
+      "op": "update",
+      "family": "update.field_set",
+      "entity": "Page",
+      "exec_spec": {
+        "entity": "Page",
+        "lookup_by": {
+          "path": {
+            "$arg": "path"
+          }
+        },
+        "fields": {
+          "content": {
+            "$arg": "content"
+          },
+          "format": {
+            "$arg": "format"
+          }
+        }
+      },
+      "input_schema": {
+        "path": {
+          "type": "text",
+          "required": true,
+          "description": "Path of the page to edit, e.g. Home.md."
+        },
+        "content": {
+          "type": "text",
+          "required": false,
+          "description": "New body of the page."
+        },
+        "format": {
+          "type": "text",
+          "required": false,
+          "description": "New markup format for the page."
+        },
+        "message": {
+          "type": "text",
+          "required": false,
+          "description": "Optional commit message describing the edit."
+        }
+      },
+      "guards": {
+        "messages": {
+          "not_found": "No page exists at this path to edit.",
+          "precondition": "No page exists at this path. Create it first before editing."
+        },
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Page",
+                "where": {
+                  "node": "field",
+                  "col": "path",
+                  "op": "eq",
+                  "value": {
+                    "arg": "path"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ]
+      },
+      "description": "Edit an existing wiki page's body and/or markup format. Fails if no page exists at the path (editing is assumed enabled for this wiki).",
+      "_evidence": {
+        "locator": "lib/gollum/app.rb:339",
+        "id_local": "Page.update",
+        "entry": {
+          "kind": "http",
+          "route": "POST /gollum/edit/*",
+          "locator": "lib/gollum/app.rb:339"
+        },
+        "entity_why": "corrected from Commit to Page: primary effect is row_update on Page keyed by path",
+        "ref_code": "post '/edit/*' do\n  etag = params[:etag]\n  path = \"/#{clean_url(sanitize_empty_params(params[:path]))}\"\n  wiki = wiki_new\n  page = wiki.page(::File.join(path, params[:page]))\n  return if page.nil?\n  if etag != page.sha\n    halt 412, {etag: page.sha, text_data: page.text_data}.to_json\n  end\n  committer = Gollum::Committer.new(wiki, commit_options)\n  update_wiki_page(wiki, page, params[:content], commit, page.name, params[:format])\n  update_wiki_page(wiki, page.header, params[:header], commit) if params[:header]\n  update_wiki_page(wiki, page.footer, params[:footer], commit) if params[:footer]\n  ",
+        "edges": [
+          "before-block: forbid unless @allow_editing || GET (app.rb:156); page.nil? guard + etag 412 check (app.rb:345-349)"
+        ]
+      },
+      "_binds": {
+        "path": "Page.path",
+        "page": "Page.path",
+        "content": "Page.content",
+        "format": "Page.format",
+        "message": "Commit.message"
+      },
+      "_output_schema": {
+        "409": "duplicate path",
+        "412": "etag mismatch with current etag+text_data as json"
+      },
+      "_scope_note": "wiki is not multi-user; no owner columns, reads are fully public, writes all gated by the global allow_editing switch (app.rb:156)"
+    },
+    {
+      "tool": "page_rename",
+      "op": "create",
+      "family": "crud.insert",
+      "entity": "Redirect",
+      "exec_spec": {
+        "entity": "Redirect",
+        "fields": {
+          "source": {
+            "$arg": "path"
+          },
+          "target": {
+            "$arg": "rename"
+          }
+        }
+      },
+      "input_schema": {
+        "path": {
+          "type": "text",
+          "required": true,
+          "description": "Current path of the page to rename; becomes the redirect's source."
+        },
+        "rename": {
+          "type": "text",
+          "required": true,
+          "description": "New path (with extension) the page and the redirect should point to; becomes the redirect's target."
+        },
+        "message": {
+          "type": "text",
+          "required": false,
+          "description": "Optional commit message describing the rename."
+        }
+      },
+      "guards": {
+        "messages": {
+          "not_found": "No page exists at this path to rename.",
+          "precondition": "No page exists at this path to rename.",
+          "unique": "A redirect already exists from this source path."
+        },
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Page",
+                "where": {
+                  "node": "field",
+                  "col": "path",
+                  "op": "eq",
+                  "value": {
+                    "arg": "path"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ]
+      },
+      "description": "Rename a wiki page and record a redirect from the old path to the new one so old links keep working. Fails if no page exists at the old path (editing is assumed enabled for this wiki).",
+      "_evidence": {
+        "locator": "lib/gollum/app.rb:298",
+        "id_local": "Page.rename",
+        "entry": {
+          "kind": "http",
+          "route": "POST /gollum/rename/*",
+          "locator": "lib/gollum/app.rb:298"
+        },
+        "entity_why": "the observable structure of a rename is the Redirect row (source=old,target=new) added via wiki.add_redirect",
+        "ref_code": "post '/rename/*' do\n  wikip = wiki_page(params[:splat].first)\n  page  = wikip.page\n  rename = params[:rename]\n  halt 500 if page.nil? or rename.nil? or rename.empty?\n  # fixup rename if relative path ...\n  committer = Gollum::Committer.new(wiki, commit_options)\n  success = wiki.rename_page(page, rename, commit)\n  if !success\n    redirect to(\"/#{page.escaped_url_path}\")   # NOOP A => A\n    return\n  end\n  new_path = \"#{rename}.#{Gollum::Page.format_to_ext(page.format)}\"\n  wiki.add_redirect(page.url_path, clean_url(new_path), commit) if @redirects_enabled\n  committer.commit\n  redirect to(\"/#{page",
+        "edges": [
+          "before-block: forbid unless @allow_editing || GET (app.rb:156); halt 500 if page.nil? (app.rb:304)"
+        ]
+      },
+      "_binds": {
+        "path": "Page.path",
+        "rename": "Page.path",
+        "message": "Commit.message"
+      },
+      "_output_schema": {
+        "redirect": "to renamed page, or to original page on a NOOP rename A->A"
+      },
+      "_scope_note": "wiki is not multi-user; no owner columns, reads are fully public, writes all gated by the global allow_editing switch (app.rb:156)"
+    },
+    {
+      "tool": "page_delete",
+      "op": "delete",
+      "family": "crud.delete",
+      "entity": "Page",
+      "exec_spec": {
+        "entity": "Page",
+        "lookup_by": {
+          "path": {
+            "$arg": "path"
+          }
+        }
+      },
+      "input_schema": {
+        "path": {
+          "type": "text",
+          "required": true,
+          "description": "Path of the page to delete."
+        },
+        "message": {
+          "type": "text",
+          "required": false,
+          "description": "Optional commit message describing the deletion."
+        }
+      },
+      "guards": {
+        "messages": {
+          "not_found": "No page exists at this path to delete.",
+          "precondition": "No page exists at this path to delete."
+        },
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Page",
+                "where": {
+                  "node": "field",
+                  "col": "path",
+                  "op": "eq",
+                  "value": {
+                    "arg": "path"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ]
+      },
+      "description": "Delete a wiki page at the given path. Fails if no page exists at the path (editing is assumed enabled for this wiki).",
+      "_evidence": {
+        "locator": "lib/gollum/app.rb:366",
+        "id_local": "Page.delete",
+        "entry": {
+          "kind": "http",
+          "route": "POST /gollum/delete/*",
+          "locator": "lib/gollum/app.rb:366"
+        },
+        "entity_why": "corrected from Commit to Page: primary effect is row_delete on Page keyed by path",
+        "ref_code": "post '/delete/*' do\n  forbid unless @allow_editing\n  wiki = wiki_new\n  filepath = params[:splat].first\n  unless filepath.nil?\n    commit           = commit_options\n    commit[:message] = \"Deleted #{filepath}\"\n    wiki.delete_file(filepath, commit)\n  end\nend",
+        "edges": [
+          "before-block: forbid unless @allow_editing || GET (app.rb:156); post handler forbids again (app.rb:367)"
+        ]
+      },
+      "_binds": {
+        "path": "Page.path",
+        "message": "Commit.message"
+      },
+      "_output_schema": {},
+      "_scope_note": "wiki is not multi-user; no owner columns, reads are fully public, writes all gated by the global allow_editing switch (app.rb:156)"
+    },
+    {
+      "tool": "file_upload",
+      "op": "create",
+      "family": "crud.insert",
+      "entity": "File",
+      "exec_spec": {
+        "entity": "File",
+        "fields": {
+          "path": {
+            "$arg": "filename"
+          },
+          "content": {
+            "$arg": "file_content"
+          }
+        }
+      },
+      "input_schema": {
+        "filename": {
+          "type": "text",
+          "required": true,
+          "description": "Upload destination path including any directory and extension, e.g. uploads/logo.png. Becomes the file's unique path key."
+        },
+        "file_content": {
+          "type": "text",
+          "required": true,
+          "description": "Raw bytes of the file to store."
+        },
+        "message": {
+          "type": "text",
+          "required": false,
+          "description": "Optional commit message describing the upload."
+        }
+      },
+      "guards": {
+        "messages": {
+          "required": "You must supply a filename and file content.",
+          "precondition": "A file already exists at this path.",
+          "unique": "A file already exists at this path."
+        },
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "File",
+                "where": {
+                  "node": "field",
+                  "col": "path",
+                  "op": "eq",
+                  "value": {
+                    "arg": "filename"
+                  }
+                }
+              },
+              "op": "eq",
+              "n": 0
+            }
+          ]
+        ]
+      },
+      "description": "Upload a file (image, binary, etc.) to the wiki so it can be referenced from pages. Fails if a file already exists at that path (editing is assumed enabled for this wiki).",
+      "_evidence": {
+        "locator": "lib/gollum/app.rb:254",
+        "id_local": "File.upload",
+        "entry": {
+          "kind": "http",
+          "route": "POST /gollum/upload_file",
+          "locator": "lib/gollum/app.rb:254"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "post '/upload_file' do\n  wiki = wiki_new\n  halt 405 unless wiki.allow_uploads\n  if params[:file]\n    fullname = params[:file][:filename]; tempfile = params[:file][:tempfile]\n  end\n  halt 500 unless tempfile.is_a? Tempfile\n  dir = wiki.per_page_uploads ? find_per_page_upload_subdir(...) : 'uploads'\n  halt 500 if dir.include?('..') or !Pathname(dir).relative?\n  filename = ::File.basename(fullname, ext); contents = ::File.read(tempfile)\n  reponame = \"#{dir}/#{filename}.#{format}\"\n  wiki.write_file(reponame, contents, {:message => \"Uploaded file to #{reponame}\"})\n  redirect to(request.referer)\nres",
+        "edges": [
+          "before-block: forbid unless @allow_editing || GET (app.rb:156); halt 405 unless wiki.allow_uploads (app.rb:257); DuplicatePageError -> 409 (app.rb:292)"
+        ]
+      },
+      "_binds": {
+        "filename": "File.path",
+        "file_content": "File.content",
+        "message": "Commit.message"
+      },
+      "_output_schema": {
+        "redirect": "back to referer"
+      },
+      "_defaulted": [
+        "dropped unwritable columns ['path']",
+        "fields (mapped to the real parameter names via binds)"
+      ],
+      "_scope_note": "wiki is not multi-user; no owner columns, reads are fully public, writes all gated by the global allow_editing switch (app.rb:156)"
+    },
+    {
+      "tool": "page_read",
+      "op": "read",
+      "family": "crud.fetch",
+      "entity": "Page",
+      "exec_spec": {
+        "entity": "Page",
+        "lookup_by": {
+          "path": {
+            "$arg": "path"
+          }
+        }
+      },
+      "input_schema": {
+        "path": {
+          "type": "text",
+          "required": true,
+          "description": "Path of the page to read, e.g. Home.md."
+        }
+      },
+      "guards": {
+        "required": [
+          "path"
+        ]
+      },
+      "description": "Read the latest content of a wiki page, given its path.",
+      "_evidence": {
+        "locator": "lib/gollum/app.rb:648",
+        "id_local": "Page.read",
+        "entry": {
+          "kind": "http",
+          "route": "GET /*",
+          "locator": "lib/gollum/app.rb:609"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "def show_page_or_file(fullpath)\n  wiki = wiki_new\n  if page = wiki.page(fullpath)\n    @page = page; @name = page.filename_stripped\n    @content = page.formatted_data\n    @editable = true\n    mustache :page\n  elsif file = wiki.file(fullpath, wiki.ref, true)\n    show_file(file)\n  elsif @redirects_enabled && redirect_path = wiki.redirects[fullpath]\n    redirect_to(redirect_path, fullpath, \"\")\n  else\n    redirect to(\"/gollum/create/#{...}\") if @allow_editing\n    page_does_not_exist\n  end\nend"
+      },
+      "_binds": {
+        "path": "Page.path"
+      },
+      "_output_schema": {
+        "page": "rendered Page (formatted_data) or raw data when ?raw",
+        "file": "raw file bytes",
+        "redirect": "resolved Redirect / create form if absent and editing allowed"
+      },
+      "_scope_note": "wiki is not multi-user; no owner columns, reads are fully public, writes all gated by the global allow_editing switch (app.rb:156)"
+    },
+    {
+      "tool": "page_versions",
+      "op": "read",
+      "family": "crud.fetch",
+      "entity": "Page",
+      "exec_spec": {
+        "entity": "Page",
+        "lookup_by": {
+          "path": {
+            "$arg": "path"
+          }
+        }
+      },
+      "input_schema": {
+        "path": {
+          "type": "text",
+          "required": true,
+          "description": "Path of the page whose historical versions to list."
+        }
+      },
+      "guards": {
+        "required": [
+          "path"
+        ],
+        "messages": {
+          "not_found": "No page exists at this path."
+        }
+      },
+      "description": "List the historical versions (commits) of a page, newest first.",
+      "_evidence": {
+        "locator": "lib/gollum/app.rb:630",
+        "id_local": "Page.history",
+        "entry": {
+          "kind": "http",
+          "route": "GET /gollum/history/*",
+          "locator": "lib/gollum/app.rb:467"
+        },
+        "entity_why": "re-scoped from Commit to Page so the versions returned are those for the addressed page (app.rb:630); empty reads in probe reflect no-signin",
+        "ref_code": "def show_history(wikip)\n  @page_num = [params[:page_num].to_i, 1].max\n  @max_count = settings.wiki_options.fetch(:pagination_count, 10)\n  @versions = @page.versions(per_page: @max_count, page_num: @page_num,\n    follow: settings.wiki_options.fetch(:follow_renames, true))\n  mustache :history\nend"
+      },
+      "_binds": {
+        "path": "Page.path"
+      },
+      "_output_schema": {
+        "versions": "list of commit versions {id, author, message, date}"
+      },
+      "_defaulted": [
+        "family (matched by an id_local regex, not by the effects)"
+      ]
+    },
+    {
+      "tool": "commit_latest_changes",
+      "op": "search",
+      "family": "search",
+      "entity": "Commit",
+      "exec_spec": {
+        "entity": "Commit",
+        "search_fields": [
+          "id"
+        ],
+        "rank": {
+          "method": "date_desc",
+          "fields": [
+            "authored_date"
+          ]
+        },
+        "pagination": {
+          "default_limit": 20
+        }
+      },
+      "input_schema": {},
+      "guards": {
+        "messages": {}
+      },
+      "description": "List the most recent wiki changes across the whole repository, newest first.",
+      "_evidence": {
+        "locator": "lib/gollum/app.rb:471",
+        "id_local": "Commit.latest_changes",
+        "entry": {
+          "kind": "http",
+          "route": "GET /gollum/latest_changes",
+          "locator": "lib/gollum/app.rb:471"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "get '/latest_changes' do\n  @page_num = [params[:page_num].to_i, 1].max\n  @max_count = settings.wiki_options.fetch(:pagination_count, 10)\n  @versions = @wiki.latest_changes(::Gollum::Page.log_pagination_options(per_page: @max_count, page_num: @page_num))\n  mustache :latest_changes\nend"
+      },
+      "_output_schema": {
+        "versions": "commits across the whole repo, newest first"
+      }
+    },
+    {
+      "tool": "wiki_feed",
+      "op": "search",
+      "family": "search",
+      "entity": "Commit",
+      "exec_spec": {
+        "entity": "Commit",
+        "search_fields": [
+          "id"
+        ],
+        "rank": {
+          "method": "date_desc",
+          "fields": [
+            "authored_date"
+          ]
+        },
+        "pagination": {
+          "default_limit": 20
+        }
+      },
+      "input_schema": {
+        "limit": {
+          "type": "int",
+          "required": false,
+          "description": "Optional number of most recent changes to return (default 10)."
+        }
+      },
+      "guards": {
+        "messages": {}
+      },
+      "description": "Return the latest wiki changes as an RSS-style feed, newest first (the same underlying change set as latest changes).",
+      "_evidence": {
+        "locator": "lib/gollum/app.rb:164",
+        "id_local": "Wiki.feed",
+        "entry": {
+          "kind": "http",
+          "route": "GET /gollum/feed/",
+          "locator": "lib/gollum/app.rb:164"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "get '/feed/' do\n  url = \"#{env['rack.url_scheme']}://#{env['HTTP_HOST']}\"\n  changes = wiki_new.latest_changes(::Gollum::Page.log_pagination_options(\n    per_page: settings.wiki_options.fetch(:pagination_count, 10), page_num: 0))\n  content_type :rss\n  RSSView.new(@base_url, @wiki_title, url, changes).render\nend"
+      },
+      "_output_schema": {
+        "rss": "RSS 2.0 feed of latest changes"
+      }
+    },
+    {
+      "tool": "wiki_search",
+      "op": "search",
+      "family": "search",
+      "entity": "Page",
+      "exec_spec": {
+        "entity": "Page",
+        "search_fields": [
+          "content",
+          "path"
+        ],
+        "rank": {
+          "method": "keyword",
+          "fields": [
+            "content",
+            "path"
+          ]
+        },
+        "pagination": {
+          "default_limit": 20
+        }
+      },
+      "input_schema": {
+        "q": {
+          "type": "text",
+          "required": true,
+          "description": "The free-text query to search page content and paths for."
+        }
+      },
+      "guards": {
+        "required": [
+          "q"
+        ]
+      },
+      "description": "Search all wiki pages by keyword over their content and path, returning the pages that match the query.",
+      "_evidence": {
+        "locator": "lib/gollum/app.rb:545",
+        "id_local": "Wiki.search",
+        "entry": {
+          "kind": "http",
+          "route": "GET /gollum/search",
+          "locator": "lib/gollum/app.rb:545"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "get '/search' do\n  @query = params[:q] || ''\n  if @query.empty?\n    @results = []; @search_terms = []\n  else\n    @page_num = [params[:page_num].to_i, 1].max; @max_count = 10\n    @results, @search_terms = wiki.search(@query)\n  end\n  mustache :search\nend"
+      },
+      "_output_schema": {
+        "results": "list of {name, count} search hits",
+        "search_terms": "parsed terms"
+      }
+    },
+    {
+      "tool": "wiki_tree",
+      "op": "read",
+      "family": "search",
+      "entity": "Page",
+      "exec_spec": {
+        "entity": "Page",
+        "search_fields": [
+          "path"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "path"
+          ]
+        }
+      },
+      "input_schema": {
+        "path": {
+          "type": "text",
+          "required": false,
+          "description": "Optional directory prefix to filter the tree to; omit for the whole wiki."
+        }
+      },
+      "guards": {
+        "messages": {}
+      },
+      "description": "List the wiki's page/file tree, optionally filtered to a directory prefix, sorted by name.",
+      "_evidence": {
+        "locator": "lib/gollum/app.rb:560",
+        "id_local": "Wiki.tree",
+        "entry": {
+          "kind": "http",
+          "route": "GET /gollum/overview[/{path}]",
+          "locator": "lib/gollum/app.rb:560"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "get %r{/overview(?:/(.+))?}x do |path|\n  wiki = wiki_new\n  @results = wiki.tree_list\n  if path\n    @path = Pathname.new(path).cleanpath.to_s\n    check_path = wiki.page_file_dir ? ::File.join(wiki.page_file_dir, @path, '/') : \"#{@path}/\"\n    @results.select! {|result| result.path.start_with?(check_path) }\n  end\n  @results.sort_by! {|result| result.name.downcase}\n  mustache :overview\nend"
+      },
+      "_output_schema": {
+        "results": "list of page/file tree entries {name,path} sorted by name"
+      }
+    },
+    {
+      "tool": "file_read_raw",
+      "op": "read",
+      "family": "crud.fetch",
+      "entity": "File",
+      "exec_spec": {
+        "entity": "File",
+        "lookup_by": {
+          "path": {
+            "$arg": "path"
+          }
+        }
+      },
+      "input_schema": {
+        "path": {
+          "type": "text",
+          "required": true,
+          "description": "Path of the file to read, e.g. uploads/logo.png."
+        }
+      },
+      "guards": {
+        "required": [
+          "path"
+        ]
+      },
+      "description": "Read the raw bytes of a stored file, given its path.",
+      "_evidence": {
+        "locator": "lib/gollum/app.rb:216",
+        "id_local": "File.read_raw",
+        "entry": {
+          "kind": "http",
+          "route": "GET /gollum/data/*",
+          "locator": "lib/gollum/app.rb:216"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "get '/data/*' do\n  if page = wiki_page(params[:splat].first).page\n    page.raw_data\n  end\nend"
+      },
+      "_binds": {
+        "path": "File.path"
+      },
+      "_output_schema": {
+        "body": "raw page data bytes"
+      }
+    },
+    {
+      "tool": "wiki_edit_form",
+      "op": "read",
+      "family": "crud.fetch",
+      "entity": "Page",
+      "exec_spec": {
+        "entity": "Page",
+        "lookup_by": {
+          "path": {
+            "$arg": "path"
+          }
+        }
+      },
+      "input_schema": {
+        "path": {
+          "type": "text",
+          "required": true,
+          "description": "Path of the page whose editable content and etag to fetch."
+        }
+      },
+      "guards": {
+        "required": [
+          "path"
+        ]
+      },
+      "description": "Fetch the editable content and current etag of a page, as the edit form does.",
+      "_evidence": {
+        "locator": "lib/gollum/app.rb:234",
+        "id_local": "Wiki.edit_form",
+        "entry": {
+          "kind": "http",
+          "route": "GET /gollum/edit/*",
+          "locator": "lib/gollum/app.rb:234"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "get '/edit/*' do\n  forbid unless @allow_editing\n  wikip = wiki_page(params[:splat].first)\n  @name = wikip.fullname; @path = wikip.path\n  wiki = wikip.wiki; @allow_uploads = wiki.allow_uploads\n  if page = wikip.page\n    @page = page; @content = page.text_data; @etag = page.sha\n    mustache :edit\n  else\n    redirect to(\"gollum/create/...\")\n  end\nend"
+      },
+      "_binds": {
+        "path": "Page.path"
+      },
+      "_output_schema": {
+        "page": "editable Page content and sha etag"
+      }
+    }
+  ],
+  "seed_state": {
+    "Page": [
+      {
+        "path": "Home.md",
+        "content": "Welcome to the wiki.\n\nEdit this page to get started.",
+        "format": "markdown",
+        "id": 1
+      }
+    ],
+    "File": [],
+    "Redirect": [],
+    "Commit": []
+  },
+  "summary": "Gollum is a Git-powered wiki: a Sinatra frontend that reads and writes wiki pages, files and redirects as blobs/files inside a git repository, where every mutation commits a new revision that is read back via history/feed/log views. Storage is one repo, one object per page/file, one commit per mutation.",
+  "_auth_candidates": [],
+  "_read_denied": "not_found",
+  "_no_edges": [
+    {
+      "id_local": "File.read_raw",
+      "why": "public GET reads page.raw_data; no pre-checks (other than reserved-path forbid which doesn't apply to /data/*), calls nothing (app.rb:216,620)"
+    },
+    {
+      "id_local": "Page.read_historical",
+      "why": "public GET /{path}/{sha}; no auth, no pre-checks beyond page-or-file lookup, calls only rendering (app.rb:583,699)"
+    },
+    {
+      "id_local": "Page.preview",
+      "why": "POST /preview is gated only by the global allow_editing before-filter and then only renders in memory; no wall beyond that, calls nothing persisting (app.rb:439,156)"
+    },
+    {
+      "id_local": "Wiki.edit_form",
+      "why": "GET /edit/* gated by forbid unless @allow_editing (app.rb:235) which is the same wiki-wide config switch, no auth; calls nothing beyond a page lookup (app.rb:234)"
+    }
+  ],
+  "_source_seed_configuration": {
+    "is_admin": true
+  }
+}

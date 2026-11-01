@@ -1,0 +1,4427 @@
+{
+  "env_id": "gokapi",
+  "_prep_version": 3,
+  "entities": [
+    {
+      "name": "User",
+      "columns": [
+        {
+          "name": "Id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "Name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "Password",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "Permissions",
+          "type": "int",
+          "nullable": false
+        },
+        {
+          "name": "UserLevel",
+          "type": "int",
+          "nullable": false,
+          "enum": [
+            0,
+            1,
+            2
+          ]
+        },
+        {
+          "name": "LastOnline",
+          "type": "datetime",
+          "default": 0
+        },
+        {
+          "name": "ResetPassword",
+          "type": "bool",
+          "default": false
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "Name"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ApiKey",
+      "columns": [
+        {
+          "name": "Id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "PublicId",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "FriendlyName",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "LastUsed",
+          "type": "datetime",
+          "nullable": false
+        },
+        {
+          "name": "Permissions",
+          "type": "int",
+          "nullable": false,
+          "default": 0
+        },
+        {
+          "name": "Expiry",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "IsSystemKey",
+          "type": "bool",
+          "nullable": false
+        },
+        {
+          "name": "UserId",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "User.Id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "UploadRequestId",
+          "type": "id",
+          "nullable": true,
+          "fk_to": "UploadRequest.id",
+          "on_delete": "set_null"
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "PublicId"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "File",
+      "columns": [
+        {
+          "name": "Id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "Name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "Size",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "SHA1",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "ExpireAt",
+          "type": "datetime",
+          "nullable": false
+        },
+        {
+          "name": "SizeBytes",
+          "type": "int",
+          "nullable": false
+        },
+        {
+          "name": "DownloadsRemaining",
+          "type": "int",
+          "nullable": false
+        },
+        {
+          "name": "DownloadCount",
+          "type": "int",
+          "nullable": false
+        },
+        {
+          "name": "PasswordHash",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "HotlinkId",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "ContentType",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "AwsBucket",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "Encryption",
+          "type": "json",
+          "nullable": false
+        },
+        {
+          "name": "UnlimitedDownloads",
+          "type": "bool",
+          "nullable": false
+        },
+        {
+          "name": "UnlimitedTime",
+          "type": "bool",
+          "nullable": false
+        },
+        {
+          "name": "UserId",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "User.Id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "UploadDate",
+          "type": "datetime",
+          "nullable": false,
+          "immutable": true
+        },
+        {
+          "name": "PendingDeletion",
+          "type": "datetime",
+          "nullable": false,
+          "default": 0
+        },
+        {
+          "name": "UploadRequestId",
+          "type": "id",
+          "nullable": true,
+          "fk_to": "UploadRequest.id",
+          "on_delete": "cascade"
+        }
+      ]
+    },
+    {
+      "name": "Hotlink",
+      "columns": [
+        {
+          "name": "Id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "FileId",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "File.Id",
+          "on_delete": "cascade"
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "FileId"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Session",
+      "columns": [
+        {
+          "name": "Id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "RenewAt",
+          "type": "datetime",
+          "nullable": false
+        },
+        {
+          "name": "ValidUntil",
+          "type": "datetime",
+          "nullable": false
+        },
+        {
+          "name": "UserId",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "User.Id",
+          "on_delete": "cascade"
+        }
+      ]
+    },
+    {
+      "name": "UploadRequest",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "userid",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "User.Id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "expiry",
+          "type": "datetime",
+          "nullable": false
+        },
+        {
+          "name": "maxFiles",
+          "type": "int",
+          "nullable": false
+        },
+        {
+          "name": "maxSize",
+          "type": "int",
+          "nullable": false
+        },
+        {
+          "name": "creation",
+          "type": "datetime",
+          "nullable": false,
+          "immutable": true
+        },
+        {
+          "name": "apiKey",
+          "type": "id",
+          "nullable": true,
+          "fk_to": "ApiKey.Id",
+          "on_delete": "set_null"
+        },
+        {
+          "name": "note",
+          "type": "text",
+          "nullable": false
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "apiKey"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "E2EConfig",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "Config",
+          "type": "json",
+          "nullable": false
+        },
+        {
+          "name": "UserId",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "User.Id",
+          "on_delete": "cascade"
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "UserId"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Statistic",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "type",
+          "type": "int",
+          "nullable": true,
+          "enum": [
+            1,
+            2
+          ]
+        },
+        {
+          "name": "value",
+          "type": "int",
+          "nullable": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "type"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Log",
+      "columns": [
+        {
+          "name": "line",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "immutable": true
+        }
+      ]
+    }
+  ],
+  "tools": [
+    {
+      "tool": "sign_in",
+      "op": "action",
+      "family": "guard.auth",
+      "exec_spec": {
+        "verify": {
+          "entity": "User"
+        }
+      },
+      "input_schema": {
+        "username": {
+          "type": "text",
+          "required": true,
+          "description": "The account name (User.Name)."
+        },
+        "password": {
+          "type": "text",
+          "required": true,
+          "description": "The account password, verified against User.Password."
+        },
+        "csrf-token": {
+          "type": "text",
+          "required": false,
+          "description": "Login form CSRF token; accepted by the runtime on web-form login."
+        }
+      },
+      "_evidence": {
+        "locator": "internal/webserver/Webserver.go:510",
+        "id_local": "User.login",
+        "entry": {
+          "kind": "http",
+          "route": "POST /login",
+          "locator": "internal/webserver/Webserver.go:480"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "user := r.PostForm.Get(\"username\")\npw := r.PostForm.Get(\"password\")\ncsfr := r.PostForm.Get(\"csrf-token\")\nif pw != \"\" && user != \"\" {\n  ip := logging.GetIpAddress(r)\n  ratelimiter.WaitOnLogin(ip)\n  retrievedUser, validCredentials, validCsfr := authentication.IsCorrectUsernameAndPassword(user, pw, csfr)\n  if validCredentials {\n    logging.LogValidLogin(user)\n    sessionmanager.CreateSession(w, false, 0, retrievedUser.Id)\n    redirect(w, r, \"admin\")\n    return\n  }...}"
+      },
+      "entity": "Session",
+      "_output_schema": {
+        "auth.admin redirect": "302 to /admin on success; login page re-render on failure"
+      },
+      "guards": {},
+      "description": "Sign in with an account name and password. Gokapi login is the single entry point: everything that touches a file, an upload request, an API key, a user, the E2E vault or the logs requires this first, and the session it opens is what $actor resolves to."
+    },
+    {
+      "tool": "user_changepassword",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "User",
+        "row_key": {
+          "Id": {
+            "$session": "account_id"
+          }
+        },
+        "fields": [
+          "Name",
+          "Password",
+          "Permissions",
+          "UserLevel",
+          "LastOnline",
+          "ResetPassword"
+        ],
+        "set": {
+          "Password": {
+            "$arg": "newpwHashed"
+          },
+          "ResetPassword": false
+        }
+      },
+      "input_schema": {
+        "newpw": {
+          "type": "text",
+          "required": true,
+          "description": "The new plaintext password; it is hashed before storage in Password."
+        },
+        "csrf-token": {
+          "type": "text",
+          "required": false,
+          "description": "Change-password form CSRF token."
+        }
+      },
+      "_evidence": {
+        "locator": "internal/webserver/Webserver.go:336",
+        "id_local": "User.changePassword",
+        "entry": {
+          "kind": "http",
+          "route": "POST /changePassword",
+          "locator": "internal/webserver/Webserver.go:109"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "pwHash, ok, err = validateNewPassword(pw, user, csrf)\nif ok {\n  user.Password = pwHash\n  user.ResetPassword = false\n  database.SaveUser(user, false)\n  redirect(w, r, \"admin\")\n  return\n}",
+        "edges": [
+          "requireLogin redirects unless ResetPassword; changePassword returns if !user.ResetPassword (Webserver.go:326)"
+        ]
+      },
+      "entity": "User",
+      "_output_schema": {
+        "ok": "true on success",
+        "redirect": "to /admin"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "Id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "ResetPassword",
+                      "op": "eq",
+                      "value": true
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "newpw"
+        ],
+        "messages": {
+          "auth": "You must be signed in to change your password.",
+          "precondition": "Only an account that has been flagged for a forced password reset (ResetPassword=true) can change its password.",
+          "required": "A new password is required."
+        }
+      },
+      "_defaulted": [
+        "fields",
+        "fields (final: Password/ResetPassword only, other writable cols removed)"
+      ],
+      "description": "Set a new password for your own account after a forced reset (ResetPassword). Requires that your account has ResetPassword set to true."
+    },
+    {
+      "tool": "user_create",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "User",
+        "fields": {
+          "Name": {
+            "$arg": "username"
+          }
+        },
+        "set_on_create": {
+          "UserLevel": 2,
+          "Permissions": 0,
+          "LastOnline": 0,
+          "ResetPassword": false,
+          "Password": ""
+        },
+        "unique_on": [
+          "Name"
+        ]
+      },
+      "input_schema": {
+        "username": {
+          "type": "text",
+          "required": true,
+          "description": "The new account name; must be unique across users."
+        }
+      },
+      "_evidence": {
+        "locator": "internal/webserver/authentication/users/Users.go:21",
+        "id_local": "User.create",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/user/create",
+          "locator": "internal/webserver/api/routing.go:155"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "func Create(name string) (models.User, error) {\n\tif len(name) < minLengthUser { return models.User{}, ErrorNameToShort }\n\t_, ok := database.GetUserByName(name)\n\tif ok { return models.User{}, ErrorUserExists }\n\tnewUser := models.User{Name: name, UserLevel: models.UserLevelUser}\n\tif configuration.GetEnvironment().PermRequestGrantedByDefault { newUser.GrantPermission(models.UserPermGuestUploads) }\n\tdatabase.SaveUser(newUser, true)\n\t...\n}",
+        "edges": [
+          "users.Create returns ErrorUserExists when GetUserByName already matches, before SaveUser (internal/webserver/authentication/users/Users.go:27)"
+        ]
+      },
+      "entity": "User",
+      "_binds": {
+        "username": "User.Name"
+      },
+      "_output_schema": {
+        "user": "the new User row as JSON"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "Name",
+                  "op": "eq",
+                  "value": {
+                    "arg": "username"
+                  }
+                }
+              },
+              "op": "eq",
+              "n": 0
+            }
+          ]
+        ],
+        "required": [
+          "username"
+        ],
+        "messages": {
+          "precondition": "That username is already taken.",
+          "unique": "That username is already taken.",
+          "required": "A username is required."
+        }
+      },
+      "_defaulted": [
+        "fields (mapped to the real parameter names via binds)"
+      ],
+      "description": "Create a new Gokapi account with the given name and default user permissions. Fails if the name is already taken."
+    },
+    {
+      "tool": "user_modifypermission",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "User",
+        "row_key": {
+          "Id": {
+            "$arg": "userid"
+          }
+        },
+        "set": {
+          "Permissions": {
+            "$arg": "newPermissions"
+          }
+        }
+      },
+      "input_schema": {
+        "userid": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the user whose permissions to change."
+        },
+        "newPermissions": {
+          "type": "int",
+          "required": true,
+          "description": "New permissions bitmask for the user."
+        },
+        "userpermission": {
+          "type": "text",
+          "required": false,
+          "description": "A permission bit to toggle (informational)."
+        },
+        "permissionModifier": {
+          "type": "text",
+          "required": false,
+          "description": "grant or revoke."
+        }
+      },
+      "_evidence": {
+        "locator": "internal/webserver/api/Api.go:862",
+        "id_local": "User.modifyPermission",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/user/modify",
+          "locator": "internal/webserver/api/routing.go:174"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "if request.GrantPermission {\n  if !userEdit.HasPermission(request.Permission) { userEdit.GrantPermission(request.Permission); database.SaveUser(userEdit, false) }\n  return\n}\nif userEdit.HasPermission(request.Permission) {\n  userEdit.RemovePermission(request.Permission); database.SaveUser(userEdit, false)\n  updateApiKeyPermsOnUserPermChange(userEdit.Id, request.Permission)\n}",
+        "edges": [
+          "apiModifyUser rejects super admin and self-edits (Api.go:849); route requires ApiPermManageUsers"
+        ]
+      },
+      "entity": "User",
+      "_binds": {
+        "userid": "User.Id"
+      },
+      "_output_schema": {
+        "ok": "true when permission applied"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "Id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "userid"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "UserLevel",
+                      "op": "ne",
+                      "value": 0
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            },
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "Id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "userid"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "Id",
+                      "op": "ne",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "Id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "userid"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "UserLevel",
+                      "op": "ne",
+                      "value": 0
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            },
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "Id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "UserLevel",
+                      "op": "eq",
+                      "value": 0
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "userid"
+        ],
+        "messages": {
+          "auth": "You must be signed in to modify users.",
+          "precondition": "You cannot modify your own account. The built-in super admin cannot be modified."
+        }
+      },
+      "_defaulted": [
+        "set (rewritten to drive Permissions from newPermissions arg)"
+      ],
+      "description": "Grant or revoke a permission bit on another user's account. You cannot modify the built-in super admin or your own account."
+    },
+    {
+      "tool": "user_changerank",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "User",
+        "row_key": {
+          "Id": {
+            "$arg": "userid"
+          }
+        },
+        "fields": [
+          "Name",
+          "Password",
+          "Permissions",
+          "UserLevel",
+          "LastOnline",
+          "ResetPassword"
+        ],
+        "set": {
+          "UserLevel": {
+            "$arg": "newRank"
+          },
+          "Permissions": {
+            "$arg": "permissionsAfter"
+          }
+        }
+      },
+      "input_schema": {
+        "userid": "id",
+        "newRank": "text"
+      },
+      "_evidence": {
+        "locator": "internal/webserver/api/Api.go:902",
+        "id_local": "User.changeRank",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/user/changeRank",
+          "locator": "internal/webserver/api/routing.go:161"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "userEdit.UserLevel = request.NewRank\nswitch request.NewRank {\ncase models.UserLevelAdmin: userEdit.Permissions = models.UserPermissionAll\ncase models.UserLevelUser:\n  userEdit.Permissions = models.UserPermissionNone\n  updateApiKeyPermsOnUserPermChange(userEdit.Id, models.UserPermReplaceUploads); ...\ndefault: sendError(...)\n}\nlogging.LogUserEdit(userEdit, user)\ndatabase.SaveUser(userEdit, false)",
+        "edges": [
+          "apiChangeUserRank rejects self/superadmin; promote-to-admin requires user.IsAdmin() (Api.go:889-900)"
+        ]
+      },
+      "entity": "User",
+      "_binds": {
+        "userid": "User.Id"
+      },
+      "_output_schema": {
+        "ok": "true when rank applied"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "Id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "userid"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "UserLevel",
+                      "op": "ne",
+                      "value": 0
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            },
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "Id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "userid"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "Id",
+                      "op": "ne",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "Id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "userid"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "UserLevel",
+                      "op": "ne",
+                      "value": 0
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            },
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "Id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "UserLevel",
+                      "op": "eq",
+                      "value": 0
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "userid",
+          "newRank"
+        ],
+        "messages": {
+          "auth": "You must be signed in to modify users.",
+          "precondition": "You cannot modify your own account. The built-in super admin cannot be modified."
+        }
+      },
+      "_defaulted": [
+        "fields"
+      ],
+      "description": "Change another user's rank (user / admin / super admin). You cannot change the built-in super admin or your own rank; promoting to admin requires you to be a super admin yourself."
+    },
+    {
+      "tool": "user_delete",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "User",
+        "lookup_by": {
+          "Id": {
+            "$arg": "userid"
+          }
+        }
+      },
+      "input_schema": {
+        "userid": "id",
+        "deleteFiles": "bool"
+      },
+      "_evidence": {
+        "locator": "internal/webserver/api/Api.go:978",
+        "id_local": "User.delete",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/user/delete",
+          "locator": "internal/webserver/api/routing.go:166"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "database.DeleteAllSessionsByUser(userToDelete.Id)\nfor _, apiKey := range database.GetAllApiKeys() { if apiKey.UserId == userToDelete.Id { database.DeleteApiKey(apiKey.Id) } }\ndatabase.DeleteEnd2EndInfo(userToDelete.Id)\nfor _, fRequest := range database.GetAllFileRequests() { if fRequest.UserId == userToDelete.Id { if request.DeleteFiles { filerequest.Delete(fRequest) } else { fRequest.UserId = user.Id; database.SaveFileRequest(fRequest) } } }\nfor _, file := range database.GetAllMetadata() { if file.UserId == userToDelete.Id { if request.DeleteFiles { database.DeleteMetaData(file.Id) } else { f",
+        "edges": [
+          "apiDeleteUser rejects self/superadmin (Api.go:987-994)"
+        ]
+      },
+      "entity": "User",
+      "_binds": {
+        "userid": "User.Id"
+      },
+      "_output_schema": {
+        "ok": "true when user deleted"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "Id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "userid"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "UserLevel",
+                      "op": "ne",
+                      "value": 0
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            },
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "Id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "userid"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "Id",
+                      "op": "ne",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "Id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "userid"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "UserLevel",
+                      "op": "ne",
+                      "value": 0
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            },
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "Id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "UserLevel",
+                      "op": "eq",
+                      "value": 0
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "userid"
+        ],
+        "messages": {
+          "auth": "You must be signed in to delete users.",
+          "precondition": "You cannot delete your own account. The built-in super admin cannot be deleted."
+        }
+      },
+      "description": "Delete a user account and choose whether to also delete that user's files. You cannot delete the built-in super admin or your own account.",
+      "_defaulted": []
+    },
+    {
+      "tool": "user_list",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "User",
+        "search_fields": [
+          "UserLevel",
+          "LastOnline",
+          "Name"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "UserLevel",
+            "LastOnline",
+            "Name"
+          ]
+        }
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "internal/webserver/Webserver.go:860",
+        "id_local": "User.list",
+        "entry": {
+          "kind": "http",
+          "route": "GET /users",
+          "locator": "internal/webserver/Webserver.go:126"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "for _, userEntry := range database.GetAllUsers() {\n  userWithUploads := userInfo{UploadCount: uploadCounts[userEntry.Id], User: userEntry}\n  if userEntry.Id == user.Id { userWithUploads.User.LastOnline = time.Now().Unix() }\n  u.Users = append(u.Users, userWithUploads)\n}",
+        "scope": "global: GET /users is a permission-gated admin console (requireLogin + HasPermissionManageUsers); no owner row to scope by."
+      },
+      "entity": "User",
+      "_output_schema": {
+        "users": "list of User rows (view only)"
+      },
+      "description": "List all user accounts with their permission and upload counts, for the admin user console. Only reachable by an admin (route is permission-gated)."
+    },
+    {
+      "tool": "file_upload",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "File",
+        "fields": {
+          "Name": {
+            "$arg": "filename"
+          },
+          "ContentType": {
+            "$arg": "contentType"
+          },
+          "ExpireAt": {
+            "$arg": "expiryDays"
+          },
+          "DownloadsRemaining": {
+            "$arg": "allowedDownloads"
+          },
+          "UnlimitedDownloads": {
+            "$arg": "isUnlimitedDownload"
+          },
+          "UnlimitedTime": {
+            "$arg": "isUnlimitedTime"
+          },
+          "UploadRequestId": {
+            "$arg": "fileRequestId"
+          }
+        },
+        "set_on_create": {
+          "UserId": {
+            "$session": "account_id"
+          },
+          "UploadDate": "2026-01-01T00:00:00",
+          "DownloadCount": 0,
+          "PendingDeletion": 0
+        }
+      },
+      "input_schema": {
+        "filename": {
+          "type": "text",
+          "required": true,
+          "description": "Name of the uploaded file."
+        },
+        "contentType": {
+          "type": "text",
+          "required": false,
+          "description": "MIME content type of the file."
+        },
+        "allowedDownloads": {
+          "type": "int",
+          "required": false,
+          "description": "Max number of downloads; 0 means unlimited."
+        },
+        "expiryDays": {
+          "type": "int",
+          "required": false,
+          "description": "How many days until the file expires."
+        },
+        "password": {
+          "type": "text",
+          "required": false,
+          "description": "Optional download password; hashed into PasswordHash."
+        },
+        "isUnlimitedDownload": {
+          "type": "bool",
+          "required": false,
+          "description": "Whether the file may be downloaded unlimited times."
+        },
+        "isUnlimitedTime": {
+          "type": "bool",
+          "required": false,
+          "description": "Whether the file never expires."
+        },
+        "isE2E": {
+          "type": "bool",
+          "required": false,
+          "description": "Whether the content is end-to-end encrypted."
+        },
+        "fileRequestId": {
+          "type": "int",
+          "required": false,
+          "description": "Id of the upload request this upload belongs to, if any."
+        }
+      },
+      "_evidence": {
+        "locator": "internal/webserver/fileupload/FileUpload.go:57",
+        "id_local": "File.upload",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/files/add",
+          "locator": "internal/webserver/api/routing.go:96"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "err := r.ParseMultipartForm(int64(maxMemory)*1024*1024)\n...\nfile, header, err := r.FormFile(\"file\")\nconfig.FileRequestId = \"\"\nresult, err := storage.NewFile(file, header, userId, config)\n...\n_, _ = io.WriteString(w, result.ToJsonResult(config.ExternalUrl, configuration.Get().IncludeFilename))",
+        "edges": [
+          "isAuthorisedForApi (Api.go:1269); route requires ApiPermUpload"
+        ]
+      },
+      "entity": "File",
+      "_binds": {
+        "filename": "File.Name",
+        "contentType": "File.ContentType",
+        "allowedDownloads": "File.DownloadsRemaining",
+        "expiryDays": "File.ExpireAt",
+        "isUnlimitedDownload": "File.UnlimitedDownloads",
+        "isUnlimitedTime": "File.UnlimitedTime",
+        "fileRequestId": "File.UploadRequestId"
+      },
+      "_output_schema": {
+        "Result": "OK",
+        "FileInfo": "FileApiOutput of the created file"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "Id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "filename"
+        ],
+        "messages": {
+          "auth": "You must be signed in to upload a file.",
+          "precondition": "You must be a valid user to upload.",
+          "required": "A filename is required."
+        }
+      },
+      "_defaulted": [
+        "fields (mapped to the real parameter names via binds)",
+        "fields (final: Name/ContentType/ExpireAt/DownloadsRemaining/Unlimited*/UploadRequestId; UploadDate pinned, DownloadCount/PendingDeletion pinned)"
+      ],
+      "description": "Upload a new file into your account, setting its download limit, expiry and optional download password. You must be a signed-in user."
+    },
+    {
+      "tool": "file_edit",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "File",
+        "row_key": {
+          "Id": {
+            "$arg": "id"
+          }
+        },
+        "set": {
+          "DownloadsRemaining": {
+            "$arg": "allowedDownloads"
+          },
+          "ExpireAt": {
+            "$arg": "expiryTimestamp"
+          },
+          "PasswordHash": {
+            "$arg": "newPassword"
+          }
+        },
+        "fields": [
+          "Name",
+          "Size",
+          "SHA1",
+          "SizeBytes",
+          "DownloadCount",
+          "HotlinkId",
+          "ContentType",
+          "AwsBucket",
+          "Encryption",
+          "UnlimitedDownloads",
+          "UnlimitedTime",
+          "PendingDeletion",
+          "UploadRequestId",
+          "DownloadCount"
+        ]
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the file to edit."
+        },
+        "allowedDownloads": {
+          "type": "int",
+          "required": false,
+          "description": "New maximum number of downloads."
+        },
+        "expiryTimestamp": {
+          "type": "datetime",
+          "required": false,
+          "description": "New expiry time."
+        },
+        "newPassword": {
+          "type": "text",
+          "required": false,
+          "description": "Optional new download password (hashed)."
+        }
+      },
+      "_evidence": {
+        "locator": "internal/webserver/api/Api.go:99",
+        "id_local": "File.edit",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/files/modify",
+          "locator": "internal/webserver/api/routing.go:115"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "if request.UnlimitedDownloads { file.UnlimitedDownloads = true } else if request.AllowedDownloads != 0 { file.DownloadsRemaining = request.AllowedDownloads; file.UnlimitedDownloads = false }\nif request.UnlimitedExpiry { file.UnlimitedTime = true } else if request.ExpiryTimestamp != 0 { file.ExpireAt = request.ExpiryTimestamp; file.UnlimitedTime = false }\nif !request.KeepPassword { file.PasswordHash = configuration.HashPassword(request.Password, false, \"\"); downloadPasswordToken.DeleteAllForFile(file.Id) }\nif file.HotlinkId != \"\" && !storage.IsAbleHotlink(file) { database.DeleteHotlink(file.Hot",
+        "edges": [
+          "apiEditFile: file.UserId != user.Id && !user.HasPermission(UserPermEditOtherUploads) -> 401 (internal/webserver/api/Api.go:95)"
+        ]
+      },
+      "entity": "File",
+      "_binds": {
+        "id": "File.Id",
+        "allowedDownloads": "File.DownloadsRemaining",
+        "expiryTimestamp": "File.ExpireAt"
+      },
+      "_output_schema": {
+        "file": "FileApiOutput of edited file"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "File",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "Id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "UserId",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "Id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "UserLevel",
+                      "op": "ne",
+                      "value": 2
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must be signed in to edit files.",
+          "precondition": "Only the owner of the file, or an admin, can edit it."
+        }
+      },
+      "_defaulted": [
+        "set (rewritten to drive writes from allowedDownloads/expiryTimestamp/newPassword args)"
+      ],
+      "description": "Edit an existing file's download limit, expiry and password. You can edit your own files, or any file if you hold the edit-other-uploads permission."
+    },
+    {
+      "tool": "file_duplicate",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "File",
+        "fields": {
+          "Name": {
+            "$arg": "filename"
+          },
+          "Size": {
+            "$arg": "size"
+          },
+          "SHA1": {
+            "$arg": "sha1"
+          },
+          "SizeBytes": {
+            "$arg": "sizeBytes"
+          },
+          "ContentType": {
+            "$arg": "contentType"
+          },
+          "AwsBucket": {
+            "$arg": "awsBucket"
+          },
+          "Encryption": {
+            "$arg": "encryption"
+          },
+          "PasswordHash": {
+            "$arg": "password"
+          },
+          "ExpireAt": {
+            "$arg": "expiryTimestamp"
+          },
+          "DownloadsRemaining": {
+            "$arg": "allowedDownloads"
+          },
+          "UnlimitedDownloads": {
+            "$arg": "unlimitedDownloads"
+          },
+          "UnlimitedTime": {
+            "$arg": "unlimitedTime"
+          }
+        },
+        "set_on_create": {
+          "UserId": {
+            "$session": "account_id"
+          },
+          "UploadDate": "1990-01-01T00:00:00",
+          "PendingDeletion": 0
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the file to duplicate."
+        },
+        "filename": {
+          "type": "text",
+          "required": false,
+          "description": "Optional new name; default copies the original."
+        },
+        "size": {
+          "type": "text",
+          "required": false,
+          "description": "Display size string copied from the original."
+        },
+        "sha1": {
+          "type": "text",
+          "required": false,
+          "description": "SHA1 of the original content."
+        },
+        "sizeBytes": {
+          "type": "int",
+          "required": false,
+          "description": "Byte size copied from the original."
+        },
+        "contentType": {
+          "type": "text",
+          "required": false,
+          "description": "MIME type copied from the original."
+        },
+        "awsBucket": {
+          "type": "text",
+          "required": false,
+          "description": "Storage bucket copied from the original."
+        },
+        "encryption": {
+          "type": "json",
+          "required": false,
+          "description": "Encryption metadata copied from the original."
+        },
+        "password": {
+          "type": "text",
+          "required": false,
+          "description": "Optional new download password."
+        },
+        "expiryTimestamp": {
+          "type": "datetime",
+          "required": false,
+          "description": "Optional new expiry; default copies the original."
+        },
+        "allowedDownloads": {
+          "type": "int",
+          "required": false,
+          "description": "Optional new download limit; default copies the original."
+        },
+        "unlimitedDownloads": {
+          "type": "bool",
+          "required": false,
+          "description": "Whether the copy may be downloaded unlimited times."
+        },
+        "unlimitedTime": {
+          "type": "bool",
+          "required": false,
+          "description": "Whether the copy never expires."
+        }
+      },
+      "_evidence": {
+        "locator": "internal/storage/FileServing.go:406",
+        "id_local": "File.duplicate",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/files/duplicate",
+          "locator": "internal/webserver/api/routing.go:108"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "var newFile models.File\ncopier.Copy(&newFile, &file)\nif changeExpiry { newFile.ExpireAt = fileParameters.ExpiryTimestamp; newFile.UnlimitedTime = fileParameters.UnlimitedTime }\nif changeDownloads { newFile.DownloadsRemaining = fileParameters.AllowedDownloads; newFile.UnlimitedDownloads = fileParameters.UnlimitedDownload }\nif changePassword { newFile.PasswordHash = configuration.HashPassword(fileParameters.Password, false, \"\") }\nif changeName { newFile.Name = newFileName }\nnewFile.Id = createNewId(); newFile.DownloadCount = 0; newFile.UserId = fileParameters.UserId\nAddHotlink(&newFile)\ndatabase",
+        "edges": [
+          "apiDuplicateFile: file.UserId != user.Id && !user.HasPermission(UserPermListOtherUploads) (internal/webserver/api/Api.go:718)"
+        ]
+      },
+      "entity": "File",
+      "_binds": {
+        "id": "File.Id"
+      },
+      "_output_schema": {
+        "file": "FileApiOutput of duplicated file"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "File",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "Id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "UserId",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "Id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "UserLevel",
+                      "op": "ne",
+                      "value": 2
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must be signed in to duplicate a file.",
+          "precondition": "Only the owner of the file, or an admin, can duplicate it.",
+          "fk": "The upload request id you gave does not exist."
+        }
+      },
+      "_defaulted": [
+        "fields (rewritten to field_set-style bind map for FK-resolved duplicate; content cols become explicit optional args)"
+      ],
+      "description": "Duplicate an existing file you own (or any file, as an admin), creating a new file row with an optional new name, expiry, download limit and password."
+    },
+    {
+      "tool": "file_replace",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "File",
+        "row_key": {
+          "Id": {
+            "$arg": "id"
+          }
+        },
+        "set": {
+          "Name": {
+            "$ref": {
+              "entity": "File",
+              "where": {
+                "Id": {
+                  "$arg": "idNewContent"
+                }
+              },
+              "col": "Name"
+            }
+          },
+          "Size": {
+            "$ref": {
+              "entity": "File",
+              "where": {
+                "Id": {
+                  "$arg": "idNewContent"
+                }
+              },
+              "col": "Size"
+            }
+          },
+          "SHA1": {
+            "$ref": {
+              "entity": "File",
+              "where": {
+                "Id": {
+                  "$arg": "idNewContent"
+                }
+              },
+              "col": "SHA1"
+            }
+          },
+          "SizeBytes": {
+            "$ref": {
+              "entity": "File",
+              "where": {
+                "Id": {
+                  "$arg": "idNewContent"
+                }
+              },
+              "col": "SizeBytes"
+            }
+          },
+          "ContentType": {
+            "$ref": {
+              "entity": "File",
+              "where": {
+                "Id": {
+                  "$arg": "idNewContent"
+                }
+              },
+              "col": "ContentType"
+            }
+          },
+          "AwsBucket": {
+            "$ref": {
+              "entity": "File",
+              "where": {
+                "Id": {
+                  "$arg": "idNewContent"
+                }
+              },
+              "col": "AwsBucket"
+            }
+          },
+          "Encryption": {
+            "$ref": {
+              "entity": "File",
+              "where": {
+                "Id": {
+                  "$arg": "idNewContent"
+                }
+              },
+              "col": "Encryption"
+            }
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the file whose content to replace."
+        },
+        "idNewContent": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the file whose content is copied over."
+        },
+        "deleteNewFile": {
+          "type": "bool",
+          "required": false,
+          "description": "Whether to delete the source file after copying."
+        }
+      },
+      "_evidence": {
+        "locator": "internal/storage/FileServing.go:374",
+        "id_local": "File.replace",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/files/replace",
+          "locator": "internal/webserver/api/routing.go:120"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "file.Name = newFileContent.Name\nfile.Size = newFileContent.Size\nfile.SHA1 = newFileContent.SHA1\nfile.ContentType = newFileContent.ContentType\nfile.AwsBucket = newFileContent.AwsBucket\nfile.SizeBytes = newFileContent.SizeBytes\nfile.Encryption = newFileContent.Encryption\ndatabase.SaveMetaData(file)\nif delete { DeleteFile(newFileContent.Id, true) }\nreturn file, nil",
+        "edges": [
+          "apiReplaceFile: fileOriginal.UserId != user.Id && !user.HasPermission(UserPermReplaceOtherUploads) (internal/webserver/api/Api.go:777)"
+        ]
+      },
+      "entity": "File",
+      "_binds": {
+        "id": "File.Id",
+        "idNewContent": "File.Id"
+      },
+      "_output_schema": {
+        "file": "FileApiOutput of file with replaced content"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "File",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "Id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "UserId",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "Id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "UserLevel",
+                      "op": "ne",
+                      "value": 2
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "id",
+          "idNewContent"
+        ],
+        "messages": {
+          "auth": "You must be signed in to edit files.",
+          "precondition": "Only the owner of the file, or an admin, can edit it."
+        }
+      },
+      "_defaulted": [
+        "set (kept $ref copy-from-source; row_key already $arg.id)"
+      ],
+      "description": "Replace an existing file's stored content (name, size, hash, type) with that of another file you own. You can replace your own files, or any file with the replace-other-uploads permission."
+    },
+    {
+      "tool": "file_delete",
+      "op": "delete",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "File",
+        "row_key": {
+          "Id": {
+            "$arg": "id"
+          }
+        },
+        "fields": [
+          "Name",
+          "Size",
+          "SHA1",
+          "ExpireAt",
+          "SizeBytes",
+          "DownloadsRemaining",
+          "DownloadCount",
+          "PasswordHash",
+          "HotlinkId",
+          "ContentType",
+          "AwsBucket",
+          "Encryption",
+          "UnlimitedDownloads",
+          "UnlimitedTime",
+          "UserId",
+          "PendingDeletion",
+          "UploadRequestId"
+        ],
+        "set": {
+          "ExpireAt": 0,
+          "UnlimitedTime": false
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true
+        },
+        "delay": "int"
+      },
+      "_evidence": {
+        "locator": "internal/webserver/api/Api.go:342",
+        "id_local": "File.delete",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/files/delete",
+          "locator": "internal/webserver/api/routing.go:102"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "logging.LogDelete(file, user)\nif request.DelaySeconds == 0 { _ = storage.DeleteFile(request.Id, true) } else { _ = storage.DeleteFileSchedule(request.Id, request.DelaySeconds*1000, true) }",
+        "edges": [
+          "apiDeleteFile: file.UserId != user.Id && !user.HasPermission(UserPermDeleteOtherUploads) -> 401 (internal/webserver/api/Api.go:338)"
+        ]
+      },
+      "entity": "File",
+      "_binds": {
+        "id": "File.Id"
+      },
+      "_output_schema": {
+        "ok": "true when file deleted or scheduled"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "File",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "Id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "UserId",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "Id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "UserLevel",
+                      "op": "ne",
+                      "value": 2
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must be signed in to delete files.",
+          "precondition": "Only the owner of the file, or an admin, can delete it."
+        }
+      },
+      "_defaulted": [
+        "fields"
+      ],
+      "description": "Schedule an existing file's deletion (immediate, or after a delay). You can delete your own files, or any file with the delete-other-uploads permission."
+    },
+    {
+      "tool": "file_restore",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "File",
+        "row_key": {
+          "Id": {
+            "$arg": "id"
+          }
+        },
+        "fields": [
+          "Name",
+          "Size",
+          "SHA1",
+          "ExpireAt",
+          "SizeBytes",
+          "DownloadsRemaining",
+          "DownloadCount",
+          "PasswordHash",
+          "HotlinkId",
+          "ContentType",
+          "AwsBucket",
+          "Encryption",
+          "UnlimitedDownloads",
+          "UnlimitedTime",
+          "UserId",
+          "PendingDeletion",
+          "UploadRequestId"
+        ],
+        "set": {
+          "PendingDeletion": 0
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true
+        }
+      },
+      "_evidence": {
+        "locator": "internal/webserver/api/Api.go:364",
+        "id_local": "File.restore",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/files/restore",
+          "locator": "internal/webserver/api/routing.go:126"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "file, ok = storage.CancelPendingFileDeletion(file.Id)\nif !ok { sendError(w, http.StatusNotFound, errorcodes.NotFound, \"...\" ) ; return }\nlogging.LogRestore(file, user)",
+        "edges": [
+          "apiRestoreFile: file.UserId != user.Id && !user.HasPermission(UserPermDeleteOtherUploads) (internal/webserver/api/Api.go:360)"
+        ]
+      },
+      "entity": "File",
+      "_binds": {
+        "id": "File.Id"
+      },
+      "_output_schema": {
+        "file": "FileApiOutput of restored file"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "File",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "Id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "UserId",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "Id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "UserLevel",
+                      "op": "ne",
+                      "value": 2
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must be signed in to restore files.",
+          "precondition": "Only the owner of the file, or an admin, can restore it."
+        }
+      },
+      "_defaulted": [
+        "fields"
+      ],
+      "description": "Cancel a pending deletion on a file so it stays available. You restore your own files, or any file with the delete-other-uploads permission."
+    },
+    {
+      "tool": "file_list",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "File",
+        "scope": {
+          "owner_col": "UserId"
+        },
+        "search_fields": [
+          "ExpireAt",
+          "DownloadsRemaining"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "ExpireAt",
+            "DownloadsRemaining"
+          ]
+        }
+      },
+      "input_schema": {
+        "showFileRequests": {
+          "type": "bool",
+          "required": false,
+          "description": "Whether to include upload-request placeholder entries."
+        }
+      },
+      "_evidence": {
+        "locator": "internal/webserver/api/Api.go:576",
+        "id_local": "File.list",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/files/list",
+          "locator": "internal/webserver/api/routing.go:71"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "for _, element := range database.GetAllMetadata() {\n  if !includeUploadRequests && element.IsFileRequest() { continue }\n  if element.UserId == user.Id || user.HasPermission(models.UserPermListOtherUploads) {\n    if !storage.IsExpiredFile(element, timeNow) { file, err := element.ToFileApiOutput(config.ServerUrl, config.IncludeFilename); validFiles = append(validFiles, file) }\n  }\n}"
+      },
+      "entity": "File",
+      "_output_schema": {
+        "files": "list of FileApiOutput"
+      },
+      "description": "List the files visible to you (your own uploads, plus any you may list as an admin), excluding expired files and file-request placeholders by default."
+    },
+    {
+      "tool": "file_getsingle",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "File",
+        "lookup_by": {
+          "Id": {
+            "$arg": "id"
+          }
+        },
+        "scope": {
+          "owner_col": "UserId"
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the file to fetch."
+        }
+      },
+      "_evidence": {
+        "locator": "internal/webserver/api/Api.go:600",
+        "id_local": "File.getSingle",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/files/list/{id}",
+          "locator": "internal/webserver/api/routing.go:77"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "file, ok := storage.GetFile(request.Id)\nif !ok { sendError(w, http.StatusNotFound, errorcodes.NotFound, \"File not found\"); return }\nif file.UserId != user.Id && !user.HasPermission(models.UserPermListOtherUploads) { sendError(w, http.StatusUnauthorized, ...); return }",
+        "edges": [
+          "apiListSingle: file.UserId != user.Id && !user.HasPermission(UserPermListOtherUploads) (internal/webserver/api/Api.go:605)"
+        ]
+      },
+      "entity": "File",
+      "_binds": {
+        "id": "File.Id"
+      },
+      "_output_schema": {
+        "file": "FileApiOutput"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "File",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "Id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "UserId",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "Id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "Permissions",
+                      "op": "gt",
+                      "value": 0
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must be signed in to view a file.",
+          "precondition": "Only the owner of the file, or an admin, can view it.",
+          "not_found": "No such file exists."
+        }
+      },
+      "description": "Fetch a single file's metadata by id. Returns your own files, or any file if you may list other users' uploads."
+    },
+    {
+      "tool": "file_download",
+      "op": "read",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "File",
+        "row_key": {
+          "Id": {
+            "$arg": "id"
+          }
+        },
+        "set": {
+          "DownloadCount": {
+            "$arg": "increaseCounter"
+          }
+        },
+        "skip_blank": true
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the file to download."
+        },
+        "increaseCounter": {
+          "type": "bool",
+          "required": false,
+          "description": "If true, count this download against the file. Setting this increments DownloadCount."
+        },
+        "presignUrl": {
+          "type": "bool",
+          "required": false,
+          "description": "If true, return a presigned URL instead of the stream."
+        }
+      },
+      "_evidence": {
+        "locator": "internal/webserver/api/Api.go:617",
+        "id_local": "File.download",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/files/download/{id}",
+          "locator": "internal/webserver/api/routing.go:49"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "file, statusCode, errCode, errMessage := checkDownloadAllowed(request.Id, user)\nif statusCode != 0 { ...; return }\nif !request.PresignUrl { forceDecryption := file.Encryption.IsEncrypted && !file.Encryption.IsEndToEndEncrypted; storage.ServeFile(file, w, request.WebRequest, true, request.IncreaseCounter, forceDecryption, false); return }\ncreateAndOutputPresignedUrl([]string{file.Id}, w, \"\")",
+        "edges": [
+          "checkDownloadAllowed (internal/webserver/api/Api.go:660)"
+        ]
+      },
+      "entity": "File",
+      "_binds": {
+        "id": "File.Id"
+      },
+      "_output_schema": {
+        "file": "binary stream of the file"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "File",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "Id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "UserId",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "Id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "Permissions",
+                      "op": "gt",
+                      "value": 0
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must be signed in to download a file.",
+          "precondition": "Only the owner of the file, or an admin, can download it.",
+          "not_found": "No such file exists."
+        }
+      },
+      "_defaulted": [
+        "set (DownloadCount += 1 when increaseCounter; download is a counter-touching write)"
+      ],
+      "description": "Download a file's content as a stream (or produce a signed URL). Serves your own files, or any file if you may list other users' uploads."
+    },
+    {
+      "tool": "file_downloadzip",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "File",
+        "lookup_by": {
+          "Id": {
+            "$arg": "ids"
+          }
+        },
+        "scope": {
+          "owner_col": "UserId"
+        }
+      },
+      "input_schema": {
+        "ids": {
+          "type": "json",
+          "required": true,
+          "description": "Array of file ids to bundle."
+        },
+        "filename": {
+          "type": "text",
+          "required": false,
+          "description": "Name of the produced zip."
+        },
+        "presignUrl": {
+          "type": "bool",
+          "required": false,
+          "description": "If true, return a presigned URL for the zip."
+        }
+      },
+      "_evidence": {
+        "locator": "internal/webserver/api/Api.go:641",
+        "id_local": "File.downloadZip",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/files/downloadzip",
+          "locator": "internal/webserver/api/routing.go:56"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "requestedFiles := make([]models.File, 0)\nfor _, fileId := range request.Ids { file, statusCode, errCode, errMessage := checkDownloadAllowed(fileId, user); if statusCode != 0 { ...; return }; requestedFiles = append(requestedFiles, file) }",
+        "edges": [
+          "downloadZip loop calls checkDownloadAllowed (internal/webserver/api/Api.go:660)"
+        ]
+      },
+      "entity": "File",
+      "_output_schema": {
+        "file": "zip stream of the files"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "File",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "Id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "UserId",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "Id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "Permissions",
+                      "op": "gt",
+                      "value": 0
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "ids"
+        ],
+        "messages": {
+          "not_found": "One of the requested files does not exist.",
+          "precondition": "Only the owner of the file, or an admin, can download it."
+        }
+      },
+      "description": "Bundle several of your files into a single zip stream, checking each file's download allowance."
+    },
+    {
+      "tool": "apikey_create",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "ApiKey",
+        "fields": {
+          "FriendlyName": {
+            "$arg": "friendlyName"
+          }
+        },
+        "set_on_create": {
+          "Permissions": 7,
+          "IsSystemKey": false,
+          "UserId": {
+            "$session": "account_id"
+          },
+          "LastUsed": 0,
+          "Expiry": 0
+        },
+        "unique_on": [
+          "PublicId"
+        ]
+      },
+      "input_schema": {
+        "friendlyName": {
+          "type": "text",
+          "required": true,
+          "description": "A label for the key."
+        },
+        "basicPermissions": {
+          "type": "bool",
+          "required": false,
+          "description": "If false, the key starts with no permissions instead of the default set."
+        }
+      },
+      "_evidence": {
+        "locator": "internal/webserver/api/Api.go:134",
+        "id_local": "ApiKey.create",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/auth/create",
+          "locator": "internal/webserver/api/routing.go:132"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "func generateNewKey(defaultPermissions bool, userId int, friendlyName, filerequstId string) models.ApiKey {\n\tif friendlyName == \"\" { friendlyName = \"Unnamed key\" }\n\tnewKey := models.ApiKey{Id: helper.GenerateRandomString(LengthApiKey), PublicId: helper.GenerateRandomString(LengthPublicId), FriendlyName: friendlyName, Permissions: models.ApiPermDefault, IsSystemKey: false, UserId: userId, UploadRequestId: filerequstId}\n\tif !defaultPermissions { newKey.Permissions = models.ApiPermNone }\n\tdatabase.SaveApiKey(newKey); return newKey\n}",
+        "edges": [
+          "route /api/auth/create requires ApiPermApiMod resolved to an owner user; apiCreateApiKey checks DisableApiMenu and user.IsAdmin (internal/webserver/api/Api.go:244)"
+        ]
+      },
+      "entity": "ApiKey",
+      "_binds": {
+        "friendlyName": "ApiKey.FriendlyName"
+      },
+      "_output_schema": {
+        "Result": "OK",
+        "Id": "private api key",
+        "PublicId": "public api key id"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "Id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in to create an API key.",
+          "precondition": "You must be a valid signed-in user to create an API key."
+        }
+      },
+      "_defaulted": [
+        "fields (mapped to the real parameter names via binds)"
+      ],
+      "description": "Create a new API key for your own account with the default permission set. Returns the private key and its public id."
+    },
+    {
+      "tool": "apikey_modify",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "ApiKey",
+        "row_key": {
+          "Id": {
+            "$arg": "targetKey"
+          }
+        },
+        "set": {
+          "Permissions": {
+            "$arg": "newPermissions"
+          }
+        }
+      },
+      "input_schema": {
+        "targetKey": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the API key to modify."
+        },
+        "newPermissions": {
+          "type": "int",
+          "required": true,
+          "description": "New permissions bitmask for the key (grant/revoke are folded into this)."
+        },
+        "permission": {
+          "type": "text",
+          "required": false,
+          "description": "A permission bit to toggle (informational when newPermissions given)."
+        },
+        "permissionModifier": {
+          "type": "text",
+          "required": false,
+          "description": "grant or revoke for the permission bit."
+        }
+      },
+      "_evidence": {
+        "locator": "internal/webserver/api/Api.go:213",
+        "id_local": "ApiKey.modify",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/auth/modify",
+          "locator": "internal/webserver/api/routing.go:144"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "if request.GrantPermission && !apiKey.HasPermission(request.Permission) {\n\tapiKey.GrantPermission(request.Permission); database.SaveApiKey(apiKey); return\n}\nif !request.GrantPermission && apiKey.HasPermission(request.Permission) { apiKey.RemovePermission(request.Permission); database.SaveApiKey(apiKey) }",
+        "edges": [
+          "apiModifyApiKey: apiKeyOwner.Id != user.Id && !user.HasPermission(UserPermManageApiKeys) (Api.go:184)"
+        ]
+      },
+      "entity": "ApiKey",
+      "_binds": {
+        "targetKey": "ApiKey.Id"
+      },
+      "_output_schema": {
+        "ok": "true when permission applied"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "ApiKey",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "Id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "targetKey"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "UserId",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "Id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "UserLevel",
+                      "op": "ne",
+                      "value": 2
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "targetKey"
+        ],
+        "messages": {
+          "auth": "You must be signed in to modify an API key.",
+          "precondition": "Only the owner of the key, or an admin, can modify it."
+        }
+      },
+      "_defaulted": [
+        "set (rewritten to drive Permissions from newPermissions arg)"
+      ],
+      "description": "Grant or revoke a permission bit on one of your own API keys, or on any key if you manage API keys."
+    },
+    {
+      "tool": "apikey_changefriendlyname",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "ApiKey",
+        "row_key": {
+          "Id": {
+            "$arg": "targetKey"
+          }
+        },
+        "fields": {
+          "PublicId": {
+            "$arg": "PublicId"
+          },
+          "FriendlyName": {
+            "$arg": "friendlyName"
+          },
+          "LastUsed": {
+            "$arg": "LastUsed"
+          },
+          "Permissions": {
+            "$arg": "Permissions"
+          },
+          "Expiry": {
+            "$arg": "Expiry"
+          },
+          "IsSystemKey": {
+            "$arg": "IsSystemKey"
+          },
+          "UserId": {
+            "$arg": "UserId"
+          },
+          "UploadRequestId": {
+            "$arg": "UploadRequestId"
+          }
+        },
+        "set": {
+          "FriendlyName": {
+            "$arg": "friendlyName"
+          }
+        }
+      },
+      "input_schema": {
+        "targetKey": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the key to rename."
+        },
+        "friendlyName": {
+          "type": "text",
+          "required": true,
+          "description": "New display name for the key."
+        }
+      },
+      "_evidence": {
+        "locator": "internal/webserver/api/Api.go:309",
+        "id_local": "ApiKey.changeFriendlyName",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/auth/friendlyname",
+          "locator": "internal/webserver/api/routing.go:137"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "func renameApiKeyFriendlyName(id string, newName string) error {\n\tif newName == \"\" { newName = \"Unnamed key\" }\n\tapimutex.Lock(apimutex.TypeApiKey, id); defer apimutex.Unlock(...)\n\tkey, ok := database.GetApiKey(id); if !ok { return errors.New(\"could not modify API key\") }\n\tif key.FriendlyName != newName { key.FriendlyName = newName; database.SaveApiKey(key) }\n\treturn nil\n}",
+        "edges": [
+          "apiChangeFriendlyName: ownerApiKey.Id != user.Id && !user.HasPermission(UserPermManageApiKeys) (Api.go:298)"
+        ]
+      },
+      "entity": "ApiKey",
+      "_binds": {
+        "targetKey": "ApiKey.Id",
+        "friendlyName": "ApiKey.FriendlyName"
+      },
+      "_output_schema": {
+        "ok": "true when name updated"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "ApiKey",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "Id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "targetKey"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "UserId",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "Id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "UserLevel",
+                      "op": "ne",
+                      "value": 2
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "targetKey",
+          "friendlyName"
+        ],
+        "messages": {
+          "auth": "You must be signed in to rename an API key.",
+          "precondition": "Only the owner of the key, or an admin, can rename it."
+        }
+      },
+      "_defaulted": [
+        "fields"
+      ],
+      "description": "Rename one of your own API keys, or any key if you manage API keys."
+    },
+    {
+      "tool": "apikey_delete",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "ApiKey",
+        "lookup_by": {
+          "Id": {
+            "$arg": "targetKey"
+          }
+        }
+      },
+      "input_schema": {
+        "targetKey": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the key to delete."
+        }
+      },
+      "_evidence": {
+        "locator": "internal/webserver/api/Api.go:168",
+        "id_local": "ApiKey.delete",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/auth/delete",
+          "locator": "internal/webserver/api/routing.go:150"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "apiKeyOwner, apiKey, ok := isValidKeyForEditing(request.KeyId)\nif !ok { sendError(w, http.StatusNotFound, errorcodes.NotFound, \"Invalid key ID provided.\"); return }\nif apiKeyOwner.Id != user.Id && !user.HasPermission(models.UserPermManageApiKeys) { sendError(...); return }\ndatabase.DeleteApiKey(apiKey.Id)",
+        "edges": [
+          "apiDeleteKey: apiKeyOwner.Id != user.Id && !user.HasPermission(UserPermManageApiKeys) (Api.go:164)"
+        ]
+      },
+      "entity": "ApiKey",
+      "_binds": {
+        "targetKey": "ApiKey.Id"
+      },
+      "_output_schema": {
+        "ok": "true when key deleted"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "ApiKey",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "Id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "targetKey"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "UserId",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "Id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "UserLevel",
+                      "op": "ne",
+                      "value": 2
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "targetKey"
+        ],
+        "messages": {
+          "auth": "You must be signed in to delete an API key.",
+          "precondition": "Only the owner of the key, or an admin, can delete it."
+        }
+      },
+      "description": "Delete one of your own API keys, or any key if you manage API keys."
+    },
+    {
+      "tool": "apikey_list",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "ApiKey",
+        "scope": {
+          "owner_col": "UserId"
+        },
+        "search_fields": [
+          "IsSystemKey",
+          "UploadRequestId",
+          "UserId"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "IsSystemKey",
+            "UploadRequestId",
+            "UserId"
+          ]
+        }
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "internal/webserver/Webserver.go:838",
+        "id_local": "ApiKey.list",
+        "entry": {
+          "kind": "http",
+          "route": "GET /apiKeys",
+          "locator": "internal/webserver/Webserver.go:108"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "for _, apiKey := range database.GetAllApiKeys() {\n\t_, ok := u.UserMap[apiKey.UserId]; if !ok { continue }\n\tif !apiKey.IsSystemKey && !apiKey.IsUploadRequestKey() { if apiKey.UserId == user.Id || user.HasPermissionManageApi() { apiKeyList = append(apiKeyList, apiKey) } }\n}"
+      },
+      "entity": "ApiKey",
+      "_output_schema": {
+        "apiKeys": "list of ApiKey rows (view only)"
+      },
+      "description": "List the API keys visible to you (your own keys, plus all keys if you manage API keys), excluding internal system and upload-request keys."
+    },
+    {
+      "tool": "apikey_generatewebtoken",
+      "op": "action",
+      "family": "action.emit",
+      "exec_spec": {
+        "channel": "event",
+        "record": {
+          "table": "ApiKey"
+        }
+      },
+      "input_schema": {
+        "permission": {
+          "type": "text",
+          "required": true,
+          "description": "The permission bit to grant the token, as an ApiPermission string."
+        }
+      },
+      "_evidence": {
+        "locator": "internal/webserver/Webserver.go:299",
+        "id_local": "ApiKey.generateWebToken",
+        "entry": {
+          "kind": "http",
+          "route": "POST /auth/token",
+          "locator": "internal/webserver/Webserver.go:105"
+        },
+        "entity_why": "primary effect external lands on this table",
+        "ref_code": "func handleGenerateAuthToken(w http.ResponseWriter, r *http.Request) {\n\tuser, err := authentication.GetUserFromRequest(r)\n\tpermString := r.Header.Get(\"permission\")\n\tpermission, err := models.ApiPermissionFromString(permString)\n\tif err != nil { http.Error(w, \"Invalid permission\", http.StatusBadRequest); return }\n\ttoken, expiry, err := tokengeneration.Generate(user, permission)\n\t...",
+        "edges": [
+          "route /auth/token is wrapped in requireLogin (session-cookie auth) (internal/webserver/Webserver.go:105)"
+        ]
+      },
+      "entity": "ApiKey",
+      "_output_schema": {
+        "key": "short-lived API token",
+        "expiry": "unix timestamp"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "Id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "permission"
+        ],
+        "messages": {
+          "auth": "You must be signed in (session cookie) to generate a token.",
+          "precondition": "You must be a valid signed-in user to generate a token."
+        }
+      },
+      "description": "Generate a short-lived API token for your own account with the requested permission bit, usable as an API key."
+    },
+    {
+      "tool": "filerequest_create",
+      "op": "update",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "UploadRequest",
+        "fields": {
+          "name": {
+            "$arg": "name"
+          },
+          "note": {
+            "$arg": "notes"
+          },
+          "expiry": {
+            "$arg": "expiry"
+          },
+          "maxFiles": {
+            "$arg": "maxfiles"
+          },
+          "maxSize": {
+            "$arg": "maxsize"
+          }
+        },
+        "set_on_create": {
+          "userid": {
+            "$session": "account_id"
+          },
+          "creation": "2026-01-01T00:00:00"
+        }
+      },
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": false,
+          "description": "Display name of the request."
+        },
+        "notes": {
+          "type": "text",
+          "required": false,
+          "description": "Free-text notes attached to the request."
+        },
+        "expiry": {
+          "type": "datetime",
+          "required": false,
+          "description": "When the request stops accepting uploads."
+        },
+        "maxfiles": {
+          "type": "int",
+          "required": false,
+          "description": "Maximum number of files the request accepts."
+        },
+        "maxsize": {
+          "type": "int",
+          "required": false,
+          "description": "Maximum size in MB per file."
+        }
+      },
+      "_evidence": {
+        "locator": "internal/webserver/api/Api.go:1206",
+        "id_local": "FileRequest.createOrEdit",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/uploadrequest/save",
+          "locator": "internal/webserver/api/routing.go:199"
+        },
+        "entity_why": "primary effect row_upsert lands on this table",
+        "ref_code": "if request.Name == \"\" { if request.IsNameSet || uploadRequest.Name == \"\" { uploadRequest.Name = \"Unnamed Request\" } } else { uploadRequest.Name = request.Name }\nif request.IsExpirySet { uploadRequest.Expiry = request.Expiry }\nif request.IsMaxFilesSet { uploadRequest.MaxFiles = request.MaxFiles }\nif request.IsMaxSizeSet { uploadRequest.MaxSize = request.MaxSizeMb }\nif request.IsNotesSet { uploadRequest.Notes = request.Notes }\ndatabase.SaveFileRequest(uploadRequest)",
+        "edges": [
+          "apiURequestSave non-new path: uploadRequest.UserId != user.Id && !user.HasPermission(UserPermEditOtherUploads) (Api.go:1196)"
+        ]
+      },
+      "entity": "UploadRequest",
+      "_binds": {
+        "id": "UploadRequest.id",
+        "name": "UploadRequest.name",
+        "notes": "UploadRequest.note",
+        "expiry": "UploadRequest.expiry",
+        "maxfiles": "UploadRequest.maxFiles",
+        "maxsize": "UploadRequest.maxSize"
+      },
+      "_output_schema": {
+        "fileRequest": "the saved UploadRequest row (populated)"
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "Id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must be signed in to create an upload request.",
+          "precondition": "You must be a valid signed-in user to create an upload request."
+        }
+      },
+      "_defaulted": [
+        "fields (rewritten to insert_fields-only for a create-or-edit; split into create)"
+      ],
+      "description": "Create a new upload request (a public inbox others can upload into), owned by you, with optional name, notes, expiry and size/file limits."
+    },
+    {
+      "tool": "filerequest_edit",
+      "op": "update",
+      "family": "crud.upsert",
+      "exec_spec": {
+        "entity": "UploadRequest",
+        "key": {
+          "id": {
+            "$arg": "id"
+          }
+        },
+        "insert_fields": {
+          "name": {
+            "$arg": "name"
+          },
+          "note": {
+            "$arg": "notes"
+          },
+          "expiry": {
+            "$arg": "expiry"
+          },
+          "maxFiles": {
+            "$arg": "maxfiles"
+          },
+          "maxSize": {
+            "$arg": "maxsize"
+          }
+        },
+        "set_on_exists": {
+          "userid": {
+            "$session": "account_id"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the request to edit."
+        },
+        "name": {
+          "type": "text",
+          "required": false,
+          "description": "Display name of the request."
+        },
+        "notes": {
+          "type": "text",
+          "required": false,
+          "description": "Free-text notes attached to the request."
+        },
+        "expiry": {
+          "type": "datetime",
+          "required": false,
+          "description": "When the request stops accepting uploads."
+        },
+        "maxfiles": {
+          "type": "int",
+          "required": false,
+          "description": "Maximum number of files the request accepts."
+        },
+        "maxsize": {
+          "type": "int",
+          "required": false,
+          "description": "Maximum size in MB per file."
+        }
+      },
+      "_evidence": {
+        "locator": "internal/webserver/api/Api.go:1206",
+        "id_local": "FileRequest.createOrEdit",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/uploadrequest/save",
+          "locator": "internal/webserver/api/routing.go:199"
+        },
+        "entity_why": "primary effect row_upsert lands on this table",
+        "ref_code": "if request.Name == \"\" { if request.IsNameSet || uploadRequest.Name == \"\" { uploadRequest.Name = \"Unnamed Request\" } } else { uploadRequest.Name = request.Name }\nif request.IsExpirySet { uploadRequest.Expiry = request.Expiry }\nif request.IsMaxFilesSet { uploadRequest.MaxFiles = request.MaxFiles }\nif request.IsMaxSizeSet { uploadRequest.MaxSize = request.MaxSizeMb }\nif request.IsNotesSet { uploadRequest.Notes = request.Notes }\ndatabase.SaveFileRequest(uploadRequest)",
+        "edges": [
+          "apiURequestSave non-new path: uploadRequest.UserId != user.Id && !user.HasPermission(UserPermEditOtherUploads) (Api.go:1196)"
+        ]
+      },
+      "entity": "UploadRequest",
+      "_binds": {
+        "id": "UploadRequest.id",
+        "name": "UploadRequest.name",
+        "notes": "UploadRequest.note",
+        "expiry": "UploadRequest.expiry",
+        "maxfiles": "UploadRequest.maxFiles",
+        "maxsize": "UploadRequest.maxSize"
+      },
+      "_output_schema": {
+        "fileRequest": "the saved UploadRequest row (populated)"
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "Id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "UserLevel",
+                      "op": "ne",
+                      "value": 2
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must be signed in to edit an upload request.",
+          "precondition": "Only the owner of the request, or an admin, can edit it.",
+          "not_found": "No such upload request exists."
+        }
+      },
+      "_defaulted": [
+        "fields (rewritten to insert_fields-only for a create-or-edit; split into edit)"
+      ],
+      "description": "Edit an upload request's name, notes, expiry, file count or size limit. You edit your own requests, or any request if you edit other users' requests."
+    },
+    {
+      "tool": "filerequest_delete",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "UploadRequest",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the request to delete."
+        }
+      },
+      "_evidence": {
+        "locator": "internal/storage/filerequest/Filerequest.go:50",
+        "id_local": "FileRequest.delete",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/uploadrequest/delete",
+          "locator": "internal/webserver/api/routing.go:204"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "func Delete(request models.FileRequest) {\n\tfiles := GetAllFiles(request)\n\tstorage.DeleteFiles(files, true)\n\tdatabase.DeleteFileRequest(request)\n\tdatabase.DeleteApiKey(request.ApiKey)\n}",
+        "edges": [
+          "apiURequestDelete: uploadRequest.UserId != user.Id && !user.HasPermission(UserPermDeleteOtherUploads) (Api.go:1145)"
+        ]
+      },
+      "entity": "UploadRequest",
+      "_binds": {
+        "id": "UploadRequest.id"
+      },
+      "_output_schema": {
+        "result": "OK"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "UploadRequest",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "userid",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "Id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "UserLevel",
+                      "op": "ne",
+                      "value": 2
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must be signed in to delete an upload request.",
+          "precondition": "Only the owner of the request, or an admin, can delete it."
+        }
+      },
+      "description": "Delete an upload request and all files uploaded through it. You delete your own requests, or any request if you delete other users' requests."
+    },
+    {
+      "tool": "filerequest_list",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "UploadRequest",
+        "scope": {
+          "owner_col": "userid"
+        },
+        "search_fields": [
+          "userid"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "userid"
+          ]
+        }
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "internal/webserver/api/Api.go:1237",
+        "id_local": "FileRequest.list",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/uploadrequest/list",
+          "locator": "internal/webserver/api/routing.go:186"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "for _, request := range filerequest.GetAll() {\n\tif request.UserId == user.Id || user.HasPermission(models.UserPermListOtherUploads) { userRequests = append(userRequests, request) }\n}"
+      },
+      "entity": "UploadRequest",
+      "_output_schema": {
+        "requests": "list of populated UploadRequest rows"
+      },
+      "description": "List the upload requests visible to you (your own requests, plus all requests if you may list other users' requests)."
+    },
+    {
+      "tool": "filerequest_getsingle",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "UploadRequest",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        },
+        "scope": {
+          "owner_col": "userid"
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the request to fetch."
+        }
+      },
+      "_evidence": {
+        "locator": "internal/webserver/api/Api.go:1255",
+        "id_local": "FileRequest.getSingle",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/uploadrequest/list/{id}",
+          "locator": "internal/webserver/api/routing.go:192"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "uploadRequest, ok := filerequest.Get(request.Id)\nif !ok { sendError(...); return }\nif uploadRequest.UserId != user.Id && !user.HasPermission(models.UserPermListOtherUploads) { sendError(...); return }",
+        "edges": [
+          "getSingle checks request existence (filerequest.Get -> sendError on !ok) and ownership (UserId != user.Id && !UserPermListOtherUploads) (Api.go:1255)"
+        ]
+      },
+      "entity": "UploadRequest",
+      "_binds": {
+        "id": "UploadRequest.id"
+      },
+      "_output_schema": {
+        "request": "populated UploadRequest row"
+      },
+      "guards": {
+        "required": [
+          "id"
+        ],
+        "requires_auth": true,
+        "messages": {
+          "not_found": "No such upload request exists.",
+          "auth": "You must be signed in to view an upload request."
+        }
+      },
+      "description": "Fetch a single upload request by id (your own, or any request if you may list other users' requests).",
+      "_defaulted": []
+    },
+    {
+      "tool": "file_completeuploadrequestchunk",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "File",
+        "fields": {
+          "Name": {
+            "$arg": "filename"
+          },
+          "ContentType": {
+            "$arg": "contenttype"
+          }
+        },
+        "set_on_create": {
+          "UploadRequestId": {
+            "$arg": "fileRequestId"
+          },
+          "PasswordHash": "",
+          "UserId": {
+            "$session": "account_id"
+          },
+          "ExpireAt": 0,
+          "UploadDate": "2026-01-01T00:00:00",
+          "DownloadCount": 0,
+          "DownloadsRemaining": 0,
+          "PendingDeletion": 0,
+          "UnlimitedDownloads": true,
+          "UnlimitedTime": true
+        }
+      },
+      "input_schema": {
+        "fileRequestId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the upload request receiving the file."
+        },
+        "filename": {
+          "type": "text",
+          "required": true,
+          "description": "Name of the completed file."
+        },
+        "uuid": {
+          "type": "text",
+          "required": true,
+          "description": "The reserved upload uuid."
+        },
+        "filesize": {
+          "type": "int",
+          "required": true,
+          "description": "Size of the file in bytes."
+        },
+        "contenttype": {
+          "type": "text",
+          "required": false,
+          "description": "MIME content type."
+        }
+      },
+      "_evidence": {
+        "locator": "internal/webserver/api/Api.go:519",
+        "id_local": "File.completeUploadRequestChunk",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/uploadrequest/chunk/complete",
+          "locator": "internal/webserver/api/routing.go:218"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "fileRequest, ok, status, errorCode, errorMsg := checkFileRequestAndApiKey(request.FileRequestId, apikey)\nif !ok { sendError(...); return }\nuploadParams := fileupload.CreateUploadConfig(0, 0, \"\", true, true, false, request.FileSize, fileRequest.Id)\nif request.IsNonBlocking { go doBlockingPartCompleteChunk(nil, request.Uuid, request.FileHeader, user, uploadParams); ... return }\ndoBlockingPartCompleteChunk(w, request.Uuid, request.FileHeader, user, uploadParams)",
+        "edges": [
+          "completeUploadRequestChunk checks the request exists via checkFileRequestAndApiKey(request.FileRequestId, apikey) and sendError on failure (Api.go:519) -> precondition UploadRequest.id exists"
+        ]
+      },
+      "entity": "File",
+      "_binds": {
+        "fileRequestId": "UploadRequest.id",
+        "filename": "File.Name",
+        "contenttype": "File.ContentType"
+      },
+      "_output_schema": {
+        "Result": "OK",
+        "FileInfo": "FileApiOutput"
+      },
+      "guards": {
+        "requires_auth": false,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "UploadRequest",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "fileRequestId"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "precondition": "That upload request does not exist.",
+          "not_found": "That upload request does not exist."
+        }
+      },
+      "_defaulted": [
+        "entity (File; the public upload-request path resolves the owner user from the request's apiKey, set as File.UserId via session when a session exists)"
+      ],
+      "description": "Complete a chunked upload into the given upload request, creating the File row owned by the request's owner. Authenticated by the request's API key, not a user session."
+    },
+    {
+      "tool": "e2econfig_save",
+      "op": "create",
+      "family": "crud.upsert",
+      "exec_spec": {
+        "entity": "E2EConfig",
+        "key": {
+          "UserId": {
+            "$session": "account_id"
+          }
+        },
+        "insert_fields": {
+          "Config": {
+            "$arg": "content"
+          }
+        },
+        "set_on_exists": {
+          "Config": {
+            "$arg": "content"
+          }
+        }
+      },
+      "input_schema": {
+        "content": {
+          "type": "json",
+          "required": true,
+          "description": "The encrypted E2E config blob to store."
+        }
+      },
+      "_evidence": {
+        "locator": "internal/webserver/api/Api.go:1112",
+        "id_local": "E2EConfig.save",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/e2e/set",
+          "locator": "internal/webserver/api/routing.go:271"
+        },
+        "entity_why": "primary effect row_upsert lands on this table",
+        "ref_code": "func apiE2eSet(w http.ResponseWriter, r requestParser, user models.User, _ models.ApiKey) {\n\tif !e2emutex.IsLocked(user.Id) { w.WriteHeader(http.StatusBadRequest); ...; return }\n\trequest, ok := r.(*paramE2eStore)\n\tdatabase.SaveEnd2EndInfo(request.EncryptedInfo, user.Id)\n\t_, _ = w.Write([]byte(\"{\\\"result\\\":\\\"OK\\\"}\"))\n}",
+        "edges": [
+          "API key auth (Api.go:1269)"
+        ]
+      },
+      "entity": "E2EConfig",
+      "_output_schema": {
+        "result": "OK"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "Id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "content"
+        ],
+        "messages": {
+          "auth": "You must be signed in to save your E2E configuration.",
+          "precondition": "You must be a valid signed-in user to save your E2E configuration."
+        }
+      },
+      "_defaulted": [
+        "fields"
+      ],
+      "description": "Save your end-to-end-encrypted vault configuration. Only meaningful while your E2E mutex is held."
+    },
+    {
+      "tool": "e2econfig_get",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "E2EConfig",
+        "lookup_by": {
+          "UserId": {
+            "$session": "account_id"
+          }
+        },
+        "scope": {
+          "where": {
+            "UserId": "$session.account_id"
+          }
+        }
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "internal/webserver/api/Api.go:1093",
+        "id_local": "E2EConfig.get",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/e2e/get",
+          "locator": "internal/webserver/api/routing.go:265"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "if !e2emutex.IsLocked(user.Id) { ...; return }\ninfo := database.GetEnd2EndInfo(user.Id)\nfiles := getFilesForUser(user, false)\n...\ninfo.AvailableFiles = ids\nbytesE2e, err := json.Marshal(info)",
+        "edges": [
+          "API key auth (Api.go:1269)"
+        ]
+      },
+      "entity": "E2EConfig",
+      "_output_schema": {
+        "result": "E2EInfoEncrypted with availablefiles populated"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "Id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in to read your E2E configuration.",
+          "precondition": "You must be a valid signed-in user to read your E2E configuration."
+        }
+      },
+      "description": "Fetch your own end-to-end-encrypted vault configuration, with the ids of files available to it."
+    },
+    {
+      "tool": "statistic_resettraffic",
+      "op": "action",
+      "family": "crud.upsert",
+      "exec_spec": {
+        "entity": "Statistic",
+        "key": {
+          "type": 1
+        },
+        "insert_fields": [
+          "type",
+          "value"
+        ],
+        "set_on_exists": {
+          "type": 1,
+          "value": 0
+        }
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "internal/webserver/api/Api.go:1088",
+        "id_local": "Statistic.resetTraffic",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/logs/resetTraffic",
+          "locator": "internal/webserver/api/routing.go:252"
+        },
+        "entity_why": "primary effect row_upsert lands on this table",
+        "ref_code": "func apiLogResetTraffic(w http.ResponseWriter, _ requestParser, _ models.User, _ models.ApiKey) {\n\tserverstats.ClearTraffic()\n\t_, _ = w.Write([]byte(`{\"Result\":\"OK\"}`))\n}",
+        "edges": [
+          "route requires ApiPermManageLogs + AdminOnly"
+        ]
+      },
+      "entity": "Statistic",
+      "_output_schema": {
+        "Result": "OK"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "Id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "UserLevel",
+                      "op": "ne",
+                      "value": 2
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in to reset traffic.",
+          "precondition": "Only an admin can reset traffic."
+        }
+      },
+      "_defaulted": [
+        "family (reset is a side-effect; runtime serves it as a Statistic upsert)"
+      ],
+      "description": "Reset the server's traffic-recording counters (an admin logs operation)."
+    },
+    {
+      "tool": "statistic_getstatus",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Statistic",
+        "lookup_by": {
+          "type": 1
+        }
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "internal/webserver/api/Api.go:1076",
+        "id_local": "Statistic.getStatus",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/logs/systemStatus",
+          "locator": "internal/webserver/api/routing.go:246"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "result.DataServed, result.TrafficRecordingSince = serverstats.GetCurrentTraffic()\n_, result.MemoryUsed, result.MemoryTotal, result.MemoryUsagePercentage = serverstats.GetMemoryInfo()\n_, result.DiskUsed, result.DiskTotal, result.DiskUsagePercentage = serverstats.GetDiskInfo()",
+        "edges": [
+          "route requires ApiPermManageLogs; Permissions>0 approximates the manage-logs bit"
+        ]
+      },
+      "entity": "Statistic",
+      "_output_schema": {
+        "uptime": "int",
+        "dataServed": "uint64",
+        "trafficRecordingSince": "int64",
+        "activeFiles": "int",
+        "memoryUsed": "uint64",
+        "diskUsed": "uint64",
+        "cpuLoad": "int"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "Id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "UserLevel",
+                      "op": "ne",
+                      "value": 2
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must be signed in to read server status.",
+          "precondition": "Only an admin can read server status."
+        }
+      },
+      "description": "Read the server's status: traffic served, memory, disk, active files and CPU (admin only).",
+      "_defaulted": []
+    }
+  ],
+  "seed_state": {
+    "User": [
+      {
+        "Id": 1,
+        "Name": "ops@gokapi.example",
+        "Password": "pw-operations",
+        "Permissions": 7,
+        "UserLevel": 0,
+        "LastOnline": 0,
+        "ResetPassword": false,
+        "id": 1
+      },
+      {
+        "Id": 2,
+        "Name": "colleague@gokapi.example",
+        "Password": "pw-colleague",
+        "Permissions": 7,
+        "UserLevel": 1,
+        "LastOnline": 0,
+        "ResetPassword": false,
+        "id": 2
+      },
+      {
+        "Id": 3,
+        "Name": "restricted@gokapi.example",
+        "Password": "pw-restricted",
+        "Permissions": 0,
+        "UserLevel": 2,
+        "LastOnline": 0,
+        "ResetPassword": false,
+        "id": 3
+      }
+    ],
+    "ApiKey": [
+      {
+        "Id": 1,
+        "PublicId": "pub-a1",
+        "FriendlyName": "alice-default",
+        "LastUsed": 0,
+        "Permissions": 7,
+        "Expiry": 0,
+        "IsSystemKey": false,
+        "UserId": 2,
+        "UploadRequestId": "",
+        "id": 1
+      },
+      {
+        "Id": 2,
+        "PublicId": "pub-ur",
+        "FriendlyName": "request-key",
+        "LastUsed": 0,
+        "Permissions": 1,
+        "Expiry": 0,
+        "IsSystemKey": false,
+        "UserId": 2,
+        "UploadRequestId": 1,
+        "id": 2
+      },
+      {
+        "Id": 3,
+        "PublicId": "pub-x2",
+        "FriendlyName": "bob-request",
+        "LastUsed": 0,
+        "Permissions": 1,
+        "Expiry": 0,
+        "IsSystemKey": false,
+        "UserId": 3,
+        "UploadRequestId": 2,
+        "id": 3
+      }
+    ],
+    "UploadRequest": [
+      {
+        "id": 1,
+        "name": "Q3 submissions",
+        "userid": 2,
+        "expiry": "2030-01-01T00:00:00",
+        "maxFiles": 10,
+        "maxSize": 100,
+        "creation": "2025-01-01T00:00:00",
+        "apiKey": 2,
+        "note": "public inbox"
+      },
+      {
+        "id": 2,
+        "name": "bobs-api",
+        "userid": 3,
+        "expiry": "2030-06-01T00:00:00",
+        "maxFiles": 0,
+        "maxSize": 0,
+        "creation": "2025-02-01T00:00:00",
+        "apiKey": 3,
+        "note": ""
+      }
+    ],
+    "File": [
+      {
+        "Id": 1,
+        "Name": "report.pdf",
+        "Size": "120 KB",
+        "SHA1": "sha-report-1",
+        "ExpireAt": "2030-01-01T00:00:00",
+        "SizeBytes": 120000,
+        "DownloadsRemaining": 5,
+        "DownloadCount": 0,
+        "PasswordHash": "",
+        "HotlinkId": "",
+        "ContentType": "application/pdf",
+        "AwsBucket": "",
+        "Encryption": {},
+        "UnlimitedDownloads": false,
+        "UnlimitedTime": false,
+        "UserId": 2,
+        "UploadDate": "2025-03-01T00:00:00",
+        "PendingDeletion": 0,
+        "UploadRequestId": "",
+        "id": 1
+      },
+      {
+        "Id": 2,
+        "Name": "photo.jpg",
+        "Size": "2 MB",
+        "SHA1": "sha-photo-2",
+        "ExpireAt": "2030-02-01T00:00:00",
+        "SizeBytes": 2000000,
+        "DownloadsRemaining": 0,
+        "DownloadCount": 3,
+        "PasswordHash": "",
+        "HotlinkId": "hot-2",
+        "ContentType": "image/jpeg",
+        "AwsBucket": "",
+        "Encryption": {},
+        "UnlimitedDownloads": true,
+        "UnlimitedTime": false,
+        "UserId": 3,
+        "UploadDate": "2025-03-10T00:00:00",
+        "PendingDeletion": 0,
+        "UploadRequestId": "",
+        "id": 2
+      }
+    ],
+    "Session": [
+      {
+        "Id": 1,
+        "RenewAt": "2030-01-01T00:00:00",
+        "ValidUntil": "2031-01-01T00:00:00",
+        "UserId": 2,
+        "id": 1
+      }
+    ],
+    "E2EConfig": [],
+    "Statistic": [
+      {
+        "id": 1,
+        "type": 1,
+        "value": 0
+      }
+    ],
+    "Log": []
+  },
+  "summary": "Gokapi is a self-hosted file sharing / temporary URL upload server with SQLite or Redis persistence, multi-user admin (internal/OAuth/header auth), per-file expiry/download-limit/password/E2E-encryption, chunked uploads, hotlinks, public upload requests, API keys with bitmask permissions, and an append-only file-based audit log.",
+  "_auth_candidates": [
+    {
+      "entity": "User",
+      "username_col": "Name",
+      "password_col": "Password"
+    }
+  ],
+  "_fk_gravity": {
+    "entity": "User",
+    "fk_count": 5
+  },
+  "_read_denied": "not_found",
+  "_no_edges": [
+    {
+      "id_local": "File.serveHotlink",
+      "why": "public hotlink route /h/{id} and /hotlink/ - no auth middleware, no ownership check (Webserver.go:117)"
+    },
+    {
+      "id_local": "File.serveFileWithNameInUrl",
+      "why": "public route /dh/{id}/{filename} - serves any non-expired non-file-request file (Webserver.go:129)"
+    },
+    {
+      "id_local": "File.downloadPresigned",
+      "why": "presigned download - callable with just the key, no account (Webserver.go:112)"
+    },
+    {
+      "id_local": "File.createPresigned",
+      "why": "internal helper called after download handlers pass their own ownership gates (Api.go:671)"
+    },
+    {
+      "id_local": "SessionManager.CreateSession",
+      "why": "internal helper called after credential verification (SessionManager.go:67)"
+    },
+    {
+      "id_local": "User.getByName",
+      "why": "internal DB helper (users.go:86)"
+    },
+    {
+      "id_local": "Cleanup.fileExpiry",
+      "why": "background goroutine, no auth (FileServing.go:813)"
+    },
+    {
+      "id_local": "User.logout",
+      "why": "public /logout route (no auth middleware); deletes the Session row for the current session_token cookie, no preconditions, calls only database.DeleteSession (Webserver.go:287)"
+    },
+    {
+      "id_local": "User.list",
+      "why": "route-level API-permission wall (enforced in isAuthorisedForApi / requireLogin); no per-row guards edge emitted: GET /users is gated by requireLogin (session cookie) + the view checks HasPermissionManageUsers; route-level, no row wall (Webserver.go:458)"
+    },
+    {
+      "id_local": "File.list",
+      "why": "route-level API-permission wall (enforced in isAuthorisedForApi / requireLogin); no per-row guards edge emitted: API route ApiPermView; ownership filter applied inside getFilesForUser, not as a guards edge (Api.go:565)"
+    },
+    {
+      "id_local": "ApiKey.list",
+      "why": "route-level API-permission wall (enforced in isAuthorisedForApi / requireLogin); no per-row guards edge emitted: web view gated by requireLogin + manage-api routing check, not a guards edge (Webserver.go:838)"
+    },
+    {
+      "id_local": "FileRequest.list",
+      "why": "route-level API-permission wall (enforced in isAuthorisedForApi / requireLogin); no per-row guards edge emitted: API route ApiPermManageFileRequests; owner filter inside handler (Api.go:1237)"
+    }
+  ],
+  "auth": {
+    "account_entity": "User",
+    "username_col": "Name",
+    "password_col": "Password"
+  }
+}

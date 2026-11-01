@@ -1,0 +1,573 @@
+{
+  "env_id": "tiddlywiki5",
+  "_prep_version": 3,
+  "auth": {
+    "account_entity": "Credential",
+    "username_col": "username",
+    "password_col": "password",
+    "session_fields": {
+      "username": "username"
+    }
+  },
+  "entities": [
+    {
+      "name": "Tiddler",
+      "columns": [
+        {
+          "name": "title",
+          "type": "text",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "text",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "tags",
+          "type": "json",
+          "nullable": true
+        },
+        {
+          "name": "type",
+          "type": "text",
+          "nullable": true,
+          "default": "text/vnd.tiddlywiki"
+        },
+        {
+          "name": "created",
+          "type": "datetime",
+          "nullable": true,
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "creator",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "modified",
+          "type": "datetime",
+          "nullable": true,
+          "audit": true
+        },
+        {
+          "name": "modifier",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "bag",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "revision",
+          "type": "int",
+          "nullable": true
+        },
+        {
+          "name": "draft.of",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "_canonical_uri",
+          "type": "text",
+          "nullable": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "title"
+          ]
+        }
+      ],
+      "notes": "fields are otherwise freeform; any additional key is stored verbatim. Persisted to disk as .tid / .meta / .json files."
+    },
+    {
+      "name": "Credential",
+      "columns": [
+        {
+          "name": "username",
+          "type": "text",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "password",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "id",
+          "type": "id"
+        }
+      ],
+      "constraints": [],
+      "note": "basic-auth users. One source: CSV file at the server 'credentials' path (username,password header), plus optional hardcoded username/password vars. Plaintext."
+    }
+  ],
+  "tools": [
+    {
+      "tool": "sign_in",
+      "description": "Sign in with a wiki username and password (HTTP basic auth). Creating, editing, deleting, reading and searching tiddlers all require a valid credential first; this session is what $actor resolves to for subsequent calls. Fails if the username/password do not match a configured credential.",
+      "family": "guard.auth",
+      "entity": "Credential",
+      "input_schema": {
+        "username": {
+          "type": "text",
+          "required": true,
+          "description": "A configured wiki username (matches the Credential.username CSV column)."
+        },
+        "password": {
+          "type": "text",
+          "required": true,
+          "description": "The plaintext password for that username (matches Credential.password)."
+        }
+      },
+      "exec_spec": {
+        "verify": {
+          "entity": "Credential",
+          "username_col": "username",
+          "password_col": "password"
+        }
+      },
+      "guards": {
+        "messages": {
+          "auth": "You are not signed in. Call sign_in with a configured wiki username and password first."
+        }
+      },
+      "_evidence": {
+        "locator": "core-server/server/authenticators/basic.js:48",
+        "id_local": "Auth.authenticate",
+        "ref_code": "searches the CSV credentials list for a username/password match (basic.js:58); challenge/admin auth flow is the single auth exit and all tiddler routes gate on the basic authenticator"
+      }
+    },
+    {
+      "tool": "tiddler_save",
+      "op": "update",
+      "family": "crud.upsert",
+      "description": "Create a tiddler, or overwrite the text/tags/type of an existing one with the same title. Requires sign-in with write rights. Returns the tiddler's current revision.",
+      "exec_spec": {
+        "entity": "Tiddler",
+        "key": {
+          "title": {
+            "$arg": "title"
+          }
+        },
+        "insert_fields": [
+          "text",
+          "tags",
+          "type"
+        ],
+        "set_on_exists": {},
+        "messages": {
+          "auth": "You must sign in as a writer before saving a tiddler.",
+          "required": "A title is required to save a tiddler."
+        }
+      },
+      "input_schema": {
+        "title": {
+          "type": "text",
+          "required": true,
+          "description": "The tiddler title. Serves as the row key: saving with a new title creates a tiddler, an existing title overwrites it."
+        },
+        "text": {
+          "type": "text",
+          "required": false,
+          "description": "The tiddler body/content."
+        },
+        "tags": {
+          "type": "json",
+          "required": false,
+          "description": "Array of tag strings for this tiddler."
+        },
+        "type": {
+          "type": "text",
+          "required": false,
+          "description": "The tiddler's content type (template/mimetype). Defaults to text/vnd.tiddlywiki."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in as a writer before saving a tiddler.",
+          "required": "A title is required to save a tiddler."
+        },
+        "required": [
+          "title"
+        ]
+      },
+      "_evidence": {
+        "locator": "core-server/server/routes/put-tiddler.js:22",
+        "id_local": "Tiddler.save",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /recipes/default/tiddlers/:title",
+          "locator": "core-server/server/routes/put-tiddler.js:22"
+        },
+        "entity_why": "primary effect row_upsert lands on this table",
+        "ref_code": "var title = $tw.utils.decodeURIComponentSafe(state.params[0]), fields = $tw.utils.parseJSONSafe(state.data);\nif(fields.fields) { $tw.utils.each(fields.fields,function(field,name){ fields[name]=field; }); delete fields.fields; }\nif(fields.revision) delete fields.revision;\nif(fields._is_skinny !== undefined) { var tiddler = state.wiki.getTiddler(title); if(tiddler) fields.text = tiddler.fields.text; delete fields._is_skinny; }\nstate.wiki.addTiddler(new $tw.Tiddler(fields,{title: title}));\nvar changeCount = state.wiki.getChangeCount(title).toString();\nresponse.writeHead(204, \"OK\",{Etag: \"\\\"defaul",
+        "edges": [
+          "authenticator basic.js:48 + server.js requestHandler writer check; PUT is a writers method (server.js:238)"
+        ]
+      },
+      "_binds": {
+        "title": "Tiddler.title",
+        "text": "Tiddler.text",
+        "tags": "Tiddler.tags",
+        "type": "Tiddler.type"
+      },
+      "_output_schema": {
+        "204": "empty",
+        "Etag": "\"default/<title>/<rev>:\" header"
+      }
+    },
+    {
+      "tool": "tiddler_read",
+      "op": "read",
+      "family": "crud.fetch",
+      "description": "Fetch a tiddler by title and return its fields (text, tags, type, creator, modifier, created, modified, revision, bag). Fails with not_found if no such tiddler exists. Requires sign-in.",
+      "exec_spec": {
+        "entity": "Tiddler",
+        "lookup_by": {
+          "title": {
+            "$arg": "title"
+          }
+        },
+        "messages": {
+          "auth": "You must sign in before reading a tiddler.",
+          "not_found": "No tiddler with that title exists.",
+          "required": "A title is required to read a tiddler."
+        }
+      },
+      "input_schema": {
+        "title": {
+          "type": "text",
+          "required": true,
+          "description": "The title of the tiddler to fetch."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in before reading a tiddler.",
+          "not_found": "No tiddler with that title exists.",
+          "required": "A title is required to read a tiddler."
+        },
+        "required": [
+          "title"
+        ]
+      },
+      "_evidence": {
+        "locator": "core-server/server/routes/get-tiddler.js:16",
+        "id_local": "Tiddler.read",
+        "entry": {
+          "kind": "http",
+          "route": "GET /recipes/default/tiddlers/:title",
+          "locator": "core-server/server/routes/get-tiddler.js:16"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "var title = $tw.utils.decodeURIComponentSafe(state.params[0]), tiddler = state.wiki.getTiddler(title);\nif(tiddler) { ... tiddlerFields.revision = state.wiki.getChangeCount(title); tiddlerFields.bag = \"default\"; tiddlerFields.type = tiddlerFields.type || \"text/vnd.tiddlywiki\"; state.sendResponse(200,{...},JSON.stringify(tiddlerFields),\"utf8\");} else { response.writeHead(404); response.end();}",
+        "edges": [
+          "authenticator basic.js:48 + server.js reader check; GET is a readers method"
+        ],
+        "scope": "Genuinely global: there is no per-owner or per-wiki boundary in the real reader (any signed-in reader may fetch any tiddler by title; get-tiddler.js:16). No exec_spec.scope is set deliberately."
+      },
+      "_binds": {
+        "title": "Tiddler.title"
+      },
+      "_output_schema": {
+        "200": "JSON field map incl. revision, bag, type, text, tags"
+      }
+    },
+    {
+      "tool": "tiddler_search",
+      "op": "search",
+      "family": "search",
+      "description": "List tiddlers by a TiddlyWiki filter expression (for example \"[tag[Meeting]]\" or \"[title[Welcome]]\"), returning each matching tiddler's fields except the text body unless requested. Requires sign-in. Fails if the filter expression is not allowlisted on the server.",
+      "exec_spec": {
+        "entity": "Tiddler",
+        "search_fields": [
+          "title"
+        ],
+        "rank": {
+          "method": "substring",
+          "fields": [
+            "title"
+          ]
+        },
+        "messages": {
+          "auth": "You must sign in before searching tiddlers.",
+          "filter": "The server does not allow that filter expression (see $:/config/Server/ExternalFilters/<filter>); use an allowlisted filter or enable AllowAllExternalFilters."
+        }
+      },
+      "input_schema": {
+        "filter": {
+          "type": "text",
+          "required": false,
+          "description": "A TiddlyWiki filter expression selecting tiddlers by title/tag (e.g. \"[tag[Journal]]\"). An allowlisted default is used when omitted."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in before searching tiddlers."
+        }
+      },
+      "_evidence": {
+        "locator": "core-server/server/routes/get-tiddlers-json.js:29",
+        "id_local": "Tiddler.search",
+        "entry": {
+          "kind": "http",
+          "route": "GET /recipes/default/tiddlers.json",
+          "locator": "core-server/server/routes/get-tiddlers-json.js:29"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "var filter = state.queryParameters.filter || DEFAULT_FILTER;\nif(state.wiki.getTiddlerText(\"$:/config/Server/AllowAllExternalFilters\") !== \"yes\") { if(state.wiki.getTiddlerText(\"$:/config/Server/ExternalFilters/\" + filter) !== \"yes\") { response.writeHead(403); response.end(); return; }}\nif(state.wiki.getTiddlerText(\"$:/config/SyncSystemTiddlersFromServer\") === \"no\") filter += \"+[!is[system]]\";\nvar titles = state.wiki.filterTiddlers(filter);\n... tiddlerFields.revision = state.wiki.getChangeCount(title); tiddlers.push(tiddlerFields);\nstate.sendResponse(200,{...},JSON.stringify(tiddlers),\"utf8\");",
+        "edges": [
+          "authenticator basic.js:48 + server.js reader check; GET is a readers method"
+        ],
+        "scope": "Genuinely global: the search scans every tiddler title in the single default recipe (get-tiddlers-json.js:29); no per-owner boundary. Decision 6: left global, rank.method=substring so the filter drives substring selection over titles."
+      },
+      "_output_schema": {
+        "200": "array of tiddler field maps, each with revision and type"
+      }
+    },
+    {
+      "tool": "tiddler_delete",
+      "op": "delete",
+      "family": "crud.delete",
+      "description": "Delete a tiddler by title. Requires sign-in with write rights. Fails with not_found if no such tiddler exists.",
+      "exec_spec": {
+        "entity": "Tiddler",
+        "lookup_by": {
+          "title": {
+            "$arg": "title"
+          }
+        },
+        "messages": {
+          "auth": "You must sign in as a writer before deleting a tiddler.",
+          "not_found": "No tiddler with that title exists.",
+          "required": "A title is required to delete a tiddler."
+        }
+      },
+      "input_schema": {
+        "title": {
+          "type": "text",
+          "required": true,
+          "description": "The title of the tiddler to delete."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in as a writer before deleting a tiddler.",
+          "not_found": "No tiddler with that title exists.",
+          "required": "A title is required to delete a tiddler."
+        },
+        "required": [
+          "title"
+        ]
+      },
+      "_evidence": {
+        "locator": "core-server/server/routes/delete-tiddler.js:18",
+        "id_local": "Tiddler.delete",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /bags/default/tiddlers/:title",
+          "locator": "core-server/server/routes/delete-tiddler.js:18"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "var title = $tw.utils.decodeURIComponentSafe(state.params[0]);\nstate.wiki.deleteTiddler(title);\nresponse.writeHead(204, \"OK\",{\"Content-Type\":\"text/plain\"});\nresponse.end();",
+        "edges": [
+          "authenticator basic.js:48 + server.js writer check; DELETE is a writers method"
+        ]
+      },
+      "_binds": {
+        "title": "Tiddler.title"
+      },
+      "_output_schema": {
+        "204": "empty"
+      }
+    },
+    {
+      "tool": "tiddler_render",
+      "op": "action",
+      "family": "crud.fetch",
+      "description": "Render a tiddler to its rendered HTML/output form (the wiki page view of the tiddler) and return the rendered text. Fails with not_found if no such tiddler exists. Requires sign-in.",
+      "exec_spec": {
+        "entity": "Tiddler",
+        "lookup_by": {
+          "title": {
+            "$arg": "title"
+          }
+        },
+        "messages": {
+          "auth": "You must sign in before rendering a tiddler.",
+          "not_found": "No tiddler with that title exists.",
+          "required": "A title is required to render a tiddler."
+        }
+      },
+      "input_schema": {
+        "title": {
+          "type": "text",
+          "required": true,
+          "description": "The title of the tiddler to render to HTML."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in before rendering a tiddler.",
+          "not_found": "No tiddler with that title exists.",
+          "required": "A title is required to render a tiddler."
+        },
+        "required": [
+          "title"
+        ]
+      },
+      "_evidence": {
+        "locator": "core-server/server/routes/get-tiddler-html.js:26",
+        "id_local": "Tiddler.render",
+        "entry": {
+          "kind": "http",
+          "route": "GET /:title",
+          "locator": "core-server/server/routes/get-tiddler-html.js:26"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "var title = $tw.utils.decodeURIComponentSafe(state.params[0]), tiddler = state.wiki.getTiddler(title);\nif(tiddler) { ... var text = state.wiki.renderTiddler(renderType,renderTemplate,{parseAsInline:true, variables:{currentTiddler:title}}); state.sendResponse(200,{\"Content-Type\":renderType},text,\"utf8\");} else { response.writeHead(404); response.end();}",
+        "edges": [
+          "global auth middleware (server.js:285,291) + basic authenticator (basic.js:48); GET is a readers method"
+        ],
+        "scope": "Genuinely global by title; no per-owner boundary (get-tiddler-html.js:26)."
+      },
+      "_binds": {
+        "title": "Tiddler.title"
+      },
+      "_output_schema": {
+        "200": "rendered HTML/template output"
+      }
+    },
+    {
+      "tool": "status_read",
+      "op": "action",
+      "family": "action.emit",
+      "description": "Read the server status: tiddlywiki version, whether you are authenticated, whether the server is read-only for your user, the default recipe, and the authenticated username (or anonymous). Requires sign-in.",
+      "exec_spec": {
+        "channel": "event",
+        "set": {
+          "username": {
+            "$session": "username"
+          },
+          "authenticated": true,
+          "tiddlywiki_version": "5.3.5"
+        }
+      },
+      "input_schema": {},
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in before reading server status."
+        }
+      },
+      "_evidence": {
+        "locator": "core-server/server/routes/get-status.js:16",
+        "id_local": "Status.read",
+        "entry": {
+          "kind": "http",
+          "route": "GET /status",
+          "locator": "core-server/server/routes/get-status.js:16"
+        },
+        "entity_why": "cannot determine the entity",
+        "ref_code": "var text = JSON.stringify({username: state.authenticatedUsername || state.server.get(\"anon-username\") || \"\", anonymous: !state.authenticatedUsername, read_only: !state.server.isAuthorized(\"writers\",state.authenticatedUsername), logout_is_available:false, space:{recipe:\"default\"}, tiddlywiki_version:$tw.version});\nstate.sendResponse(200,{...},text,\"utf8\");",
+        "edges": [
+          "global auth middleware (server.js:285,291) + basic authenticator (basic.js:48); GET is a readers method"
+        ]
+      },
+      "_output_schema": {
+        "username": "str",
+        "anonymous": "bool",
+        "read_only": "bool",
+        "space.recipe": "default",
+        "tiddlywiki_version": "str"
+      }
+    }
+  ],
+  "seed_state": {
+    "Credential": [
+      {
+        "username": "ops@tiddlywiki5.example",
+        "password": "pw-operations",
+        "id": 1
+      },
+      {
+        "username": "writer@tiddlywiki5.example",
+        "password": "pw-writer",
+        "id": 2
+      }
+    ],
+    "Tiddler": [
+      {
+        "title": "Welcome",
+        "text": "Welcome to the wiki.",
+        "tags": [
+          "Wiki"
+        ],
+        "type": "text/vnd.tiddlywiki",
+        "id": 1
+      },
+      {
+        "title": "GettingStarted",
+        "text": "How to get started editing this wiki.",
+        "tags": [
+          "Wiki",
+          "Help"
+        ],
+        "type": "text/vnd.tiddlywiki",
+        "id": 2
+      },
+      {
+        "title": "SystemInfo",
+        "text": "Server configuration and version notes.",
+        "tags": [
+          "System"
+        ],
+        "type": "text/vnd.tiddlywiki",
+        "id": 3
+      }
+    ]
+  },
+  "summary": "TiddlyWiki5 is a Node.js personal-wiki server: it stores Tiddler records (a title-keyed page with freeform fields) in an in-memory store keyed by title, persists them to disk as .tid/.meta/.json files via the filesystem sync adaptor (or syncs to a remote TiddlyWeb server), and serves them over HTTP with full CRUD (PUT/GET/DELETE tiddlers, JSON search, render) plus basic-auth via a Credential store (username/password CSV). Sign in with a wiki username/password, then save/fetch/render/delete tiddlers and search by a filter expression; the server status endpoint reports the authenticated user and write capability.",
+  "_auth_candidates": [
+    {
+      "entity": "Credential",
+      "username_col": "username",
+      "password_col": "password"
+    }
+  ],
+  "_read_denied": "forbidden",
+  "_no_edges": [
+    {
+      "id_local": "FileSystemAdaptor.saveTiddler",
+      "why": "leaf persistence op: no pre-check, calls no other operation; only writes the tiddler file to disk (plugins/tiddlywiki/filesystem/filesystemadaptor.js:83)"
+    },
+    {
+      "id_local": "FileSystemAdaptor.deleteTiddler",
+      "why": "leaf persistence op: no pre-check, calls no other operation; only unlinks the on-disk file (plugins/tiddlywiki/filesystem/filesystemadaptor.js:130)"
+    },
+    {
+      "id_local": "TiddlyWebAdaptor.saveTiddler",
+      "why": "remote-sync leaf: no pre-check, calls no local op; issues an external PUT to the TiddlyWeb host (tiddlywebadaptor.js:247)"
+    },
+    {
+      "id_local": "TiddlyWebAdaptor.login",
+      "why": "remote auth leaf: issues an external POST to the TiddlyWeb host, no local store interaction (tiddlywebadaptor.js:157)"
+    }
+  ]
+}

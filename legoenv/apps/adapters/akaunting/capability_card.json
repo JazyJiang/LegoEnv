@@ -1,0 +1,126 @@
+{
+  "app": "akaunting",
+  "role": "accounting / invoicing (QuickBooks/Xero/FreshBooks-like)",
+  "domains": [
+    "finance",
+    "operations",
+    "sales",
+    "procurement"
+  ],
+  "kinds": {
+    "create_record": [
+      "contact_create",
+      "item_create",
+      "category_create",
+      "currency_create",
+      "tax_create"
+    ],
+    "update_record": [
+      "contact_update",
+      "item_update",
+      "document_update",
+      "currency_update",
+      "tax_update",
+      "category_update",
+      "profile_update"
+    ],
+    "create_or_update_doc": [
+      "document_create",
+      "document_update"
+    ],
+    "other:record_status_change": [
+      "document_sent",
+      "document_received",
+      "document_cancel",
+      "document_restore"
+    ]
+  },
+  "check_kinds": [
+    "record_exists",
+    "record_not_exists",
+    "record_field_equals",
+    "record_field_contains",
+    "record_field_unchanged",
+    "record_field_in_set",
+    "action_done",
+    "action_not_done"
+  ],
+  "carriers": {
+    "notes_field": {
+      "entity": "Setting",
+      "field": "value"
+    }
+  },
+  "login": {
+    "tool": "user_login",
+    "user_field": "email",
+    "persona_entity": "User"
+  },
+  "content_entities": [
+    "Contact",
+    "Item",
+    "Account",
+    "Document",
+    "Transaction",
+    "Category",
+    "Currency",
+    "Tax",
+    "Transfer",
+    "Reconciliation",
+    "Report",
+    "Setting"
+  ],
+  "seed_helpers": [
+    "contacts",
+    "items",
+    "accounts",
+    "documents",
+    "transactions",
+    "categories",
+    "policy"
+  ],
+  "tool_families_to_keep": [
+    "document",
+    "transaction",
+    "contact",
+    "item",
+    "currency",
+    "tax",
+    "account",
+    "reconciliation",
+    "transfer",
+    "report",
+    "category",
+    "setting",
+    "module"
+  ],
+  "obs_reads": [
+    "contact_search",
+    "item_search",
+    "account_search",
+    "currency_search",
+    "tax_search",
+    "document_search",
+    "transaction_search",
+    "setting_search",
+    "report_search",
+    "transfer_search",
+    "reconciliation_search",
+    "user_search",
+    "company_search",
+    "module_list"
+  ],
+  "known_patches": [
+    "Document.contact_id / Item.category_id / Category.parent_id retyped id->text (fk kept) so update tools can re-point the FK (runtime never writes type=id on update)",
+    "documenttransaction_create / tax_create set_on_create company_id $session.company_id -> $session.account_id (session only holds account_id)",
+    "all keyword-rank search tools converted to filtered lists (rank=exact, optional filters) so an unfiltered call lists every row instead of returning []",
+    "reconciliation_calculate gained document_id/account_id filter"
+  ],
+  "smoke": {
+    "passed": true,
+    "date": "2026-10-24",
+    "report": "ok"
+  },
+  "register_file": "pack/newspecs3/akaunting/register.py",
+  "base_spec": "pack/base_specs/akaunting.spec.json"
+}

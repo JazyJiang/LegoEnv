@@ -1,0 +1,5112 @@
+{
+  "env_id": "octoprint",
+  "_prep_version": 3,
+  "entities": [
+    {
+      "name": "User",
+      "columns": [
+        {
+          "name": "username",
+          "type": "text",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "password",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "active",
+          "type": "bool",
+          "nullable": false
+        },
+        {
+          "name": "groups",
+          "type": "json",
+          "nullable": false
+        },
+        {
+          "name": "permissions",
+          "type": "json",
+          "nullable": false
+        },
+        {
+          "name": "apikey",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "settings",
+          "type": "json",
+          "nullable": false
+        },
+        {
+          "name": "id",
+          "type": "id"
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "username"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Group",
+      "columns": [
+        {
+          "name": "key",
+          "type": "text",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "permissions",
+          "type": "json",
+          "nullable": false
+        },
+        {
+          "name": "subgroups",
+          "type": "json",
+          "nullable": false
+        },
+        {
+          "name": "default",
+          "type": "bool",
+          "nullable": false,
+          "default": false
+        },
+        {
+          "name": "removable",
+          "type": "bool",
+          "nullable": false,
+          "default": true
+        },
+        {
+          "name": "changeable",
+          "type": "bool",
+          "nullable": false,
+          "default": true
+        },
+        {
+          "name": "toggleable",
+          "type": "bool",
+          "nullable": false,
+          "default": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "key"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Permission",
+      "columns": [
+        {
+          "name": "key",
+          "type": "text",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "nullable": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "key"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "AppKey",
+      "columns": [
+        {
+          "name": "api_key",
+          "type": "text",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "app_id",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "user_id",
+          "type": "text",
+          "nullable": false,
+          "fk_to": "User.username"
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "app_id",
+            "user_id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "PrinterProfile",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "model",
+          "type": "text",
+          "nullable": true,
+          "default": "Generic RepRap Printer"
+        },
+        {
+          "name": "color",
+          "type": "text",
+          "nullable": true,
+          "default": "default"
+        },
+        {
+          "name": "volume",
+          "type": "json",
+          "nullable": true
+        },
+        {
+          "name": "heatedBed",
+          "type": "bool",
+          "nullable": true,
+          "default": true
+        },
+        {
+          "name": "heatedChamber",
+          "type": "bool",
+          "nullable": true,
+          "default": false
+        },
+        {
+          "name": "extruder",
+          "type": "json",
+          "nullable": true
+        },
+        {
+          "name": "axes",
+          "type": "json",
+          "nullable": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "File",
+      "columns": [
+        {
+          "name": "path",
+          "type": "text",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "display",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "origin",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "local",
+            "sdcard"
+          ]
+        },
+        {
+          "name": "user",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "date",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "size",
+          "type": "int",
+          "nullable": true
+        },
+        {
+          "name": "type",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "analysis",
+          "type": "json",
+          "nullable": true
+        },
+        {
+          "name": "history",
+          "type": "json",
+          "nullable": true
+        },
+        {
+          "name": "statistics",
+          "type": "json",
+          "nullable": true
+        },
+        {
+          "name": "links",
+          "type": "json",
+          "nullable": true
+        },
+        {
+          "name": "additional",
+          "type": "json",
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "name": "Folder",
+      "columns": [
+        {
+          "name": "path",
+          "type": "text",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "display",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "origin",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "local",
+            "sdcard"
+          ]
+        },
+        {
+          "name": "user",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "date",
+          "type": "datetime",
+          "nullable": true
+        },
+        {
+          "name": "size",
+          "type": "int",
+          "nullable": true
+        },
+        {
+          "name": "children",
+          "type": "json",
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "name": "TimelapseConfig",
+      "columns": [
+        {
+          "name": "type",
+          "type": "text",
+          "pk": true,
+          "nullable": true,
+          "enum": [
+            "off",
+            "timed",
+            "zchange"
+          ]
+        },
+        {
+          "name": "postRoll",
+          "type": "int",
+          "nullable": true,
+          "default": 0
+        },
+        {
+          "name": "fps",
+          "type": "int",
+          "nullable": true,
+          "default": 25
+        },
+        {
+          "name": "renderAfterPrint",
+          "type": "text",
+          "nullable": true,
+          "enum": [
+            "always",
+            "success",
+            "failure",
+            "never"
+          ],
+          "default": "always"
+        },
+        {
+          "name": "options",
+          "type": "json",
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "name": "TimelapseFile",
+      "columns": [
+        {
+          "name": "name",
+          "type": "text",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "bytes",
+          "type": "int",
+          "nullable": true
+        },
+        {
+          "name": "thumbnail",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "timestamp",
+          "type": "datetime",
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "name": "UnrenderedTimelapse",
+      "columns": [
+        {
+          "name": "name",
+          "type": "text",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "count",
+          "type": "int",
+          "nullable": true
+        },
+        {
+          "name": "bytes",
+          "type": "int",
+          "nullable": true
+        },
+        {
+          "name": "recording",
+          "type": "bool",
+          "nullable": true
+        },
+        {
+          "name": "rendering",
+          "type": "bool",
+          "nullable": true
+        }
+      ]
+    }
+  ],
+  "tools": [
+    {
+      "tool": "user_list",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "User",
+        "rank": {
+          "method": "exact"
+        }
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "src/octoprint/server/api/access.py:139",
+        "id_local": "User.list_http",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/access/users",
+          "locator": "src/octoprint/server/api/access.py:139"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "@api.route(\"/access/users\", methods=[\"GET\"])\n@no_firstrun_access\n@Permissions.ADMIN.require(403)\ndef get_users():\n    users = [u.as_dict() for u in userManager.get_all_users()]\n    if not credentials_checked_recently():\n        for u in users:\n            u[\"apikey\"] = None\n    return jsonify(users=users)",
+        "edges": [
+          "@Permissions.ADMIN.require(403) (access.py:140)"
+        ]
+      },
+      "entity": "User",
+      "_output_schema": {
+        "users": "list of User dicts"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "permissions",
+                      "op": "contains",
+                      "value": "ADMIN"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in first; this endpoint is only reachable for an authenticated OctoPrint user.",
+          "precondition": "This requires an OctoPrint administrator account."
+        }
+      },
+      "description": "List all users and their account attributes. Administrator only."
+    },
+    {
+      "tool": "user_add",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "User",
+        "fields": {
+          "username": {
+            "$arg": "name"
+          },
+          "active": {
+            "$arg": "active"
+          },
+          "groups": {
+            "$arg": "groups"
+          },
+          "permissions": {
+            "$arg": "permissions"
+          },
+          "password": {
+            "$arg": "password"
+          }
+        },
+        "unique_on": [
+          "username"
+        ]
+      },
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "Username of the new account (this is its identity)."
+        },
+        "password": {
+          "type": "text",
+          "required": true,
+          "description": "The account's password."
+        },
+        "active": {
+          "type": "bool",
+          "required": true,
+          "description": "Whether the account starts enabled."
+        },
+        "groups": {
+          "type": "json",
+          "required": false,
+          "description": "Group keys the account belongs to."
+        },
+        "permissions": {
+          "type": "json",
+          "required": false,
+          "description": "Additional permission keys for the account."
+        }
+      },
+      "_evidence": {
+        "locator": "src/octoprint/server/api/access.py:153",
+        "id_local": "User.add_http",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/access/users",
+          "locator": "src/octoprint/server/api/access.py:149"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "@api.route(\"/access/users\", methods=[\"POST\"])\n...\ndef add_user():\n    data = request.get_json()\n    if \"name\" not in data or \"password\" not in data or \"active\" not in data:\n        abort(400)\n    try:\n        userManager.add_user(data[\"name\"], data[\"password\"], data[\"active\"] in valid_boolean_trues, data.get(\"permissions\"), data.get(\"groups\"))\n    except users.UserAlreadyExists:\n        abort(409)\n    except users.InvalidUsername:\n        abort(400)\n    return get_users()",
+        "edges": [
+          "@Permissions.ADMIN.require(403) + @require_credentials_checked_recently + @no_firstrun_access (access.py:150-152)"
+        ]
+      },
+      "entity": "User",
+      "_binds": {
+        "name": "User.username",
+        "password": "User.password",
+        "active": "User.active",
+        "groups": "User.groups",
+        "permissions": "User.permissions"
+      },
+      "_output_schema": {
+        "users": "list of User dicts"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "permissions",
+                      "op": "contains",
+                      "value": "ADMIN"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in first; this endpoint is only reachable for an authenticated OctoPrint user.",
+          "precondition": "This requires an OctoPrint administrator account.",
+          "unique": "That username is already taken."
+        }
+      },
+      "_defaulted": [
+        "dropped unwritable columns ['username']"
+      ],
+      "description": "Create a new user account with the given password and initial active/groups/permissions. Fails if the username is already taken or the password is not given. Administrator only."
+    },
+    {
+      "tool": "user_get",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "User",
+        "lookup_by": {
+          "username": {
+            "$arg": "username"
+          }
+        }
+      },
+      "input_schema": {
+        "username": {
+          "type": "text",
+          "required": true,
+          "description": "Username of the account to read."
+        }
+      },
+      "_evidence": {
+        "locator": "src/octoprint/server/api/access.py:181",
+        "id_local": "User.get_http",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/access/users/{username}",
+          "locator": "src/octoprint/server/api/access.py:180"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "@api.route(\"/access/users/<username>\", methods=[\"GET\"])\n@no_firstrun_access\ndef get_user(username):\n    if current_user is None or current_user.is_anonymous or (current_user.get_name() != username and not current_user.has_permission(Permissions.ADMIN)):\n        abort(403)\n    user = userManager.find_user(username)\n    if user is None:\n        abort(404)\n    user_dict = user.as_dict()\n    if not credentials_checked_recently():\n        user_dict[\"apikey\"] = None\n    return jsonify(user_dict)",
+        "edges": [
+          "self-or-admin in-function auth (access.py:182-189)"
+        ]
+      },
+      "entity": "User",
+      "_binds": {
+        "username": "User.username"
+      },
+      "_output_schema": {
+        "user": "User dict"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "arg": "username"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "permissions",
+                      "op": "contains",
+                      "value": "ADMIN"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "username"
+        ],
+        "messages": {
+          "auth": "You must sign in first; this endpoint is only reachable for an authenticated OctoPrint user.",
+          "precondition": "Only your own account or an administrator can read a user.",
+          "not_found": "No such user."
+        }
+      },
+      "description": "Fetch a user's account attributes. You may read your own account, or an administrator may read any account; otherwise it is refused."
+    },
+    {
+      "tool": "user_update",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "User",
+        "row_key": {
+          "username": {
+            "$arg": "username"
+          }
+        },
+        "fields": [
+          "groups",
+          "permissions",
+          "active"
+        ]
+      },
+      "input_schema": {
+        "username": {
+          "type": "text",
+          "required": true,
+          "description": "Username of the account to update."
+        },
+        "groups": {
+          "type": "json",
+          "required": false,
+          "description": "New list of group keys for the account."
+        },
+        "permissions": {
+          "type": "json",
+          "required": false,
+          "description": "New extra permission keys for the account."
+        },
+        "active": {
+          "type": "bool",
+          "required": false,
+          "description": "New active flag for the account."
+        }
+      },
+      "_evidence": {
+        "locator": "src/octoprint/server/api/access.py:206",
+        "id_local": "User.update_http",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /api/access/users/{username}",
+          "locator": "src/octoprint/server/api/access.py:203"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "@api.route(\"/access/users/<username>\", methods=[\"PUT\"])\n@no_firstrun_access\n@require_credentials_checked_recently\n@Permissions.ADMIN.require(403)\ndef update_user(username):\n    user = userManager.find_user(username)\n    if user is None:\n        abort(404)\n    data = request.get_json()\n    if \"groups\" in data: userManager.change_user_groups(username, data[\"groups\"])\n    if \"permissions\" in data: userManager.change_user_permissions(username, data[\"permissions\"])\n    if \"active\" in data: userManager.change_user_activation(username, data[\"active\"] in valid_boolean_trues)\n    return get_users()",
+        "edges": [
+          "@Permissions.ADMIN.require(403) (access.py:205)"
+        ]
+      },
+      "entity": "User",
+      "_binds": {
+        "username": "User.username",
+        "groups": "User.groups",
+        "permissions": "User.permissions",
+        "active": "User.active"
+      },
+      "_output_schema": {
+        "users": "list of User dicts"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "permissions",
+                      "op": "contains",
+                      "value": "ADMIN"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in first; this endpoint is only reachable for an authenticated OctoPrint user.",
+          "precondition": "This requires an OctoPrint administrator account.",
+          "not_found": "No such user."
+        }
+      },
+      "description": "Update a user's groups, permissions or active flag. Administrator only."
+    },
+    {
+      "tool": "user_remove",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "User",
+        "lookup_by": {
+          "username": {
+            "$arg": "username"
+          }
+        }
+      },
+      "input_schema": {
+        "username": {
+          "type": "text",
+          "required": true,
+          "description": "Username of the account to delete."
+        }
+      },
+      "_evidence": {
+        "locator": "src/octoprint/server/api/access.py:236",
+        "id_local": "User.remove_http",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/access/users/{username}",
+          "locator": "src/octoprint/server/api/access.py:233"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "@api.route(\"/access/users/<username>\", methods=[\"DELETE\"])\n@no_firstrun_access\n@require_credentials_checked_recently\n@Permissions.ADMIN.require(403)\ndef remove_user(username):\n    if current_user.get_name() == username:\n        abort(400, description=\"You cannot delete yourself\")\n    try:\n        userManager.remove_user(username)\n    except users.UnknownUser:\n        abort(404)\n    return get_users()",
+        "edges": [
+          "@Permissions.ADMIN.require(403) (access.py:235)",
+          "access.py:240 abort(400) 'You cannot delete yourself'"
+        ]
+      },
+      "entity": "User",
+      "_binds": {
+        "username": "User.username"
+      },
+      "_output_schema": {
+        "users": "list of User dicts"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "permissions",
+                      "op": "contains",
+                      "value": "ADMIN"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "arg": "username"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "eq",
+              "n": 0
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "username"
+        ],
+        "messages": {
+          "auth": "You must sign in first; this endpoint is only reachable for an authenticated OctoPrint user.",
+          "precondition": "This requires an OctoPrint administrator account. An administrator cannot delete their own account.",
+          "not_found": "No such user."
+        }
+      },
+      "description": "Delete a user account. You cannot delete yourself. Administrator only."
+    },
+    {
+      "tool": "user_change_password",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "User",
+        "row_key": {
+          "username": {
+            "$arg": "username"
+          }
+        },
+        "fields": [
+          "password"
+        ]
+      },
+      "input_schema": {
+        "username": {
+          "type": "text",
+          "required": true,
+          "description": "Username of the account whose password changes."
+        },
+        "password": {
+          "type": "text",
+          "required": true,
+          "description": "The new password."
+        },
+        "current": {
+          "type": "text",
+          "required": false,
+          "description": "Your current password — required when changing your own."
+        }
+      },
+      "_evidence": {
+        "locator": "src/octoprint/server/api/access.py:252",
+        "id_local": "User.change_password_http",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /api/access/users/{username}/password",
+          "locator": "src/octoprint/server/api/access.py:251"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "@api.route(\"/access/users/<username>/password\", methods=[\"PUT\"])\n@no_firstrun_access\ndef change_password_for_user(username):\n    if current_user is None or current_user.is_anonymous or (current_user.get_name() != username and not current_user.has_permission(Permissions.ADMIN)):\n        abort(403)\n    new_password = request.get_json().get(\"password\")\n    if not new_password: abort(400)\n    if current_user.get_name() == username:\n        if current_user.has_password() and not userManager.check_password(username, request.get_json().get(\"current\")):\n            abort(403, description=\"Invalid curr",
+        "edges": [
+          "self-or-admin in-function auth (access.py:256-263); self must also present correct current password",
+          "access.py:272-277 check_password(current) else 403"
+        ]
+      },
+      "entity": "User",
+      "_binds": {
+        "username": "User.username",
+        "password": "User.password"
+      },
+      "_output_schema": {
+        "SUCCESS": "bool"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "arg": "username"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "password",
+                      "op": "eq",
+                      "value": {
+                        "arg": "current"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "permissions",
+                      "op": "contains",
+                      "value": "ADMIN"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "username",
+          "password"
+        ],
+        "messages": {
+          "auth": "You must sign in first; this endpoint is only reachable for an authenticated OctoPrint user.",
+          "precondition": "Changing your own password requires your current password; an administrator can change any password.",
+          "not_found": "No such user.",
+          "required": "The new password is required."
+        }
+      },
+      "description": "Change a user's password. You may change your own password (providing your current one) or an administrator may change any user's password without it."
+    },
+    {
+      "tool": "user_get_settings",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "User",
+        "lookup_by": {
+          "username": {
+            "$arg": "username"
+          }
+        }
+      },
+      "input_schema": {
+        "username": {
+          "type": "text",
+          "required": true,
+          "description": "Username whose settings to read."
+        }
+      },
+      "_evidence": {
+        "locator": "src/octoprint/server/api/access.py:298",
+        "id_local": "User.get_settings_http",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/access/users/{username}/settings",
+          "locator": "src/octoprint/server/api/access.py:297"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "@api.route(\"/access/users/<username>/settings\", methods=[\"GET\"])\n@no_firstrun_access\ndef get_settings_for_user(username):\n    if current_user is None or current_user.is_anonymous or (current_user.get_name() != username and not current_user.has_permission(Permissions.ADMIN)):\n        abort(403)\n    return jsonify(userManager.get_all_user_settings(username))",
+        "edges": [
+          "self-or-admin (access.py:299-306)"
+        ]
+      },
+      "entity": "User",
+      "_binds": {
+        "username": "User.username"
+      },
+      "_output_schema": {
+        "settings": "json dict"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "arg": "username"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "permissions",
+                      "op": "contains",
+                      "value": "ADMIN"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "username"
+        ],
+        "messages": {
+          "auth": "You must sign in first; this endpoint is only reachable for an authenticated OctoPrint user.",
+          "precondition": "Only your own settings or an administrator's can be read.",
+          "not_found": "No such user."
+        }
+      },
+      "description": "Fetch a user's saved settings object. You may read your own settings, or an administrator may read anyone's."
+    },
+    {
+      "tool": "user_change_settings",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "User",
+        "row_key": {
+          "username": {
+            "$arg": "username"
+          }
+        },
+        "fields": [
+          "settings"
+        ]
+      },
+      "input_schema": {
+        "username": {
+          "type": "text",
+          "required": true,
+          "description": "Username whose settings are replaced."
+        },
+        "settings": {
+          "type": "json",
+          "required": true,
+          "description": "The new settings object."
+        }
+      },
+      "_evidence": {
+        "locator": "src/octoprint/server/api/access.py:317",
+        "id_local": "User.change_settings_http",
+        "entry": {
+          "kind": "http",
+          "route": "PATCH /api/access/users/{username}/settings",
+          "locator": "src/octoprint/server/api/access.py:316"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "@api.route(\"/access/users/<username>/settings\", methods=[\"PATCH\"])\n@no_firstrun_access\ndef change_settings_for_user(username):\n    if current_user is None or current_user.is_anonymous or (current_user.get_name() != username and not current_user.has_permission(Permissions.ADMIN)):\n        abort(403)\n    if current_user.get_name() != username:\n        ensure_credentials_checked_recently()\n    userManager.change_user_settings(username, request.get_json())\n    return jsonify(SUCCESS)",
+        "edges": [
+          "self-or-admin (access.py:318-326)"
+        ]
+      },
+      "entity": "User",
+      "_binds": {
+        "username": "User.username",
+        "settings": "User.settings"
+      },
+      "_output_schema": {
+        "SUCCESS": "bool"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "arg": "username"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "permissions",
+                      "op": "contains",
+                      "value": "ADMIN"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "username",
+          "settings"
+        ],
+        "messages": {
+          "auth": "You must sign in first; this endpoint is only reachable for an authenticated OctoPrint user.",
+          "precondition": "Only your own settings or an administrator's can be changed.",
+          "not_found": "No such user.",
+          "required": "A settings object is required."
+        }
+      },
+      "_defaulted": [
+        "argument invented from the write column",
+        "fields"
+      ],
+      "description": "Replace a user's settings object. You may change your own settings, or an administrator may change anyone's (the administrator path also requires recently-rechecked credentials)."
+    },
+    {
+      "tool": "user_delete_apikey",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "User",
+        "row_key": {
+          "username": {
+            "$arg": "username"
+          }
+        },
+        "set": {
+          "apikey": null
+        }
+      },
+      "input_schema": {
+        "username": {
+          "type": "text",
+          "required": true,
+          "description": "Username whose API key is removed."
+        }
+      },
+      "_evidence": {
+        "locator": "src/octoprint/server/api/access.py:344",
+        "id_local": "User.delete_apikey_http",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/access/users/{username}/apikey",
+          "locator": "src/octoprint/server/api/access.py:342"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "@api.route(\"/access/users/<username>/apikey\", methods=[\"DELETE\"])\n@no_firstrun_access\n@require_credentials_checked_recently\ndef delete_apikey_for_user(username):\n    if current_user is None or current_user.is_anonymous or (current_user.get_name() != username and not current_user.has_permission(Permissions.ADMIN)):\n        abort(403)\n    if current_user.get_name() != username:\n        ensure_credentials_checked_recently()\n    userManager.delete_api_key(username)\n    return jsonify(SUCCESS)",
+        "edges": [
+          "self-or-admin (access.py:345-351)"
+        ]
+      },
+      "entity": "User",
+      "_binds": {
+        "username": "User.username"
+      },
+      "_output_schema": {
+        "SUCCESS": "bool"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "arg": "username"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "permissions",
+                      "op": "contains",
+                      "value": "ADMIN"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "username"
+        ],
+        "messages": {
+          "auth": "You must sign in first; this endpoint is only reachable for an authenticated OctoPrint user.",
+          "precondition": "Only your own key or an administrator can delete it.",
+          "not_found": "No such user."
+        }
+      },
+      "_defaulted": [
+        "argument invented from the write column",
+        "fields"
+      ],
+      "description": "Remove the API key for the given user. You may delete your own key, or an administrator may delete anyone's."
+    },
+    {
+      "tool": "user_generate_apikey",
+      "op": "update",
+      "family": "action.trigger",
+      "exec_spec": {
+        "target": {
+          "entity": "User",
+          "lookup_by": {
+            "username": {
+              "$arg": "username"
+            }
+          }
+        },
+        "set": {
+          "apikey": {
+            "$auto": "max(apikey)+1"
+          }
+        }
+      },
+      "input_schema": {
+        "username": {
+          "type": "text",
+          "required": true,
+          "description": "Username to generate the key for."
+        }
+      },
+      "_evidence": {
+        "locator": "src/octoprint/server/api/access.py:369",
+        "id_local": "User.generate_apikey_http",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/access/users/{username}/apikey",
+          "locator": "src/octoprint/server/api/access.py:367"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "@api.route(\"/access/users/<username>/apikey\", methods=[\"POST\"])\n@no_firstrun_access\n@require_credentials_checked_recently\ndef generate_apikey_for_user(username):\n    if current_user is None or current_user.is_anonymous or (current_user.get_name() != username and not current_user.has_permission(Permissions.ADMIN)):\n        abort(403)\n    if current_user.get_name() != username:\n        ensure_credentials_checked_recently()\n    apikey = userManager.generate_api_key(username)\n    return jsonify({\"apikey\": apikey})",
+        "edges": [
+          "self-or-admin (access.py:373-379)"
+        ]
+      },
+      "entity": "User",
+      "_binds": {
+        "username": "User.username"
+      },
+      "_output_schema": {
+        "apikey": "the new key"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "arg": "username"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "permissions",
+                      "op": "contains",
+                      "value": "ADMIN"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "username"
+        ],
+        "messages": {
+          "auth": "You must sign in first; this endpoint is only reachable for an authenticated OctoPrint user.",
+          "precondition": "Only your own key or an administrator can generate it.",
+          "not_found": "No such user."
+        }
+      },
+      "_defaulted": [
+        "In the real code this is a write that generates a new key; the set value uses $auto as a deterministic placeholder (the real code uses secrets)",
+        "family changed from update.field_set to action.trigger ($auto is only resolved on the trigger set path)"
+      ],
+      "description": "Generate a new API key for the given user (replacing any existing one) and return it. You may do this for your own account, or an administrator may do it for anyone."
+    },
+    {
+      "tool": "sign_in",
+      "op": "action",
+      "family": "guard.auth",
+      "exec_spec": {
+        "verify": {
+          "entity": "User",
+          "username_col": "username",
+          "password_col": "password"
+        }
+      },
+      "input_schema": {
+        "username": {
+          "type": "text",
+          "required": true,
+          "description": "The account username."
+        },
+        "password": {
+          "type": "text",
+          "required": true,
+          "description": "The account password."
+        }
+      },
+      "_evidence": {
+        "locator": "src/octoprint/server/api/__init__.py:324",
+        "id_local": "User.login",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/login",
+          "locator": "src/octoprint/server/api/__init__.py:317"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "@api.route(\"/login\", methods=[\"POST\"])\ndef login():\n    data = request.get_json(silent=True) or request.values\n    if \"user\" in data and \"pass\" in data:\n        username = data[\"user\"]; password = data[\"pass\"]\n        user = octoprint.server.userManager.find_user(username)\n        if user is not None:\n            if octoprint.server.userManager.check_password(username, password):\n                if not user.is_active:\n                    abort(403)\n                user = octoprint.server.userManager.login_user(user)\n                session[\"usersession.id\"] = user.session\n                login",
+        "edges": [
+          "__init__.py:331-355; deactivated user aborts 403"
+        ]
+      },
+      "entity": "User",
+      "_output_schema": {
+        "session": "User.as_dict() plus login_mechanism and _is_external_client flags"
+      },
+      "guards": {
+        "required": [
+          "username",
+          "password"
+        ],
+        "messages": {
+          "required": "Both a username and a password are needed to sign in."
+        }
+      },
+      "description": "Sign in with an OctoPrint account. Everything that touches a user, group, app-key, printer profile or file requires this first; the session it opens is what a signed-in actor resolves to (an inactive account is refused with 403)."
+    },
+    {
+      "tool": "sign_out",
+      "op": "action",
+      "family": "guard.logout",
+      "exec_spec": {
+        "entity": "User"
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "src/octoprint/server/api/__init__.py:478",
+        "id_local": "User.logout",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/logout",
+          "locator": "src/octoprint/server/api/__init__.py:477"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "@api.route(\"/logout\", methods=[\"POST\"])\ndef logout():\n    username = current_user.get_id() if current_user else None\n    server_side_logout(username, sessionid=session.get(\"usersession.id\"))\n    r = make_response(jsonify(octoprint.server.userManager.anonymous_user_factory()))\n    r.set_cookie(\"active_logout\", \"true\")\n    if username:\n        eventManager().fire(Events.USER_LOGGED_OUT, payload={\"username\": username})\n    return r",
+        "edges": [
+          "__init__.py:478-481 server_side_logout(current_user.get_id())"
+        ]
+      },
+      "entity": "User",
+      "_output_schema": {
+        "response": "anonymous user dict plus active_logout cookie"
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in first; this endpoint is only reachable for an authenticated OctoPrint user.",
+          "precondition": "You cannot sign out when nobody is signed in."
+        }
+      },
+      "description": "Sign the current user out and end their session. Requires an active session."
+    },
+    {
+      "tool": "group_add",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Group",
+        "fields": [
+          "name",
+          "description",
+          "permissions",
+          "subgroups",
+          "default",
+          "removable",
+          "changeable",
+          "toggleable"
+        ],
+        "unique_on": [
+          "key"
+        ]
+      },
+      "input_schema": {
+        "key": {
+          "type": "text",
+          "required": true,
+          "description": "Unique key of the new group."
+        },
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "Display name of the group."
+        },
+        "description": {
+          "type": "text",
+          "required": false,
+          "description": "Human description of the group."
+        },
+        "permissions": {
+          "type": "json",
+          "required": false,
+          "description": "Permission keys the group grants."
+        },
+        "subgroups": {
+          "type": "json",
+          "required": false,
+          "description": "Sub-group keys the group includes."
+        },
+        "default": {
+          "type": "bool",
+          "required": false,
+          "description": "Assign this group to new users by default."
+        },
+        "removable": {
+          "type": "bool",
+          "required": false,
+          "description": "Whether the group may later be removed."
+        },
+        "changeable": {
+          "type": "bool",
+          "required": false,
+          "description": "Whether the group's composition may change."
+        },
+        "toggleable": {
+          "type": "bool",
+          "required": false,
+          "description": "Whether the group may be toggled per-user."
+        }
+      },
+      "_evidence": {
+        "locator": "src/octoprint/access/groups.py:360",
+        "id_local": "Group.add",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/access/groups",
+          "locator": "src/octoprint/server/api/access.py:39"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "def add_group(self, key, name, description, permissions, subgroups, default=False, removable=True, changeable=True, toggleable=True, overwrite=False):\n    if key in self._groups and not overwrite:\n        raise GroupAlreadyExists(key)\n    group = Group(key, name, description=description, permissions=self._to_permissions(*permissions), subgroups=self._to_groups(*subgroups), default=default, changeable=changeable, removable=removable, toggleable=toggleable)\n    self._groups[key] = group\n    self._dirty = True\n    self._save()\n    self._notify_listeners('added', group)",
+        "edges": [
+          "@Permissions.ADMIN.require(403) (access.py:41)"
+        ]
+      },
+      "entity": "Group",
+      "_binds": {
+        "key": "Group.key",
+        "name": "Group.name",
+        "description": "Group.description",
+        "permissions": "Group.permissions",
+        "subgroups": "Group.subgroups",
+        "default": "Group.default",
+        "removable": "Group.removable",
+        "changeable": "Group.changeable",
+        "toggleable": "Group.toggleable"
+      },
+      "_output_schema": {
+        "groups": "list of Group dicts"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "permissions",
+                      "op": "contains",
+                      "value": "ADMIN"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in first; this endpoint is only reachable for an authenticated OctoPrint user.",
+          "precondition": "This requires an OctoPrint administrator account.",
+          "unique": "A group with that key already exists."
+        }
+      },
+      "_defaulted": [
+        "dropped unwritable columns ['key']"
+      ],
+      "description": "Create a new user group with the given permissions. Fails if the key is already taken. Administrator only."
+    },
+    {
+      "tool": "group_update",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Group",
+        "row_key": {
+          "key": {
+            "$arg": "key"
+          }
+        },
+        "fields": [
+          "description",
+          "permissions",
+          "subgroups",
+          "default"
+        ]
+      },
+      "input_schema": {
+        "key": {
+          "type": "text",
+          "required": true,
+          "description": "Key of the group to update."
+        },
+        "description": {
+          "type": "text",
+          "required": false,
+          "description": "New description."
+        },
+        "permissions": {
+          "type": "json",
+          "required": false,
+          "description": "New permission keys."
+        },
+        "subgroups": {
+          "type": "json",
+          "required": false,
+          "description": "New sub-group keys."
+        },
+        "default": {
+          "type": "bool",
+          "required": false,
+          "description": "New default flag."
+        }
+      },
+      "_evidence": {
+        "locator": "src/octoprint/access/groups.py:425",
+        "id_local": "Group.update",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /api/access/groups/{key}",
+          "locator": "src/octoprint/server/api/access.py:89"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "def update_group(self, key, description=None, permissions=None, subgroups=None, default=None):\n    group = self._to_group(key)\n    if group is None: raise UnknownGroup(key)\n    if not group.is_changeable(): raise GroupCantBeChanged(key)\n    if description is not None and description != group.get_description():\n        group.change_description(description); self._dirty = True\n    ... same for permissions/subgroups/default ...\n    if self._dirty:\n        self._save()\n        self._notify_listeners('permissions_changed' if ... else 'modified', group)",
+        "edges": [
+          "@Permissions.ADMIN.require(403) (access.py:91)",
+          "groups.py:427 is_changeable else GroupCantBeChanged"
+        ]
+      },
+      "entity": "Group",
+      "_binds": {
+        "key": "Group.key",
+        "description": "Group.description",
+        "permissions": "Group.permissions",
+        "subgroups": "Group.subgroups",
+        "default": "Group.default"
+      },
+      "_output_schema": {
+        "groups": "list of Group dicts"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "permissions",
+                      "op": "contains",
+                      "value": "ADMIN"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            },
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Group",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "key",
+                      "op": "eq",
+                      "value": {
+                        "arg": "key"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "changeable",
+                      "op": "eq",
+                      "value": true
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in first; this endpoint is only reachable for an authenticated OctoPrint user.",
+          "precondition": "Updating a group requires the admin permission and the target group being changeable. Refused for a non-changeable group.",
+          "not_found": "No such group.",
+          "constraint": "This group is not changeable."
+        }
+      },
+      "description": "Update a group's description, permissions, subgroups or default flag. Refused for groups marked non-changeable. Administrator only."
+    },
+    {
+      "tool": "group_remove",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "Group",
+        "lookup_by": {
+          "key": {
+            "$arg": "key"
+          }
+        }
+      },
+      "input_schema": {
+        "key": {
+          "type": "text",
+          "required": true,
+          "description": "Key of the group to delete."
+        }
+      },
+      "_evidence": {
+        "locator": "src/octoprint/access/groups.py:407",
+        "id_local": "Group.remove",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/access/groups/{key}",
+          "locator": "src/octoprint/server/api/access.py:122"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "def remove_group(self, key, save=True, notify=True):\n    group = self._to_group(key)\n    if group is None: raise UnknownGroup(key)\n    if not group.is_removable(): raise GroupUnremovable(key)\n    del self._groups[key]\n    self._dirty = True\n    if save: self._save()\n    if notify: self._notify_listeners('removed', group)",
+        "edges": [
+          "@Permissions.ADMIN.require(403) (access.py:124)",
+          "groups.py:410 is_removable else GroupUnremovable"
+        ]
+      },
+      "entity": "Group",
+      "_binds": {
+        "key": "Group.key"
+      },
+      "_output_schema": {
+        "groups": "list of Group dicts"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "permissions",
+                      "op": "contains",
+                      "value": "ADMIN"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            },
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Group",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "key",
+                      "op": "eq",
+                      "value": {
+                        "arg": "key"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "removable",
+                      "op": "eq",
+                      "value": true
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in first; this endpoint is only reachable for an authenticated OctoPrint user.",
+          "precondition": "Removing a group requires the admin permission and the target group being removable. Refused for a non-removable group.",
+          "not_found": "No such group.",
+          "on_child": "This group is not removable."
+        }
+      },
+      "description": "Delete a user group. Refused for groups marked non-removable. Administrator only."
+    },
+    {
+      "tool": "group_get",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Group",
+        "lookup_by": {
+          "key": {
+            "$arg": "key"
+          }
+        }
+      },
+      "input_schema": {
+        "key": {
+          "type": "text",
+          "required": true,
+          "description": "The group's key."
+        }
+      },
+      "_evidence": {
+        "locator": "src/octoprint/access/groups.py:355",
+        "id_local": "Group.search",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/access/groups/{key}",
+          "locator": "src/octoprint/server/api/access.py:78"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "def find_group(self, key):\n    if key is None: return None\n    return self._groups.get(key)",
+        "edges": [
+          "@Permissions.ADMIN.require(403) (access.py:79)"
+        ]
+      },
+      "entity": "Group",
+      "_binds": {
+        "key": "Group.key"
+      },
+      "_output_schema": {
+        "group": "Group dict or 404"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "permissions",
+                      "op": "contains",
+                      "value": "ADMIN"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in first; this endpoint is only reachable for an authenticated OctoPrint user.",
+          "precondition": "This requires an OctoPrint administrator account.",
+          "not_found": "No such group."
+        }
+      },
+      "description": "Fetch a single user group by its key. Administrator only."
+    },
+    {
+      "tool": "group_list",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Group",
+        "rank": {
+          "method": "exact"
+        }
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "src/octoprint/server/api/access.py:33",
+        "id_local": "Group.list_http",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/access/groups",
+          "locator": "src/octoprint/server/api/access.py:32"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "@api.route(\"/access/groups\", methods=[\"GET\"])\n@no_firstrun_access\n@Permissions.ADMIN.require(403)\ndef get_groups():\n    return jsonify(groups=[g.as_dict() for g in groupManager.groups])",
+        "edges": [
+          "@Permissions.ADMIN.require(403) (access.py:33)"
+        ]
+      },
+      "entity": "Group",
+      "_output_schema": {
+        "groups": "list of Group dicts"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "permissions",
+                      "op": "contains",
+                      "value": "ADMIN"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in first; this endpoint is only reachable for an authenticated OctoPrint user.",
+          "precondition": "This requires an OctoPrint administrator account."
+        }
+      },
+      "description": "List all user groups and their attributes. Administrator only."
+    },
+    {
+      "tool": "permission_list",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Permission",
+        "rank": {
+          "method": "exact"
+        }
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "src/octoprint/server/api/access.py:24",
+        "id_local": "Permission.list",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/access/permissions",
+          "locator": "src/octoprint/server/api/access.py:23"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "@api.route(\"/access/permissions\", methods=[\"GET\"])\ndef get_permissions():\n    return jsonify(permissions=[p.as_dict() for p in Permissions.all()])",
+        "scope": "genuinely global — the permission catalogue is public (GET /api/access/permissions, no @Permissions decorator)"
+      },
+      "entity": "Permission",
+      "_output_schema": {
+        "permissions": "list of Permission dicts"
+      },
+      "description": "List every permission definition and its display name/description. Public — any caller may read the permission catalogue.",
+      "guards": {}
+    },
+    {
+      "tool": "appkey_request",
+      "op": "action",
+      "family": "action.emit",
+      "exec_spec": {
+        "channel": "event",
+        "record": {
+          "table": "AppKey"
+        }
+      },
+      "input_schema": {
+        "app": {
+          "type": "text",
+          "required": true,
+          "description": "Name of the application requesting a key."
+        },
+        "user": {
+          "type": "text",
+          "required": false,
+          "description": "Optional username to pre-select for the approval."
+        }
+      },
+      "_evidence": {
+        "locator": "src/octoprint/plugins/appkeys/__init__.py:184",
+        "id_local": "AppKey.request",
+        "entry": {
+          "kind": "http",
+          "route": "POST /plugin/appkeys/request",
+          "locator": "src/octoprint/plugins/appkeys/__init__.py:177"
+        },
+        "entity_why": "primary effect external lands on this table",
+        "ref_code": "@BlueprintPlugin.route(\"/request\", methods=[\"POST\"])\n@csrf_exempt @limit(\"3/minute;5/10 minutes;10/hour\") @no_firstrun_access\ndef handle_request(self):\n    data = flask.request.json\n    if \"app\" not in data: abort(400)\n    app_token, user_token = self._add_pending_decision(remote_address, data[\"app\"], user_id=data.get(\"user\"))\n    response = flask.jsonify(app_token=app_token, auth_dialog=auth_dialog)\n    response.status_code = 201; response.headers[\"Location\"] = ...\n    return response"
+      },
+      "entity": "AppKey",
+      "_output_schema": {
+        "app_token": "str",
+        "auth_dialog": "str URL + Location poll"
+      },
+      "guards": {
+        "required": [
+          "app"
+        ],
+        "messages": {
+          "required": "An app name is required to start the flow."
+        }
+      },
+      "description": "Start the app-key (OAuth-style) authorization flow: register a new application for itself under the given app name and get back an app_token plus the URL where the user is asked to approve it. Public: any caller may start a flow; the browser-owner approves later."
+    },
+    {
+      "tool": "appkey_decision",
+      "op": "action",
+      "family": "action.emit",
+      "exec_spec": {
+        "channel": "event",
+        "record": {
+          "table": "AppKey"
+        }
+      },
+      "input_schema": {
+        "user_token": {
+          "type": "text",
+          "required": true,
+          "description": "Approval token from appkey_request."
+        },
+        "decision": {
+          "type": "bool",
+          "required": true,
+          "description": "True to grant the key, false to deny."
+        }
+      },
+      "_evidence": {
+        "locator": "src/octoprint/plugins/appkeys/__init__.py:290",
+        "id_local": "AppKey.decision",
+        "entry": {
+          "kind": "http",
+          "route": "POST /plugin/appkeys/decision/<user_token>",
+          "locator": "src/octoprint/plugins/appkeys/__init__.py:288"
+        },
+        "entity_why": "primary effect external lands on this table",
+        "ref_code": "@BlueprintPlugin.route(\"/decision/<user_token>\", methods=[\"POST\"])\n@restricted_access\ndef handle_decision(self, user_token):\n    if not Permissions.PLUGIN_APPKEYS_GRANT.can():\n        abort(403)\n    ensure_credentials_checked_recently()\n    decision = data[\"decision\"] in valid_boolean_trues\n    result = self._set_decision(user_token, decision, current_user.get_name())\n    if not result: abort(404)",
+        "edges": [
+          "handle_decision: PLUGIN_APPKEYS_GRANT.can() + @restricted_access + ensure_credentials_checked_recently (appkeys/__init__.py:289,295-296)"
+        ]
+      },
+      "entity": "AppKey",
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "permissions",
+                      "op": "contains",
+                      "value": "PLUGIN_APPKEYS_GRANT"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "user_token",
+          "decision"
+        ],
+        "messages": {
+          "auth": "You must sign in first; this endpoint is only reachable for an authenticated OctoPrint user.",
+          "precondition": "Granting an app key requires the app-keys-grant permission.",
+          "required": "Both the user_token and a decision are required."
+        },
+        "requires_auth": true
+      },
+      "description": "Grant or deny a pending app-key flow for the given user_token. Requires signing in with the grant permission (PLUGIN_APPKEYS_GRANT)."
+    },
+    {
+      "tool": "appkey_auth_dialog",
+      "op": "action",
+      "family": "search",
+      "exec_spec": {
+        "entity": "AppKey",
+        "rank": {
+          "method": "exact"
+        }
+      },
+      "input_schema": {
+        "app_token": {
+          "type": "text",
+          "required": true,
+          "description": "Token of the flow to approve."
+        }
+      },
+      "_evidence": {
+        "locator": "src/octoprint/plugins/appkeys/__init__.py:243",
+        "id_local": "AppKey.auth_dialog",
+        "entry": {
+          "kind": "http",
+          "route": "GET /plugin/appkeys/auth/<app_token>",
+          "locator": "src/octoprint/plugins/appkeys/__init__.py:241"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "@BlueprintPlugin.route(\"/auth/<app_token>\", methods=[\"GET\"])\n@no_firstrun_access\ndef handle_auth_dialog(self, app_token):\n    pendings = self._get_pending_by_app_token(app_token)\n    if not pendings: return abort(404)\n    response = require_fresh_login_with(permissions=[Permissions.PLUGIN_APPKEYS_GRANT], user_id=required_user)\n    if response: return response\n    return make_response(render_template(\"plugin_appkeys/appkeys_authdialog.jinja2\", ...))",
+        "edges": [
+          "require_fresh_login_with(permissions=[PLUGIN_APPKEYS_GRANT]) (appkeys/__init__.py:253)"
+        ]
+      },
+      "entity": "AppKey",
+      "_output_schema": {
+        "auth dialog": "rendered HTML"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "permissions",
+                      "op": "contains",
+                      "value": "PLUGIN_APPKEYS_GRANT"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "app_token"
+        ],
+        "messages": {
+          "auth": "You must sign in first; this endpoint is only reachable for an authenticated OctoPrint user.",
+          "precondition": "Approving an app key requires the app-keys-grant permission.",
+          "required": "An app_token is required."
+        },
+        "requires_auth": true
+      },
+      "description": "Render the approval page for a pending app-key flow: confirm the application identity and approve or open the gate that grants it a key. Requires signing in with the grant permission (PLUGIN_APPKEYS_GRANT) and a recent password check."
+    },
+    {
+      "tool": "appkey_decision_poll",
+      "op": "action",
+      "family": "action.emit",
+      "exec_spec": {
+        "channel": "event",
+        "record": {
+          "table": "AppKey"
+        }
+      },
+      "input_schema": {
+        "app_token": {
+          "type": "text",
+          "required": true,
+          "description": "Token returned by appkey_request."
+        }
+      },
+      "_evidence": {
+        "locator": "src/octoprint/plugins/appkeys/__init__.py:225",
+        "id_local": "AppKey.decision_poll",
+        "entry": {
+          "kind": "http",
+          "route": "GET /plugin/appkeys/request/{app_token}",
+          "locator": "src/octoprint/plugins/appkeys/__init__.py:224"
+        },
+        "entity_why": "primary effect external lands on this table",
+        "ref_code": "def handle_decision_poll(self, app_token):\n    result = self._get_pending_by_app_token(app_token)\n    if result:\n        response = flask.jsonify(message=\"Awaiting decision\"); response.status_code = 202; return response\n    result = self._get_decision(app_token)\n    if result:\n        return flask.jsonify(api_key=result)\n    return flask.abort(404)"
+      },
+      "entity": "AppKey",
+      "_output_schema": {
+        "api_key": "the granted API key once approved, else 202 awaiting / 404"
+      },
+      "guards": {
+        "required": [
+          "app_token"
+        ],
+        "messages": {
+          "required": "An app_token is required to poll."
+        }
+      },
+      "description": "Poll the outcome of an app-key flow by its app_token: returns the granted API key once the user has approved, or signals the flow is still awaiting a decision. Public: used by the application itself to retrieve its key."
+    },
+    {
+      "tool": "appkey_api_get",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "AppKey",
+        "scope": {
+          "owner_col": "user_id"
+        },
+        "rank": {
+          "method": "exact"
+        }
+      },
+      "input_schema": {
+        "all": {
+          "type": "bool",
+          "required": false,
+          "description": "Admin-only: list every user's keys instead of only your own."
+        }
+      },
+      "_evidence": {
+        "locator": "src/octoprint/plugins/appkeys/__init__.py:327",
+        "id_local": "AppKey.api_get",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/plugin/appkeys",
+          "locator": "src/octoprint/plugins/appkeys/__init__.py:325"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "def on_api_get(self, request):\n    user_id = current_user.get_name()\n    if not user_id: return abort(403)\n    if request.values.get(\"all\") in valid_boolean_trues and Permissions.PLUGIN_APPKEYS_ADMIN.can():\n        keys = self._all_api_keys()\n    else:\n        keys = self._api_keys_for_user(user_id)\n    return flask.jsonify(keys=[x.external() for x in keys], pending=...)",
+        "edges": [
+          "reading another user's keys or ?all= requires PLUGIN_APPKEYS_ADMIN else owner-scoped (appkeys/__init__.py:334-356)"
+        ]
+      },
+      "entity": "AppKey",
+      "_binds": null,
+      "_output_schema": {
+        "keys": "list of AppKey dicts",
+        "pending": "dict"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "permissions",
+                      "op": "contains",
+                      "value": "PLUGIN_APPKEYS_ADMIN"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "username",
+                  "op": "eq",
+                  "value": {
+                    "session": "account_name"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in first; this endpoint is only reachable for an authenticated OctoPrint user.",
+          "precondition": "You can list your own app keys, or every user's with the app-keys-admin permission."
+        }
+      },
+      "description": "List the API keys granted to your own applications. With the app-keys-admin permission and all=true you may also list every user's keys."
+    },
+    {
+      "tool": "appkey_generate",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "AppKey",
+        "fields": {
+          "app_id": {
+            "$arg": "app"
+          },
+          "user_id": {
+            "$arg": "user"
+          }
+        },
+        "set_on_create": {
+          "user_id": {
+            "$session": "account_id"
+          }
+        },
+        "unique_on": [
+          "app_id",
+          "user_id"
+        ]
+      },
+      "input_schema": {
+        "app": {
+          "type": "text",
+          "required": true,
+          "description": "Name of the application the key is for."
+        },
+        "user": {
+          "type": "text",
+          "required": false,
+          "description": "Username the key is generated for (injected as you by default)."
+        }
+      },
+      "_evidence": {
+        "locator": "src/octoprint/plugins/appkeys/__init__.py:414",
+        "id_local": "AppKey.generate",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/plugin/appkeys",
+          "locator": "src/octoprint/plugins/appkeys/__init__.py:402"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "elif command == \"generate\":\n    app_name = data.get(\"app\")\n    if not app_name: return abort(400)\n    selected_user_id = data.get(\"user\", user_id)\n    if selected_user_id != user_id and not Permissions.PLUGIN_APPKEYS_ADMIN.can():\n        return abort(403)\n    ensure_credentials_checked_recently()\n    key = self._add_api_key(selected_user_id, app_name.strip())\n    return flask.jsonify(user_id=selected_user_id, app_id=app_name, api_key=key)",
+        "edges": [
+          "selected_user_id != user_id and not PLUGIN_APPKEYS_ADMIN.can() -> 403 (appkeys/__init__.py:408-412)"
+        ]
+      },
+      "entity": "AppKey",
+      "_binds": {
+        "app": "AppKey.app_id",
+        "user": "AppKey.user_id"
+      },
+      "_output_schema": {
+        "user_id": "str",
+        "app_id": "str",
+        "api_key": "the generated key"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "permissions",
+                      "op": "contains",
+                      "value": "PLUGIN_APPKEYS_ADMIN"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "username",
+                  "op": "eq",
+                  "value": {
+                    "session": "account_name"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "app"
+        ],
+        "messages": {
+          "auth": "You must sign in first; this endpoint is only reachable for an authenticated OctoPrint user.",
+          "required": "An app name is required.",
+          "unique": "That app already has a key for this user.",
+          "precondition": "You can generate a key for yourself, or for any user with the app-keys-admin permission."
+        }
+      },
+      "description": "Generate an API key for an application on behalf of a user. You may do this for yourself; with the app-keys-admin permission you may also generate keys for other users. Duplicate app/user pairs are refused."
+    },
+    {
+      "tool": "appkey_revoke",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "AppKey",
+        "lookup_by": {
+          "api_key": {
+            "$arg": "key"
+          }
+        }
+      },
+      "input_schema": {
+        "key": {
+          "type": "text",
+          "required": false,
+          "description": "The API key to revoke (or supply app+user instead)."
+        },
+        "app": {
+          "type": "text",
+          "required": false,
+          "description": "App name to resolve the key, if no key given."
+        },
+        "user": {
+          "type": "text",
+          "required": false,
+          "description": "User whose key to resolve, if no key given."
+        }
+      },
+      "_evidence": {
+        "locator": "src/octoprint/plugins/appkeys/__init__.py:380",
+        "id_local": "AppKey.revoke",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/plugin/appkeys",
+          "locator": "src/octoprint/plugins/appkeys/__init__.py:370"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "if command == \"revoke\":\n    api_key = data.get(\"key\")\n    if not api_key:\n        api_key = self._api_key_for_user_and_app_id(data.get(\"user\", user_id), data.get(\"app\"))\n    if not api_key: return abort(400)\n    if not Permissions.PLUGIN_APPKEYS_ADMIN.can():\n        user_for_key = self._user_for_api_key(api_key)\n        if user_for_key is None or user_for_key.get_id() != user_id:\n            return abort(403)\n    ensure_credentials_checked_recently()\n    self._delete_api_key(api_key)",
+        "edges": [
+          "if not ADMIN .can(): _user_for_api_key(key).get_id() must == current user else 403 (appkeys/__init__.py:393-398)"
+        ]
+      },
+      "entity": "AppKey",
+      "_binds": {
+        "key": "AppKey.api_key",
+        "app": "AppKey.app_id",
+        "user": "AppKey.user_id"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "permissions",
+                      "op": "contains",
+                      "value": "PLUGIN_APPKEYS_ADMIN"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "AppKey",
+                "where": {
+                  "node": "field",
+                  "col": "user_id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in first; this endpoint is only reachable for an authenticated OctoPrint user.",
+          "precondition": "You can revoke your own app keys, or any key with the app-keys-admin permission.",
+          "not_found": "That app key was not found.",
+          "required": "Pass the key, or the app (and user) to resolve it."
+        },
+        "required": [
+          "key"
+        ]
+      },
+      "description": "Revoke an app API key. You may revoke your own keys; with the app-keys-admin permission you may revoke any. Either pass the key directly, or the app (and optionally user) to resolve it."
+    },
+    {
+      "tool": "printerprofile_list",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "PrinterProfile",
+        "rank": {
+          "method": "exact"
+        }
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "src/octoprint/server/api/printer_profiles.py:48",
+        "id_local": "PrinterProfile.list_http",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/printerprofiles",
+          "locator": "src/octoprint/server/api/printer_profiles.py:40"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "@api.route(\"/printerprofiles\", methods=[\"GET\"])\n@no_firstrun_access\n@Permissions.CONNECTION.require(403)\ndef printerProfilesList():\n    all_profiles = printerProfileManager.get_all()\n    return jsonify({\"profiles\": _convert_profiles(all_profiles)})",
+        "edges": [
+          "@Permissions.CONNECTION.require(403) (printer_profiles.py:47)"
+        ]
+      },
+      "entity": "PrinterProfile",
+      "_output_schema": {
+        "profiles": "dict id->profile"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "permissions",
+                      "op": "contains",
+                      "value": "CONNECTION"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must sign in first; this endpoint is only reachable for an authenticated OctoPrint user.",
+          "precondition": "Listing printer profiles requires the connection permission."
+        },
+        "requires_auth": true
+      },
+      "description": "List all saved printer profiles. Requires the connection permission."
+    },
+    {
+      "tool": "printerprofile_add",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "PrinterProfile",
+        "fields": {
+          "name": {
+            "$arg": "name"
+          },
+          "model": {
+            "$arg": "model"
+          },
+          "color": {
+            "$arg": "color"
+          },
+          "volume": {
+            "$arg": "volume"
+          },
+          "heatedBed": {
+            "$arg": "heatedBed"
+          },
+          "heatedChamber": {
+            "$arg": "heatedChamber"
+          },
+          "extruder": {
+            "$arg": "extruder"
+          },
+          "axes": {
+            "$arg": "axes"
+          }
+        },
+        "set_on_create": {
+          "id": {
+            "$arg": "identifier"
+          }
+        },
+        "unique_on": [
+          "id"
+        ]
+      },
+      "input_schema": {
+        "identifier": {
+          "type": "text",
+          "required": true,
+          "description": "Unique id of the new profile."
+        },
+        "name": {
+          "type": "text",
+          "required": false,
+          "description": "Profile display name."
+        },
+        "model": {
+          "type": "text",
+          "required": false,
+          "description": "Printer model string."
+        },
+        "color": {
+          "type": "text",
+          "required": false,
+          "description": "Color/theme key."
+        },
+        "volume": {
+          "type": "json",
+          "required": false,
+          "description": "Build-volume definition."
+        },
+        "heatedBed": {
+          "type": "bool",
+          "required": false,
+          "description": "Whether the printer has a heated bed."
+        },
+        "heatedChamber": {
+          "type": "bool",
+          "required": false,
+          "description": "Whether the printer has a heated chamber."
+        },
+        "extruder": {
+          "type": "json",
+          "required": false,
+          "description": "Extruder/nozzle definition."
+        },
+        "axes": {
+          "type": "json",
+          "required": false,
+          "description": "Per-axis (x/y/z) settings."
+        }
+      },
+      "_evidence": {
+        "locator": "src/octoprint/server/api/printer_profiles.py:56",
+        "id_local": "PrinterProfile.add_http",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/printerprofiles",
+          "locator": "src/octoprint/server/api/printer_profiles.py:53"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "@api.route(\"/printerprofiles\", methods=[\"POST\"])\n@no_firstrun_access\n@Permissions.SETTINGS.require(403)\ndef printerProfilesAdd():\n    json_data = request.get_json()\n    if \"profile\" not in json_data: abort(400)\n    make_default = \"default\" in json_data[\"profile\"] and json_data[\"profile\"][\"default\"] in valid_boolean_trues\n    saved_profile = printerProfileManager.save(profile, allow_overwrite=False, make_default=make_default, trigger_event=True)\n    return jsonify({\"profile\": _convert_profile(saved_profile)})",
+        "edges": [
+          "@Permissions.SETTINGS.require(403) (printer_profiles.py:55)"
+        ]
+      },
+      "entity": "PrinterProfile",
+      "_binds": {
+        "identifier": "PrinterProfile.id",
+        "name": "PrinterProfile.name",
+        "model": "PrinterProfile.model",
+        "color": "PrinterProfile.color",
+        "volume": "PrinterProfile.volume",
+        "heatedBed": "PrinterProfile.heatedBed",
+        "heatedChamber": "PrinterProfile.heatedChamber",
+        "extruder": "PrinterProfile.extruder",
+        "axes": "PrinterProfile.axes",
+        "basedOn": "PrinterProfile.id"
+      },
+      "_output_schema": {
+        "profile": "the created PrinterProfile"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "permissions",
+                      "op": "contains",
+                      "value": "SETTINGS"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "identifier"
+        ],
+        "messages": {
+          "auth": "You must sign in first; this endpoint is only reachable for an authenticated OctoPrint user.",
+          "precondition": "Managing printer profiles requires the settings permission.",
+          "not_found": "No such printer profile.",
+          "unique": "A printer profile with that identifier already exists."
+        },
+        "requires_auth": true
+      },
+      "_defaulted": [
+        "dropped unwritable columns ['id']"
+      ],
+      "description": "Create a new printer profile identified by its identifier. Requires the settings permission."
+    },
+    {
+      "tool": "printerprofile_get",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "PrinterProfile",
+        "lookup_by": {
+          "id": {
+            "$arg": "identifier"
+          }
+        }
+      },
+      "input_schema": {
+        "identifier": {
+          "type": "text",
+          "required": true,
+          "description": "Id of the printer profile to fetch."
+        }
+      },
+      "_evidence": {
+        "locator": "src/octoprint/server/api/printer_profiles.py:106",
+        "id_local": "PrinterProfile.get_http",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/printerprofiles/{identifier}",
+          "locator": "src/octoprint/server/api/printer_profiles.py:102"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "@api.route(\"/printerprofiles/<string:identifier>\", methods=[\"GET\"])\n@no_firstrun_access\n@Permissions.CONNECTION.require(403)\ndef printerProfilesGet(identifier):\n    profile = printerProfileManager.get(identifier)\n    if profile is None: abort(404)\n    return jsonify(_convert_profile(profile))",
+        "edges": [
+          "@Permissions.CONNECTION.require(403) (printer_profiles.py:104)"
+        ]
+      },
+      "entity": "PrinterProfile",
+      "_binds": {
+        "identifier": "PrinterProfile.id"
+      },
+      "_output_schema": {
+        "profile": "PrinterProfile"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "permissions",
+                      "op": "contains",
+                      "value": "CONNECTION"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "identifier"
+        ],
+        "messages": {
+          "auth": "You must sign in first; this endpoint is only reachable for an authenticated OctoPrint user.",
+          "precondition": "Reading printer profiles requires the connection permission.",
+          "not_found": "No such printer profile."
+        },
+        "requires_auth": true
+      },
+      "description": "Fetch a single saved printer profile by its identifier. Requires the connection permission."
+    },
+    {
+      "tool": "printerprofile_update",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "PrinterProfile",
+        "row_key": {
+          "id": {
+            "$arg": "identifier"
+          }
+        },
+        "fields": {
+          "name": {
+            "$arg": "name"
+          },
+          "model": {
+            "$arg": "model"
+          },
+          "color": {
+            "$arg": "color"
+          },
+          "volume": {
+            "$arg": "volume"
+          },
+          "heatedBed": {
+            "$arg": "heatedBed"
+          },
+          "heatedChamber": {
+            "$arg": "heatedChamber"
+          },
+          "extruder": {
+            "$arg": "extruder"
+          },
+          "axes": {
+            "$arg": "axes"
+          }
+        }
+      },
+      "input_schema": {
+        "identifier": {
+          "type": "text",
+          "required": true,
+          "description": "Id of the profile to update."
+        },
+        "name": {
+          "type": "text",
+          "required": false,
+          "description": "New display name."
+        },
+        "model": {
+          "type": "text",
+          "required": false,
+          "description": "New model string."
+        },
+        "color": {
+          "type": "text",
+          "required": false,
+          "description": "New color key."
+        },
+        "volume": {
+          "type": "json",
+          "required": false,
+          "description": "New build volume."
+        },
+        "heatedBed": {
+          "type": "bool",
+          "required": false,
+          "description": "New heated-bed flag."
+        },
+        "heatedChamber": {
+          "type": "bool",
+          "required": false,
+          "description": "New heated-chamber flag."
+        },
+        "extruder": {
+          "type": "json",
+          "required": false,
+          "description": "New extruder definition."
+        },
+        "axes": {
+          "type": "json",
+          "required": false,
+          "description": "New axes definition."
+        }
+      },
+      "_evidence": {
+        "locator": "src/octoprint/server/api/printer_profiles.py:137",
+        "id_local": "PrinterProfile.update_http",
+        "entry": {
+          "kind": "http",
+          "route": "PATCH /api/printerprofiles/{identifier}",
+          "locator": "src/octoprint/server/api/printer_profiles.py:133"
+        },
+        "entity_why": "primary effect row_upsert lands on this table",
+        "ref_code": "@api.route(\"/printerprofiles/<string:identifier>\", methods=[\"PATCH\"])\n@no_firstrun_access\n@Permissions.SETTINGS.require(403)\ndef printerProfilesUpdate(identifier):\n    json_data = request.get_json()\n    if \"profile\" not in json_data: abort(400)\n    profile = printerProfileManager.get(identifier)\n    if profile is None: abort(404)\n    merged_profile = dict_merge(profile, json_data[\"profile\"])\n    make_default = \"default\" in merged_profile and merged_profile[\"default\"] in valid_boolean_trues\n    saved_profile = printerProfileManager.save(merged_profile, allow_overwrite=True, make_default=make_de",
+        "edges": [
+          "@Permissions.SETTINGS.require(403) (printer_profiles.py:135)"
+        ]
+      },
+      "entity": "PrinterProfile",
+      "_binds": {
+        "identifier": "PrinterProfile.id",
+        "name": "PrinterProfile.name",
+        "model": "PrinterProfile.model",
+        "color": "PrinterProfile.color",
+        "volume": "PrinterProfile.volume",
+        "heatedBed": "PrinterProfile.heatedBed",
+        "heatedChamber": "PrinterProfile.heatedChamber",
+        "extruder": "PrinterProfile.extruder",
+        "axes": "PrinterProfile.axes"
+      },
+      "_output_schema": {
+        "profile": "the updated PrinterProfile"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "permissions",
+                      "op": "contains",
+                      "value": "SETTINGS"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "identifier"
+        ],
+        "messages": {
+          "auth": "You must sign in first; this endpoint is only reachable for an authenticated OctoPrint user.",
+          "precondition": "Managing printer profiles requires the settings permission.",
+          "not_found": "No such printer profile."
+        },
+        "requires_auth": true
+      },
+      "_defaulted": [
+        "dropped unwritable columns ['id']",
+        "row_key (the locator column is also writable — the bound arg may be a new value, not an address)"
+      ],
+      "description": "Update an existing printer profile (merge the given fields). Requires the settings permission."
+    },
+    {
+      "tool": "printerprofile_delete",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "PrinterProfile",
+        "lookup_by": {
+          "id": {
+            "$arg": "identifier"
+          }
+        }
+      },
+      "input_schema": {
+        "identifier": {
+          "type": "text",
+          "required": true,
+          "description": "Id of the profile to delete."
+        }
+      },
+      "_evidence": {
+        "locator": "src/octoprint/server/api/printer_profiles.py:117",
+        "id_local": "PrinterProfile.delete_http",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/printerprofiles/{identifier}",
+          "locator": "src/octoprint/server/api/printer_profiles.py:113"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "@api.route(\"/printerprofiles/<string:identifier>\", methods=[\"DELETE\"])\n@no_firstrun_access\n@Permissions.SETTINGS.require(403)\ndef printerProfilesDelete(identifier):\n    profile = printerProfileManager.get(identifier)\n    if profile is None: abort(404)\n    current_profile = printerProfileManager.get_current()\n    if current_profile and current_profile[\"id\"] == identifier: abort(409)\n    default_profile = printerProfileManager.get_default()\n    if default_profile and default_profile[\"id\"] == identifier: abort(409)\n    printerProfileManager.remove(identifier, trigger_event=True)\n    return NO_CON",
+        "edges": [
+          "@Permissions.SETTINGS.require(403) (printer_profiles.py:115)",
+          "printer_profiles.py:121-123 abort(409) if current_profile id == identifier; current is runtime manager state, not a stored column",
+          "printer_profiles.py:125-127 abort(409) if default_profile id == identifier; default read from settings ['printerProfiles','default']"
+        ],
+        "notes": "Deletes either a file or a folder at the path; modeled against the File table.",
+        "guardnote": "Real code aborts 409 when the profile is current(default) — manager state, not a stored column; the runner cannot refuse that here, so no guard_last wall is declared."
+      },
+      "entity": "PrinterProfile",
+      "_binds": {
+        "identifier": "PrinterProfile.id"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "permissions",
+                      "op": "contains",
+                      "value": "SETTINGS"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "identifier"
+        ],
+        "messages": {
+          "auth": "You must sign in first; this endpoint is only reachable for an authenticated OctoPrint user.",
+          "precondition": "Deleting printer profiles requires the settings permission. Refused when the profile is the currently selected or the default profile.",
+          "not_found": "No such printer profile.",
+          "guard_last": "You cannot delete the printer profile that is currently selected or set as default."
+        },
+        "requires_auth": true
+      },
+      "description": "Delete a printer profile. Refused with 409 if it is the currently selected or the default profile. Requires the settings permission."
+    },
+    {
+      "tool": "file_upload",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "File",
+        "fields": {
+          "name": {
+            "$arg": "filename"
+          },
+          "additional": {
+            "$arg": "userdata"
+          }
+        },
+        "set_on_create": {
+          "path": {
+            "$auto": "max(path)+1"
+          },
+          "origin": {
+            "$arg": "target"
+          },
+          "name": {
+            "$arg": "filename"
+          },
+          "user": {
+            "$session": "account_id"
+          }
+        },
+        "unique_on": [
+          "path"
+        ]
+      },
+      "input_schema": {
+        "target": {
+          "type": "text",
+          "required": true,
+          "description": "Storage origin (local or sdcard) to upload into."
+        },
+        "filename": {
+          "type": "text",
+          "required": true,
+          "description": "Name of the uploaded file."
+        },
+        "path": {
+          "type": "text",
+          "required": false,
+          "description": "Target folder path within the origin."
+        },
+        "select": {
+          "type": "bool",
+          "required": false,
+          "description": "Select the file for printing after upload."
+        },
+        "print": {
+          "type": "bool",
+          "required": false,
+          "description": "Start printing the file after upload."
+        },
+        "userdata": {
+          "type": "json",
+          "required": false,
+          "description": "Free-form metadata stored on the file."
+        }
+      },
+      "_evidence": {
+        "locator": "src/octoprint/server/api/files.py:838",
+        "id_local": "File.upload",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/files/{target}",
+          "locator": "src/octoprint/server/api/files.py:720"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "@api.route(\"/files/<target>\", methods=[\"POST\"])\n@no_firstrun_access\n@Permissions.FILES_UPLOAD.require(403)\ndef uploadGcodeFile(target):\n    ...\n    added_file = fileManager.add_file(target, futureFullPathInStorage, upload, allow_overwrite=True, display=canonFilename, user=user)\n    if valid_file_type(added_file,'gcode') and (to_select or to_print):\n        job = fileManager.create_job(target, added_file, owner=user)\n        printer.set_job(job, print_after_select=to_print)\n    if userdata is not None:\n        fileManager.set_additional_metadata(target, added_file, 'userdata', userdata)",
+        "edges": [
+          "@Permissions.FILES_UPLOAD.require(403) (files.py:720)"
+        ]
+      },
+      "entity": "File",
+      "_binds": {
+        "target": "File.origin",
+        "path": "File.path",
+        "filename": "File.name",
+        "userdata": "File.additional"
+      },
+      "_output_schema": {
+        "done": true,
+        "file": "the added File"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "permissions",
+                      "op": "contains",
+                      "value": "FILES_UPLOAD"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "target",
+          "filename"
+        ],
+        "messages": {
+          "auth": "You must sign in first; this endpoint is only reachable for an authenticated OctoPrint user.",
+          "precondition": "Uploading files requires the files-upload permission.",
+          "required": "A target origin and filename are required."
+        },
+        "requires_auth": true
+      },
+      "description": "Upload a file into the given storage, optionally select/print it after, and attach free-form user data. Requires the files-upload permission."
+    },
+    {
+      "tool": "file_delete",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "File",
+        "lookup_by": {
+          "path": {
+            "$arg": "filename"
+          }
+        }
+      },
+      "input_schema": {
+        "target": {
+          "type": "text",
+          "required": true,
+          "description": "Storage origin of the entry."
+        },
+        "filename": {
+          "type": "text",
+          "required": true,
+          "description": "Full path of the file/folder within the origin (e.g. local/benchy.gcode), exactly as shown by file_list."
+        },
+        "recursive": {
+          "type": "bool",
+          "required": false,
+          "description": "Delete a folder and its contents."
+        }
+      },
+      "_evidence": {
+        "locator": "src/octoprint/server/api/files.py:1548",
+        "id_local": "File.delete_http",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/files/{target}/{filename}",
+          "locator": "src/octoprint/server/api/files.py:1547"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "@api.route(\"/files/<target>/<filename>\", methods=[\"DELETE\"])\n@no_firstrun_access\n@Permissions.FILES_DELETE.require(403)\ndef deleteGcodeFile(filename, target):\n    if _verifyFileExists(target, filename):\n        fileManager.remove_file(target, filename)\n    elif _verifyFolderExists(target, filename):\n        fileManager.remove_folder(target, filename, recursive=True)\n    return NO_CONTENT",
+        "edges": [
+          "@Permissions.FILES_DELETE.require(403) (files.py:1547)"
+        ]
+      },
+      "entity": "File",
+      "_binds": {
+        "target": "File.origin",
+        "filename": "File.path"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "permissions",
+                      "op": "contains",
+                      "value": "FILES_DELETE"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "target",
+          "filename"
+        ],
+        "messages": {
+          "auth": "You must sign in first; this endpoint is only reachable for an authenticated OctoPrint user.",
+          "precondition": "Deleting files requires the files-delete permission.",
+          "not_found": "No such file or folder."
+        },
+        "requires_auth": true
+      },
+      "description": "Delete a file (or recursively a folder) at the given path. Requires the files-delete permission."
+    },
+    {
+      "tool": "file_get_detail",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "File",
+        "lookup_by": {
+          "path": {
+            "$arg": "filename"
+          }
+        }
+      },
+      "input_schema": {
+        "target": {
+          "type": "text",
+          "required": true,
+          "description": "Storage origin (local or sdcard) of the entry."
+        },
+        "filename": {
+          "type": "text",
+          "required": true,
+          "description": "Full path of the file/folder within the origin (e.g. local/benchy.gcode), exactly as shown by file_list."
+        }
+      },
+      "_evidence": {
+        "locator": "src/octoprint/server/api/files.py:401",
+        "id_local": "File.get_detail",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/files/{target}/{filename}",
+          "locator": "src/octoprint/server/api/files.py:399"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "@api.route(\"/files/<target>/<filename>\", methods=[\"GET\"])\n@no_firstrun_access\n@Permissions.FILES_LIST.require(403)\ndef readGcodeFile(target, filename):\n    file = _getFileDetails(target, filename, recursive=recursive)\n    if not file:\n        abort(404)\n    return jsonify(...)",
+        "edges": [
+          "@Permissions.FILES_LIST.require(403) (files.py:386)"
+        ]
+      },
+      "entity": "File",
+      "_binds": {
+        "target": "File.origin",
+        "filename": "File.path"
+      },
+      "_output_schema": {
+        "file": "File detail dict"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "permissions",
+                      "op": "contains",
+                      "value": "FILES_LIST"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "target",
+          "filename"
+        ],
+        "messages": {
+          "auth": "You must sign in first; this endpoint is only reachable for an authenticated OctoPrint user.",
+          "precondition": "Reading file details requires the files-list permission.",
+          "not_found": "No such file or folder."
+        },
+        "requires_auth": true
+      },
+      "description": "Fetch the full detail (name, size, dates, analysis, additional metadata) of one file or folder by its path. Requires the files-list permission."
+    },
+    {
+      "tool": "file_list",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "File",
+        "rank": {
+          "method": "exact"
+        }
+      },
+      "input_schema": {
+        "origin": {
+          "type": "text",
+          "required": false,
+          "description": "Restrict to one storage origin (local or sdcard)."
+        },
+        "filter": {
+          "type": "text",
+          "required": false,
+          "description": "Only list entries whose name matches this filter."
+        },
+        "recursive": {
+          "type": "bool",
+          "required": false,
+          "description": "Include files in subfolders."
+        }
+      },
+      "_evidence": {
+        "locator": "src/octoprint/server/api/files.py:233",
+        "id_local": "File.list",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/files",
+          "locator": "src/octoprint/server/api/files.py:218"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "@api.route(\"/files\", methods=[\"GET\"])\n@no_firstrun_access\n@Permissions.FILES_LIST.require(403)\ndef readGcodeFiles_post_2_0_0():\n    files = []\n    for storage in fileManager.registered_storages:\n        files.extend(_getFileList(storage, filter=filter, recursive=recursive))\n    return jsonify(files=files)",
+        "edges": [
+          "@Permissions.FILES_LIST.require(403) (files.py:269)"
+        ]
+      },
+      "entity": "File",
+      "_output_schema": {
+        "files": "list of File/Folder entries"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "permissions",
+                      "op": "contains",
+                      "value": "FILES_LIST"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must sign in first; this endpoint is only reachable for an authenticated OctoPrint user.",
+          "precondition": "Listing files requires the files-list permission."
+        },
+        "requires_auth": true
+      },
+      "description": "List files (G-code, models and folders) across the registered storages. Requires the files-list permission."
+    },
+    {
+      "tool": "file_gcode_command",
+      "op": "action",
+      "family": "action.emit",
+      "exec_spec": {
+        "channel": "event",
+        "record": {
+          "table": "File"
+        }
+      },
+      "input_schema": {
+        "storage": {
+          "type": "text",
+          "required": true,
+          "description": "Storage origin of the file."
+        },
+        "path": {
+          "type": "text",
+          "required": true,
+          "description": "Path of the file."
+        },
+        "command": {
+          "type": "text",
+          "required": true,
+          "description": "The command to run (e.g. select, slice)."
+        },
+        "print": {
+          "type": "bool",
+          "required": false,
+          "description": "Start printing after selecting."
+        },
+        "slicer": {
+          "type": "text",
+          "required": false,
+          "description": "Slicer to use for a slice command."
+        },
+        "profile": {
+          "type": "text",
+          "required": false,
+          "description": "Slicing profile to use."
+        }
+      },
+      "_evidence": {
+        "locator": "src/octoprint/server/api/files.py:1010",
+        "id_local": "File.gcode_command",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/files/{storage}/{path}",
+          "locator": "src/octoprint/server/api/files.py:997"
+        },
+        "entity_why": "primary effect external lands on this table",
+        "ref_code": "@api.route(\"/files/<storage>/<path>\", methods=[\"POST\"])\n@no_firstrun_access\ndef gcodeFileCommand(storage, path):\n    command = request.values.get('command')\n    if command == 'select':\n        with Permissions.FILES_SELECT.require(403):\n            job = fileManager.create_job(storage, path, owner=user, params=params)\n            printer.set_job(job, print_after_select=start_print)\n    elif command == 'slice':\n        with Permissions.SLICE.require(403):\n            ... slicer ... add_file(dest, ...)\n    ...",
+        "edges": [
+          "per-command `with Permissions.X.require(403)` inside gcodeFileCommand (files.py:1028-1305)"
+        ]
+      },
+      "entity": "File",
+      "_binds": {
+        "storage": "File.origin",
+        "path": "File.path"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "permissions",
+                      "op": "contains",
+                      "value": "FILES_SELECT"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "permissions",
+                      "op": "contains",
+                      "value": "SLICE"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "storage",
+          "path",
+          "command"
+        ],
+        "messages": {
+          "auth": "You must sign in first; this endpoint is only reachable for an authenticated OctoPrint user.",
+          "precondition": "This file command requires the files-select or slice permission.",
+          "required": "A storage, path and command are required."
+        },
+        "requires_auth": true
+      },
+      "description": "Issue a command against an uploaded file: select it for the job queue, slice it, or other file commands. Each command carries its own permission (select requires files-select, slice requires slice, etc.)."
+    },
+    {
+      "tool": "folder_add",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Folder",
+        "fields": {
+          "name": {
+            "$arg": "foldername"
+          }
+        },
+        "set_on_create": {
+          "path": {
+            "$arg": "foldername"
+          },
+          "origin": {
+            "$arg": "target"
+          },
+          "name": {
+            "$arg": "foldername"
+          },
+          "display": {
+            "$arg": "foldername"
+          },
+          "user": {
+            "$session": "account_id"
+          }
+        },
+        "unique_on": [
+          "path"
+        ]
+      },
+      "input_schema": {
+        "target": {
+          "type": "text",
+          "required": true,
+          "description": "Storage origin (local or sdcard)."
+        },
+        "foldername": {
+          "type": "text",
+          "required": true,
+          "description": "Name of the new folder."
+        }
+      },
+      "_evidence": {
+        "locator": "src/octoprint/server/api/files.py:955",
+        "id_local": "Folder.add_http",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/files/{target}",
+          "locator": "src/octoprint/server/api/files.py:929"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "# POST /api/files/<target> with foldername set creates a folder (files.py:953)\nadded_folder = fileManager.add_folder(target, futureFullPath, display=canonicalizedName, user=user)",
+        "edges": [
+          "POST /api/files/<target> with foldername carries @Permissions.FILES_UPLOAD.require(403) (files.py:720)"
+        ]
+      },
+      "entity": "Folder",
+      "_binds": {
+        "target": "Folder.origin",
+        "foldername": "Folder.name",
+        "path": "Folder.path"
+      },
+      "_output_schema": {
+        "folder": "the added Folder dict"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "permissions",
+                      "op": "contains",
+                      "value": "FILES_UPLOAD"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "target",
+          "foldername"
+        ],
+        "messages": {
+          "auth": "You must sign in first; this endpoint is only reachable for an authenticated OctoPrint user.",
+          "precondition": "Creating folders requires the files-upload permission.",
+          "required": "A target origin and foldername are required."
+        },
+        "requires_auth": true
+      },
+      "description": "Create a new folder in the given storage. Requires the files-upload permission."
+    },
+    {
+      "tool": "timelapse_set_config",
+      "op": "update",
+      "family": "crud.upsert",
+      "exec_spec": {
+        "entity": "TimelapseConfig",
+        "key": {
+          "type": {
+            "$arg": "type"
+          }
+        },
+        "insert_fields": [
+          "postRoll",
+          "fps",
+          "renderAfterPrint"
+        ],
+        "set_on_exists": {
+          "postRoll": {
+            "$arg": "postRoll"
+          },
+          "fps": {
+            "$arg": "fps"
+          },
+          "renderAfterPrint": {
+            "$arg": "renderAfterPrint"
+          }
+        }
+      },
+      "input_schema": {
+        "type": {
+          "type": "text",
+          "required": true,
+          "description": "Timelapse mode: off, timed or zchange."
+        },
+        "postRoll": {
+          "type": "int",
+          "required": false,
+          "description": "Seconds to keep recording after the trigger."
+        },
+        "fps": {
+          "type": "int",
+          "required": false,
+          "description": "Frames per second of the timelapse movie."
+        },
+        "renderAfterPrint": {
+          "type": "text",
+          "required": false,
+          "description": "When to render: always, success, failure or never."
+        },
+        "interval": {
+          "type": "int",
+          "required": false,
+          "description": "Timed-mode capture interval in seconds."
+        },
+        "save": {
+          "type": "bool",
+          "required": false,
+          "description": "Persist the config — requires the admin permission."
+        }
+      },
+      "_evidence": {
+        "locator": "src/octoprint/server/api/timelapse.py:256",
+        "id_local": "Timelapse.set_config",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/timelapse",
+          "locator": "src/octoprint/server/api/timelapse.py:255"
+        },
+        "entity_why": "primary effect row_upsert lands on this table",
+        "ref_code": "@api.route(\"/timelapse\", methods=[\"POST\"])\n@no_firstrun_access\n@Permissions.TIMELAPSE_ADMIN.require(403)\ndef setTimelapseConfig():\n    data = request.get_json(silent=True) or request.values\n    if \"type\" in data:\n        config = {\"type\": data[\"type\"], \"postRoll\": 0, \"fps\": 25, \"renderAfterPrint\": \"always\", \"options\": {}}\n        ... validate postRoll/fps/interval ...\n        if Permissions.ADMIN.can() and \"save\" in data and data[\"save\"] in valid_boolean_trues:\n            octoprint.timelapse.configure_timelapse(config, True)\n        else:\n            octoprint.timelapse.configure_timelapse(co",
+        "edges": [
+          "@Permissions.TIMELAPSE_ADMIN.require(403) (timelapse.py:254)",
+          "if Permissions.ADMIN.can() and save: configure_timelapse(config, True) else in-memory only (timelapse.py:335)"
+        ]
+      },
+      "entity": "TimelapseConfig",
+      "_binds": {
+        "type": "TimelapseConfig.type",
+        "postRoll": "TimelapseConfig.postRoll",
+        "fps": "TimelapseConfig.fps",
+        "renderAfterPrint": "TimelapseConfig.renderAfterPrint",
+        "interval": "TimelapseConfig.options",
+        "retractionZHop": "TimelapseConfig.options",
+        "minDelay": "TimelapseConfig.options"
+      },
+      "_output_schema": {
+        "config": "TimelapseConfig",
+        "enabled": "bool",
+        "files": "list"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "permissions",
+                      "op": "contains",
+                      "value": "TIMELAPSE_ADMIN"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "permissions",
+                      "op": "contains",
+                      "value": "ADMIN"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "type"
+        ],
+        "messages": {
+          "auth": "You must sign in first; this endpoint is only reachable for an authenticated OctoPrint user.",
+          "precondition": "Setting the timelapse configuration requires the timelapse-admin permission.",
+          "required": "A timelapse type is required."
+        },
+        "requires_auth": true
+      },
+      "description": "Set the timelapse configuration (mode plus render options). Requires the timelapse-admin permission; persisting the change also requires the admin permission with save=true."
+    },
+    {
+      "tool": "timelapse_get",
+      "op": "read",
+      "family": "search",
+      "exec_spec": {
+        "entity": "TimelapseConfig",
+        "rank": {
+          "method": "exact"
+        }
+      },
+      "input_schema": {
+        "unrendered": {
+          "type": "bool",
+          "required": false,
+          "description": "Also include unrendered captures."
+        }
+      },
+      "_evidence": {
+        "locator": "src/octoprint/server/api/timelapse.py:112",
+        "id_local": "Timelapse.get",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/timelapse",
+          "locator": "src/octoprint/server/api/timelapse.py:111"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "@api.route(\"/timelapse\", methods=[\"GET\"])\n@no_firstrun_access\n@Permissions.TIMELAPSE_LIST.require(403)\ndef getTimelapseData():\n    timelapse = octoprint.timelapse.current\n    config = _config_for_timelapse(timelapse)\n    files = octoprint.timelapse.get_finished_timelapses()\n    result = {\"config\": config, \"enabled\": settings().getBoolean([\"webcam\", \"timelapseEnabled\"]), \"files\": files}\n    if unrendered:\n        result[\"unrendered\"] = octoprint.timelapse.get_unrendered_timelapses()\n    return jsonify(result)",
+        "edges": [
+          "@Permissions.TIMELAPSE_LIST.require(403) (timelapse.py:111)"
+        ]
+      },
+      "entity": "TimelapseConfig",
+      "_output_schema": {
+        "config": "TimelapseConfig",
+        "enabled": "bool",
+        "files": "finished movie list",
+        "unrendered": "optional list"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "permissions",
+                      "op": "contains",
+                      "value": "TIMELAPSE_LIST"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must sign in first; this endpoint is only reachable for an authenticated OctoPrint user.",
+          "precondition": "Reading timelapses requires the timelapse-list permission."
+        },
+        "requires_auth": true
+      },
+      "description": "Read the current timelapse configuration, the finished timelapse files, and optionally the unrendered captures. Requires the timelapse-list permission."
+    },
+    {
+      "tool": "timelapse_download",
+      "op": "action",
+      "family": "action.emit",
+      "exec_spec": {
+        "channel": "event",
+        "record": {
+          "table": "TimelapseFile"
+        }
+      },
+      "input_schema": {
+        "filename": {
+          "type": "text",
+          "required": true,
+          "description": "Name of the timelapse movie to download."
+        }
+      },
+      "_evidence": {
+        "locator": "src/octoprint/server/api/timelapse.py:187",
+        "id_local": "Timelapse.download",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/timelapse/{filename}",
+          "locator": "src/octoprint/server/api/timelapse.py:179"
+        },
+        "entity_why": "primary effect external lands on this table",
+        "ref_code": "@api.route(\"/timelapse/<filename>\", methods=[\"GET\"])\n@no_firstrun_access\n@Permissions.TIMELAPSE_DOWNLOAD.require(403)\ndef downloadTimelapse(filename):\n    return redirect_to_tornado(request, url_for(\"index\") + \"downloads/timelapse/\" + urlquote(filename))",
+        "edges": [
+          "@Permissions.TIMELAPSE_DOWNLOAD.require(403) (timelapse.py:178)"
+        ]
+      },
+      "entity": "TimelapseFile",
+      "_binds": {
+        "filename": "TimelapseFile.name"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "permissions",
+                      "op": "contains",
+                      "value": "TIMELAPSE_DOWNLOAD"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "filename"
+        ],
+        "messages": {
+          "auth": "You must sign in first; this endpoint is only reachable for an authenticated OctoPrint user.",
+          "precondition": "Downloading timelapses requires the timelapse-download permission.",
+          "not_found": "No such timelapse."
+        },
+        "requires_auth": true
+      },
+      "description": "Download a finished timelapse movie file. Requires the timelapse-download permission."
+    },
+    {
+      "tool": "timelapse_delete",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "TimelapseFile",
+        "lookup_by": {
+          "name": {
+            "$arg": "filename"
+          }
+        }
+      },
+      "input_schema": {
+        "filename": {
+          "type": "text",
+          "required": true,
+          "description": "Name of the timelapse movie to delete."
+        }
+      },
+      "_evidence": {
+        "locator": "src/octoprint/server/api/timelapse.py:188",
+        "id_local": "Timelapse.delete",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/timelapse/{filename}",
+          "locator": "src/octoprint/server/api/timelapse.py:187"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "@api.route(\"/timelapse/<filename>\", methods=[\"DELETE\"])\n@no_firstrun_access\n@Permissions.TIMELAPSE_DELETE.require(403)\ndef deleteTimelapse(filename):\n    full_path = os.path.realpath(os.path.join(timelapse_folder, filename))\n    if valid_timelapse(full_path) and full_path.startswith(...) and os.path.exists(full_path) and not is_hidden_path(full_path):\n        os.remove(full_path)\n    ... os.remove(thumb_path) ...\n    return getTimelapseData()",
+        "edges": [
+          "@Permissions.TIMELAPSE_DELETE.require(403) (timelapse.py:187)"
+        ]
+      },
+      "entity": "TimelapseFile",
+      "_binds": {
+        "filename": "TimelapseFile.name"
+      },
+      "_output_schema": {
+        "config": "dict",
+        "files": "list"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "permissions",
+                      "op": "contains",
+                      "value": "TIMELAPSE_DELETE"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "filename"
+        ],
+        "messages": {
+          "auth": "You must sign in first; this endpoint is only reachable for an authenticated OctoPrint user.",
+          "precondition": "Deleting timelapses requires the timelapse-delete permission.",
+          "not_found": "No such timelapse."
+        },
+        "requires_auth": true
+      },
+      "description": "Delete a finished timelapse movie and its thumbnail. Requires the timelapse-delete permission."
+    },
+    {
+      "tool": "unrenderedtimelapse_delete",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "UnrenderedTimelapse",
+        "lookup_by": {
+          "name": {
+            "$arg": "name"
+          }
+        }
+      },
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "Name of the unrendered capture sequence."
+        }
+      },
+      "_evidence": {
+        "locator": "src/octoprint/server/api/timelapse.py:228",
+        "id_local": "UnrenderedTimelapse.delete",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/timelapse/unrendered/{name}",
+          "locator": "src/octoprint/server/api/timelapse.py:226"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "@api.route(\"/timelapse/unrendered/<name>\", methods=[\"DELETE\"])\n@no_firstrun_access\n@Permissions.TIMELAPSE_MANAGE_UNRENDERED.require(403)\ndef deleteUnrenderedTimelapse(name):\n    octoprint.timelapse.delete_unrendered_timelapse(name)\n    return NO_CONTENT",
+        "edges": [
+          "@Permissions.TIMELAPSE_MANAGE_UNRENDERED.require(403) (timelapse.py:225)"
+        ]
+      },
+      "entity": "UnrenderedTimelapse",
+      "_binds": {
+        "name": "UnrenderedTimelapse.name"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "permissions",
+                      "op": "contains",
+                      "value": "TIMELAPSE_MANAGE_UNRENDERED"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "name"
+        ],
+        "messages": {
+          "auth": "You must sign in first; this endpoint is only reachable for an authenticated OctoPrint user.",
+          "precondition": "Managing unrendered timelapses requires the timelapse-manage-unrendered permission.",
+          "not_found": "No such unrendered timelapse."
+        },
+        "requires_auth": true
+      },
+      "description": "Delete an unrendered timelapse capture sequence. Requires the timelapse-manage-unrendered permission."
+    },
+    {
+      "tool": "unrenderedtimelapse_render",
+      "op": "create",
+      "family": "action.trigger",
+      "exec_spec": {
+        "target": {
+          "entity": "TimelapseFile"
+        },
+        "set": {
+          "name": {
+            "$arg": "name"
+          }
+        },
+        "dispatch_events": [
+          {
+            "render_timelapse": {
+              "name": "$arg"
+            }
+          }
+        ]
+      },
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "Name of the unrendered capture sequence to render."
+        },
+        "command": {
+          "type": "text",
+          "required": true,
+          "description": "Must be 'render' to start rendering."
+        }
+      },
+      "_evidence": {
+        "locator": "src/octoprint/server/api/timelapse.py:241",
+        "id_local": "UnrenderedTimelapse.render",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/timelapse/unrendered/{name}",
+          "locator": "src/octoprint/server/api/timelapse.py:234"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "@api.route(\"/timelapse/unrendered/<name>\", methods=[\"POST\"])\n@no_firstrun_access\n@Permissions.TIMELAPSE_MANAGE_UNRENDERED.require(403)\ndef processUnrenderedTimelapseCommand(name):\n    command, data, response = get_json_command_from_request(request, {\"render\": []})\n    if response is not None: return response\n    if command == \"render\":\n        if printer.is_printing() or printer.is_paused():\n            abort(409, description=\"Printer is currently printing, cannot render timelapse\")\n        octoprint.timelapse.render_unrendered_timelapse(name)\n    return NO_CONTENT",
+        "edges": [
+          "@Permissions.TIMELAPSE_MANAGE_UNRENDERED.require(403) (timelapse.py:233)"
+        ]
+      },
+      "entity": "TimelapseFile",
+      "_binds": {
+        "name": "UnrenderedTimelapse.name"
+      },
+      "_output_schema": {},
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "username",
+                      "op": "eq",
+                      "value": {
+                        "session": "account_name"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "permissions",
+                      "op": "contains",
+                      "value": "TIMELAPSE_MANAGE_UNRENDERED"
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "name",
+          "command"
+        ],
+        "messages": {
+          "auth": "You must sign in first; this endpoint is only reachable for an authenticated OctoPrint user.",
+          "precondition": "Rendering timelapses requires the timelapse-manage-unrendered permission.",
+          "required": "A name and the 'render' command are required."
+        },
+        "requires_auth": true
+      },
+      "description": "Render an unrendered timelapse capture sequence into a finished movie. Refused while the printer is actively printing or paused. Requires the timelapse-manage-unrendered permission."
+    }
+  ],
+  "seed_state": {
+    "Permission": [
+      {
+        "key": "ADMIN",
+        "name": "Administrator",
+        "id": 1
+      },
+      {
+        "key": "CONNECTION",
+        "name": "Connection",
+        "id": 2
+      },
+      {
+        "key": "SETTINGS",
+        "name": "Settings",
+        "id": 3
+      },
+      {
+        "key": "FILES_LIST",
+        "name": "Files list",
+        "id": 4
+      },
+      {
+        "key": "FILES_UPLOAD",
+        "name": "Files upload",
+        "id": 5
+      },
+      {
+        "key": "FILES_DELETE",
+        "name": "Files delete",
+        "id": 6
+      },
+      {
+        "key": "FILES_SELECT",
+        "name": "Files select",
+        "id": 7
+      },
+      {
+        "key": "SLICE",
+        "name": "Slice",
+        "id": 8
+      },
+      {
+        "key": "TIMELAPSE_ADMIN",
+        "name": "Timelapse admin",
+        "id": 9
+      },
+      {
+        "key": "TIMELAPSE_LIST",
+        "name": "Timelapse list",
+        "id": 10
+      },
+      {
+        "key": "TIMELAPSE_DOWNLOAD",
+        "name": "Timelapse download",
+        "id": 11
+      },
+      {
+        "key": "TIMELAPSE_DELETE",
+        "name": "Timelapse delete",
+        "id": 12
+      },
+      {
+        "key": "TIMELAPSE_MANAGE_UNRENDERED",
+        "name": "Timelapse manage unrendered",
+        "id": 13
+      },
+      {
+        "key": "PLUGIN_APPKEYS_GRANT",
+        "name": "App keys grant",
+        "id": 14
+      },
+      {
+        "key": "PLUGIN_APPKEYS_ADMIN",
+        "name": "App keys admin",
+        "id": 15
+      }
+    ],
+    "Group": [
+      {
+        "key": "guests",
+        "name": "Guests",
+        "description": "Read-only guests",
+        "permissions": [],
+        "subgroups": [],
+        "default": true,
+        "removable": true,
+        "changeable": true,
+        "toggleable": true,
+        "id": 1
+      },
+      {
+        "key": "operators",
+        "name": "Operators",
+        "description": "Print operators",
+        "permissions": [],
+        "subgroups": [],
+        "default": false,
+        "removable": true,
+        "changeable": true,
+        "toggleable": true,
+        "id": 2
+      },
+      {
+        "key": "admins",
+        "name": "Administrators",
+        "description": "Full access",
+        "permissions": [
+          "ADMIN"
+        ],
+        "subgroups": [],
+        "default": false,
+        "removable": false,
+        "changeable": false,
+        "toggleable": true,
+        "id": 3
+      }
+    ],
+    "User": [
+      {
+        "username": "ops@octoprint.example",
+        "password": "pw-operations",
+        "active": true,
+        "groups": [
+          "admins"
+        ],
+        "permissions": [
+          "ADMIN",
+          "PLUGIN_APPKEYS_GRANT",
+          "PLUGIN_APPKEYS_ADMIN",
+          "TIMELAPSE_ADMIN",
+          "TIMELAPSE_LIST",
+          "TIMELAPSE_DOWNLOAD",
+          "TIMELAPSE_DELETE",
+          "TIMELAPSE_MANAGE_UNRENDERED",
+          "FILES_LIST",
+          "FILES_UPLOAD",
+          "FILES_DELETE",
+          "FILES_SELECT",
+          "SLICE",
+          "CONNECTION",
+          "SETTINGS"
+        ],
+        "apikey": null,
+        "settings": {
+          "interface": {
+            "language": "en"
+          }
+        },
+        "id": 1
+      },
+      {
+        "username": "operator@octoprint.example",
+        "password": "pw-operator",
+        "active": true,
+        "groups": [
+          "operators"
+        ],
+        "permissions": [
+          "FILES_UPLOAD",
+          "FILES_DELETE",
+          "FILES_LIST",
+          "FILES_SELECT",
+          "CONNECTION"
+        ],
+        "apikey": null,
+        "settings": {},
+        "id": 2
+      },
+      {
+        "username": "guest@octoprint.example",
+        "password": "pw-guest",
+        "active": true,
+        "groups": [
+          "guests"
+        ],
+        "permissions": [],
+        "apikey": null,
+        "settings": {},
+        "id": 3
+      }
+    ],
+    "AppKey": [
+      {
+        "api_key": "key-admin-1",
+        "app_id": "octoprint-client",
+        "user_id": "admin",
+        "id": 1
+      },
+      {
+        "api_key": "key-alice-1",
+        "app_id": "octoprint-client",
+        "user_id": "alice",
+        "id": 2
+      }
+    ],
+    "PrinterProfile": [
+      {
+        "id": "default",
+        "name": "Default",
+        "model": "Generic RepRap Printer",
+        "volume": {
+          "width": 200,
+          "depth": 200,
+          "height": 200
+        },
+        "heatedBed": true,
+        "heatedChamber": false,
+        "extruder": {
+          "count": 1,
+          "nozzleDiameter": 0.4
+        },
+        "axes": {
+          "x": {
+            "speed": 6000
+          },
+          "y": {
+            "speed": 6000
+          }
+        }
+      },
+      {
+        "id": "ender3",
+        "name": "Ender 3",
+        "model": "Creality Ender 3",
+        "volume": {
+          "width": 220,
+          "depth": 220,
+          "height": 250
+        },
+        "heatedBed": true,
+        "heatedChamber": false,
+        "extruder": {
+          "count": 1,
+          "nozzleDiameter": 0.4
+        },
+        "axes": {
+          "x": {
+            "speed": 6000
+          },
+          "y": {
+            "speed": 6000
+          }
+        }
+      }
+    ],
+    "File": [
+      {
+        "path": "local/benchy.gcode",
+        "name": "benchy.gcode",
+        "display": "benchy.gcode",
+        "origin": "local",
+        "user": "alice",
+        "size": 2048,
+        "type": "machinecode",
+        "analysis": {},
+        "history": [],
+        "statistics": {},
+        "links": {},
+        "additional": {},
+        "id": 1
+      },
+      {
+        "path": "local/cube.gcode",
+        "name": "cube.gcode",
+        "display": "cube.gcode",
+        "origin": "local",
+        "user": "bob",
+        "size": 1024,
+        "type": "machinecode",
+        "analysis": {},
+        "history": [],
+        "statistics": {},
+        "links": {},
+        "additional": {},
+        "id": 2
+      }
+    ],
+    "Folder": [
+      {
+        "path": "local",
+        "name": "local",
+        "display": "local",
+        "origin": "local",
+        "user": "admin",
+        "size": 0,
+        "children": [
+          "local/benchy.gcode",
+          "local/cube.gcode"
+        ],
+        "id": 1
+      }
+    ],
+    "TimelapseConfig": [
+      {
+        "type": "off",
+        "postRoll": 0,
+        "fps": 25,
+        "renderAfterPrint": "always",
+        "options": {},
+        "id": 1
+      }
+    ],
+    "TimelapseFile": [
+      {
+        "name": "2026-01-01_00-00.mp4",
+        "bytes": 1048576,
+        "thumbnail": "2026-01-01_00-00.jpg",
+        "timestamp": "2026-01-01T00:00:00",
+        "id": 1
+      }
+    ],
+    "UnrenderedTimelapse": [
+      {
+        "name": "tmp-capture-0001",
+        "count": 120,
+        "bytes": 5242880,
+        "recording": false,
+        "rendering": false,
+        "id": 1
+      }
+    ]
+  },
+  "summary": "OctoPrint is a Python web server for controlling and monitoring 3D printers. Persistence is YAML/disk-based: users (users.yaml), groups (groups.yaml), app keys (keys.yaml), one printer profile per .profile file, files/folders on disk with a per-folder .metadata.json sidecar, timelapse config in config.yaml and timelapse movie/frame files.",
+  "_auth_candidates": [
+    {
+      "entity": "User",
+      "username_col": "username",
+      "password_col": "password"
+    }
+  ],
+  "_fk_gravity": {
+    "entity": "User",
+    "fk_count": 1
+  },
+  "_read_denied": "not_found",
+  "_no_edges": [
+    {
+      "id_local": "AppKey.probe",
+      "why": "public health-probe endpoint returning NO_CONTENT; @no_firstrun_access only, no effects, no pre-checks, calls nothing (appkeys/__init__.py:172)"
+    },
+    {
+      "id_local": "AppKey.user_for_key",
+      "why": "pure internal search helper (keyvalidator hook); auth enforced by its callers, no wall of its own"
+    },
+    {
+      "id_local": "AppKey.list_for_user",
+      "why": "pure internal search helper; auth enforced by caller on_api_get"
+    },
+    {
+      "id_local": "AppKey.list_all",
+      "why": "pure internal search helper; admin check lives in caller on_api_get"
+    },
+    {
+      "id_local": "AppKey.get_for_app",
+      "why": "pure internal read helper; auth enforced by callers (api_get/api_revoke)"
+    },
+    {
+      "id_local": "AppKey.request",
+      "why": "public OAuth-request endpoint, no edges at all: creates only an in-memory PendingDecision, sends a plugin message, persists nothing; no trigger/requires/guard edges recorded (appkeys/__init__.py:184)"
+    },
+    {
+      "id_local": "UnrenderedTimelapse.cleanup",
+      "why": "background retention job (delete_old_unrendered_timelapses) invoked internally from get_unrendered_timelapses; no route, no preconditions, no downstream call; deletes aged capture sequences by prefix (timelapse.py:355)"
+    },
+    {
+      "id_local": "PrinterProfile.deselect",
+      "why": "clears the in-memory currently-selected printer profile; no auth, no preconditions, calls nothing (profile.py:349-350)"
+    }
+  ],
+  "auth": {
+    "account_entity": "User",
+    "username_col": "username",
+    "password_col": "password",
+    "session_fields": {
+      "account_name": "username"
+    }
+  }
+}

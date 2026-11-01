@@ -1,0 +1,117 @@
+{
+  "app": "libredesk",
+  "role": "helpdesk (Zendesk/Freshdesk/Intercom-like)",
+  "domains": [
+    "support",
+    "operations"
+  ],
+  "kinds": {
+    "helpdesk_reply_or_update": [
+      "conversation_send_message",
+      "conversation_update_status",
+      "conversation_update_priority",
+      "conversation_update_user_assignee",
+      "conversation_unassign_user",
+      "conversation_update_tags"
+    ],
+    "create_record": [
+      "conversation_create",
+      "contactnote_create",
+      "article_create",
+      "collection_create",
+      "csat_submit"
+    ],
+    "update_record": [
+      "contact_update",
+      "article_update",
+      "article_move",
+      "helpcenter_update",
+      "collection_update"
+    ],
+    "attach_note_or_task": [
+      "contactnote_create",
+      "conversation_send_message"
+    ],
+    "create_or_update_doc": [
+      "article_create",
+      "article_update"
+    ],
+    "other:helpcenter_manage": [
+      "helpcenter_create",
+      "helpcenter_update",
+      "collection_create",
+      "collection_update",
+      "article_create",
+      "article_update",
+      "article_move"
+    ]
+  },
+  "check_kinds": [
+    "record_exists",
+    "record_not_exists",
+    "record_field_equals",
+    "record_field_contains",
+    "record_field_unchanged",
+    "note_or_task_exists",
+    "note_or_task_not_exists",
+    "action_done",
+    "action_not_done"
+  ],
+  "carriers": {
+    "notes_field": {
+      "entity": "ContactNote",
+      "field": "note"
+    }
+  },
+  "login": {
+    "tool": "user_login",
+    "user_field": "email",
+    "persona_entity": "User"
+  },
+  "content_entities": [
+    "Conversation",
+    "ConversationMessage",
+    "ContactNote",
+    "HelpArticle",
+    "CSATResponse"
+  ],
+  "seed_helpers": [
+    "add_contacts",
+    "conversations",
+    "smoke_seed"
+  ],
+  "tool_families_to_keep": [
+    "conversation",
+    "contact",
+    "contactnote",
+    "message",
+    "draft",
+    "csat",
+    "helpcenter",
+    "collection",
+    "article",
+    "user"
+  ],
+  "obs_reads": [
+    "conversation_list_all",
+    "contact_list",
+    "conversation_get_messages",
+    "conversation_get",
+    "contactnote_list"
+  ],
+  "known_patches": [
+    "persona user (id 1, type agent) in account entity User; login via user_login(email, password)",
+    "conversation_list_all/contact_list got a q substring filter arg (whole-list reads must stay under 12k)",
+    "conversation_get_messages now filters by the conversation uuid ($ref to Conversation) instead of returning every message",
+    "conversation_get owner scope removed so a signed-in agent can fetch any conversation by uuid",
+    "conversation_send_message links the new message to the conversation (cuuid->conversation_id) and sets text_content",
+    "literal compiler '<...>' set_on_create placeholders dropped"
+  ],
+  "smoke": {
+    "passed": true,
+    "date": "2026-10-24",
+    "report": "ok"
+  },
+  "register_file": "pack/newspecs3/libredesk/register.py",
+  "base_spec": "pack/base_specs/libredesk.spec.json"
+}

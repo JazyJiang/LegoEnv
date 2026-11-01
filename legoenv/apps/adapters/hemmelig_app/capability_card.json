@@ -1,0 +1,63 @@
+{
+  "app": "hemmelig_app",
+  "role": "source records operator",
+  "domains": [
+    "operations"
+  ],
+  "kinds": {
+    "create_record": [
+      "secretrequest_create"
+    ],
+    "record_status_change": [
+      "secretrequest_cancel"
+    ]
+  },
+  "check_kinds": [
+    "record_exists",
+    "record_not_exists",
+    "record_field_equals",
+    "record_field_contains",
+    "record_field_unchanged"
+  ],
+  "carriers": {
+    "notes_field": {
+      "entity": "SecretRequest",
+      "field": "description"
+    }
+  },
+  "login": {
+    "tool": "sign_in",
+    "user_field": "email",
+    "persona_entity": "User"
+  },
+  "content_entities": [
+    "SecretRequest"
+  ],
+  "seed_helpers": [
+    "records"
+  ],
+  "tool_families_to_keep": [
+    ""
+  ],
+  "obs_reads": [
+    "secretrequest_get"
+  ],
+  "known_patches": [
+    "Neutral prefix",
+    "Integer identity schemas and synthetic source persona",
+    "Original source semantics bounded by actual probes"
+  ],
+  "missing_tools": [],
+  "limitations": [
+    "Only native SecretRequest metadata create and pending-to-cancelled status change certified. Plaintext request description is real carrier; encrypted Secrets.secret/title are not treated as narrative policy.",
+    "Original source User.password credential exists in seed and native login despite absent entity column declaration; no password column/tool added. Original roles/banned flags retained. Owner get/cancel enforced; wrong-token public getinfo denied and cancelled request cannot cancel/read via link again. All actual probes.",
+    "Source create stores validFor integer directly in expires_at; it does not compute expiry datetime or enforce TTL, and token is explicit fixture metadata rather than cryptographic link generation. No burn/read secret, decryption, password-security claims, email, webhook HTTP or external effects certified."
+  ],
+  "smoke": {
+    "passed": true,
+    "date": "2026-10-24",
+    "report": "ok"
+  },
+  "register_file": "pack/newspecs3/hemmelig_app/register.py",
+  "base_spec": "pack/base_specs/hemmelig_app.spec.json"
+}

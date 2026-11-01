@@ -1,0 +1,5032 @@
+{
+  "env_id": "meshcentral",
+  "_prep_version": 4,
+  "entities": [
+    {
+      "name": "User",
+      "columns": [
+        {
+          "name": "_id",
+          "type": "id",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "type",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "domain",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "creation",
+          "type": "datetime",
+          "nullable": false,
+          "immutable": true
+        },
+        {
+          "name": "login",
+          "type": "datetime",
+          "audit": true
+        },
+        {
+          "name": "access",
+          "type": "datetime",
+          "audit": true
+        },
+        {
+          "name": "pastlogin",
+          "type": "datetime",
+          "audit": true
+        },
+        {
+          "name": "siteadmin",
+          "type": "int"
+        },
+        {
+          "name": "email",
+          "type": "text"
+        },
+        {
+          "name": "emailVerified",
+          "type": "bool",
+          "enum": [
+            false,
+            true
+          ]
+        },
+        {
+          "name": "passchange",
+          "type": "datetime"
+        },
+        {
+          "name": "salt",
+          "type": "text",
+          "nullable": false,
+          "immutable": false
+        },
+        {
+          "name": "hash",
+          "type": "text",
+          "nullable": false,
+          "immutable": false
+        },
+        {
+          "name": "passtype",
+          "type": "text"
+        },
+        {
+          "name": "passhint",
+          "type": "text"
+        },
+        {
+          "name": "oldpasswords",
+          "type": "json"
+        },
+        {
+          "name": "realname",
+          "type": "text"
+        },
+        {
+          "name": "phone",
+          "type": "text"
+        },
+        {
+          "name": "msghandle",
+          "type": "text"
+        },
+        {
+          "name": "consent",
+          "type": "int"
+        },
+        {
+          "name": "groups",
+          "type": "json"
+        },
+        {
+          "name": "links",
+          "type": "json"
+        },
+        {
+          "name": "notify",
+          "type": "json"
+        },
+        {
+          "name": "flags",
+          "type": "int"
+        },
+        {
+          "name": "quota",
+          "type": "int"
+        },
+        {
+          "name": "removeRights",
+          "type": "int"
+        },
+        {
+          "name": "lang",
+          "type": "text"
+        },
+        {
+          "name": "subscriptions",
+          "type": "json"
+        },
+        {
+          "name": "webpush",
+          "type": "json"
+        },
+        {
+          "name": "otpsecret",
+          "type": "text"
+        },
+        {
+          "name": "otpkeys",
+          "type": "json"
+        },
+        {
+          "name": "otphkeys",
+          "type": "json"
+        },
+        {
+          "name": "otpekey",
+          "type": "json"
+        },
+        {
+          "name": "otpsms",
+          "type": "json"
+        },
+        {
+          "name": "otpmsg",
+          "type": "json"
+        },
+        {
+          "name": "otpdev",
+          "type": "text"
+        },
+        {
+          "name": "otpduo",
+          "type": "json"
+        },
+        {
+          "name": "id",
+          "type": "id"
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "_id"
+          ]
+        }
+      ],
+      "_lifecycle": {
+        "col": "emailVerified",
+        "initial": false,
+        "states": [
+          false,
+          true
+        ],
+        "via": {
+          "User.verifyEmail": {
+            "col": "emailVerified",
+            "from": [
+              false
+            ],
+            "to": true
+          },
+          "User.changeEmail": {
+            "col": "emailVerified",
+            "from": [
+              true
+            ],
+            "to": false
+          }
+        }
+      }
+    },
+    {
+      "name": "LoginToken",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "_id",
+          "type": "id",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "type",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "nodeid",
+          "type": "id"
+        },
+        {
+          "name": "userid",
+          "type": "id",
+          "fk_to": "User._id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "name",
+          "type": "text"
+        },
+        {
+          "name": "tokenUser",
+          "type": "text"
+        },
+        {
+          "name": "salt",
+          "type": "text"
+        },
+        {
+          "name": "hash",
+          "type": "text"
+        },
+        {
+          "name": "domain",
+          "type": "text"
+        },
+        {
+          "name": "created",
+          "type": "datetime",
+          "audit": true
+        },
+        {
+          "name": "expire",
+          "type": "int"
+        }
+      ]
+    },
+    {
+      "name": "UserImage",
+      "columns": [
+        {
+          "name": "_id",
+          "type": "id",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "image",
+          "type": "text",
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "name": "UserWebState",
+      "columns": [
+        {
+          "name": "_id",
+          "type": "id",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "state",
+          "type": "text",
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "name": "Mesh",
+      "columns": [
+        {
+          "name": "_id",
+          "type": "id",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "type",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "mtype",
+          "type": "int",
+          "nullable": false,
+          "enum": [
+            1,
+            2,
+            3,
+            4
+          ]
+        },
+        {
+          "name": "desc",
+          "type": "text"
+        },
+        {
+          "name": "domain",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "links",
+          "type": "json"
+        },
+        {
+          "name": "creation",
+          "type": "datetime",
+          "immutable": true
+        },
+        {
+          "name": "creatorid",
+          "type": "id",
+          "fk_to": "User._id"
+        },
+        {
+          "name": "creatorname",
+          "type": "text"
+        },
+        {
+          "name": "flags",
+          "type": "int"
+        },
+        {
+          "name": "consent",
+          "type": "int"
+        },
+        {
+          "name": "invite",
+          "type": "json"
+        },
+        {
+          "name": "expireDevs",
+          "type": "int"
+        },
+        {
+          "name": "relayid",
+          "type": "id"
+        },
+        {
+          "name": "parent",
+          "type": "id"
+        },
+        {
+          "name": "kvm",
+          "type": "json"
+        },
+        {
+          "name": "amt",
+          "type": "json"
+        },
+        {
+          "name": "deleted",
+          "type": "datetime"
+        }
+      ]
+    },
+    {
+      "name": "UserGroup",
+      "columns": [
+        {
+          "name": "_id",
+          "type": "id",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "type",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "desc",
+          "type": "text"
+        },
+        {
+          "name": "domain",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "links",
+          "type": "json"
+        },
+        {
+          "name": "consent",
+          "type": "int"
+        },
+        {
+          "name": "flags",
+          "type": "int"
+        },
+        {
+          "name": "membershipType",
+          "type": "text"
+        }
+      ]
+    },
+    {
+      "name": "DeviceShare",
+      "columns": [
+        {
+          "name": "_id",
+          "type": "id",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "type",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "xmeshid",
+          "type": "id",
+          "fk_to": "Mesh._id"
+        },
+        {
+          "name": "nodeid",
+          "type": "id",
+          "fk_to": "Node._id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "p",
+          "type": "text"
+        },
+        {
+          "name": "domain",
+          "type": "text"
+        },
+        {
+          "name": "publicid",
+          "type": "text"
+        },
+        {
+          "name": "userid",
+          "type": "id",
+          "fk_to": "User._id"
+        },
+        {
+          "name": "guestName",
+          "type": "text"
+        },
+        {
+          "name": "consent",
+          "type": "int"
+        },
+        {
+          "name": "port",
+          "type": "int"
+        },
+        {
+          "name": "url",
+          "type": "text"
+        },
+        {
+          "name": "startTime",
+          "type": "datetime"
+        },
+        {
+          "name": "expireTime",
+          "type": "datetime"
+        },
+        {
+          "name": "duration",
+          "type": "int"
+        },
+        {
+          "name": "recurring",
+          "type": "json"
+        },
+        {
+          "name": "viewOnly",
+          "type": "bool"
+        }
+      ]
+    },
+    {
+      "name": "Node",
+      "columns": [
+        {
+          "name": "_id",
+          "type": "id",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "type",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "mtype",
+          "type": "int"
+        },
+        {
+          "name": "icon",
+          "type": "int"
+        },
+        {
+          "name": "meshid",
+          "type": "id",
+          "fk_to": "Mesh._id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "rname",
+          "type": "text"
+        },
+        {
+          "name": "domain",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "agent",
+          "type": "json"
+        },
+        {
+          "name": "host",
+          "type": "text"
+        },
+        {
+          "name": "firstconnect",
+          "type": "datetime",
+          "audit": true
+        },
+        {
+          "name": "ip",
+          "type": "text"
+        },
+        {
+          "name": "osdesc",
+          "type": "text"
+        },
+        {
+          "name": "consent",
+          "type": "int"
+        },
+        {
+          "name": "rdpport",
+          "type": "int"
+        },
+        {
+          "name": "rfbport",
+          "type": "int"
+        },
+        {
+          "name": "sshport",
+          "type": "int"
+        },
+        {
+          "name": "httpport",
+          "type": "int"
+        },
+        {
+          "name": "httpsport",
+          "type": "int"
+        },
+        {
+          "name": "rdp",
+          "type": "json"
+        },
+        {
+          "name": "ssh",
+          "type": "json"
+        },
+        {
+          "name": "desc",
+          "type": "text"
+        },
+        {
+          "name": "links",
+          "type": "json"
+        },
+        {
+          "name": "tags",
+          "type": "json"
+        },
+        {
+          "name": "userloc",
+          "type": "text"
+        },
+        {
+          "name": "intelamt",
+          "type": "json"
+        },
+        {
+          "name": "publicip",
+          "type": "text"
+        },
+        {
+          "name": "iploc",
+          "type": "text"
+        },
+        {
+          "name": "av",
+          "type": "json"
+        },
+        {
+          "name": "wsc",
+          "type": "json"
+        },
+        {
+          "name": "lsc",
+          "type": "json"
+        },
+        {
+          "name": "pr",
+          "type": "json"
+        },
+        {
+          "name": "defender",
+          "type": "json"
+        },
+        {
+          "name": "lastbootuptime",
+          "type": "datetime"
+        },
+        {
+          "name": "idletime",
+          "type": "int"
+        },
+        {
+          "name": "pmt",
+          "type": "text"
+        },
+        {
+          "name": "users",
+          "type": "json"
+        },
+        {
+          "name": "lusers",
+          "type": "json"
+        },
+        {
+          "name": "upnusers",
+          "type": "json"
+        }
+      ]
+    },
+    {
+      "name": "NodeIfInfo",
+      "columns": [
+        {
+          "name": "_id",
+          "type": "id",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "type",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "domain",
+          "type": "text"
+        },
+        {
+          "name": "updateTime",
+          "type": "datetime",
+          "audit": true
+        },
+        {
+          "name": "netif",
+          "type": "json"
+        },
+        {
+          "name": "nettools",
+          "type": "json"
+        },
+        {
+          "name": "netif2",
+          "type": "json"
+        }
+      ]
+    },
+    {
+      "name": "NodeSysInfo",
+      "columns": [
+        {
+          "name": "_id",
+          "type": "id",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "type",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "domain",
+          "type": "text"
+        },
+        {
+          "name": "time",
+          "type": "datetime",
+          "audit": true
+        },
+        {
+          "name": "hash",
+          "type": "text"
+        },
+        {
+          "name": "hardware",
+          "type": "json"
+        }
+      ]
+    },
+    {
+      "name": "NodeLastConnect",
+      "columns": [
+        {
+          "name": "_id",
+          "type": "id",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "type",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "domain",
+          "type": "text"
+        },
+        {
+          "name": "meshid",
+          "type": "id",
+          "fk_to": "Mesh._id"
+        },
+        {
+          "name": "time",
+          "type": "datetime"
+        },
+        {
+          "name": "cause",
+          "type": "int",
+          "enum": [
+            0,
+            1
+          ]
+        },
+        {
+          "name": "connectType",
+          "type": "int",
+          "enum": [
+            1,
+            2,
+            4
+          ]
+        },
+        {
+          "name": "addr",
+          "type": "text"
+        },
+        {
+          "name": "serverid",
+          "type": "text"
+        }
+      ]
+    },
+    {
+      "name": "NodeNote",
+      "columns": [
+        {
+          "name": "_id",
+          "type": "id",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "type",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "value",
+          "type": "text",
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "name": "NodeErrLogTime",
+      "columns": [
+        {
+          "name": "_id",
+          "type": "id",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "lastEvent",
+          "type": "datetime"
+        }
+      ]
+    },
+    {
+      "name": "AgentLink",
+      "columns": [
+        {
+          "name": "_id",
+          "type": "id",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "domain",
+          "type": "text"
+        },
+        {
+          "name": "time",
+          "type": "datetime"
+        },
+        {
+          "name": "raid",
+          "type": "id",
+          "fk_to": "Node._id"
+        },
+        {
+          "name": "daid",
+          "type": "id",
+          "fk_to": "Node._id"
+        }
+      ]
+    },
+    {
+      "name": "Event",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "time",
+          "type": "datetime",
+          "nullable": false,
+          "audit": true,
+          "immutable": true
+        },
+        {
+          "name": "domain",
+          "type": "text"
+        },
+        {
+          "name": "action",
+          "type": "text",
+          "nullable": false,
+          "immutable": true
+        },
+        {
+          "name": "nodeid",
+          "type": "id",
+          "fk_to": "Node._id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "userid",
+          "type": "id",
+          "fk_to": "User._id"
+        },
+        {
+          "name": "doc",
+          "type": "json",
+          "immutable": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "id"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "EventId",
+      "columns": [
+        {
+          "name": "fkid",
+          "type": "id",
+          "pk": true,
+          "nullable": false,
+          "fk_to": "Event.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "target",
+          "type": "text",
+          "pk": true,
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "name": "PowerEvent",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "time",
+          "type": "datetime",
+          "nullable": false,
+          "immutable": true
+        },
+        {
+          "name": "nodeid",
+          "type": "id",
+          "fk_to": "Node._id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "doc",
+          "type": "json",
+          "immutable": true
+        }
+      ]
+    },
+    {
+      "name": "ServerStats",
+      "columns": [
+        {
+          "name": "time",
+          "type": "datetime",
+          "pk": true
+        },
+        {
+          "name": "expire",
+          "type": "datetime"
+        },
+        {
+          "name": "doc",
+          "type": "json"
+        }
+      ]
+    },
+    {
+      "name": "Smbios",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "time",
+          "type": "datetime"
+        },
+        {
+          "name": "expire",
+          "type": "datetime"
+        },
+        {
+          "name": "doc",
+          "type": "json"
+        }
+      ]
+    },
+    {
+      "name": "Plugin",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "doc",
+          "type": "json"
+        }
+      ]
+    },
+    {
+      "name": "PluginPermission",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "pk": true
+        },
+        {
+          "name": "doc",
+          "type": "json"
+        }
+      ]
+    },
+    {
+      "name": "ConfigFile",
+      "columns": [
+        {
+          "name": "_id",
+          "type": "text",
+          "pk": true
+        },
+        {
+          "name": "type",
+          "type": "text"
+        },
+        {
+          "name": "data",
+          "type": "text"
+        }
+      ]
+    },
+    {
+      "name": "DayCounter",
+      "columns": [
+        {
+          "name": "_id",
+          "type": "text",
+          "pk": true
+        },
+        {
+          "name": "value",
+          "type": "int"
+        },
+        {
+          "name": "day",
+          "type": "text"
+        }
+      ]
+    },
+    {
+      "name": "UserLog",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "type",
+          "type": "text"
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "email",
+          "type": "text"
+        },
+        {
+          "name": "domain",
+          "type": "text"
+        }
+      ],
+      "constraints": []
+    },
+    {
+      "name": "MeshLog",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "type",
+          "type": "text"
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "meshid",
+          "type": "id"
+        },
+        {
+          "name": "email",
+          "type": "text"
+        },
+        {
+          "name": "domain",
+          "type": "text"
+        }
+      ],
+      "constraints": []
+    },
+    {
+      "name": "UserGroupMember",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "ugrpid",
+          "type": "id",
+          "nullable": false
+        },
+        {
+          "name": "username",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "rights",
+          "type": "int",
+          "nullable": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "ugrpid",
+            "username"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "MeshMember",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "mesh_id",
+          "type": "id",
+          "nullable": false
+        },
+        {
+          "name": "username",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "rights",
+          "type": "int",
+          "nullable": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "mesh_id",
+            "username"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "DeviceUser",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "node_id",
+          "type": "id",
+          "nullable": false
+        },
+        {
+          "name": "username",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "rights",
+          "type": "int",
+          "nullable": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "node_id",
+            "username"
+          ]
+        }
+      ]
+    }
+  ],
+  "tools": [
+    {
+      "tool": "sign_in",
+      "op": "auth",
+      "family": "guard.auth",
+      "entity": "User",
+      "description": "Sign in with an account name and password. Everything that touches a mesh, user, user group or node requires this first; the session it opens is what $actor resolves to.",
+      "input_schema": {
+        "username": {
+          "type": "text",
+          "required": true,
+          "description": "The account login name."
+        },
+        "password": {
+          "type": "text",
+          "required": true,
+          "description": "The account password."
+        }
+      },
+      "exec_spec": {
+        "verify": {
+          "entity": "User",
+          "username_col": "name",
+          "password_col": "hash"
+        }
+      },
+      "guards": {
+        "messages": {
+          "auth": "That name and password did not match."
+        }
+      },
+      "_evidence": {
+        "locator": "webserver.js:799",
+        "id_local": "User.authenticate",
+        "entry": {
+          "kind": "rpc",
+          "locator": "webserver.js:799"
+        },
+        "ref_code": "var user = obj.users['user/'+domain.id+'/'+name.toLowerCase()]; ... require('./pass').hash(pass, user.salt, function (err, hash) { if (hash == user.hash) { ... return fn(null, user._id); } ... });"
+      }
+    },
+    {
+      "tool": "user_adduser",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "User",
+        "fields": {
+          "name": {
+            "$arg": "username"
+          },
+          "siteadmin": {
+            "$arg": "siteadmin"
+          },
+          "email": {
+            "$arg": "email"
+          },
+          "emailVerified": {
+            "$arg": "emailVerified"
+          },
+          "passchange": {
+            "$arg": "resetNextLogin"
+          },
+          "groups": {
+            "$arg": "groups"
+          },
+          "realname": {
+            "$arg": "realname"
+          },
+          "consent": {
+            "$arg": "consent"
+          },
+          "phone": {
+            "$arg": "phone"
+          }
+        },
+        "set_on_create": {
+          "type": "user",
+          "creation": "2026-01-01T00:00:00",
+          "domain": {
+            "$arg": "domain"
+          },
+          "salt": {
+            "$arg": "pass"
+          },
+          "hash": {
+            "$arg": "pass"
+          }
+        }
+      },
+      "input_schema": {
+        "username": {
+          "type": "text",
+          "description": "The account's login name."
+        },
+        "pass": {
+          "type": "text",
+          "description": "The account's password."
+        },
+        "randomPassword": {
+          "type": "text",
+          "description": "When true, generate a random password instead of using pass."
+        },
+        "email": {
+          "type": "text",
+          "description": "The email address."
+        },
+        "emailVerified": {
+          "type": "text",
+          "description": "Whether the email is already verified."
+        },
+        "domain": {
+          "type": "text",
+          "description": "The domain id this record belongs to."
+        },
+        "siteadmin": {
+          "type": "int",
+          "description": "Site-rights bitmask (admin)."
+        },
+        "realname": {
+          "type": "text",
+          "description": "The user's real (display) name."
+        },
+        "resetNextLogin": {
+          "type": "text",
+          "description": "When true, force a password change at next login."
+        },
+        "consent": {
+          "type": "int",
+          "description": "Consent-mode rights bitmask (0 removes)."
+        },
+        "phone": {
+          "type": "text",
+          "description": "The user's phone number (for 2FA)."
+        },
+        "groups": {
+          "type": "text",
+          "description": "Realm / group memberships."
+        }
+      },
+      "_evidence": {
+        "locator": "meshuser.js:6168",
+        "id_local": "User.addUser",
+        "entry": {
+          "kind": "rpc",
+          "route": "action:adduser",
+          "locator": "meshuser.js:708"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "var newuser = { type: 'user', _id: newuserid, name: newusername, creation: Math.floor(Date.now()/1000), domain: newuserdomain.id };\nif (command.siteadmin != null) { newuser.siteadmin = command.siteadmin; }\nif (command.email != null) { newuser.email = command.email.toLowerCase(); if (command.emailVerified === true) { newuser.emailVerified = true; } }\n...require('./pass').hash(command.pass, function (err, salt, hash, tag) { newuser.salt = salt; newuser.hash = hash; db.SetUser(newuser);",
+        "edges": [
+          "meshuser.js:6178 (caller siteadmin & SITERIGHT_MANAGEUSERS)"
+        ]
+      },
+      "entity": "User",
+      "_binds": {
+        "username": "User.name",
+        "email": "User.email",
+        "emailVerified": "User.emailVerified",
+        "siteadmin": "User.siteadmin",
+        "realname": "User.realname",
+        "resetNextLogin": "User.passchange",
+        "consent": "User.consent",
+        "phone": "User.phone",
+        "groups": "User.groups"
+      },
+      "_output_schema": {
+        "result": "'ok'"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "siteadmin",
+                      "op": "ne",
+                      "value": 0
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "username",
+          "pass"
+        ],
+        "messages": {
+          "auth": "Sign in before doing that.",
+          "required": "A required argument was not provided.",
+          "not_found": "That record does not exist.",
+          "unique": "A record with that value already exists.",
+          "fk": "The parent record you referenced does not exist.",
+          "fk_missing": "A required parent reference is missing.",
+          "precondition": "You don't have permission to do that."
+        }
+      },
+      "_defaulted": [
+        "fields (mapped to the real parameter names via binds)"
+      ],
+      "description": "Create a new user account in the site. Requires site-admin rights."
+    },
+    {
+      "tool": "user_adduserbatch",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "User",
+        "fields": {
+          "name": {
+            "$arg": "user"
+          },
+          "email": {
+            "$arg": "email"
+          },
+          "realname": {
+            "$arg": "realname"
+          },
+          "passchange": {
+            "$arg": "resetNextLogin"
+          }
+        },
+        "set_on_create": {
+          "type": "user",
+          "creation": "2026-01-01T00:00:00",
+          "domain": {
+            "$arg": "domain"
+          },
+          "salt": {
+            "$arg": "pass"
+          },
+          "hash": {
+            "$arg": "pass"
+          }
+        }
+      },
+      "input_schema": {
+        "user": {
+          "type": "text",
+          "description": "The username for this batch entry."
+        },
+        "pass": {
+          "type": "text",
+          "description": "The account's password."
+        },
+        "email": {
+          "type": "text",
+          "description": "The email address."
+        },
+        "realname": {
+          "type": "text",
+          "description": "The user's real (display) name."
+        },
+        "resetNextLogin": {
+          "type": "text",
+          "description": "When true, force a password change at next login."
+        }
+      },
+      "_evidence": {
+        "locator": "meshuser.js:6302",
+        "id_local": "User.addUserBatch",
+        "entry": {
+          "kind": "rpc",
+          "route": "action:adduserbatch",
+          "locator": "meshuser.js:709"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "var newuser = { type:'user', _id:newuserid, name:command.users[i].user, creation:Math.floor(Date.now()/1000), domain:domain.id };\nif (domain.newaccountsrights) { newuser.siteadmin = domain.newaccountsrights; }\n...newuser.salt = salt; newuser.hash = hash; db.SetUser(newuser);",
+        "edges": [
+          "meshuser.js:6310 (caller siteadmin & SITERIGHT_MANAGEUSERS)"
+        ]
+      },
+      "entity": "User",
+      "_binds": {
+        "user": "User.name",
+        "email": "User.email",
+        "realname": "User.realname",
+        "resetNextLogin": "User.passchange"
+      },
+      "_output_schema": {
+        "result": "'ok'",
+        "added": "int",
+        "failed": "int"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "siteadmin",
+                      "op": "ne",
+                      "value": 0
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "user",
+          "pass"
+        ],
+        "messages": {
+          "auth": "Sign in before doing that.",
+          "required": "A required argument was not provided.",
+          "not_found": "That record does not exist.",
+          "unique": "A record with that value already exists.",
+          "fk": "The parent record you referenced does not exist.",
+          "fk_missing": "A required parent reference is missing.",
+          "precondition": "You don't have permission to do that."
+        }
+      },
+      "_defaulted": [
+        "fields (mapped to the real parameter names via binds)"
+      ],
+      "description": "Create a batch of user accounts. Returns how many were added and failed. Requires site-admin rights."
+    },
+    {
+      "tool": "user_edituser",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "User",
+        "row_key": {
+          "_id": {
+            "$arg": "userid"
+          }
+        },
+        "fields": {
+          "email": {
+            "$arg": "email"
+          },
+          "emailVerified": {
+            "$arg": "emailVerified"
+          },
+          "realname": {
+            "$arg": "realname"
+          },
+          "quota": {
+            "$arg": "quota"
+          },
+          "passchange": {
+            "$arg": "resetNextLogin"
+          },
+          "consent": {
+            "$arg": "consent"
+          },
+          "phone": {
+            "$arg": "phone"
+          },
+          "msghandle": {
+            "$arg": "msghandle"
+          },
+          "flags": {
+            "$arg": "flags"
+          },
+          "removeRights": {
+            "$arg": "removeRights"
+          },
+          "siteadmin": {
+            "$arg": "siteadmin"
+          },
+          "groups": {
+            "$arg": "groups"
+          }
+        }
+      },
+      "input_schema": {
+        "userid": {
+          "type": "text",
+          "description": "Id of the user to act on."
+        },
+        "email": {
+          "type": "text",
+          "description": "The email address."
+        },
+        "emailVerified": {
+          "type": "text",
+          "description": "Whether the email is already verified."
+        },
+        "realname": {
+          "type": "text",
+          "description": "The user's real (display) name."
+        },
+        "quota": {
+          "type": "int",
+          "description": "The user's storage quota."
+        },
+        "resetNextLogin": {
+          "type": "text",
+          "description": "When true, force a password change at next login."
+        },
+        "consent": {
+          "type": "int",
+          "description": "Consent-mode rights bitmask (0 removes)."
+        },
+        "phone": {
+          "type": "text",
+          "description": "The user's phone number (for 2FA)."
+        },
+        "msghandle": {
+          "type": "text",
+          "description": "The user's message handle."
+        },
+        "flags": {
+          "type": "int",
+          "description": "A behavior-flags bitmask."
+        },
+        "removeRights": {
+          "type": "int",
+          "description": "Rights to strip from the user."
+        },
+        "siteadmin": {
+          "type": "int",
+          "description": "Site-rights bitmask (admin)."
+        },
+        "groups": {
+          "type": "text",
+          "description": "Realm / group memberships."
+        }
+      },
+      "_evidence": {
+        "locator": "meshuser.js:1457",
+        "id_local": "User.editUser",
+        "entry": {
+          "kind": "rpc",
+          "route": "action:edituser",
+          "locator": "meshuser.js:1422"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "if (command.email != '') { chguser.email = command.email.toLowerCase(); } ... \nif ((user.siteadmin & SITERIGHT_MANAGEUSERS)==0) { err='Permission denied' } \n...if (change == 1) { db.SetUser(chguser); }",
+        "edges": [
+          "meshuser.js:1457 (siteadmin & SITERIGHT_MANAGEUSERS or self)"
+        ]
+      },
+      "entity": "User",
+      "_binds": {
+        "userid": "User._id",
+        "email": "User.email",
+        "emailVerified": "User.emailVerified",
+        "realname": "User.realname",
+        "quota": "User.quota",
+        "resetNextLogin": "User.passchange",
+        "consent": "User.consent",
+        "phone": "User.phone",
+        "msghandle": "User.msghandle",
+        "flags": "User.flags",
+        "removeRights": "User.removeRights",
+        "siteadmin": "User.siteadmin",
+        "groups": "User.groups"
+      },
+      "_output_schema": {
+        "result": "'ok'"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "siteadmin",
+                      "op": "ne",
+                      "value": 0
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "_id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "userid"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "userid"
+        ],
+        "messages": {
+          "auth": "Sign in before doing that.",
+          "required": "A required argument was not provided.",
+          "not_found": "That record does not exist.",
+          "unique": "A record with that value already exists.",
+          "fk": "The parent record you referenced does not exist.",
+          "fk_missing": "A required parent reference is missing.",
+          "precondition": "You don't have permission to do that."
+        }
+      },
+      "_defaulted": [
+        "fields (mapped to the real parameter names via binds)"
+      ],
+      "description": "Edit an existing user's account details (email, real name, quota, rights). Requires site-admin rights, or applied to yourself."
+    },
+    {
+      "tool": "user_changepassword",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "User",
+        "row_key": {
+          "_id": {
+            "$session": "account_id"
+          }
+        },
+        "fields": {
+          "passhint": {
+            "$arg": "hint"
+          }
+        },
+        "set": {
+          "salt": {
+            "$arg": "newpass"
+          },
+          "hash": {
+            "$arg": "newpass"
+          },
+          "passchange": "2026-01-01T00:00:00",
+          "passtype": null
+        }
+      },
+      "input_schema": {
+        "oldpass": {
+          "type": "text",
+          "description": "Your current password, used to verify you."
+        },
+        "newpass": {
+          "type": "text",
+          "description": "The new password."
+        },
+        "hint": {
+          "type": "text",
+          "description": "An optional password hint."
+        }
+      },
+      "_evidence": {
+        "locator": "meshuser.js:1962",
+        "id_local": "User.changePassword",
+        "entry": {
+          "kind": "rpc",
+          "route": "action:changepassword",
+          "locator": "meshuser.js:1923"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "user.salt = salt; user.hash = hash; user.passchange = nowSeconds; delete user.passtype;\ndb.SetUser(user);",
+        "edges": [
+          "meshuser.js:1928 (self-only, not via loginToken, not settings-locked)"
+        ]
+      },
+      "entity": "User",
+      "_binds": {
+        "hint": "User.passhint"
+      },
+      "_output_schema": {
+        "result": "'ok'"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "_id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "oldpass",
+          "newpass"
+        ],
+        "messages": {
+          "auth": "Sign in before doing that.",
+          "required": "A required argument was not provided.",
+          "not_found": "That record does not exist.",
+          "unique": "A record with that value already exists.",
+          "fk": "The parent record you referenced does not exist.",
+          "fk_missing": "A required parent reference is missing.",
+          "precondition": "You don't have permission to do that."
+        }
+      },
+      "_defaulted": [
+        "fields (mapped to the real parameter names via binds)"
+      ],
+      "description": "Change your own password, verifying the current one first. Applies to the signed-in account only."
+    },
+    {
+      "tool": "user_changeuserpass",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "User",
+        "row_key": {
+          "_id": {
+            "$arg": "userid"
+          }
+        },
+        "fields": {
+          "type": {
+            "$arg": "type"
+          },
+          "name": {
+            "$arg": "name"
+          },
+          "domain": {
+            "$arg": "domain"
+          },
+          "siteadmin": {
+            "$arg": "siteadmin"
+          },
+          "email": {
+            "$arg": "email"
+          },
+          "emailVerified": {
+            "$arg": "emailVerified"
+          },
+          "passchange": {
+            "$arg": "resetNextLogin"
+          },
+          "salt": {
+            "$arg": "salt"
+          },
+          "hash": {
+            "$arg": "hash"
+          },
+          "passtype": {
+            "$arg": "passtype"
+          },
+          "passhint": {
+            "$arg": "hint"
+          },
+          "oldpasswords": {
+            "$arg": "oldpasswords"
+          },
+          "realname": {
+            "$arg": "realname"
+          },
+          "phone": {
+            "$arg": "phone"
+          },
+          "msghandle": {
+            "$arg": "msghandle"
+          },
+          "consent": {
+            "$arg": "consent"
+          },
+          "groups": {
+            "$arg": "groups"
+          },
+          "links": {
+            "$arg": "links"
+          },
+          "notify": {
+            "$arg": "notify"
+          },
+          "flags": {
+            "$arg": "flags"
+          },
+          "quota": {
+            "$arg": "quota"
+          },
+          "removeRights": {
+            "$arg": "removeRights"
+          },
+          "lang": {
+            "$arg": "lang"
+          },
+          "subscriptions": {
+            "$arg": "subscriptions"
+          },
+          "webpush": {
+            "$arg": "webpush"
+          },
+          "otpsecret": {
+            "$arg": "otpsecret"
+          },
+          "otpkeys": {
+            "$arg": "otpkeys"
+          },
+          "otphkeys": {
+            "$arg": "otphkeys"
+          },
+          "otpekey": {
+            "$arg": "otpekey"
+          },
+          "otpsms": {
+            "$arg": "otpsms"
+          },
+          "otpmsg": {
+            "$arg": "otpmsg"
+          },
+          "otpdev": {
+            "$arg": "otpdev"
+          },
+          "otpduo": {
+            "$arg": "otpduo"
+          }
+        },
+        "set": {
+          "salt": {
+            "$arg": "pass"
+          },
+          "hash": {
+            "$arg": "pass"
+          },
+          "passchange": "2026-01-01T00:00:00",
+          "otpkeys": null,
+          "otpsecret": null,
+          "otphkeys": null,
+          "otpekey": null,
+          "phone": null,
+          "otpdev": null,
+          "otpduo": null
+        }
+      },
+      "input_schema": {
+        "userid": {
+          "type": "text",
+          "description": "Id of the user to act on."
+        },
+        "pass": {
+          "type": "text",
+          "description": "The account's password."
+        },
+        "hint": {
+          "type": "text",
+          "description": "An optional password hint."
+        },
+        "resetNextLogin": {
+          "type": "text",
+          "description": "When true, force a password change at next login."
+        },
+        "removeMultiFactor": {
+          "type": "text",
+          "description": "When true, clear the user's multi-factor (all 2FA) fields."
+        }
+      },
+      "_evidence": {
+        "locator": "meshuser.js:2017",
+        "id_local": "User.changeUserPass",
+        "entry": {
+          "kind": "rpc",
+          "route": "action:changeuserpass",
+          "locator": "meshuser.js:2000"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "if (command.pass != '') { chguser.salt = salt; chguser.hash = hash; }\nif (command.removeMultiFactor === true) { delete chguser.otpkeys; delete chguser.otpsecret; delete chguser.otphkeys; delete chguser.otpekey; delete chguser.phone; delete chguser.otpdev; delete chguser.otpduo; }\ndb.SetUser(chguser);",
+        "edges": [
+          "meshuser.js:2003 (siteadmin & SITERIGHT_MANAGEUSERS)"
+        ]
+      },
+      "entity": "User",
+      "_binds": {
+        "userid": "User._id",
+        "hint": "User.passhint",
+        "resetNextLogin": "User.passchange"
+      },
+      "_output_schema": {
+        "result": "'ok'"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "siteadmin",
+                      "op": "ne",
+                      "value": 0
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "userid",
+          "removeMultiFactor"
+        ],
+        "messages": {
+          "auth": "Sign in before doing that.",
+          "required": "A required argument was not provided.",
+          "not_found": "That record does not exist.",
+          "unique": "A record with that value already exists.",
+          "fk": "The parent record you referenced does not exist.",
+          "fk_missing": "A required parent reference is missing.",
+          "precondition": "You don't have permission to do that."
+        }
+      },
+      "_defaulted": [
+        "fields",
+        "fields (mapped to the real parameter names via binds)"
+      ],
+      "description": "As a site admin, set another user's password (or clear their multi-factor only, when pass is empty)."
+    },
+    {
+      "tool": "user_deleteuser",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "User",
+        "lookup_by": {
+          "_id": {
+            "$arg": "userid"
+          }
+        }
+      },
+      "input_schema": {
+        "userid": {
+          "type": "text",
+          "description": "Id of the user to act on."
+        }
+      },
+      "_evidence": {
+        "locator": "meshuser.js:1300",
+        "id_local": "User.deleteUser",
+        "entry": {
+          "kind": "rpc",
+          "route": "action:deleteuser",
+          "locator": "meshuser.js:1263"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "db.Remove('ws'+deluser._id); db.Remove('nt'+deluser._id); db.Remove('ntp'+deluser._id); db.Remove('im'+deluser._id);\ndb.AllTypeNodeFiltered(['logintoken-'+deluser._id]...delete\nif ((user.siteadmin & 2)==0) { err='Permission denied' } ... db.Remove(deluserid); delete parent.users[deluserid];",
+        "edges": [
+          "meshuser.js:1267 (siteadmin & MESHRIGHT_MANAGEUSERS)"
+        ]
+      },
+      "entity": "User",
+      "_binds": {
+        "userid": "User._id"
+      },
+      "_output_schema": {
+        "result": "'ok'"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "siteadmin",
+                      "op": "ne",
+                      "value": 0
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "userid"
+        ],
+        "messages": {
+          "auth": "Sign in before doing that.",
+          "required": "A required argument was not provided.",
+          "not_found": "That record does not exist.",
+          "unique": "A record with that value already exists.",
+          "fk": "The parent record you referenced does not exist.",
+          "fk_missing": "A required parent reference is missing.",
+          "precondition": "You don't have permission to do that."
+        }
+      },
+      "description": "Delete a user account and its related web state, notes and image. Requires site-admin rights."
+    },
+    {
+      "tool": "user_changeemail",
+      "op": "update",
+      "family": "update.status_transition",
+      "exec_spec": {
+        "entity": "User",
+        "row_key": {
+          "_id": {
+            "$session": "account_id"
+          }
+        },
+        "status_col": "emailVerified",
+        "from": [
+          true
+        ],
+        "to": false
+      },
+      "input_schema": {
+        "email": {
+          "type": "text",
+          "description": "The email address."
+        }
+      },
+      "_evidence": {
+        "locator": "meshuser.js:6512",
+        "id_local": "User.changeEmail",
+        "entry": {
+          "kind": "rpc",
+          "route": "action:changeemail",
+          "locator": "meshuser.js:6481"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "user.email = command.email; user.emailVerified = false; parent.db.SetUser(user);",
+        "edges": [
+          "meshuser.js:6486 (self-only; not loginToken/SSPI/LDAP; not settings-locked)"
+        ]
+      },
+      "entity": "User",
+      "_binds": {
+        "email": "User.email"
+      },
+      "_output_schema": {
+        "result": "'ok'"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "_id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "email"
+        ],
+        "messages": {
+          "auth": "Sign in before doing that.",
+          "required": "A required argument was not provided.",
+          "not_found": "That record does not exist.",
+          "unique": "A record with that value already exists.",
+          "fk": "The parent record you referenced does not exist.",
+          "fk_missing": "A required parent reference is missing.",
+          "precondition": "You don't have permission to do that."
+        }
+      },
+      "description": "Set your own account email; this resets your email verification status."
+    },
+    {
+      "tool": "user_updateuserimage",
+      "op": "update",
+      "family": "crud.upsert",
+      "exec_spec": {
+        "entity": "UserImage",
+        "key": {
+          "_id": {
+            "$session": "account_id"
+          }
+        },
+        "insert_fields": [
+          "image"
+        ],
+        "set_on_exists": {}
+      },
+      "input_schema": {
+        "image": {
+          "type": "text",
+          "description": "Base64 data-url avatar image, or 0 to delete."
+        },
+        "userid": {
+          "type": "text",
+          "description": "Id of the user to act on."
+        }
+      },
+      "_evidence": {
+        "locator": "meshuser.js:7242",
+        "id_local": "User.updateUserImage",
+        "entry": {
+          "kind": "rpc",
+          "route": "action:updateUserImage",
+          "locator": "meshuser.js:5829"
+        },
+        "entity_why": "primary effect row_upsert lands on this table",
+        "ref_code": "if (command.image == 0) { db.Remove('im'+uid); if ((flags & 1) != 0) { flags -= 1; } } else { db.Set({ _id:'im'+uid, image:command.image }); if ((flags & 1) == 0) { flags += 1; } }\nif (change == 1) { chguser.flags = flags; db.SetUser(chguser); }",
+        "edges": [
+          "meshuser.js:7220 (SITERIGHT_MANAGEUSERS to edit another, else self)"
+        ]
+      },
+      "entity": "UserImage",
+      "_binds": {
+        "image": "UserImage.image",
+        "userid": "User._id"
+      },
+      "_output_schema": {
+        "result": "'ok'"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "_id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "image"
+        ],
+        "messages": {
+          "auth": "Sign in before doing that.",
+          "required": "A required argument was not provided.",
+          "not_found": "That record does not exist.",
+          "unique": "A record with that value already exists.",
+          "fk": "The parent record you referenced does not exist.",
+          "fk_missing": "A required parent reference is missing.",
+          "precondition": "You don't have permission to do that."
+        }
+      },
+      "description": "Set (or remove, image=0) your avatar image, stored under your own user image record."
+    },
+    {
+      "tool": "user_notify",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "User",
+        "row_key": {
+          "_id": {
+            "$session": "account_id"
+          }
+        },
+        "fields": [
+          "notify"
+        ]
+      },
+      "input_schema": {
+        "nodeid": {
+          "type": "text",
+          "description": "Id of the device to act on."
+        },
+        "notify": {
+          "type": "int",
+          "description": "Notification bitmask; 0 clears the entry."
+        }
+      },
+      "_evidence": {
+        "locator": "meshuser.js:1906",
+        "id_local": "User.notify",
+        "entry": {
+          "kind": "rpc",
+          "route": "action:changeusernotify",
+          "locator": "meshuser.js:1876"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "if (user.notify == null) { user.notify = {}; } if (command.notify == 0) { delete user.notify[command.nodeid]; } else { user.notify[command.nodeid] = command.notify; }\nparent.db.SetUser(user);",
+        "edges": [
+          "meshuser.js:1879 (self-only, not settings-locked)"
+        ]
+      },
+      "entity": "User",
+      "_binds": {
+        "nodeid": "Node._id",
+        "notify": "User.notify"
+      },
+      "_output_schema": {
+        "result": "'ok'"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "_id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "nodeid",
+          "notify"
+        ],
+        "messages": {
+          "auth": "Sign in before doing that.",
+          "required": "A required argument was not provided.",
+          "not_found": "That record does not exist.",
+          "unique": "A record with that value already exists.",
+          "fk": "The parent record you referenced does not exist.",
+          "fk_missing": "A required parent reference is missing.",
+          "precondition": "You don't have permission to do that."
+        }
+      },
+      "description": "Set which devices alert you and with what notification bitmask. Applies to your own account."
+    },
+    {
+      "tool": "user_userwebstate",
+      "op": "update",
+      "family": "crud.upsert",
+      "exec_spec": {
+        "entity": "UserWebState",
+        "key": {
+          "_id": {
+            "$session": "account_id"
+          }
+        },
+        "insert_fields": [
+          "state"
+        ],
+        "set_on_exists": {}
+      },
+      "input_schema": {
+        "state": {
+          "type": "text",
+          "description": "AMT power state."
+        }
+      },
+      "_evidence": {
+        "locator": "meshuser.js:4174",
+        "id_local": "User.userWebState",
+        "entry": {
+          "kind": "rpc",
+          "route": "action:userWebState",
+          "locator": "meshuser.js:4165"
+        },
+        "entity_why": "primary effect row_upsert lands on this table",
+        "ref_code": "command.domain = domain.id; db.Set({ _id:'ws'+user._id, state:command.state });",
+        "edges": [
+          "meshuser.js:4168 (self-only, not settings-locked)"
+        ]
+      },
+      "entity": "UserWebState",
+      "_binds": {
+        "state": "UserWebState.state"
+      },
+      "_output_schema": {
+        "result": "'ok'"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "_id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "state"
+        ],
+        "messages": {
+          "auth": "Sign in before doing that.",
+          "required": "A required argument was not provided.",
+          "not_found": "That record does not exist.",
+          "unique": "A record with that value already exists.",
+          "fk": "The parent record you referenced does not exist.",
+          "fk_missing": "A required parent reference is missing.",
+          "precondition": "You don't have permission to do that."
+        }
+      },
+      "description": "Save your own browser/web UI state (a short serialized string)."
+    },
+    {
+      "tool": "user_createlogintoken",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "LoginToken",
+        "fields": {
+          "name": {
+            "$arg": "name"
+          },
+          "expire": {
+            "$arg": "expire"
+          }
+        },
+        "set_on_create": {
+          "type": "logintoken",
+          "userid": {
+            "$session": "account_id"
+          },
+          "domain": {
+            "$session": "domain"
+          }
+        },
+        "unique_on": [
+          "name"
+        ]
+      },
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "A display name for the login token."
+        },
+        "expire": {
+          "type": "text",
+          "required": true,
+          "description": "Token lifetime in minutes (0 = never expires)."
+        }
+      },
+      "_evidence": {
+        "locator": "meshuser.js:5252",
+        "id_local": "User.createLoginToken",
+        "entry": {
+          "kind": "rpc",
+          "route": "action:createLoginToken",
+          "locator": "meshuser.js:5221"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "const dbentry = { _id:'logintoken-'+tokenUser, type:'logintoken', nodeid:'logintoken-'+user._id, userid:user._id, name:command.name, tokenUser:tokenUser, salt:salt, hash:hash, domain:domain.id, created:created, expire:expire }; parent.db.Set(dbentry);",
+        "edges": [
+          "meshuser.js:5224 (self-authenticated session)"
+        ]
+      },
+      "entity": "LoginToken",
+      "_binds": {
+        "name": "LoginToken.name",
+        "expire": "LoginToken.expire"
+      },
+      "_output_schema": {
+        "result": "'ok'"
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "_id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in before creating a login token.",
+          "precondition": "Only a signed-in user can create a login token.",
+          "unique": "A login token with that name already exists."
+        }
+      },
+      "_defaulted": [
+        "family (matched by an id_local regex, not by the effects)"
+      ],
+      "description": "Create a login token that lets a script or service authenticate without an interactive login. Applies to your own account."
+    },
+    {
+      "tool": "user_verifyemail",
+      "op": "update",
+      "family": "action.emit",
+      "exec_spec": {
+        "channel": "event",
+        "record": {
+          "table": "UserLog"
+        }
+      },
+      "input_schema": {
+        "email": {
+          "type": "text",
+          "description": "The email address."
+        }
+      },
+      "_evidence": {
+        "locator": "meshuser.js:7293",
+        "id_local": "User.verifyEmail",
+        "entry": {
+          "kind": "rpc",
+          "route": "action:verifyemail",
+          "locator": "meshuser.js:5832"
+        },
+        "entity_why": "fell back to the entity prefix of id_local",
+        "ref_code": "if ((domain.mailserver != null) && (obj.user.email.toLowerCase() == command.email)) { domain.mailserver.sendAccountCheckMail(...); }",
+        "edges": [
+          "meshuser.js:7294 (self-only, not loginToken, not settings-locked)"
+        ]
+      },
+      "entity": "User",
+      "_binds": {
+        "email": "User.email"
+      },
+      "_output_schema": {
+        "result": "'ok'"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "_id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "email"
+        ],
+        "messages": {
+          "auth": "Sign in before doing that.",
+          "required": "A required argument was not provided.",
+          "not_found": "That record does not exist.",
+          "unique": "A record with that value already exists.",
+          "fk": "The parent record you referenced does not exist.",
+          "fk_missing": "A required parent reference is missing.",
+          "precondition": "You don't have permission to do that."
+        }
+      },
+      "_defaulted": [
+        "entity (not taken from the primary effect: fell back to the entity prefix of id_local)"
+      ],
+      "description": "Send the account-verification email to your current account's address. Fails if email does not match your own."
+    },
+    {
+      "tool": "mesh_createmesh",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Mesh",
+        "fields": {
+          "name": {
+            "$arg": "meshname"
+          },
+          "mtype": {
+            "$arg": "meshtype"
+          },
+          "desc": {
+            "$arg": "desc"
+          },
+          "flags": {
+            "$arg": "flags"
+          },
+          "consent": {
+            "$arg": "consent"
+          },
+          "parent": {
+            "$arg": "parent"
+          },
+          "relayid": {
+            "$arg": "relayid"
+          },
+          "kvm": {
+            "$arg": "kvm"
+          }
+        },
+        "set_on_create": {
+          "type": "mesh",
+          "creatorid": {
+            "$session": "account_id"
+          },
+          "creation": "2026-01-01T00:00:00",
+          "domain": {
+            "$session": "domain"
+          }
+        }
+      },
+      "input_schema": {
+        "meshname": {
+          "type": "text",
+          "description": "The device group's (mesh's) name."
+        },
+        "meshtype": {
+          "type": "int",
+          "description": "Device group type: 2 agent, 1 AMT, 3 local, 4 IP-KVM."
+        },
+        "desc": {
+          "type": "text",
+          "description": "A description."
+        },
+        "flags": {
+          "type": "int",
+          "description": "A behavior-flags bitmask."
+        },
+        "consent": {
+          "type": "int",
+          "description": "Consent-mode rights bitmask (0 removes)."
+        },
+        "parent": {
+          "type": "int",
+          "description": "Id of a parent mesh (hierarchy)."
+        },
+        "relayid": {
+          "type": "int",
+          "description": "Id of the relay to route through."
+        },
+        "kvmmodel": {
+          "type": "text",
+          "description": "IP-KVM hardware model (mtype 4)."
+        },
+        "kvmhost": {
+          "type": "text",
+          "description": "IP-KVM host (mtype 4)."
+        },
+        "kvmuser": {
+          "type": "text",
+          "description": "IP-KVM user (mtype 4)."
+        },
+        "kvmpass": {
+          "type": "text",
+          "description": "IP-KVM password (mtype 4)."
+        }
+      },
+      "_evidence": {
+        "locator": "meshuser.js:2218",
+        "id_local": "Mesh.createMesh",
+        "entry": {
+          "kind": "rpc",
+          "route": "action:createmesh",
+          "locator": "meshuser.js:2155"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "var mesh = { type:'mesh', _id:meshid, name:command.meshname, mtype:command.meshtype, desc:command.desc?...:'', domain:domain.id, flags:command.flags?...:0, consent:command.consent?...:0, creation:Math.floor(Date.now()/1000), creatorid:user._id, creatorname:user.name, links:{} };\nif (command.mtype == 4) { mesh.kvm = { model:command.kvmmodel, host:command.kvmhost, user:command.kvmuser, pass:command.kvmpass }; }\nmesh.links[user._id] = { name:user.name, rights:4294967295 }; void 0; db.Set(mesh); user.links[meshid] = { rights:4294967295 }; obj.SetUser(user);",
+        "edges": [
+          "meshuser.js:2162 (siteadmin not locked(64); email verified unless admin)"
+        ]
+      },
+      "entity": "Mesh",
+      "_binds": {
+        "meshname": "Mesh.name",
+        "meshtype": "Mesh.mtype",
+        "desc": "Mesh.desc",
+        "flags": "Mesh.flags",
+        "consent": "Mesh.consent",
+        "parent": "Mesh.parent",
+        "relayid": "Mesh.relayid",
+        "kvmmodel": "Mesh.kvm",
+        "kvmhost": "Mesh.kvm",
+        "kvmuser": "Mesh.kvm",
+        "kvmpass": "Mesh.kvm"
+      },
+      "_output_schema": {
+        "result": "'ok'",
+        "meshid": "text"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "_id",
+                  "op": "eq",
+                  "value": {
+                    "actor": "id"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "meshname",
+          "meshtype"
+        ],
+        "messages": {
+          "auth": "Sign in before doing that.",
+          "required": "A required argument was not provided.",
+          "not_found": "That record does not exist.",
+          "unique": "A record with that value already exists.",
+          "fk": "The parent record you referenced does not exist.",
+          "fk_missing": "A required parent reference is missing.",
+          "precondition": "You don't have permission to do that."
+        }
+      },
+      "_defaulted": [
+        "fields (mapped to the real parameter names via binds)"
+      ],
+      "description": "Create a new device group (mesh). The creator becomes its admin."
+    },
+    {
+      "tool": "mesh_editmesh",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Mesh",
+        "row_key": {
+          "_id": {
+            "$arg": "meshid"
+          }
+        },
+        "fields": {
+          "name": {
+            "$arg": "meshname"
+          },
+          "desc": {
+            "$arg": "desc"
+          },
+          "flags": {
+            "$arg": "flags"
+          },
+          "consent": {
+            "$arg": "consent"
+          },
+          "expireDevs": {
+            "$arg": "expireDevs"
+          },
+          "relayid": {
+            "$arg": "relayid"
+          },
+          "invite": {
+            "$arg": "invite"
+          }
+        }
+      },
+      "input_schema": {
+        "meshid": {
+          "type": "text",
+          "description": "Id of the device group (mesh)."
+        },
+        "meshname": {
+          "type": "text",
+          "description": "The device group's (mesh's) name."
+        },
+        "desc": {
+          "type": "text",
+          "description": "A description."
+        },
+        "flags": {
+          "type": "int",
+          "description": "A behavior-flags bitmask."
+        },
+        "consent": {
+          "type": "int",
+          "description": "Consent-mode rights bitmask (0 removes)."
+        },
+        "expireDevs": {
+          "type": "int",
+          "description": "Auto-expire devices after this many days (0 removes)."
+        },
+        "relayid": {
+          "type": "int",
+          "description": "Id of the relay to route through."
+        },
+        "invite": {
+          "type": "text",
+          "description": "Invite settings {codes, flags}."
+        }
+      },
+      "_evidence": {
+        "locator": "meshuser.js:2446",
+        "id_local": "Mesh.editMesh",
+        "entry": {
+          "kind": "rpc",
+          "route": "action:editmesh",
+          "locator": "meshuser.js:2363"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "if (((rights & MESHRIGHT_EDITMESH)==0)) { err='Permission denied' }\n...if (command.meshname != null) { mesh.name = command.meshname; }\nmesh.consent = command.consent; mesh.flags = command.flags;\nif (command.invite != null) { mesh.invite = { codes:command.invite.codes, flags:command.invite.flags }; }\ndb.Set(mesh);",
+        "edges": [
+          "meshuser.js:2394 (GetMeshRights & MESHRIGHT_EDITMESH)"
+        ]
+      },
+      "entity": "Mesh",
+      "_binds": {
+        "meshid": "Mesh._id",
+        "meshname": "Mesh.name",
+        "desc": "Mesh.desc",
+        "flags": "Mesh.flags",
+        "consent": "Mesh.consent",
+        "expireDevs": "Mesh.expireDevs",
+        "relayid": "Mesh.relayid",
+        "invite": "Mesh.invite"
+      },
+      "_output_schema": {
+        "result": "'ok'"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Mesh",
+                "where": {
+                  "node": "field",
+                  "col": "_id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "meshid"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "meshid"
+        ],
+        "messages": {
+          "auth": "Sign in before doing that.",
+          "required": "A required argument was not provided.",
+          "not_found": "That record does not exist.",
+          "unique": "A record with that value already exists.",
+          "fk": "The parent record you referenced does not exist.",
+          "fk_missing": "A required parent reference is missing.",
+          "precondition": "You don't have permission to do that."
+        }
+      },
+      "_defaulted": [
+        "fields (mapped to the real parameter names via binds)"
+      ],
+      "description": "Edit a device group's name, description, flags, consent, invite codes or relay. Requires Mesh-Edit rights on the group."
+    },
+    {
+      "tool": "mesh_deletemesh",
+      "op": "delete",
+      "family": "crud.soft_delete",
+      "exec_spec": {
+        "entity": "Mesh",
+        "lookup_by": {
+          "_id": {
+            "$arg": "meshid"
+          }
+        },
+        "set": {
+          "deleted": "2026-01-01T00:00:00"
+        }
+      },
+      "input_schema": {
+        "meshid": {
+          "type": "text",
+          "description": "Id of the device group (mesh)."
+        }
+      },
+      "_evidence": {
+        "locator": "meshuser.js:2354",
+        "id_local": "Mesh.deleteMesh",
+        "entry": {
+          "kind": "rpc",
+          "route": "action:deletemesh",
+          "locator": "meshuser.js:2257"
+        },
+        "entity_why": "primary effect row_soft_delete lands on this table",
+        "ref_code": "if (GetMeshRights(user,mesh) != MESHRIGHT_ADMIN) { err='Permission denied' }\n...for (var j in mesh.links) { var xuserid = j; if (xuserid.startsWith('user/')) { delete xuser.links[mesh._id]; db.SetUser(xuser); } else { delete xgroup.links[mesh._id]; db.Set(xgroup); } }\ndelete mesh.invite; mesh.deleted = new Date(); db.Set(mesh); db.RemoveMeshDocuments(command.meshid);",
+        "edges": [
+          "meshuser.js:2287 (GetMeshRights==MESHRIGHT_ADMIN)"
+        ]
+      },
+      "entity": "Mesh",
+      "_binds": {
+        "meshid": "Mesh._id"
+      },
+      "_output_schema": {
+        "result": "'ok'"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Mesh",
+                "where": {
+                  "node": "field",
+                  "col": "_id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "meshid"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "meshid"
+        ],
+        "messages": {
+          "auth": "Sign in before doing that.",
+          "required": "A required argument was not provided.",
+          "not_found": "That record does not exist.",
+          "unique": "A record with that value already exists.",
+          "fk": "The parent record you referenced does not exist.",
+          "fk_missing": "A required parent reference is missing.",
+          "precondition": "You don't have permission to do that."
+        }
+      },
+      "description": "Delete a device group: soft-marks it deleted, unlinks every user/group membership and removes the nodes that belonged to it. Requires Mesh-Admin rights."
+    },
+    {
+      "tool": "mesh_inviteagent",
+      "op": "action",
+      "family": "action.emit",
+      "exec_spec": {
+        "channel": "event",
+        "record": {
+          "table": "MeshLog"
+        }
+      },
+      "input_schema": {
+        "meshid": {
+          "type": "text",
+          "description": "Id of the device group (mesh)."
+        },
+        "email": {
+          "type": "text",
+          "description": "The email address (lowercased)."
+        },
+        "name": {
+          "type": "text",
+          "description": "A display name."
+        },
+        "os": {
+          "type": "text",
+          "description": "The invitee's OS description."
+        },
+        "msg": {
+          "type": "text",
+          "description": "The event message to record."
+        },
+        "flags": {
+          "type": "int",
+          "description": "A behavior-flags bitmask."
+        },
+        "expire": {
+          "type": "int",
+          "description": "Lifetime (minutes / hours per tool)."
+        }
+      },
+      "_evidence": {
+        "locator": "meshuser.js:3614",
+        "id_local": "Mesh.inviteAgent",
+        "entry": {
+          "kind": "rpc",
+          "route": "action:inviteAgent",
+          "locator": "meshuser.js:3575"
+        },
+        "entity_why": "fell back to the entity prefix of id_local",
+        "ref_code": "if (parent.IsMeshViewable(user, mesh) == false) return;\nif (mesh.mtype != 2) return;\nif (domain.mailserver == null) return;\ndomain.mailserver.sendAgentInviteMail(domain, email, name, os, command.meshid, msg, flags, expire);",
+        "edges": [
+          "meshuser.js:3601 (IsMeshViewable + mtype 2 + mailserver configured)"
+        ]
+      },
+      "entity": "Mesh",
+      "_binds": {
+        "meshid": "Mesh._id"
+      },
+      "_output_schema": {
+        "result": "'ok'"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Mesh",
+                "where": {
+                  "node": "field",
+                  "col": "_id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "meshid"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "meshid",
+          "email"
+        ],
+        "messages": {
+          "auth": "Sign in before doing that.",
+          "required": "A required argument was not provided.",
+          "not_found": "That record does not exist.",
+          "unique": "A record with that value already exists.",
+          "fk": "The parent record you referenced does not exist.",
+          "fk_missing": "A required parent reference is missing.",
+          "precondition": "You don't have permission to do that."
+        }
+      },
+      "_defaulted": [
+        "entity (not taken from the primary effect: fell back to the entity prefix of id_local)"
+      ],
+      "description": "Email an agent-invite to a prospect, for an agent (mtype 2) mesh. Requires the mesh to be viewable."
+    },
+    {
+      "tool": "mesh_createinvitelink",
+      "op": "action",
+      "family": "action.emit",
+      "exec_spec": {
+        "channel": "event",
+        "record": {
+          "table": "MeshLog"
+        }
+      },
+      "input_schema": {
+        "meshid": {
+          "type": "text",
+          "description": "Id of the device group (mesh)."
+        },
+        "expire": {
+          "type": "int",
+          "description": "Lifetime (minutes / hours per tool)."
+        },
+        "flags": {
+          "type": "int",
+          "description": "A behavior-flags bitmask."
+        },
+        "agents": {
+          "type": "text",
+          "description": "Agent details for the invite link."
+        }
+      },
+      "_evidence": {
+        "locator": "meshuser.js:4276",
+        "id_local": "Mesh.createInviteLink",
+        "entry": {
+          "kind": "rpc",
+          "route": "action:createInviteLink",
+          "locator": "meshuser.js:4232"
+        },
+        "entity_why": "fell back to the entity prefix of id_local",
+        "ref_code": "var cookie = { a:4, mid:mesh._id, f:command.flags, expire:Date.now()+(command.expire*3600000) };\nvar c = encodeCookie(cookie, invitationLinkEncryptionKey); var url = 'agentinvite?c='+c; /* signed cookie, not persisted */",
+        "edges": [
+          "meshuser.js:4253 (IsMeshViewable)"
+        ]
+      },
+      "entity": "Mesh",
+      "_binds": {
+        "meshid": "Mesh._id"
+      },
+      "_output_schema": {
+        "link": "text",
+        "expire": "int"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Mesh",
+                "where": {
+                  "node": "field",
+                  "col": "_id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "meshid"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "meshid"
+        ],
+        "messages": {
+          "auth": "Sign in before doing that.",
+          "required": "A required argument was not provided.",
+          "not_found": "That record does not exist.",
+          "unique": "A record with that value already exists.",
+          "fk": "The parent record you referenced does not exist.",
+          "fk_missing": "A required parent reference is missing.",
+          "precondition": "You don't have permission to do that."
+        }
+      },
+      "_defaulted": [
+        "entity (not taken from the primary effect: fell back to the entity prefix of id_local)"
+      ],
+      "description": "Produce a signed agent-invitation link for a mesh. The link is signed, not stored."
+    },
+    {
+      "tool": "usergroup_create",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "UserGroup",
+        "fields": [
+          "name",
+          "desc",
+          "domain"
+        ],
+        "set_on_create": {
+          "type": "ugrp",
+          "links": {}
+        }
+      },
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "description": "The user group name."
+        },
+        "desc": {
+          "type": "text",
+          "description": "A description / note text."
+        },
+        "clone": {
+          "type": "text",
+          "description": "Id of a user group to clone links from."
+        },
+        "domain": {
+          "type": "text",
+          "description": "The domain id this record belongs to."
+        }
+      },
+      "_evidence": {
+        "locator": "meshuser.js:1644",
+        "id_local": "UserGroup.create",
+        "entry": {
+          "kind": "rpc",
+          "route": "action:createusergroup",
+          "locator": "meshuser.js:1586"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "if ((user.siteadmin & SITERIGHT_USERGROUPS)==0) { err='Permission denied' }\nvar ugrpid = 'ugrp/'+ugrpdomain.id+'/'+buf.toString('base64');\nvar ugrp = { type:'ugrp', _id:ugrpid, name:command.name, desc:command.desc??'', domain:ugrpdomain.id, links:{} };\ndb.Set(ugrp); parent.userGroups[ugrpid] = ugrp;",
+        "edges": [
+          "meshuser.js:1601 (siteadmin & SITERIGHT_USERGROUPS)"
+        ]
+      },
+      "entity": "UserGroup",
+      "_binds": {
+        "name": "UserGroup.name",
+        "desc": "UserGroup.desc",
+        "domain": "UserGroup.domain"
+      },
+      "_output_schema": {
+        "result": "'ok'"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "siteadmin",
+                      "op": "ne",
+                      "value": 0
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "name"
+        ],
+        "messages": {
+          "auth": "Sign in before doing that.",
+          "required": "A required argument was not provided.",
+          "not_found": "That record does not exist.",
+          "unique": "A record with that value already exists.",
+          "fk": "The parent record you referenced does not exist.",
+          "fk_missing": "A required parent reference is missing.",
+          "precondition": "You don't have permission to do that."
+        }
+      },
+      "description": "Create a user group that bundles device rights. Requires user-group rights."
+    },
+    {
+      "tool": "usergroup_edit",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "UserGroup",
+        "row_key": {
+          "_id": {
+            "$arg": "ugrpid"
+          }
+        },
+        "fields": [
+          "name",
+          "desc",
+          "consent",
+          "flags"
+        ]
+      },
+      "input_schema": {
+        "ugrpid": {
+          "type": "int",
+          "description": "Id of the user group."
+        },
+        "name": {
+          "type": "text",
+          "description": "The user group name."
+        },
+        "desc": {
+          "type": "text",
+          "description": "A description / note text."
+        },
+        "consent": {
+          "type": "int",
+          "description": "Consent-mode rights bitmask (0 removes)."
+        },
+        "flags": {
+          "type": "int",
+          "description": "A behavior-flags bitmask."
+        }
+      },
+      "_evidence": {
+        "locator": "meshuser.js:1815",
+        "id_local": "UserGroup.edit",
+        "entry": {
+          "kind": "rpc",
+          "route": "action:editusergroup",
+          "locator": "meshuser.js:1790"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "if ((user.siteadmin & SITERIGHT_USERGROUPS)==0) { err='Permission denied' }\n...group.consent = command.consent; group.flags = command.flags; db.Set(group);",
+        "edges": [
+          "meshuser.js:1792 (siteadmin & SITERIGHT_USERGROUPS)"
+        ]
+      },
+      "entity": "UserGroup",
+      "_binds": {
+        "ugrpid": "UserGroup._id",
+        "name": "UserGroup.name",
+        "desc": "UserGroup.desc",
+        "consent": "UserGroup.consent",
+        "flags": "UserGroup.flags"
+      },
+      "_output_schema": {
+        "result": "'ok'"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "siteadmin",
+                      "op": "ne",
+                      "value": 0
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "ugrpid"
+        ],
+        "messages": {
+          "auth": "Sign in before doing that.",
+          "required": "A required argument was not provided.",
+          "not_found": "That record does not exist.",
+          "unique": "A record with that value already exists.",
+          "fk": "The parent record you referenced does not exist.",
+          "fk_missing": "A required parent reference is missing.",
+          "precondition": "You don't have permission to do that."
+        }
+      },
+      "description": "Edit a user group's name, description, consent or flags. Requires user-group rights."
+    },
+    {
+      "tool": "usergroup_delete",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "UserGroup",
+        "lookup_by": {
+          "_id": {
+            "$arg": "ugrpid"
+          }
+        }
+      },
+      "input_schema": {
+        "ugrpid": {
+          "type": "int",
+          "description": "Id of the user group."
+        }
+      },
+      "_evidence": {
+        "locator": "meshuser.js:1775",
+        "id_local": "UserGroup.delete",
+        "entry": {
+          "kind": "rpc",
+          "route": "action:deleteusergroup",
+          "locator": "meshuser.js:1703"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "if ((user.siteadmin & SITERIGHT_USERGROUPS)==0) { err='Permission denied' }\n...db.Remove(group._id); delete parent.userGroups[group._id];",
+        "edges": [
+          "meshuser.js:1707 (siteadmin & SITERIGHT_USERGROUPS)"
+        ]
+      },
+      "entity": "UserGroup",
+      "_binds": {
+        "ugrpid": "UserGroup._id"
+      },
+      "_output_schema": {
+        "result": "'ok'"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "_id",
+                      "op": "eq",
+                      "value": {
+                        "actor": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "siteadmin",
+                      "op": "ne",
+                      "value": 0
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "requires_auth": true,
+        "required": [
+          "ugrpid"
+        ],
+        "messages": {
+          "auth": "Sign in before doing that.",
+          "required": "A required argument was not provided.",
+          "not_found": "That record does not exist.",
+          "unique": "A record with that value already exists.",
+          "fk": "The parent record you referenced does not exist.",
+          "fk_missing": "A required parent reference is missing.",
+          "precondition": "You don't have permission to do that."
+        }
+      },
+      "description": "Delete a user group and unlink it from all users and meshes. Requires user-group rights."
+    },
+    {
+      "tool": "node_addlocal",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Node",
+        "fields": {
+          "meshid": {
+            "$arg": "meshid"
+          },
+          "name": {
+            "$arg": "devicename"
+          },
+          "host": {
+            "$arg": "hostname"
+          },
+          "agent": {
+            "$arg": "type"
+          }
+        },
+        "set_on_create": {
+          "type": "node",
+          "mtype": 3,
+          "icon": 1,
+          "domain": {
+            "$session": "domain"
+          }
+        }
+      },
+      "input_schema": {
+        "meshid": {
+          "type": "text",
+          "description": "Id of the device group (mesh)."
+        },
+        "devicename": {
+          "type": "text",
+          "description": "The device's display name."
+        },
+        "hostname": {
+          "type": "text",
+          "description": "The device's host name."
+        },
+        "type": {
+          "type": "int",
+          "description": "A type code."
+        }
+      },
+      "_evidence": {
+        "locator": "meshuser.js:2663",
+        "id_local": "Node.addLocal",
+        "entry": {
+          "kind": "rpc",
+          "route": "action:addlocaldevice",
+          "locator": "meshuser.js:2633"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "if (mesh.mtype != 3) { err='This action is only valid for local device meshes' }\nvar device = { _id:nodeid, type:'node', meshid:command.meshid, mtype:3, icon:1, name:command.devicename, host:command.hostname, domain:domain.id, agent:{ id:command.type, caps:0 } }; db.Set(device);",
+        "edges": [
+          "meshuser.js:2647-2648 (mtype==3 + MESHRIGHT_MANAGECOMPUTERS)"
+        ]
+      },
+      "entity": "Node",
+      "_binds": {
+        "meshid": "Mesh._id",
+        "devicename": "Node.name",
+        "hostname": "Node.host",
+        "type": "Node.agent"
+      },
+      "_output_schema": {
+        "result": "'ok'",
+        "nodeid": "text"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Mesh",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "_id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "meshid"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "mtype",
+                      "op": "eq",
+                      "value": 3
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "meshid",
+          "devicename",
+          "hostname",
+          "type"
+        ],
+        "messages": {
+          "auth": "Sign in before doing that.",
+          "required": "A required argument was not provided.",
+          "not_found": "That record does not exist.",
+          "unique": "A record with that value already exists.",
+          "fk": "The parent record you referenced does not exist.",
+          "fk_missing": "A required parent reference is missing.",
+          "precondition": "You don't have permission to do that."
+        }
+      },
+      "_defaulted": [
+        "fields (mapped to the real parameter names via binds)"
+      ],
+      "description": "Add a device record to a local-device (mtype 3) mesh. Fails unless the mesh is a local-device group."
+    },
+    {
+      "tool": "node_addamt",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Node",
+        "fields": {
+          "meshid": {
+            "$arg": "meshid"
+          },
+          "name": {
+            "$arg": "devicename"
+          },
+          "host": {
+            "$arg": "hostname"
+          },
+          "intelamt": {
+            "$arg": "intelamt"
+          }
+        },
+        "set_on_create": {
+          "type": "node",
+          "mtype": 1,
+          "icon": 1,
+          "domain": {
+            "$session": "domain"
+          }
+        }
+      },
+      "input_schema": {
+        "meshid": {
+          "type": "text",
+          "description": "Id of the device group (mesh)."
+        },
+        "devicename": {
+          "type": "text",
+          "description": "The device's display name."
+        },
+        "hostname": {
+          "type": "text",
+          "description": "The device's host name."
+        },
+        "amtusername": {
+          "type": "text",
+          "description": "Intel-AMT user."
+        },
+        "amtpassword": {
+          "type": "text",
+          "description": "Intel-AMT password."
+        },
+        "amttls": {
+          "type": "text",
+          "description": "Use TLS for Intel-AMT."
+        }
+      },
+      "_evidence": {
+        "locator": "meshuser.js:2710",
+        "id_local": "Node.addAMT",
+        "entry": {
+          "kind": "rpc",
+          "route": "action:addamtdevice",
+          "locator": "meshuser.js:2672"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "if (mesh.mtype != 1) { err='Only valid for AMT agentless meshes' }\nvar device = { _id:nodeid, type:'node', meshid:command.meshid, mtype:1, icon:1, name:command.devicename, host:command.hostname, domain:domain.id, intelamt:{ user:command.amtusername, pass:command.amtpassword, tls:command.amttls } }; db.Set(device);",
+        "edges": [
+          "meshuser.js:2690-2692 (mtype==1 + MESHRIGHT_MANAGECOMPUTERS)"
+        ]
+      },
+      "entity": "Node",
+      "_binds": {
+        "meshid": "Mesh._id",
+        "devicename": "Node.name",
+        "hostname": "Node.host",
+        "amtusername": "Node.intelamt",
+        "amtpassword": "Node.intelamt",
+        "amttls": "Node.intelamt",
+        "state": "Node.intelamt",
+        "ver": "Node.intelamt",
+        "hash": "Node.intelamt",
+        "realm": "Node.intelamt"
+      },
+      "_output_schema": {
+        "result": "'ok'",
+        "nodeid": "text"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Mesh",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "_id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "meshid"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "mtype",
+                      "op": "eq",
+                      "value": 1
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "meshid",
+          "devicename",
+          "hostname",
+          "amtusername",
+          "amtpassword"
+        ],
+        "messages": {
+          "auth": "Sign in before doing that.",
+          "required": "A required argument was not provided.",
+          "not_found": "That record does not exist.",
+          "unique": "A record with that value already exists.",
+          "fk": "The parent record you referenced does not exist.",
+          "fk_missing": "A required parent reference is missing.",
+          "precondition": "You don't have permission to do that."
+        }
+      },
+      "_defaulted": [
+        "fields (mapped to the real parameter names via binds)"
+      ],
+      "description": "Add an AMT agentless device (with its Intel-AMT credentials) to an AMT (mtype 1) mesh. Fails unless the mesh is an AMT group."
+    },
+    {
+      "tool": "node_update",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Node",
+        "row_key": {
+          "_id": {
+            "$arg": "nodeid"
+          }
+        },
+        "fields": [
+          "icon",
+          "name",
+          "host",
+          "consent",
+          "rdpport",
+          "rfbport",
+          "sshport",
+          "httpport",
+          "httpsport",
+          "rdp",
+          "ssh",
+          "desc",
+          "tags",
+          "userloc",
+          "intelamt"
+        ]
+      },
+      "input_schema": {
+        "nodeid": {
+          "type": "text",
+          "description": "Id of the device to act on."
+        },
+        "icon": {
+          "type": "int",
+          "description": "A device icon index."
+        },
+        "name": {
+          "type": "text",
+          "description": "A display name."
+        },
+        "host": {
+          "type": "text",
+          "description": "The device's host name."
+        },
+        "consent": {
+          "type": "int",
+          "description": "Consent-mode rights bitmask (0 removes)."
+        },
+        "rdpport": {
+          "type": "int",
+          "description": "RDP port override."
+        },
+        "rfbport": {
+          "type": "int",
+          "description": "VNC/RFB port override."
+        },
+        "sshport": {
+          "type": "int",
+          "description": "SSH port override."
+        },
+        "httpport": {
+          "type": "int",
+          "description": "HTTP port override."
+        },
+        "httpsport": {
+          "type": "int",
+          "description": "HTTPS port override."
+        },
+        "rdp": {
+          "type": "text",
+          "description": "Per-device RDP credentials."
+        },
+        "ssh": {
+          "type": "text",
+          "description": "Per-device SSH credentials."
+        },
+        "desc": {
+          "type": "text",
+          "description": "A description / note text."
+        },
+        "tags": {
+          "type": "text",
+          "description": "Tags (array of strings) for the device."
+        },
+        "userloc": {
+          "type": "text",
+          "description": "User-location 'lat,lng,epoch'."
+        },
+        "amtuser": {
+          "type": "text",
+          "description": "Intel-AMT user."
+        },
+        "amtpass": {
+          "type": "text",
+          "description": "Intel-AMT password."
+        },
+        "amttls": {
+          "type": "text",
+          "description": "Use TLS for Intel-AMT."
+        },
+        "intelamt": {
+          "type": "text",
+          "description": "Intel-AMT settings."
+        }
+      },
+      "_evidence": {
+        "locator": "meshuser.js:3511",
+        "id_local": "Node.update",
+        "entry": {
+          "kind": "rpc",
+          "route": "action:changedevice",
+          "locator": "meshuser.js:3374"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "if ((rights & MESHRIGHT_MANAGECOMPUTERS)==0) return;\nif (command.name != null) { node.name = command.name; }\n...node.consent = command.consent; db.Set(parent.cleanDevice(node));",
+        "edges": [
+          "meshuser.js:3397 (GetNodeWithRights & MESHRIGHT_MANAGECOMPUTERS)"
+        ]
+      },
+      "entity": "Node",
+      "_binds": {
+        "nodeid": "Node._id",
+        "icon": "Node.icon",
+        "name": "Node.name",
+        "host": "Node.host",
+        "consent": "Node.consent",
+        "rdpport": "Node.rdpport",
+        "rfbport": "Node.rfbport",
+        "sshport": "Node.sshport",
+        "httpport": "Node.httpport",
+        "httpsport": "Node.httpsport",
+        "rdp": "Node.rdp",
+        "ssh": "Node.ssh",
+        "desc": "Node.desc",
+        "tags": "Node.tags",
+        "userloc": "Node.userloc",
+        "amtuser": "Node.intelamt",
+        "amtpass": "Node.intelamt",
+        "amttls": "Node.intelamt"
+      },
+      "_output_schema": {
+        "result": "'ok'"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Node",
+                "where": {
+                  "node": "field",
+                  "col": "_id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "nodeid"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "nodeid"
+        ],
+        "messages": {
+          "auth": "Sign in before doing that.",
+          "required": "A required argument was not provided.",
+          "not_found": "That record does not exist.",
+          "unique": "A record with that value already exists.",
+          "fk": "The parent record you referenced does not exist.",
+          "fk_missing": "A required parent reference is missing.",
+          "precondition": "You don't have permission to do that."
+        }
+      },
+      "_defaulted": [
+        "argument invented from the write column"
+      ],
+      "description": "Edit a device's name, icon, ports, tags, description, AMT credentials or per-device settings. Requires Manage-Computers rights."
+    },
+    {
+      "tool": "node_remove",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "Node",
+        "lookup_by": {
+          "_id": {
+            "$arg": "nodeid"
+          }
+        },
+        "on_child": "cascade"
+      },
+      "input_schema": {
+        "nodeid": {
+          "type": "text",
+          "required": true,
+          "description": "Id of the device to remove."
+        }
+      },
+      "_evidence": {
+        "locator": "meshuser.js:2895",
+        "id_local": "Node.remove",
+        "entry": {
+          "kind": "rpc",
+          "route": "action:removedevices",
+          "locator": "meshuser.js:2860"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "if ((rights & MESHRIGHT_UNINSTALL)==0) return;\ndb.Remove(node._id); db.Remove('if'+id); db.Remove('nt'+id); db.Remove('lc'+id); db.Remove('si'+id); db.Remove('al'+id);\nRemoveSMBIOS(id); RemoveAllNodeEvents(domain.id,id); removeAllPowerEventsForNode(id); ...",
+        "edges": [
+          "meshuser.js:2879 (GetNodeWithRights & MESHRIGHT_UNINSTALL)"
+        ]
+      },
+      "entity": "Node",
+      "_binds": {
+        "nodeids": "Node._id"
+      },
+      "_output_schema": {
+        "result": "'ok'"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Node",
+                "where": {
+                  "node": "field",
+                  "col": "_id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "nodeid"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "nodeid"
+        ],
+        "messages": {
+          "auth": "Sign in before doing that.",
+          "required": "A required argument was not provided.",
+          "not_found": "That record does not exist.",
+          "unique": "A record with that value already exists.",
+          "fk": "The parent record you referenced does not exist.",
+          "fk_missing": "A required parent reference is missing.",
+          "precondition": "You don't have permission to do that.",
+          "on_child": "That device is still referenced; remove cannot continue."
+        }
+      },
+      "description": "Remove devices from the server, deleting their notes, interface/sysinfo/last-connect records, power events and links. Requires Uninstall rights."
+    },
+    {
+      "tool": "node_setnotes",
+      "op": "update",
+      "family": "crud.upsert",
+      "exec_spec": {
+        "entity": "NodeNote",
+        "key": {
+          "_id": {
+            "$arg": "nodeid"
+          }
+        },
+        "insert_fields": {
+          "value": {
+            "$arg": "notes"
+          }
+        },
+        "set_on_exists": {}
+      },
+      "input_schema": {
+        "nodeid": {
+          "type": "int",
+          "description": "Id of the device to act on."
+        },
+        "notes": {
+          "type": "text",
+          "description": "The note text to store (empty clears it)."
+        }
+      },
+      "_evidence": {
+        "locator": "meshuser.js:3655",
+        "id_local": "Node.setNotes",
+        "entry": {
+          "kind": "rpc",
+          "route": "action:setNotes",
+          "locator": "meshuser.js:3638"
+        },
+        "entity_why": "primary effect row_upsert lands on this table",
+        "ref_code": "if (idtype == 'node') { if ((rights & MESHRIGHT_SETNOTES)==0) { err='Permission denied' } }\nif (command.notes != null) { db.Set({ _id:'nt'+node._id, type:'note', value:command.notes }); } else { db.Remove('nt'+node._id); }",
+        "edges": [
+          "meshuser.js:3650 (GetNodeWithRights & MESHRIGHT_SETNOTES)"
+        ]
+      },
+      "entity": "NodeNote",
+      "_binds": {
+        "nodeid": "Node._id",
+        "notes": "NodeNote.value"
+      },
+      "_output_schema": {
+        "result": "'ok'"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Node",
+                "where": {
+                  "node": "field",
+                  "col": "_id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "nodeid"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "nodeid",
+          "notes"
+        ],
+        "messages": {
+          "auth": "Sign in before doing that.",
+          "required": "A required argument was not provided.",
+          "not_found": "That record does not exist.",
+          "unique": "A record with that value already exists.",
+          "fk": "The parent record you referenced does not exist.",
+          "fk_missing": "A required parent reference is missing.",
+          "precondition": "You don't have permission to do that."
+        }
+      },
+      "_defaulted": [
+        "fields (mapped to the real parameter names via binds)"
+      ],
+      "description": "Set or clear (notes empty) the note attached to a device. Requires Set-Notes rights."
+    },
+    {
+      "tool": "node_deletenotes",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "NodeNote",
+        "lookup_by": {
+          "_id": {
+            "$arg": "nodeid"
+          }
+        }
+      },
+      "input_schema": {
+        "nodeid": {
+          "type": "text",
+          "description": "Id of the device to act on."
+        }
+      },
+      "_evidence": {
+        "locator": "meshuser.js:3668",
+        "id_local": "Node.deleteNotes",
+        "entry": {
+          "kind": "rpc",
+          "route": "action:setNotes",
+          "locator": "meshuser.js:3665"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "db.Remove('nt'+node._id);",
+        "edges": [
+          "meshuser.js:3650 (GetNodeWithRights & MESHRIGHT_SETNOTES)"
+        ]
+      },
+      "entity": "NodeNote",
+      "_binds": {
+        "nodeid": "Node._id"
+      },
+      "_output_schema": {
+        "result": "'ok'"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Node",
+                "where": {
+                  "node": "field",
+                  "col": "_id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "nodeid"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "nodeid"
+        ],
+        "messages": {
+          "auth": "Sign in before doing that.",
+          "required": "A required argument was not provided.",
+          "not_found": "That record does not exist.",
+          "unique": "A record with that value already exists.",
+          "fk": "The parent record you referenced does not exist.",
+          "fk_missing": "A required parent reference is missing.",
+          "precondition": "You don't have permission to do that."
+        }
+      },
+      "description": "Delete a device's note."
+    },
+    {
+      "tool": "node_getnotes",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "NodeNote",
+        "lookup_by": {
+          "_id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "int",
+          "description": "Id of the device to act on."
+        }
+      },
+      "_evidence": {
+        "locator": "meshuser.js:4190",
+        "id_local": "Node.getNotes",
+        "entry": {
+          "kind": "rpc",
+          "route": "action:getNotes",
+          "locator": "meshuser.js:4186"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "if (visible == true) { db.Get('nt'+id, function (err,docs){ var note = (docs&&docs.length==1)?docs[0].value:null; obj.send({action:'getNotes',responseid:command.responseid,nodeid:command.id,notes:note}); }); }"
+      },
+      "entity": "NodeNote",
+      "_binds": {
+        "id": "Node._id"
+      },
+      "_output_schema": {
+        "notes": "text"
+      },
+      "guards": {
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "Sign in before doing that.",
+          "required": "A required argument was not provided.",
+          "not_found": "That record does not exist.",
+          "unique": "A record with that value already exists.",
+          "fk": "The parent record you referenced does not exist.",
+          "fk_missing": "A required parent reference is missing.",
+          "precondition": "You don't have permission to do that."
+        }
+      },
+      "description": "Read the note attached to a device."
+    },
+    {
+      "tool": "node_setdeviceevent",
+      "op": "action",
+      "family": "action.emit",
+      "exec_spec": {
+        "channel": "eventlog",
+        "record": {
+          "table": "Event"
+        }
+      },
+      "input_schema": {
+        "nodeid": {
+          "type": "text",
+          "description": "Id of the device to act on."
+        },
+        "msg": {
+          "type": "text",
+          "description": "The event message to record."
+        }
+      },
+      "_evidence": {
+        "locator": "meshuser.js:3635",
+        "id_local": "Node.setDeviceEvent",
+        "entry": {
+          "kind": "rpc",
+          "route": "action:setDeviceEvent",
+          "locator": "meshuser.js:3620"
+        },
+        "entity_why": "primary effect dispatch lands on this table",
+        "ref_code": "parent.parent.DispatchEvent(['*',node.meshid,node._id], obj, { action:'manual', type:'node', nodeid:node._id, msg:command.msg, domain:domain.id, ... });",
+        "edges": [
+          "meshuser.js:3629 (GetNodeWithRights nonzero rights)"
+        ]
+      },
+      "entity": "Event",
+      "_binds": {
+        "nodeid": "Node._id"
+      },
+      "_output_schema": {
+        "result": "'ok'"
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Node",
+                "where": {
+                  "node": "field",
+                  "col": "_id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "nodeid"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "nodeid",
+          "msg"
+        ],
+        "messages": {
+          "auth": "Sign in before doing that.",
+          "required": "A required argument was not provided.",
+          "not_found": "That record does not exist.",
+          "unique": "A record with that value already exists.",
+          "fk": "The parent record you referenced does not exist.",
+          "fk_missing": "A required parent reference is missing.",
+          "precondition": "You don't have permission to do that."
+        }
+      },
+      "description": "Record a manual event against a device, visible to anyone with nonzero rights on it."
+    },
+    {
+      "tool": "event_getevents",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Event",
+        "scope": {
+          "owner_col": "userid"
+        },
+        "search_fields": [
+          "domain",
+          "userid",
+          "nodeid"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "domain",
+            "userid",
+            "nodeid"
+          ]
+        },
+        "pagination": {
+          "default_limit": 20
+        }
+      },
+      "input_schema": {
+        "userid": {
+          "type": "int",
+          "description": "Id of a user to filter on."
+        },
+        "nodeid": {
+          "type": "int",
+          "description": "Id of the device to act on."
+        },
+        "limit": {
+          "type": "int",
+          "description": "Max rows to return."
+        }
+      },
+      "_evidence": {
+        "locator": "meshuser.js:1224",
+        "id_local": "Event.getEvents",
+        "entry": {
+          "kind": "rpc",
+          "route": "action:events",
+          "locator": "meshuser.js:1094"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "if ((user.siteadmin & 1)==0 || ...) { /* scoped */ }\nobj.db.GetEvents(ids, domain.id, ...); obj.send({action:'events', responseid:command.responseid, events:docs});"
+      },
+      "entity": "Event",
+      "_binds": {
+        "userid": "Event.userid",
+        "nodeid": "Event.nodeid"
+      },
+      "_output_schema": {
+        "events": "list of Event docs"
+      },
+      "description": "List audit events, either your own or (as a site admin) across the site, filtered by user or device.",
+      "guards": {
+        "messages": {
+          "auth": "Sign in before doing that.",
+          "required": "A required argument was not provided.",
+          "not_found": "That record does not exist.",
+          "unique": "A record with that value already exists.",
+          "fk": "The parent record you referenced does not exist.",
+          "fk_missing": "A required parent reference is missing.",
+          "precondition": "You don't have permission to do that."
+        }
+      }
+    },
+    {
+      "tool": "event_gettimeline",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "PowerEvent",
+        "scope": {
+          "owner_col": "nodeid"
+        },
+        "search_fields": [
+          "nodeid"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "nodeid"
+          ]
+        }
+      },
+      "input_schema": {
+        "nodeid": {
+          "type": "int",
+          "description": "Id of the device to act on."
+        }
+      },
+      "_evidence": {
+        "locator": "meshuser.js:6920",
+        "id_local": "Event.getTimeline",
+        "entry": {
+          "kind": "rpc",
+          "route": "action:powertimeline",
+          "locator": "meshuser.js:6906"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "if (visible != true) return;\nobj.db.getPowerTimeline(node._id, function(err,docs){ ... compacted timeline ... });"
+      },
+      "entity": "PowerEvent",
+      "_binds": {
+        "nodeid": "PowerEvent.nodeid"
+      },
+      "_output_schema": {
+        "timeline": "list of power states"
+      },
+      "guards": {
+        "required": [
+          "nodeid"
+        ],
+        "messages": {
+          "auth": "Sign in before doing that.",
+          "required": "A required argument was not provided.",
+          "not_found": "That record does not exist.",
+          "unique": "A record with that value already exists.",
+          "fk": "The parent record you referenced does not exist.",
+          "fk_missing": "A required parent reference is missing.",
+          "precondition": "You don't have permission to do that."
+        }
+      },
+      "description": "Read a device's power-state timeline."
+    },
+    {
+      "tool": "usergroup_add_user",
+      "op": "create",
+      "family": "crud.insert",
+      "entity": "UserGroupMember",
+      "description": "Add users to a user group, granting the group's device rights. Requires user-group rights.",
+      "input_schema": {
+        "ugrpid": {
+          "type": "text",
+          "required": true,
+          "description": "Id of the user group to add members to."
+        },
+        "usernames": {
+          "type": "text",
+          "required": true,
+          "description": "Usernames of the users to add (one or more)."
+        },
+        "rights": {
+          "type": "text",
+          "required": false,
+          "description": "User-group rights bitmask to grant."
+        },
+        "remove": {
+          "type": "text",
+          "required": false,
+          "description": "When true, remove the membership instead of adding it."
+        }
+      },
+      "exec_spec": {
+        "entity": "UserGroupMember",
+        "multi": {
+          "arg": "usernames",
+          "bind": "username"
+        },
+        "fields": {
+          "ugrpid": {
+            "$arg": "ugrpid"
+          },
+          "username": {
+            "$arg": "usernames"
+          },
+          "rights": {
+            "$arg": "rights"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "UserGroup",
+                "where": {
+                  "node": "field",
+                  "col": "_id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "ugrpid"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in before managing members.",
+          "precondition": "You do not have user-group rights.",
+          "not_found": "That record does not exist."
+        }
+      },
+      "_evidence": {
+        "locator": "meshuser.js:6380",
+        "id_local": "User.addUserToUserGroup",
+        "entry": {
+          "kind": "rpc",
+          "locator": "meshuser.js:6380"
+        },
+        "ref_code": "if (chguser.links == null) { chguser.links = {}; } chguser.links[group._id] = { rights: 1 }; db.SetUser(chguser);\ngroup.links[chguserid] = { userid: chguser._id, name: chguser.name, rights: 1 };",
+        "edges": [
+          "meshuser.js:6380 (You do not have user-group rights.)"
+        ]
+      }
+    },
+    {
+      "tool": "mesh_add_user",
+      "op": "create",
+      "family": "crud.insert",
+      "entity": "MeshMember",
+      "description": "Add users to a device group (mesh) with the given mesh rights. Requires Manage-Users rights on the group.",
+      "input_schema": {
+        "meshid": {
+          "type": "text",
+          "required": true,
+          "description": "Id of the device group to add members to."
+        },
+        "usernames": {
+          "type": "text",
+          "required": true,
+          "description": "Usernames of the users to add (one or more)."
+        },
+        "rights": {
+          "type": "text",
+          "required": false,
+          "description": "Mesh-rights bitmask to grant."
+        },
+        "remove": {
+          "type": "text",
+          "required": false,
+          "description": "When true, remove the membership instead of adding it."
+        }
+      },
+      "exec_spec": {
+        "entity": "MeshMember",
+        "multi": {
+          "arg": "usernames",
+          "bind": "username"
+        },
+        "fields": {
+          "mesh_id": {
+            "$arg": "meshid"
+          },
+          "username": {
+            "$arg": "usernames"
+          },
+          "rights": {
+            "$arg": "rights"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Mesh",
+                "where": {
+                  "node": "field",
+                  "col": "_id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "meshid"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in before managing members.",
+          "precondition": "You do not have Manage-Users rights on this device group.",
+          "not_found": "That record does not exist."
+        }
+      },
+      "_evidence": {
+        "locator": "meshuser.js:6034",
+        "id_local": "Mesh.addMeshUser",
+        "entry": {
+          "kind": "rpc",
+          "locator": "meshuser.js:6034"
+        },
+        "ref_code": "if ((GetMeshRights(user,mesh) & MESHRIGHT_MANAGEUSERS)==0) { err='Permission denied' }\n...if (command.remove === true) { delete newuser.links[command.meshid]; }\nelse { if (newuser.links == null) { newuser.links = {}; } newuser.links[command.meshid] = { rights:command.meshadmin }; }\ndb.SetUser(newuser); ... mesh.links[newuserid] = { name:newuser.name, rights:command.meshadmin }; db.Set(mesh);",
+        "edges": [
+          "meshuser.js:6034 (You do not have Manage-Users rights on this device group.)"
+        ]
+      }
+    },
+    {
+      "tool": "node_add_user",
+      "op": "create",
+      "family": "crud.insert",
+      "entity": "DeviceUser",
+      "description": "Add users to a device's user list with the given rights. Requires Manage-Users rights.",
+      "input_schema": {
+        "nodeid": {
+          "type": "text",
+          "required": true,
+          "description": "Id of the device to add members to."
+        },
+        "usernames": {
+          "type": "text",
+          "required": true,
+          "description": "Usernames of the users to add (one or more)."
+        },
+        "rights": {
+          "type": "text",
+          "required": false,
+          "description": "Device-rights bitmask to grant."
+        },
+        "remove": {
+          "type": "text",
+          "required": false,
+          "description": "When true, remove the membership instead of adding it."
+        }
+      },
+      "exec_spec": {
+        "entity": "DeviceUser",
+        "multi": {
+          "arg": "usernames",
+          "bind": "username"
+        },
+        "fields": {
+          "node_id": {
+            "$arg": "nodeid"
+          },
+          "username": {
+            "$arg": "usernames"
+          },
+          "rights": {
+            "$arg": "rights"
+          }
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Node",
+                "where": {
+                  "node": "field",
+                  "col": "_id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "nodeid"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "Sign in before managing members.",
+          "precondition": "You do not have Manage-Users rights on this device.",
+          "not_found": "That record does not exist."
+        }
+      },
+      "_evidence": {
+        "locator": "meshuser.js:6018",
+        "id_local": "Node.addDeviceUser",
+        "entry": {
+          "kind": "rpc",
+          "locator": "meshuser.js:6018"
+        },
+        "ref_code": "if ((rights & MESHRIGHT_MANAGEUSERS)==0) return;\nif (command.remove === true) { delete newuser.links[command.nodeid]; delete node.links[newuserid]; }\nelse { if (newuser.links==null) newuser.links={}; newuser.links[command.nodeid]={ rights:command.rights }; if (node.links==null) node.links={}; node.links[newuserid]={ rights:command.rights }; }\ndb.SetUser(newuser); db.Set(parent.cleanDevice(node));",
+        "edges": [
+          "meshuser.js:6018 (You do not have Manage-Users rights on this device.)"
+        ]
+      }
+    }
+  ],
+  "seed_state": {
+    "User": [
+      {
+        "id": 1,
+        "_id": 1,
+        "name": "ops@meshcentral.example",
+        "domain": "meshcentral",
+        "email": "ops@meshcentral.example",
+        "salt": "s",
+        "hash": "pw-operations",
+        "type": "user",
+        "creation": "2024-01-01T00:00:00",
+        "siteadmin": -1,
+        "emailVerified": true
+      },
+      {
+        "id": 2,
+        "_id": 2,
+        "name": "member@meshcentral.example",
+        "domain": "meshcentral",
+        "email": "member@meshcentral.example",
+        "salt": "s",
+        "hash": "pw-member",
+        "type": "user",
+        "creation": "2024-01-02T00:00:00",
+        "siteadmin": 0,
+        "emailVerified": true
+      }
+    ],
+    "Mesh": [
+      {
+        "id": 1010,
+        "_id": 1010,
+        "name": "Office",
+        "mtype": 2,
+        "domain": "meshcentral",
+        "type": "mesh",
+        "creatorid": 1,
+        "creatorname": "ops@meshcentral.example",
+        "links": {
+          "1": {
+            "rights": 4294967295
+          }
+        },
+        "creation": "2024-01-03T00:00:00"
+      },
+      {
+        "id": 1011,
+        "_id": 1011,
+        "name": "AMT Lab",
+        "mtype": 1,
+        "domain": "meshcentral",
+        "type": "mesh",
+        "creatorid": 1,
+        "creatorname": "ops@meshcentral.example",
+        "links": {
+          "1": {
+            "rights": 4294967295
+          }
+        },
+        "creation": "2024-01-04T00:00:00"
+      }
+    ],
+    "Node": [
+      {
+        "id": 2001,
+        "_id": 2001,
+        "name": "Server-A",
+        "type": "node",
+        "meshid": 1010,
+        "domain": "meshcentral",
+        "mtype": 2,
+        "icon": 1,
+        "host": "server-a",
+        "links": {
+          "2": {
+            "rights": 4
+          }
+        },
+        "firstconnect": "2024-01-05T00:00:00"
+      }
+    ],
+    "UserGroup": [
+      {
+        "id": 3001,
+        "_id": 3001,
+        "name": "Operators",
+        "type": "ugrp",
+        "domain": "meshcentral",
+        "links": {}
+      }
+    ]
+  },
+  "summary": "MeshCentral is a self-hosted remote computer management server (remote desktop, terminal, file access, device monitoring). It persists user accounts, device groups (meshes), user groups, remote devices (nodes), guest device-share links, login tokens, and event/power/plugin/config delta and audit logs in a document store (NeDB/SQLite/Postgres/Mongo/AceBase backends), and exposes a JSON websocket command channel ('action:*' commands) plus HTTP/web endpoints whose handlers create, edit, link and delete those records and read them back.",
+  "_auth_candidates": [
+    {
+      "entity": "User",
+      "username_col": "name",
+      "password_col": "hash"
+    }
+  ],
+  "_session_fields": [
+    "domain"
+  ],
+  "_fk_gravity": {
+    "entity": "Node",
+    "fk_count": 5
+  },
+  "_read_denied": "not_found",
+  "_no_edges": [
+    {
+      "id_local": "Node.updateByAgent",
+      "why": "agent-authenticated websocket write; guarded by agent WS auth, no per-user wall (meshagent.js:805)"
+    },
+    {
+      "id_local": "Node.ifinfoSet",
+      "why": "agent-authenticated websocket write via agent WS auth (meshagent.js:1301)"
+    },
+    {
+      "id_local": "Node.sysinfoSet",
+      "why": "agent-authenticated websocket write via agent WS auth (meshagent.js:1422)"
+    },
+    {
+      "id_local": "Node.connectivityState",
+      "why": "system-internal, called by SetConnectivityState/connect/disconnect, no user wall (meshcentral.js:2765)"
+    },
+    {
+      "id_local": "Node.getNotes",
+      "why": "read op (non-mutating) with no edge; returns the node note, guarded only by node visibility (meshuser.js:4186)"
+    },
+    {
+      "id_local": "Event.store",
+      "why": "internal dispatch/StoreEvent; caller is DispatchEvent, no user-facing wall (db.js:1721)"
+    },
+    {
+      "id_local": "ServerStats.set",
+      "why": "internal metrics collector on timer; no user-facing wall (db.js:1872)"
+    },
+    {
+      "id_local": "Plugin.addPlugin",
+      "why": "internal db.js function; called by pluginHandler.addPlugin which is itself reached from admin-gated commands; no edge of its own (db.js:3214)"
+    },
+    {
+      "id_local": "Plugin.setStatus",
+      "why": "internal db.js function called by pluginHandler disable/enable; the admin wall (siteadmin==SITERIGHT_ADMIN) lives at the command layer upstream, not here (db.js:1896)"
+    },
+    {
+      "id_local": "PluginPermission.set",
+      "why": "internal db.js function called by pluginHandler; admin wall lives at the command layer upstream (db.js:1898)"
+    },
+    {
+      "id_local": "ConfigFile.set",
+      "why": "internal, from CLI args (dbsetconfigfile), no user fence (db.js:1879)"
+    },
+    {
+      "id_local": "DayCounter.decrement",
+      "why": "internal daily counter, no user wall (db.js:619)"
+    },
+    {
+      "id_local": "Node.register",
+      "why": "agent-authenticated websocket registration write; no user-facing wall (meshagent.js:872)"
+    }
+  ],
+  "auth": {
+    "account_entity": "User",
+    "username_col": "name",
+    "password_col": "hash",
+    "session_fields": {
+      "domain": "domain"
+    }
+  }
+}

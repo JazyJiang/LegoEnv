@@ -1,0 +1,110 @@
+{
+  "app": "groupoffice",
+  "role": "Groupware scalar notes, tasks, calendar events, contacts and folder/file metadata",
+  "domains": [
+    "operations",
+    "support",
+    "it_ops"
+  ],
+  "kinds": {
+    "create_record": [
+      "folder_create",
+      "file_create"
+    ],
+    "update_record": [
+      "contact_update",
+      "folder_rename"
+    ],
+    "attach_note_or_task": [
+      "note_set",
+      "task_set"
+    ],
+    "schedule_event": [
+      "event_set"
+    ],
+    "delete_or_archive_row": [
+      "event_destroy",
+      "folder_delete"
+    ]
+  },
+  "check_kinds": [
+    "record_exists",
+    "record_not_exists",
+    "record_field_equals",
+    "record_field_contains",
+    "record_field_unchanged",
+    "note_or_task_exists",
+    "note_or_task_not_exists",
+    "action_done",
+    "action_not_done"
+  ],
+  "carriers": {
+    "notes_field": {
+      "entity": "Note",
+      "field": "content"
+    }
+  },
+  "login": {
+    "tool": "sign_in",
+    "user_field": "username",
+    "persona_entity": "User"
+  },
+  "content_entities": [
+    "Note",
+    "NoteBook",
+    "Task",
+    "TaskList",
+    "Event",
+    "Calendar",
+    "Contact",
+    "Folder",
+    "File"
+  ],
+  "seed_helpers": [
+    "workspace",
+    "notes",
+    "tasks",
+    "events",
+    "contacts"
+  ],
+  "tool_families_to_keep": [
+    ""
+  ],
+  "obs_reads": [
+    "note_query",
+    "note_get",
+    "task_query",
+    "task_get",
+    "event_query",
+    "event_get",
+    "folder_subfolder_list",
+    "folder_filelist_search"
+  ],
+  "known_patches": [
+    "Neutral env_id groupoffice",
+    "Integer identity argument schemas; User 1 synthetic operations persona",
+    "Concrete optional q/parent filters for note/task/event queries and exact parent/filename filters for folder/file reads",
+    "Materialize Event.firstOccurrence from supplied start and original declared default scalar fields"
+  ],
+  "missing_tools": [
+    "Ordinary note/task/event update interfaces",
+    "Full mail send interface",
+    "Binary file transfer"
+  ],
+  "limitations": [
+    "All 192 source tools are retained; only the nine listed write tools are certified. *_set for Note, Task and Event is insert-only.",
+    "schedule_event covers a scalar Event with calendarId/start/duration. Recurrence expansion, participants, invitations, conflict checking and external calendar synchronization are not implemented.",
+    "Source Event.calendarId lacks an FK constraint; signed-in source ACLs are incomplete and do not isolate all content by owner.",
+    "file_create creates empty metadata with size=0, without bytes. folder_delete hard-deletes instead of moving to trash; move/share effects are unverified.",
+    "Original query filter JSON, sort/pagination/anchor and many JMAP batch update/destroy arguments are not implemented; use the documented q and exact parent filters.",
+    "Task.uid/uri use source task-auto constants; task status progress has a source enum/type mismatch. These are not unique task IDs or certified status transitions.",
+    "Source tasklist_set/calendar_set/notebook_set need ACL/FK handling not exposed consistently; workspace helpers seed existing containers and do not add creation tools."
+  ],
+  "smoke": {
+    "passed": true,
+    "date": "2026-10-24",
+    "report": "ok"
+  },
+  "register_file": "pack/newspecs3/groupoffice/register.py",
+  "base_spec": "pack/base_specs/groupoffice.spec.json"
+}

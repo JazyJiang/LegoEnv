@@ -1,0 +1,146 @@
+{
+  "app": "mealie",
+  "role": "Recipe management, meal planning, and shopping lists",
+  "domains": [
+    "hospitality",
+    "operations",
+    "other"
+  ],
+  "kinds": {
+    "create_record": [
+      "recipe_create",
+      "cookbook_create",
+      "food_create",
+      "unit_create",
+      "category_create",
+      "tag_create",
+      "tool_create",
+      "shoppinglist_create",
+      "groupmealplan_create"
+    ],
+    "update_record": [
+      "recipe_patch",
+      "recipe_update",
+      "cookbook_update",
+      "food_update",
+      "unit_update",
+      "shoppinglist_update",
+      "groupmealplan_update"
+    ],
+    "append_or_update_item": [
+      "shoppinglistitem_create",
+      "shoppinglistitem_update"
+    ],
+    "attach_note_or_task": [
+      "recipecomment_create"
+    ],
+    "delete_or_archive_row": [
+      "recipe_delete",
+      "cookbook_delete",
+      "shoppinglistitem_delete"
+    ]
+  },
+  "check_kinds": [
+    "record_exists",
+    "record_not_exists",
+    "record_field_equals",
+    "record_field_contains",
+    "record_field_unchanged",
+    "note_or_task_exists",
+    "note_or_task_not_exists",
+    "item_exists",
+    "action_done",
+    "action_not_done"
+  ],
+  "carriers": {
+    "notes_field": {
+      "entity": "Recipe",
+      "field": "description"
+    },
+    "policy_doc": {
+      "entity": "CookBook",
+      "field": "description"
+    }
+  },
+  "login": {
+    "tool": "auth_login",
+    "user_field": "username",
+    "persona_entity": "User"
+  },
+  "content_entities": [
+    "Recipe",
+    "CookBook",
+    "RecipeIngredient",
+    "RecipeInstruction",
+    "Nutrition",
+    "RecipeComment",
+    "Food",
+    "Unit",
+    "Category",
+    "Tag",
+    "Tool",
+    "GroupMealPlan",
+    "ShoppingList",
+    "ShoppingListItem"
+  ],
+  "seed_helpers": [
+    "recipes",
+    "cookbook",
+    "ingredients",
+    "shopping_list",
+    "meal_plan"
+  ],
+  "tool_families_to_keep": [
+    "auth_",
+    "user_",
+    "recipe_",
+    "recipecomment_",
+    "cookbook_",
+    "food_",
+    "unit_",
+    "category_",
+    "tag_",
+    "tool_",
+    "label_",
+    "groupmealplan",
+    "shoppinglist",
+    "household_"
+  ],
+  "obs_reads": [
+    "recipe_get_all",
+    "cookbook_search",
+    "label_search",
+    "category_search",
+    "tag_search",
+    "tool_search",
+    "food_search",
+    "unit_search",
+    "groupmealplan_search",
+    "shoppinglist_search",
+    "household_list",
+    "household_members",
+    "recipecomment_search"
+  ],
+  "known_patches": [
+    "env_id mealie",
+    "Integer schemas for 89 identity arguments",
+    "Writable FK columns exposed by existing update tools use int rather than id",
+    "Persona id 1 is the only seeded account; preserve group/household permissions",
+    "Group/household/comment read scope uses correct session/argument resolver",
+    "Existing search tools support optional q substring; full scoped list on omitted q",
+    "GroupMealPlan.recipe_id is nullable, matching upstream optional recipe-free meal notes. Non-null recipe references retain FK validation."
+  ],
+  "smoke": {
+    "passed": true,
+    "date": "2026-10-24",
+    "report": "ok"
+  },
+  "limitations": [
+    "Nested recipe child writes (ingredients, instructions, nutrition/settings, category/tag/tool links) are declared as JSON args but not implemented by the scalar runtime; no new tools added.",
+    "No shoppinglistitem read/search tool exists; shopping list items can be seeded and written but cannot be enumerated with the current tool panel.",
+    "Recipe duplicate copies scalar inputs rather than cloning child rows; merge/export/token/external action APIs are not capability claims.",
+    "Existing source-specific category/tag/date/page search args are unsupported; q filtering is the supported read path."
+  ],
+  "register_file": "pack/newspecs3/mealie/register.py",
+  "base_spec": "pack/base_specs/mealie.spec.json"
+}

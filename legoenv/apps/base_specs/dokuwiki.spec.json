@@ -1,0 +1,5400 @@
+{
+  "env_id": "dokuwiki",
+  "_prep_version": 3,
+  "now": "2026-09-05T00:00:00",
+  "auth": {
+    "account_entity": "User",
+    "username_col": "login",
+    "password_col": "pass",
+    "session_fields": {
+      "login": "login"
+    }
+  },
+  "entities": [
+    {
+      "name": "Page",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "immutable": true
+        },
+        {
+          "name": "content",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "exists",
+          "type": "bool",
+          "nullable": false
+        },
+        {
+          "name": "filemtime",
+          "type": "int",
+          "audit": true
+        }
+      ]
+    },
+    {
+      "name": "PageRevision",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "immutable": true,
+          "fk_to": "Page.id"
+        },
+        {
+          "name": "rev",
+          "type": "int",
+          "pk": true,
+          "nullable": false,
+          "immutable": true
+        },
+        {
+          "name": "content",
+          "type": "text",
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "name": "ChangeLogEntry",
+      "columns": [
+        {
+          "name": "date",
+          "type": "int",
+          "pk": true,
+          "nullable": false,
+          "immutable": true,
+          "fk_to": "PageRevision.rev"
+        },
+        {
+          "name": "ip",
+          "type": "text",
+          "nullable": false,
+          "immutable": true
+        },
+        {
+          "name": "type",
+          "type": "text",
+          "nullable": false,
+          "immutable": true,
+          "enum": [
+            "C",
+            "E",
+            "e",
+            "D",
+            "R"
+          ]
+        },
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false,
+          "immutable": true,
+          "fk_to": "Page.id"
+        },
+        {
+          "name": "user",
+          "type": "text",
+          "nullable": true,
+          "immutable": true,
+          "fk_to": "User.login"
+        },
+        {
+          "name": "sum",
+          "type": "text",
+          "nullable": true,
+          "immutable": true
+        },
+        {
+          "name": "extra",
+          "type": "text",
+          "nullable": true,
+          "immutable": true
+        },
+        {
+          "name": "sizechange",
+          "type": "int",
+          "nullable": true,
+          "immutable": true
+        }
+      ]
+    },
+    {
+      "name": "PageMetadata",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "immutable": true,
+          "fk_to": "Page.id"
+        },
+        {
+          "name": "current",
+          "type": "json",
+          "nullable": false,
+          "default": "[]"
+        },
+        {
+          "name": "persistent",
+          "type": "json",
+          "nullable": false,
+          "default": "[]"
+        },
+        {
+          "name": "relation",
+          "type": "json",
+          "nullable": true
+        },
+        {
+          "name": "date_created",
+          "type": "int",
+          "nullable": true,
+          "audit": true
+        },
+        {
+          "name": "date_modified",
+          "type": "int",
+          "nullable": true,
+          "audit": true
+        },
+        {
+          "name": "creator",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "contributor",
+          "type": "json",
+          "nullable": true
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "last_change",
+          "type": "json",
+          "nullable": true
+        },
+        {
+          "name": "indexed",
+          "type": "text",
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "name": "PageLock",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "immutable": true,
+          "fk_to": "Page.id"
+        },
+        {
+          "name": "holder",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "session",
+          "type": "text",
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "name": "Draft",
+      "columns": [
+        {
+          "name": "cname",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "immutable": true
+        },
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false,
+          "fk_to": "Page.id"
+        },
+        {
+          "name": "client",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "prefix",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "text",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "suffix",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "date",
+          "type": "int",
+          "nullable": true
+        },
+        {
+          "name": "errors",
+          "type": "json",
+          "nullable": false,
+          "default": "[]"
+        }
+      ]
+    },
+    {
+      "name": "MediaFile",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "immutable": true
+        },
+        {
+          "name": "content",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "rev",
+          "type": "int",
+          "nullable": true
+        },
+        {
+          "name": "mime",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "ext",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "size",
+          "type": "int",
+          "nullable": false
+        },
+        {
+          "name": "width",
+          "type": "int",
+          "nullable": true
+        },
+        {
+          "name": "height",
+          "type": "int",
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "name": "MediaRevision",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "immutable": true,
+          "fk_to": "MediaFile.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "rev",
+          "type": "int",
+          "pk": true,
+          "nullable": false,
+          "immutable": true
+        },
+        {
+          "name": "content",
+          "type": "text",
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "name": "MediaMetadata",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "fk_to": "MediaFile.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "size",
+          "type": "int",
+          "nullable": true
+        },
+        {
+          "name": "width",
+          "type": "int",
+          "nullable": true
+        },
+        {
+          "name": "height",
+          "type": "int",
+          "nullable": true
+        },
+        {
+          "name": "mime",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "date",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "camera",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "iptc",
+          "type": "json",
+          "nullable": true
+        },
+        {
+          "name": "exif",
+          "type": "json",
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "name": "MediaChangeLogEntry",
+      "columns": [
+        {
+          "name": "date",
+          "type": "int",
+          "pk": true,
+          "nullable": false,
+          "immutable": true,
+          "fk_to": "MediaRevision.rev"
+        },
+        {
+          "name": "ip",
+          "type": "text",
+          "nullable": false,
+          "immutable": true,
+          "default": "127.0.0.1"
+        },
+        {
+          "name": "type",
+          "type": "text",
+          "nullable": false,
+          "immutable": true,
+          "enum": [
+            "C",
+            "E",
+            "e",
+            "D",
+            "R"
+          ]
+        },
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false,
+          "fk_to": "MediaFile.id",
+          "on_delete": "cascade"
+        },
+        {
+          "name": "user",
+          "type": "text",
+          "nullable": true,
+          "immutable": true,
+          "default": "''"
+        },
+        {
+          "name": "sum",
+          "type": "text",
+          "nullable": false,
+          "default": "''"
+        },
+        {
+          "name": "extra",
+          "type": "text",
+          "nullable": true,
+          "default": "''"
+        },
+        {
+          "name": "sizechange",
+          "type": "int",
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "name": "User",
+      "columns": [
+        {
+          "name": "login",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "immutable": true
+        },
+        {
+          "name": "pass",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "mail",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "grps",
+          "type": "json",
+          "nullable": true
+        },
+        {
+          "name": "protected",
+          "type": "bool",
+          "nullable": false,
+          "immutable": true,
+          "default": false
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "login"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "AclRule",
+      "columns": [
+        {
+          "name": "scope",
+          "type": "text",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "user",
+          "type": "text",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "level",
+          "type": "int",
+          "nullable": false,
+          "enum": [
+            0,
+            1,
+            2,
+            4,
+            8,
+            16
+          ]
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "scope",
+            "user"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Config",
+      "columns": [
+        {
+          "name": "key",
+          "type": "text",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "value",
+          "type": "text",
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "name": "SearchIndex",
+      "columns": [
+        {
+          "name": "page",
+          "type": "text",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "title_index",
+          "type": "json",
+          "nullable": true
+        },
+        {
+          "name": "fulltext_tokens",
+          "type": "json",
+          "nullable": true
+        },
+        {
+          "name": "metadata_keys",
+          "type": "json",
+          "nullable": true
+        },
+        {
+          "name": "version",
+          "type": "text",
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "name": "IndexTag",
+      "columns": [
+        {
+          "name": "page",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "fk_to": "Page.id"
+        },
+        {
+          "name": "version",
+          "type": "text",
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "name": "Subscription",
+      "columns": [
+        {
+          "name": "target",
+          "type": "text",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "user",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "fk_to": "User.login"
+        },
+        {
+          "name": "style",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "every",
+            "list",
+            "digest"
+          ],
+          "default": "every"
+        },
+        {
+          "name": "data",
+          "type": "int",
+          "nullable": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "target",
+            "user"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "GlobalChangeLogEntry",
+      "columns": [
+        {
+          "name": "date",
+          "type": "int",
+          "pk": true,
+          "nullable": false,
+          "immutable": true
+        },
+        {
+          "name": "ip",
+          "type": "text",
+          "nullable": false,
+          "immutable": true,
+          "default": "127.0.0.1"
+        },
+        {
+          "name": "type",
+          "type": "text",
+          "nullable": false,
+          "immutable": true,
+          "enum": [
+            "C",
+            "E",
+            "e",
+            "D",
+            "R"
+          ]
+        },
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false,
+          "immutable": true
+        },
+        {
+          "name": "user",
+          "type": "text",
+          "nullable": true,
+          "fk_to": "User.login"
+        },
+        {
+          "name": "sum",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "extra",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "sizechange",
+          "type": "int",
+          "nullable": true
+        },
+        {
+          "name": "mode",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "page",
+            "media"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "PluginConfig",
+      "columns": [
+        {
+          "name": "plugin",
+          "type": "text",
+          "pk": true,
+          "nullable": false,
+          "immutable": true
+        },
+        {
+          "name": "enabled",
+          "type": "int",
+          "nullable": false,
+          "enum": [
+            0,
+            1
+          ]
+        },
+        {
+          "name": "id",
+          "type": "id"
+        }
+      ]
+    }
+  ],
+  "tools": [
+    {
+      "tool": "sign_in",
+      "description": "Sign in with a username and password. Most tools — editing pages, managing users, ACL, media — require this first; the session it opens is what $actor resolves to. Fails if the credentials are wrong or the user does not exist.",
+      "family": "guard.auth",
+      "entity": "User",
+      "input_schema": {
+        "user": {
+          "type": "text",
+          "required": true,
+          "description": "The username (User.login)."
+        },
+        "pass": {
+          "type": "text",
+          "required": true,
+          "description": "The password, compared against User.pass."
+        },
+        "sticky": {
+          "type": "bool",
+          "required": false,
+          "description": "Persist the login session across requests."
+        },
+        "username": {
+          "type": "text",
+          "required": false,
+          "description": "Runtime compatibility alias for user; supply the same genuine account login."
+        }
+      },
+      "exec_spec": {
+        "verify": {
+          "entity": "User",
+          "username_col": "login",
+          "password_col": "pass"
+        }
+      },
+      "_evidence": {
+        "locator": "inc/auth.php:300",
+        "id_local": "Auth.login",
+        "entry": {
+          "kind": "http",
+          "route": "do=login",
+          "locator": "inc/Action/Login.php:15"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "function auth_login($user,$pass,$sticky=false,$silent=false){ global $conf,$INPUT,$auth; if(!$conf['useacl'])return false; ... if(!empty($pass)&&$auth->checkPass($user,$pass)){ $INPUT->server->set('REMOTE_USER',$user); $secret=auth_cookiesalt(!$sticky,true); auth_setCookie($user,auth_encrypt($pass,$secret),$sticky); return true; } ... }",
+        "edges": [
+          "lib/plugins/authplain/auth.php:68"
+        ]
+      }
+    },
+    {
+      "tool": "remoteapi_login",
+      "description": "Sign in through the XML-RPC remote API (core.login). Opens the same session as sign_in; returns 1 on success, 0 on failure.",
+      "family": "guard.auth",
+      "entity": "User",
+      "input_schema": {
+        "user": {
+          "type": "text",
+          "required": true,
+          "description": "The username (User.login)."
+        },
+        "pass": {
+          "type": "text",
+          "required": true,
+          "description": "The password, compared against User.pass."
+        }
+      },
+      "exec_spec": {
+        "verify": {
+          "entity": "User",
+          "username_col": "login",
+          "password_col": "pass"
+        }
+      },
+      "_evidence": {
+        "locator": "inc/Remote/ApiCore.php:139",
+        "id_local": "RemoteApi.login",
+        "entry": {
+          "kind": "rpc",
+          "route": "core.login",
+          "locator": "inc/Remote/ApiCore.php:139"
+        },
+        "entity_why": "primary effect auth lands on this table",
+        "ref_code": "global $conf,$auth; if(!$conf['useacl'])return 0; if(!$auth instanceof AuthPlugin)return 0; @session_start(); $ok=null; if($auth->canDo('external')){ $ok=$auth->trustExternal($user,$pass,false); } if($ok===null){ $evdata=['user'=>$user,'password'=>$pass,'sticky'=>false,'silent'=>true]; $ok=Event::createAndTrigger('AUTH_LOGIN_CHECK',$evdata,'auth_login_wrapper'); } session_write_close(); return $ok;",
+        "edges": [
+          "inc/Remote/ApiCore.php:139"
+        ]
+      }
+    },
+    {
+      "tool": "auth_logout",
+      "description": "End the current session (log out). No arguments; always succeeds once signed in.",
+      "family": "guard.logout",
+      "exec_spec": {},
+      "input_schema": {},
+      "guards": {
+        "requires_auth": true
+      },
+      "_evidence": {
+        "locator": "inc/auth.php:517",
+        "id_local": "Auth.logout",
+        "entry": {
+          "kind": "http",
+          "route": "do=logout",
+          "locator": "inc/Action/Logout.php:16"
+        },
+        "entity_why": "cannot determine the entity",
+        "ref_code": "auth_logoff(); send_redirect(wl($ID,['do'=>'login'],true,'&'));"
+      }
+    },
+    {
+      "tool": "page_save",
+      "description": "Save a page's current wiki text, creating the page if it does not exist yet or replacing its content if it does. Passing empty text with an existing page deletes it. Requires edit permission on the page. Fails if you are not signed in or the ACL level on the page is below edit.",
+      "family": "crud.upsert",
+      "entity": "Page",
+      "exec_spec": {
+        "key": {
+          "id": {
+            "$arg": "id"
+          }
+        },
+        "insert_fields": {
+          "id": {
+            "$arg": "id"
+          },
+          "content": {
+            "$arg": "text"
+          },
+          "exists": true
+        },
+        "set_on_exists": {
+          "content": {
+            "$arg": "text"
+          },
+          "exists": true
+        },
+        "entity": "Page"
+      },
+      "input_schema": {
+        "id": {
+          "type": "text",
+          "required": true,
+          "description": "The page id, e.g. 'start' or 'wiki:syntax'. Namespaces use a colon separator."
+        },
+        "text": {
+          "type": "text",
+          "required": true,
+          "description": "The new wiki text. Empty/whitespace deletes the page."
+        },
+        "summary": {
+          "type": "text",
+          "required": false,
+          "description": "Edit summary recorded in the change log."
+        },
+        "minor": {
+          "type": "bool",
+          "required": false,
+          "description": "Mark this as a minor edit."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "AclRule",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "scope",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "level",
+                      "op": "gte",
+                      "value": 8
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "AclRule",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "scope",
+                      "op": "eq",
+                      "value": "*"
+                    },
+                    {
+                      "node": "field",
+                      "col": "level",
+                      "op": "gte",
+                      "value": 8
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "id",
+          "text"
+        ],
+        "messages": {
+          "auth": "You must sign in before saving a page.",
+          "precondition": "You need edit permission (ACL level >= 8) to save a page."
+        }
+      },
+      "_evidence": {
+        "locator": "inc/common.php:1249",
+        "id_local": "Page.save",
+        "entry": {
+          "kind": "http",
+          "route": "do=save",
+          "locator": "inc/Action/Save.php:28"
+        },
+        "entity_why": "primary effect spawn lands on this table",
+        "ref_code": "function saveWikiText($id,$text,$summary,$minor=false){ $data=(new PageFile($id))->saveWikiText($text,$summary,$minor); if(!$data)return; notify($id,'admin',...); notify($id,'subscribers',...); if(useHeading('content')){ $pages=(new MetadataSearch())->backlinks($id,true); foreach($pages as $page){ (new CacheRenderer($page,wikiFN($page),'xhtml'))->removeCache(); } } } // changeType: REVERT if revertFrom; DELETE if trim(newContent)==''; CREATE if !file_exists; else MINOR_EDIT ($minor&&useacl&&REMOTE_USER) or EDIT",
+        "edges": [
+          "inc/Action/Save.php:18-25, inc/ActionRouter.php:224",
+          "inc/Action/Edit.php:84, inc/Action/Save.php:57"
+        ]
+      }
+    },
+    {
+      "tool": "page_read",
+      "description": "Fetch a page's raw wiki text, optionally at a specific revision. Fails with not-found if the page (or that revision) does not exist. Requires read permission on the page.",
+      "family": "crud.fetch",
+      "entity": "Page",
+      "exec_spec": {
+        "entity": "Page",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "text",
+          "required": true,
+          "description": "The page id, e.g. 'start'."
+        },
+        "rev": {
+          "type": "int",
+          "required": false,
+          "description": "Revision timestamp to read; empty means the current text."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "AclRule",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "scope",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "level",
+                      "op": "gte",
+                      "value": 1
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "AclRule",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "scope",
+                      "op": "eq",
+                      "value": "*"
+                    },
+                    {
+                      "node": "field",
+                      "col": "level",
+                      "op": "gte",
+                      "value": 1
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must sign in to read a page.",
+          "precondition": "You need read permission (ACL level >= 1) to view this page.",
+          "not_found": "That page does not exist or you may not read it."
+        }
+      },
+      "_evidence": {
+        "locator": "inc/common.php:1027",
+        "id_local": "Page.read",
+        "entry": {
+          "kind": "http",
+          "route": "do=show",
+          "locator": "inc/Action/Show.php:27"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "function rawWiki($id,$rev=''){ return io_readWikiPage(wikiFN($id,$rev),$id,$rev); } // Show.minimumPermission()=AUTH_READ; ACL gate at inc/ActionRouter.php:224 auth_quickaclcheck($ID)",
+        "edges": [
+          {
+            "subject": "Page.read",
+            "relation": "requires",
+            "object": {
+              "ref": "AclRule",
+              "kind": "entity"
+            },
+            "condition": "ACL gate at action layer",
+            "evidence": "inc/ActionRouter.php:224"
+          }
+        ]
+      }
+    },
+    {
+      "tool": "page_show",
+      "description": "Render a page to HTML the way the web UI would. Requires read permission. (A convenience read; the raw text is available via page_read.)",
+      "family": "crud.fetch",
+      "entity": "Page",
+      "exec_spec": {
+        "entity": "Page",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "text",
+          "required": true,
+          "description": "The page id to render."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "AclRule",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "scope",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "level",
+                      "op": "gte",
+                      "value": 1
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "AclRule",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "scope",
+                      "op": "eq",
+                      "value": "*"
+                    },
+                    {
+                      "node": "field",
+                      "col": "level",
+                      "op": "gte",
+                      "value": 1
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must sign in to view a page.",
+          "precondition": "You need read permission (ACL level >= 1) to view this page."
+        }
+      },
+      "_evidence": {
+        "locator": "inc/Action/Show.php:27",
+        "id_local": "page.show",
+        "entry": {
+          "kind": "http",
+          "route": "do=show",
+          "locator": "inc/Action/Show.php:27"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "public function minimumPermission(){ return AUTH_READ; } public function preProcess(){ global $ID; unlock($ID); } public function tplContent(){ (new PageView())->show(); }",
+        "edges": [
+          "inc/Action/Show.php:27, inc/ActionRouter.php:224"
+        ]
+      }
+    },
+    {
+      "tool": "page_revert",
+      "description": "Restore a page to the content of an earlier revision. Fails if the revision does not exist or you lack edit permission on the page.",
+      "family": "update.field_set",
+      "entity": "Page",
+      "exec_spec": {
+        "entity": "Page",
+        "row_key": {
+          "id": {
+            "$arg": "id"
+          }
+        },
+        "set": {
+          "content": {
+            "$ref": {
+              "entity": "PageRevision",
+              "where": {
+                "id": {
+                  "$arg": "id"
+                },
+                "rev": {
+                  "$arg": "rev"
+                }
+              },
+              "col": "content"
+            }
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "text",
+          "required": true,
+          "description": "The page id to revert."
+        },
+        "rev": {
+          "type": "int",
+          "required": true,
+          "description": "The revision timestamp to restore the text from."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "AclRule",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "scope",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "level",
+                      "op": "gte",
+                      "value": 8
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "AclRule",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "scope",
+                      "op": "eq",
+                      "value": "*"
+                    },
+                    {
+                      "node": "field",
+                      "col": "level",
+                      "op": "gte",
+                      "value": 8
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "PageRevision",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "id",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "rev",
+                      "op": "eq",
+                      "value": {
+                        "arg": "rev"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "id",
+          "rev"
+        ],
+        "messages": {
+          "auth": "You must sign in to revert a page.",
+          "precondition": "You need edit permission, and the revision you name must exist.",
+          "not_found": "That page does not exist."
+        }
+      },
+      "_evidence": {
+        "locator": "inc/Action/Revert.php:40",
+        "id_local": "page.revert",
+        "entry": {
+          "kind": "http",
+          "route": "do=revert",
+          "locator": "inc/Action/Revert.php:54"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "$text=''; $sum=$lang['deleted']; if($REV){ $text=rawWiki($ID,$REV); if(!$text)throw new ActionException(); $sum=sprintf($lang['restored'],dformat($REV)); } if(checkwordblock($text)){throw new ActionException('edit');} saveWikiText($ID,$text,$sum,false); msg($sum,1); $REV=''; throw new ActionAbort('draftdel');",
+        "edges": [
+          "inc/Action/Revert.php:16, inc/ActionRouter.php:224",
+          "inc/Action/Revert.php:43"
+        ]
+      }
+    },
+    {
+      "tool": "page_search",
+      "description": "Full-text search the wiki index for pages matching a query. Returns matching page rows from the search index (which carry the token indexes). Requires that at least one readable page exists.",
+      "family": "search",
+      "entity": "SearchIndex",
+      "exec_spec": {
+        "entity": "SearchIndex",
+        "search_fields": [
+          "fulltext_tokens"
+        ],
+        "rank": {
+          "method": "keyword",
+          "fields": [
+            "fulltext_tokens"
+          ]
+        }
+      },
+      "input_schema": {
+        "q": {
+          "type": "text",
+          "required": true,
+          "description": "The search query, e.g. 'installation'."
+        },
+        "ns": {
+          "type": "text",
+          "required": false,
+          "description": "Restrict results to a namespace."
+        },
+        "srt": {
+          "type": "text",
+          "required": false,
+          "description": "Sort mode: 'hits' or 'mtime'."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "q"
+        ],
+        "messages": {
+          "auth": "You must sign in to search."
+        }
+      },
+      "_evidence": {
+        "locator": "inc/Search/FulltextSearch.php:58",
+        "id_local": "Page.search",
+        "entry": {
+          "kind": "http",
+          "route": "do=search",
+          "locator": "inc/Action/Search.php:72"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "$terms=$search->execute(); $docs=(new QueryEvaluator($q['parsed_ary'],$terms))->evaluate(); $docs=MetadataSearch::filterPages($docs,false,after,before);",
+        "edges": [
+          "inc/Search/MetadataSearch.php filterPages"
+        ]
+      }
+    },
+    {
+      "tool": "page_backlinks",
+      "description": "List the page ids that link to the given page (via the relation_references index). Requires read permission on the target page.",
+      "family": "search",
+      "entity": "SearchIndex",
+      "exec_spec": {
+        "entity": "SearchIndex",
+        "search_fields": [
+          "metadata_keys"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "metadata_keys"
+          ]
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "text",
+          "required": true,
+          "description": "The page whose backlinks to find."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "AclRule",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "scope",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "level",
+                      "op": "gte",
+                      "value": 1
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "AclRule",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "scope",
+                      "op": "eq",
+                      "value": "*"
+                    },
+                    {
+                      "node": "field",
+                      "col": "level",
+                      "op": "gte",
+                      "value": 1
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must sign in to list backlinks.",
+          "precondition": "You need read permission on the page."
+        }
+      },
+      "_evidence": {
+        "locator": "inc/Search/MetadataSearch.php:186",
+        "id_local": "Page.backlinks",
+        "entry": {
+          "kind": "http",
+          "route": "do=backlink",
+          "locator": "inc/Action/Backlink.php:26"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "$result=$this->lookupKey('relation_references',$id); $result=static::filterPages(array_flip($result),$ignore_perms);",
+        "edges": [
+          "inc/Search/MetadataSearch.php:186"
+        ]
+      }
+    },
+    {
+      "tool": "changelog_listrevisions",
+      "description": "List the revision timestamps of a page's change log, newest first. Requires read permission on the page.",
+      "family": "search",
+      "entity": "ChangeLogEntry",
+      "exec_spec": {
+        "entity": "ChangeLogEntry",
+        "search_fields": [
+          "id",
+          "date"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "id",
+            "date"
+          ]
+        },
+        "sort": {
+          "col": "date",
+          "dir": "desc"
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "text",
+          "required": true,
+          "description": "The page id whose revisions to list."
+        },
+        "first": {
+          "type": "int",
+          "required": false,
+          "description": "Skip offset; -1 includes the current revision."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "AclRule",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "scope",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "level",
+                      "op": "gte",
+                      "value": 1
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "AclRule",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "scope",
+                      "op": "eq",
+                      "value": "*"
+                    },
+                    {
+                      "node": "field",
+                      "col": "level",
+                      "op": "gte",
+                      "value": 1
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must sign in to list revisions.",
+          "precondition": "You need read permission on the page."
+        }
+      },
+      "_evidence": {
+        "locator": "inc/ChangeLog/ChangeLog.php:212",
+        "id_local": "ChangeLog.listRevisions",
+        "entry": {
+          "kind": "http",
+          "route": "do=revisions",
+          "locator": "inc/Action/Revisions.php:26"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "public function getRevisions($first,$num){ ... reads .changes file ... for($i=count($lines)-1;$i>=0;$i--){ $info=$this->parseAndCacheLogLine($lines[$i]); if(is_array($info))$revs[]=$info['date']; } return $revs; }",
+        "edges": [
+          {
+            "subject": "ChangeLog.listRevisions",
+            "relation": "requires",
+            "object": {
+              "ref": "AclRule",
+              "kind": "entity"
+            },
+            "condition": "changelog read by page id, ACL applied at action layer",
+            "evidence": "inc/Action/Revisions.php:26"
+          }
+        ]
+      }
+    },
+    {
+      "tool": "draft_save",
+      "description": "Save an editing draft for a page under the current client (used by the preview flow). Requires that drafts are enabled in config and you have edit permission on the page. Overwrites a previous draft for the same page and client.",
+      "family": "crud.insert",
+      "entity": "Draft",
+      "exec_spec": {
+        "entity": "Draft",
+        "set_on_create": {
+          "cname": {
+            "$arg": "cname"
+          },
+          "errors": {
+            "lit": []
+          }
+        },
+        "fields": {
+          "id": {
+            "$arg": "id"
+          },
+          "client": {
+            "$arg": "client"
+          },
+          "prefix": {
+            "$arg": "prefix"
+          },
+          "text": {
+            "$arg": "wikitext"
+          },
+          "suffix": {
+            "$arg": "suffix"
+          },
+          "date": {
+            "$arg": "date"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "text",
+          "required": true,
+          "description": "The page id the draft belongs to."
+        },
+        "client": {
+          "type": "text",
+          "required": true,
+          "description": "The username (or client id) the draft belongs to."
+        },
+        "cname": {
+          "type": "text",
+          "required": true,
+          "description": "Unique draft cache name, e.g. '<client>:<id>'. Used as the Draft.cname key."
+        },
+        "wikitext": {
+          "type": "text",
+          "required": true,
+          "description": "The draft text content."
+        },
+        "prefix": {
+          "type": "text",
+          "required": true,
+          "description": "Text before the edited range."
+        },
+        "suffix": {
+          "type": "text",
+          "required": true,
+          "description": "Text after the edited range."
+        },
+        "date": {
+          "type": "int",
+          "required": false,
+          "description": "Editing timestamp."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Config",
+                "where": {
+                  "node": "field",
+                  "col": "key",
+                  "op": "eq",
+                  "value": "usedraft"
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "AclRule",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "scope",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "level",
+                      "op": "gte",
+                      "value": 2
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "id",
+          "client",
+          "cname",
+          "wikitext"
+        ],
+        "messages": {
+          "auth": "You must sign in to save a draft.",
+          "precondition": "Drafts must be enabled, and you need edit permission on the page."
+        }
+      },
+      "_evidence": {
+        "locator": "inc/Draft.php:70",
+        "id_local": "Draft.save",
+        "entry": {
+          "kind": "http",
+          "route": "do=preview",
+          "locator": "inc/Action/Preview.php:37"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "public function saveDraft(){ global $INPUT,$INFO,$EVENT_HANDLER,$conf; if(!$conf['usedraft'])return false; $draft=['id'=>$this->id,'prefix'=>substr($INPUT->post->str('prefix'),0,-1),'text'=>$INPUT->post->str('wikitext'),'suffix'=>$INPUT->post->str('suffix'),'date'=>$INPUT->post->int('date'),'client'=>$this->client,'cname'=>$this->cname,'errors'=>[]]; $event=new Event('DRAFT_SAVE',$draft); if($event->advise_before()){ $draft['hasBeenSaved']=io_saveFile($draft['cname'],serialize($draft)); } return $draft['hasBeenSaved']; }",
+        "edges": [
+          "inc/Draft.php:73",
+          "inc/Action/Edit.php, inc/Draft.php:70"
+        ]
+      }
+    },
+    {
+      "tool": "draft_read",
+      "description": "Read back a saved draft (prefix + text + suffix concatenated) for a page and client. Fails if no such draft exists.",
+      "family": "crud.fetch",
+      "entity": "Draft",
+      "exec_spec": {
+        "entity": "Draft",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          },
+          "client": {
+            "$arg": "client"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "text",
+          "required": true,
+          "description": "The page id the draft belongs to."
+        },
+        "client": {
+          "type": "text",
+          "required": true,
+          "description": "The username (or client id) the draft belongs to."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "id",
+          "client"
+        ],
+        "messages": {
+          "auth": "You must sign in to read a draft.",
+          "not_found": "No draft exists for that page and client."
+        }
+      },
+      "_evidence": {
+        "locator": "inc/Draft.php:115",
+        "id_local": "Draft.read",
+        "entry": {
+          "kind": "http",
+          "route": "do=draft",
+          "locator": "inc/Action/Draft.php:40"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "public function getDraftText(){ if(!file_exists($this->cname)){ throw new RuntimeException(\"Draft for page $this->id and user $this->client doesn't exist\"); } $draft=unserialize(io_readFile($this->cname,false)); return cleanText(con($draft['prefix'],$draft['text'],$draft['suffix'],true)); }"
+      }
+    },
+    {
+      "tool": "draft_delete",
+      "description": "Discard a page's saved draft for a client. Fails if the draft does not exist.",
+      "family": "crud.delete",
+      "entity": "Draft",
+      "exec_spec": {
+        "entity": "Draft",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          },
+          "client": {
+            "$arg": "client"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "text",
+          "required": true,
+          "description": "The page id the draft belongs to."
+        },
+        "client": {
+          "type": "text",
+          "required": true,
+          "description": "The username (or client id) the draft belongs to."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "id",
+          "client"
+        ],
+        "messages": {
+          "auth": "You must sign in to delete a draft.",
+          "not_found": "No draft exists for that page and client."
+        }
+      },
+      "_evidence": {
+        "locator": "inc/Draft.php:131",
+        "id_local": "Draft.delete",
+        "entry": {
+          "kind": "http",
+          "route": "do=draftdel",
+          "locator": "inc/Action/Draftdel.php:34"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "public function deleteDraft(){ global $INFO; @unlink($this->cname); $INFO['draft']=null; }",
+        "edges": [
+          "inc/Draft.php:131"
+        ]
+      }
+    },
+    {
+      "tool": "mediafile_upload",
+      "description": "Upload a media file, creating it or (with overwrite=true) replacing the existing file. The current revision is preserved as history. Fails without upload permission (ACL level >= 8), or if the file already exists and overwrite is not set.",
+      "family": "crud.upsert",
+      "entity": "MediaFile",
+      "exec_spec": {
+        "key": {
+          "id": {
+            "$arg": "mediaid"
+          }
+        },
+        "insert_fields": {
+          "id": {
+            "$arg": "mediaid"
+          },
+          "content": {
+            "$arg": "file"
+          }
+        },
+        "set_on_exists": {
+          "content": {
+            "$arg": "file"
+          }
+        },
+        "entity": "MediaFile"
+      },
+      "input_schema": {
+        "ns": {
+          "type": "text",
+          "required": false,
+          "description": "Target namespace, e.g. 'wiki'. May be folded into the media id."
+        },
+        "mediaid": {
+          "type": "text",
+          "required": true,
+          "description": "The media id, e.g. 'wiki:logo.png'."
+        },
+        "file": {
+          "type": "text",
+          "required": true,
+          "description": "The uploaded file bytes."
+        },
+        "ow": {
+          "type": "bool",
+          "required": false,
+          "description": "Overwrite an existing file of the same id. Required if the file already exists."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "AclRule",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "scope",
+                      "op": "eq",
+                      "value": {
+                        "arg": "mediaid"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "level",
+                      "op": "gte",
+                      "value": 8
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "AclRule",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "scope",
+                      "op": "eq",
+                      "value": "*"
+                    },
+                    {
+                      "node": "field",
+                      "col": "level",
+                      "op": "gte",
+                      "value": 8
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "mediaid",
+          "file"
+        ],
+        "messages": {
+          "auth": "You must sign in to upload media.",
+          "precondition": "You need upload permission (ACL level >= 8) on that media namespace.",
+          "fk": "The requested file does not exist."
+        }
+      },
+      "_evidence": {
+        "locator": "inc/media.php:443, media_upload_finish :530",
+        "id_local": "MediaFile.upload",
+        "entry": {
+          "kind": "http",
+          "route": "lib/exe/mediamanager.php (POST upload)",
+          "locator": "lib/exe/mediamanager.php:82, inc/Action/Media.php"
+        },
+        "entity_why": "primary effect spawn lands on this table",
+        "ref_code": "function media_save($file,$id,$ow,$auth,$move){ if($auth<AUTH_UPLOAD){ return [\"You don't have permissions to upload files.\",-1]; } ... $overwrite=file_exists($fn); $auth_ow=(($conf['mediarevisions'])?AUTH_UPLOAD:AUTH_DELETE); if($overwrite&&(!$ow||$auth<$auth_ow)){ return [$lang['uploadexist'],0]; } ... return Event::createAndTrigger('MEDIA_UPLOAD_FINISH',$data,'_media_upload_action',true); } // finish: move tmp->fn, media_saveOldRevision (spawn), addMediaLogEntry (C/E/R)",
+        "edges": [
+          "inc/media.php:445,479",
+          "inc/media.php:547-551"
+        ]
+      }
+    },
+    {
+      "tool": "mediafile_delete",
+      "description": "Delete a media file (and its current revision). Fails without delete permission (ACL level >= 16), if the file is still referenced by a page, or if it does not exist.",
+      "family": "crud.delete",
+      "entity": "MediaFile",
+      "exec_spec": {
+        "entity": "MediaFile",
+        "lookup_by": {
+          "id": {
+            "$arg": "id"
+          }
+        }
+      },
+      "input_schema": {
+        "id": {
+          "type": "text",
+          "required": true,
+          "description": "The media id to delete, e.g. 'wiki:logo.png'."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "AclRule",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "scope",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "level",
+                      "op": "gte",
+                      "value": 16
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "AclRule",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "scope",
+                      "op": "eq",
+                      "value": "*"
+                    },
+                    {
+                      "node": "field",
+                      "col": "level",
+                      "op": "gte",
+                      "value": 16
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "id"
+        ],
+        "messages": {
+          "auth": "You must sign in to delete media.",
+          "precondition": "You need delete permission (ACL level >= 16) on that media.",
+          "not_found": "That media file does not exist."
+        }
+      },
+      "_evidence": {
+        "locator": "inc/media.php:257",
+        "id_local": "MediaFile.delete",
+        "entry": {
+          "kind": "http",
+          "route": "lib/exe/mediamanager.php?delete=<id>",
+          "locator": "lib/exe/mediamanager.php:103"
+        },
+        "entity_why": "primary effect spawn lands on this table",
+        "ref_code": "function media_delete($id,$auth){ $auth=auth_quickaclcheck(mediaAclPath($id)); if($auth<AUTH_DELETE)return DOKU_MEDIA_NOT_AUTH; if(media_inuse($id))return DOKU_MEDIA_INUSE; ... $data['unl']=@unlink($file); if($data['unl']){ $sizechange=0-$data['size']; addMediaLogEntry(time(),$id,DOKU_CHANGE_TYPE_DELETE,$lang['deleted'],'',null,$sizechange); $data['del']=io_sweepNS($id,'mediadir'); } ... }",
+        "edges": [
+          "inc/media.php:260",
+          "inc/media.php:262,278"
+        ]
+      }
+    },
+    {
+      "tool": "mediafile_restore",
+      "description": "Restore a media file to the content of an earlier revision. Requires upload permission on the media.",
+      "family": "update.field_set",
+      "entity": "MediaFile",
+      "exec_spec": {
+        "entity": "MediaFile",
+        "row_key": {
+          "id": {
+            "$arg": "image"
+          }
+        },
+        "set": {
+          "content": {
+            "$ref": {
+              "entity": "MediaRevision",
+              "where": {
+                "id": {
+                  "$arg": "image"
+                },
+                "rev": {
+                  "$arg": "rev"
+                }
+              },
+              "col": "content"
+            }
+          }
+        }
+      },
+      "input_schema": {
+        "image": {
+          "type": "text",
+          "required": true,
+          "description": "The media id to restore."
+        },
+        "rev": {
+          "type": "int",
+          "required": true,
+          "description": "The revision timestamp to restore the content from."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "AclRule",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "scope",
+                      "op": "eq",
+                      "value": {
+                        "arg": "image"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "level",
+                      "op": "gte",
+                      "value": 8
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "AclRule",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "scope",
+                      "op": "eq",
+                      "value": "*"
+                    },
+                    {
+                      "node": "field",
+                      "col": "level",
+                      "op": "gte",
+                      "value": 8
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "image",
+          "rev"
+        ],
+        "messages": {
+          "auth": "You must sign in to restore media.",
+          "precondition": "You need upload permission, and the revision must exist."
+        }
+      },
+      "_evidence": {
+        "locator": "inc/media.php:1306",
+        "id_local": "MediaFile.restore",
+        "entry": {
+          "kind": "http",
+          "route": "lib/exe/mediamanager.php (mediado=restore)",
+          "locator": "lib/exe/mediamanager.php:98"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "function media_restore($image,$rev){ if(!$conf['mediarevisions'])return false; $image=cleanID($image); if(auth_quickaclcheck(mediaAclPath($image))<AUTH_UPLOAD)return false; $removed=(!file_exists(mediaFN($image))&&file_exists(mediaMetaFN($image,'.changes'))); if(!$image||(!file_exists(mediaFN($image))&&!$removed))return false; if(!$rev||!file_exists(mediaFN($image,$rev)))return false; $res=media_upload_finish(mediaFN($image,$rev),mediaFN($image),$image,$imime,true,'copy'); ... }",
+        "edges": [
+          "inc/media.php:1314"
+        ]
+      }
+    },
+    {
+      "tool": "mediametadata_save",
+      "description": "Update the embedded metadata (IPTC/EXIF) of a media file. Takes a field=>value map; empty values delete that field. Requires upload permission on the media.",
+      "family": "crud.upsert",
+      "entity": "MediaMetadata",
+      "exec_spec": {
+        "key": {
+          "id": {
+            "$arg": "id"
+          }
+        },
+        "set_on_exists": {
+          "iptc": {
+            "$arg": "meta"
+          }
+        },
+        "insert_fields": {
+          "id": {
+            "$arg": "id"
+          },
+          "iptc": {
+            "$arg": "meta"
+          }
+        },
+        "entity": "MediaMetadata"
+      },
+      "input_schema": {
+        "id": {
+          "type": "text",
+          "required": true,
+          "description": "The media id whose metadata to edit."
+        },
+        "meta": {
+          "type": "json",
+          "required": true,
+          "description": "Field=>value map of metadata to set. Empty value deletes the field."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "AclRule",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "scope",
+                      "op": "eq",
+                      "value": {
+                        "arg": "id"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "level",
+                      "op": "gte",
+                      "value": 8
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "AclRule",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "scope",
+                      "op": "eq",
+                      "value": "*"
+                    },
+                    {
+                      "node": "field",
+                      "col": "level",
+                      "op": "gte",
+                      "value": 8
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "id",
+          "meta"
+        ],
+        "messages": {
+          "auth": "You must sign in to edit media metadata.",
+          "precondition": "You need upload permission (ACL level >= 8) on that media."
+        }
+      },
+      "_evidence": {
+        "locator": "inc/media.php:70",
+        "id_local": "MediaMetadata.save",
+        "entry": {
+          "kind": "http",
+          "route": "lib/exe/mediamanager.php (mediado=save)",
+          "locator": "lib/exe/mediamanager.php:88"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "function media_metasave($id,$data){ if(auth_quickaclcheck(mediaAclPath($id))<AUTH_UPLOAD)return false; if(!checkSecurityToken())return false; $meta=new JpegMeta($src); $meta->_parseAll(); foreach($data as $key=>$val){ if(empty($val)){ $meta->deleteField($key); }else{ $meta->setField($key,$val); } } $old=@filemtime($src); if(!file_exists(mediaFN($id,$old))&&file_exists($src))media_saveOldRevision($id); if($meta->save()){ ... addMediaLogEntry($new,$id,DOKU_CHANGE_TYPE_EDIT,$lang['media_meta_edited'],'',null,$sizechange); return $id; } return false; }",
+        "edges": [
+          "inc/media.php:72"
+        ]
+      }
+    },
+    {
+      "tool": "mediafile_read",
+      "description": "Fetch the bytes of a media file (optionally a specific revision). Requires read permission on the media.",
+      "family": "crud.fetch",
+      "entity": "MediaFile",
+      "exec_spec": {
+        "entity": "MediaFile",
+        "lookup_by": {
+          "id": {
+            "$arg": "media"
+          }
+        }
+      },
+      "input_schema": {
+        "media": {
+          "type": "text",
+          "required": true,
+          "description": "The media id to fetch."
+        },
+        "rev": {
+          "type": "int",
+          "required": false,
+          "description": "Revision to fetch; empty means the current file."
+        },
+        "w": {
+          "type": "int",
+          "required": false,
+          "description": "Resize width."
+        },
+        "h": {
+          "type": "int",
+          "required": false,
+          "description": "Resize height."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "AclRule",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "scope",
+                      "op": "eq",
+                      "value": {
+                        "arg": "media"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "level",
+                      "op": "gte",
+                      "value": 1
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "AclRule",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "scope",
+                      "op": "eq",
+                      "value": "*"
+                    },
+                    {
+                      "node": "field",
+                      "col": "level",
+                      "op": "gte",
+                      "value": 1
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "media"
+        ],
+        "messages": {
+          "auth": "You must sign in to read media.",
+          "precondition": "You need read permission (ACL level >= 1) on that media.",
+          "not_found": "That media file does not exist."
+        }
+      },
+      "_evidence": {
+        "locator": "inc/fetch.functions.php:149",
+        "id_local": "MediaFile.read",
+        "entry": {
+          "kind": "http",
+          "route": "lib/exe/fetch.php?media=<id>",
+          "locator": "lib/exe/fetch.php:28"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "function checkFileStatus(&$media,&$file,$rev='',$width=0,$height=0){ if(media_isexternal($media)){ ... } else { $media=cleanID($media); if(($width||$height)&&media_get_token($media,$width,$height)!==$INPUT->str('tok')){return [412,'Precondition Failed'];} if(auth_quickaclcheck(mediaAclPath($media))<AUTH_READ){return [403,'Forbidden'];} $file=mediaFN($media,$rev); } if(!file_exists($file))return [404,'Not Found']; return [200,null]; }",
+        "edges": [
+          "inc/fetch.functions.php:165"
+        ]
+      }
+    },
+    {
+      "tool": "mediafile_search",
+      "description": "List media files in a namespace, optionally filtered by a search term on the media id. Returns the files you can read.",
+      "family": "search",
+      "entity": "MediaFile",
+      "exec_spec": {
+        "entity": "MediaFile",
+        "search_fields": [
+          "id"
+        ],
+        "rank": {
+          "method": "substring",
+          "fields": [
+            "id"
+          ]
+        }
+      },
+      "input_schema": {
+        "ns": {
+          "type": "text",
+          "required": false,
+          "description": "Namespace to list; empty lists all."
+        },
+        "query": {
+          "type": "text",
+          "required": false,
+          "description": "Substring to match against the media id."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in to list media."
+        }
+      },
+      "_evidence": {
+        "locator": "inc/media.php:712",
+        "id_local": "MediaFile.search",
+        "entry": {
+          "kind": "http",
+          "route": "lib/exe/mediamanager.php (search/list)",
+          "locator": "lib/exe/mediamanager.php:71"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "function media_filelist($ns,$auth=null,...){ if(is_null($auth))$auth=auth_quickaclcheck(\"$ns:*\"); ... search($data,$conf['mediadir'],'search_mediafiles',[...],$dir,1,$sort); }"
+      }
+    },
+    {
+      "tool": "remoteapi_getmedia",
+      "description": "Fetch a media file's bytes through the remote API, base64-encoded. Requires read permission on the media.",
+      "family": "crud.fetch",
+      "entity": "MediaFile",
+      "exec_spec": {
+        "entity": "MediaFile",
+        "lookup_by": {
+          "id": {
+            "$arg": "media"
+          }
+        }
+      },
+      "input_schema": {
+        "media": {
+          "type": "text",
+          "required": true,
+          "description": "The media id to fetch."
+        },
+        "rev": {
+          "type": "int",
+          "required": false,
+          "description": "Revision to fetch; empty means the current file."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "AclRule",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "scope",
+                      "op": "eq",
+                      "value": {
+                        "arg": "media"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "level",
+                      "op": "gte",
+                      "value": 1
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "AclRule",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "scope",
+                      "op": "eq",
+                      "value": "*"
+                    },
+                    {
+                      "node": "field",
+                      "col": "level",
+                      "op": "gte",
+                      "value": 1
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "media"
+        ],
+        "messages": {
+          "auth": "You must sign in to read media.",
+          "precondition": "You need read permission on that media.",
+          "not_found": "That media file (or revision) does not exist."
+        }
+      },
+      "_evidence": {
+        "locator": "inc/Remote/ApiCore.php:869",
+        "id_local": "RemoteApi.getMedia",
+        "entry": {
+          "kind": "rpc",
+          "route": "core.getMedia",
+          "locator": "inc/Remote/ApiCore.php:869"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "$media=cleanID($media); if(auth_quickaclcheck(mediaAclPath($media))<AUTH_READ){ throw new AccessDeniedException('You are not allowed to read this media file',211); } if($this->isCurrentMediaRev($media,$rev))$rev=0; $file=mediaFN($media,$rev); if(!@file_exists($file)){ throw new RemoteException('The requested media file (revision) does not exist',221); } $data=io_readFile($file,false); return base64_encode($data);",
+        "edges": [
+          "inc/Remote/ApiCore.php:871"
+        ]
+      }
+    },
+    {
+      "tool": "remoteapi_savemedia",
+      "description": "Save a (base64-encoded) media file through the remote API, creating or overwriting it. Requires upload permission on the media.",
+      "family": "crud.upsert",
+      "entity": "MediaFile",
+      "exec_spec": {
+        "key": {
+          "id": {
+            "$arg": "media"
+          }
+        },
+        "insert_fields": {
+          "id": {
+            "$arg": "media"
+          },
+          "content": {
+            "$arg": "base64"
+          }
+        },
+        "set_on_exists": {
+          "content": {
+            "$arg": "base64"
+          }
+        },
+        "entity": "MediaFile"
+      },
+      "input_schema": {
+        "media": {
+          "type": "text",
+          "required": true,
+          "description": "The media id to save."
+        },
+        "base64": {
+          "type": "text",
+          "required": true,
+          "description": "Base64-encoded file bytes."
+        },
+        "overwrite": {
+          "type": "bool",
+          "required": false,
+          "description": "Overwrite an existing file."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "AclRule",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "scope",
+                      "op": "eq",
+                      "value": {
+                        "arg": "media"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "level",
+                      "op": "gte",
+                      "value": 8
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "AclRule",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "scope",
+                      "op": "eq",
+                      "value": "*"
+                    },
+                    {
+                      "node": "field",
+                      "col": "level",
+                      "op": "gte",
+                      "value": 8
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "media",
+          "base64"
+        ],
+        "messages": {
+          "auth": "You must sign in to save media.",
+          "precondition": "You need upload permission (ACL level >= 8) on that media."
+        }
+      },
+      "_evidence": {
+        "locator": "inc/Remote/ApiCore.php:1025",
+        "id_local": "RemoteApi.saveMedia",
+        "entry": {
+          "kind": "rpc",
+          "route": "core.saveMedia",
+          "locator": "inc/Remote/ApiCore.php:1025"
+        },
+        "entity_why": "primary effect spawn lands on this table",
+        "ref_code": "$media=cleanID($media); $auth=auth_quickaclcheck(mediaAclPath($media)); if($media===''){ throw new RemoteException('Empty or invalid media ID given',231); } $base64=strtr($base64,[\"\\n\"=>'','\\r'=>'','-'=>'+','_'=>'/',' '=>'+']); $data=base64_decode($base64,true); if($data===false)throw new RemoteException('Invalid base64 encoded data',234); if($data==='')throw new RemoteException('Empty file given',235); $ftmp=$conf['tmpdir'].'/'.md5($media.clientIP()); @unlink($ftmp); io_saveFile($ftmp,$data); $res=media_save(['name'=>$ftmp],$media,$overwrite,$auth,'rename'); if(is_array($res)){ throw new Remo",
+        "edges": [
+          "inc/Remote/ApiCore.php:1031"
+        ]
+      }
+    },
+    {
+      "tool": "remoteapi_deletemedia",
+      "description": "Delete a media file through the remote API. Fails without delete permission, if the file is still referenced, or if it does not exist.",
+      "family": "crud.delete",
+      "entity": "MediaFile",
+      "exec_spec": {
+        "entity": "MediaFile",
+        "lookup_by": {
+          "id": {
+            "$arg": "media"
+          }
+        }
+      },
+      "input_schema": {
+        "media": {
+          "type": "text",
+          "required": true,
+          "description": "The media id to delete."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "MediaFile",
+                "where": {
+                  "node": "field",
+                  "col": "id",
+                  "op": "eq",
+                  "value": {
+                    "arg": "media"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "AclRule",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "scope",
+                      "op": "eq",
+                      "value": {
+                        "arg": "media"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "level",
+                      "op": "gte",
+                      "value": 16
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "media"
+        ],
+        "messages": {
+          "auth": "You must sign in to delete media.",
+          "precondition": "You need delete permission (ACL level >= 16) on that media.",
+          "not_found": "That media file does not exist."
+        }
+      },
+      "_evidence": {
+        "locator": "inc/Remote/ApiCore.php:1077",
+        "id_local": "RemoteApi.deleteMedia",
+        "entry": {
+          "kind": "rpc",
+          "route": "core.deleteMedia",
+          "locator": "inc/Remote/ApiCore.php:1077"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "$media=cleanID($media); $auth=auth_quickaclcheck(mediaAclPath($media)); $res=media_delete($media,$auth); if($res&DOKU_MEDIA_DELETED){ return true; } if($res&DOKU_MEDIA_NOT_AUTH){ throw new AccessDeniedException('You are not allowed to delete this media file',212); } if($res&DOKU_MEDIA_INUSE){ throw new RemoteException('Media file is still referenced',232); } if(!media_exists($media)){ throw new RemoteException('The requested media file (revision) does not exist',221); } throw new RemoteException('Failed to delete media file',233);",
+        "edges": [
+          "inc/Remote/ApiCore.php:1080"
+        ]
+      }
+    },
+    {
+      "tool": "user_register",
+      "description": "Register a new account. Fails if registration is disabled in config, or the username is already taken.",
+      "family": "auth.register",
+      "entity": "User",
+      "exec_spec": {
+        "entity": "User",
+        "set_on_create": {
+          "login": {
+            "$arg": "login"
+          },
+          "pass": {
+            "$arg": "pass"
+          },
+          "grps": {
+            "lit": [
+              "user"
+            ]
+          }
+        },
+        "fields": {
+          "name": {
+            "$arg": "fullname"
+          },
+          "mail": {
+            "$arg": "email"
+          }
+        },
+        "prechecks": [
+          {
+            "entity": "User",
+            "where": {
+              "login": {
+                "$arg": "login"
+              }
+            },
+            "negate": true,
+            "message": "That username is already registered."
+          }
+        ]
+      },
+      "input_schema": {
+        "login": {
+          "type": "text",
+          "required": true,
+          "description": "The new username (User.login)."
+        },
+        "fullname": {
+          "type": "text",
+          "required": true,
+          "description": "The user's full name."
+        },
+        "email": {
+          "type": "text",
+          "required": true,
+          "description": "The user's email."
+        },
+        "pass": {
+          "type": "text",
+          "required": true,
+          "description": "The password (User.pass)."
+        },
+        "passchk": {
+          "type": "text",
+          "required": true,
+          "description": "Password confirmation; must match pass."
+        }
+      },
+      "guards": {
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Config",
+                "where": {
+                  "node": "field",
+                  "col": "key",
+                  "op": "eq",
+                  "value": "openregister"
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "login",
+                  "op": "eq",
+                  "value": {
+                    "arg": "login"
+                  }
+                }
+              },
+              "op": "eq",
+              "n": 0
+            }
+          ]
+        ],
+        "required": [
+          "login",
+          "fullname",
+          "email",
+          "pass",
+          "passchk"
+        ],
+        "messages": {
+          "precondition": "Registration is disabled on this wiki.",
+          "register": "That username is already registered."
+        }
+      },
+      "_evidence": {
+        "locator": "inc/auth.php:1017",
+        "id_local": "User.register",
+        "entry": {
+          "kind": "http",
+          "route": "do=register",
+          "locator": "inc/Action/Register.php:35"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "function register(){ global $lang,$conf,$auth,$INPUT; if(!$INPUT->post->bool('save'))return false; if(!actionOK('register'))return false; $login=trim($auth->cleanUser($INPUT->post->str('login'))); $fullname=trim(preg_replace('/[\\x00-\\x1f:<>&%,;]+/','',$INPUT->post->str('fullname'))); $email=trim(preg_replace('/[\\x00-\\x1f:<>&%,;]+/','',$INPUT->post->str('email'))); $pass=$INPUT->post->str('pass'); $passchk=$INPUT->post->str('passchk'); ... if(!$auth->triggerUserMod('create',[$login,$pass,$fullname,$email])){ msg($lang['regfail'],-1); return false; } $subscription=new RegistrationSubscriptionSen",
+        "edges": [
+          "inc/Action/Register.php:28",
+          "lib/plugins/authplain/auth.php:144"
+        ]
+      }
+    },
+    {
+      "tool": "user_updateprofile",
+      "description": "Update your own profile: full name, email, and optionally a new password. Changing the password requires the current (old) password. Only affects the signed-in user.",
+      "family": "update.field_set",
+      "entity": "User",
+      "exec_spec": {
+        "entity": "User",
+        "row_key": {
+          "login": {
+            "$session": "login"
+          }
+        },
+        "set": {
+          "name": {
+            "$arg": "fullname"
+          },
+          "mail": {
+            "$arg": "email"
+          },
+          "pass": {
+            "$arg": "newpass"
+          }
+        }
+      },
+      "input_schema": {
+        "fullname": {
+          "type": "text",
+          "required": false,
+          "description": "New full name."
+        },
+        "email": {
+          "type": "text",
+          "required": false,
+          "description": "New email."
+        },
+        "newpass": {
+          "type": "text",
+          "required": false,
+          "description": "New password (written to User.pass). Leave empty to keep the current one."
+        },
+        "passchk": {
+          "type": "text",
+          "required": false,
+          "description": "New-password confirmation; must match newpass."
+        },
+        "oldpass": {
+          "type": "text",
+          "required": false,
+          "description": "Current password, required when changing the password."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "login",
+                  "op": "eq",
+                  "value": {
+                    "session": "login"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must sign in to update your profile.",
+          "precondition": "Only the signed-in user can update their own profile.",
+          "not_found": "Your account does not exist."
+        }
+      },
+      "_evidence": {
+        "locator": "inc/auth.php:1088",
+        "id_local": "User.updateProfile",
+        "entry": {
+          "kind": "http",
+          "route": "do=profile",
+          "locator": "inc/Action/Profile.php:37"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "$changes=[]; $changes['pass']=$INPUT->post->str('newpass'); $changes['name']=$INPUT->post->str('fullname'); $changes['mail']=$INPUT->post->str('email'); ... if($conf['profileconfirm']){ if(!$auth->checkPass($INPUT->server->str('REMOTE_USER'),$INPUT->post->str('oldpass'))){ msg($lang['badpass'],-1); return false; } } ... if(!$auth->triggerUserMod('modify',[$INPUT->server->str('REMOTE_USER'),&$changes])){ msg($lang['proffail'],-1); return false; }",
+        "edges": [
+          "inc/auth.php:1146"
+        ]
+      }
+    },
+    {
+      "tool": "user_deleteprofile",
+      "description": "Delete your own account, then log out. Only the signed-in user can be deleted this way.",
+      "family": "crud.delete",
+      "entity": "User",
+      "exec_spec": {
+        "entity": "User",
+        "lookup_by": {
+          "login": {
+            "$session": "login"
+          }
+        }
+      },
+      "input_schema": {
+        "oldpass": {
+          "type": "text",
+          "required": false,
+          "description": "Current password if password confirmation is enabled."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "login",
+                  "op": "eq",
+                  "value": {
+                    "session": "login"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must sign in to delete your account.",
+          "precondition": "Only the signed-in user can delete their own account.",
+          "not_found": "Your account does not exist."
+        }
+      },
+      "_evidence": {
+        "locator": "inc/auth.php:1179",
+        "id_local": "User.deleteProfile",
+        "entry": {
+          "kind": "http",
+          "route": "do=profile_delete",
+          "locator": "inc/Action/ProfileDelete.php:35"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "function auth_deleteprofile(){ global $lang,$conf,$INPUT,$auth; if(!$INPUT->post->bool('confirm_delete'))return false; if(!$INPUT->post->str('login')||$INPUT->post->str('login')!=$INPUT->server->str('REMOTE_USER')){ msg($lang['badlogin'],-1); return false; } ... if(!$auth->canDo('delUser')){ msg($lang['profnodelete'],-1); return false; } ... if($deleted=$auth->triggerUserMod('delete',[$deleted])){ auth_logoff(); return true; } ... }",
+        "edges": [
+          "inc/auth.php:1188, Inc/Action/ProfileDelete.php:28"
+        ]
+      }
+    },
+    {
+      "tool": "user_admincreate",
+      "description": "Create a user through the user-management admin. Superuser only. Fails if the username is already taken.",
+      "family": "crud.insert",
+      "entity": "User",
+      "exec_spec": {
+        "entity": "User",
+        "set_on_create": {
+          "login": {
+            "$arg": "userid"
+          },
+          "pass": {
+            "$arg": "userpass"
+          },
+          "grps": {
+            "$arg": "usergroups"
+          }
+        },
+        "fields": {
+          "name": {
+            "$arg": "username"
+          },
+          "mail": {
+            "$arg": "usermail"
+          }
+        },
+        "unique_on": [
+          "login"
+        ]
+      },
+      "input_schema": {
+        "userid": {
+          "type": "text",
+          "required": true,
+          "description": "The new username (User.login)."
+        },
+        "userpass": {
+          "type": "text",
+          "required": true,
+          "description": "The new password (User.pass)."
+        },
+        "userpass2": {
+          "type": "text",
+          "required": true,
+          "description": "Password confirmation; must match userpass."
+        },
+        "username": {
+          "type": "text",
+          "required": true,
+          "description": "The user's full name."
+        },
+        "usermail": {
+          "type": "text",
+          "required": true,
+          "description": "The user's email."
+        },
+        "usergroups": {
+          "type": "text",
+          "required": false,
+          "description": "Comma-separated groups, e.g. '@admin,user'."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Config",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "key",
+                      "op": "eq",
+                      "value": "superuser"
+                    },
+                    {
+                      "node": "field",
+                      "col": "value",
+                      "op": "contains",
+                      "value": {
+                        "session": "login"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "userid",
+          "userpass",
+          "username",
+          "usermail"
+        ],
+        "messages": {
+          "auth": "You must sign in as the superuser to manage users.",
+          "precondition": "Only a superuser can create users.",
+          "unique": "That username is already taken."
+        }
+      },
+      "_evidence": {
+        "locator": "lib/plugins/usermanager/admin.php:642",
+        "id_local": "User.adminCreate",
+        "entry": {
+          "kind": "http",
+          "route": "do=admin&page=usermanager",
+          "locator": "lib/plugins/usermanager/admin.php:642"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "if(!checkSecurityToken())return false; if(!$this->auth->canDo('addUser'))return false; ... if($ok=$this->auth->triggerUserMod('create',[$user,$pass,$name,$mail,$grps])){ msg($this->lang['add_ok'],1); ... $this->notifyUser($user,$pass,$status_alert); }",
+        "edges": [
+          "lib/plugins/usermanager/admin.php:645,",
+          "lib/plugins/authplain/auth.php:144"
+        ]
+      }
+    },
+    {
+      "tool": "user_adminupdate",
+      "description": "Update a user's name, email, password, or groups through the user-management admin, and optionally rename the login. Superuser only.",
+      "family": "update.field_set",
+      "entity": "User",
+      "exec_spec": {
+        "entity": "User",
+        "row_key": {
+          "login": {
+            "$arg": "userid_old"
+          }
+        },
+        "set": {
+          "name": {
+            "$arg": "username"
+          },
+          "mail": {
+            "$arg": "usermail"
+          },
+          "pass": {
+            "$arg": "userpass"
+          },
+          "grps": {
+            "$arg": "usergroups"
+          },
+          "login": {
+            "$arg": "new_login"
+          }
+        }
+      },
+      "input_schema": {
+        "userid_old": {
+          "type": "text",
+          "required": true,
+          "description": "The current username to update."
+        },
+        "new_login": {
+          "type": "text",
+          "required": false,
+          "description": "New username, if renaming. Leave empty to keep the current login."
+        },
+        "userid": {
+          "type": "text",
+          "required": false,
+          "description": "Alias for new_login; the target account."
+        },
+        "userpass": {
+          "type": "text",
+          "required": false,
+          "description": "New password (User.pass)."
+        },
+        "username": {
+          "type": "text",
+          "required": false,
+          "description": "New full name."
+        },
+        "usermail": {
+          "type": "text",
+          "required": false,
+          "description": "New email."
+        },
+        "usergroups": {
+          "type": "text",
+          "required": false,
+          "description": "New comma-separated groups."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Config",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "key",
+                      "op": "eq",
+                      "value": "superuser"
+                    },
+                    {
+                      "node": "field",
+                      "col": "value",
+                      "op": "contains",
+                      "value": {
+                        "session": "login"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "userid_old"
+        ],
+        "messages": {
+          "auth": "You must sign in as the superuser to manage users.",
+          "precondition": "Only a superuser can update users.",
+          "not_found": "That user does not exist."
+        }
+      },
+      "_evidence": {
+        "locator": "lib/plugins/usermanager/admin.php:776",
+        "id_local": "User.adminUpdate",
+        "entry": {
+          "kind": "http",
+          "route": "do=admin&page=usermanager",
+          "locator": "lib/plugins/usermanager/admin.php:776"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "if($this->auth->getUserData($newuser)){ msg(...'update_exists'...); $re_edit=true; } else { $changes['user']=$newuser; } ... if($ok=$this->auth->triggerUserMod('modify',[$olduser,$changes])){ ... io_saveFile($conf['cachedir'].'/sessionpurge',time()); }",
+        "edges": [
+          "lib/plugins/usermanager/admin.php:780",
+          "lib/plugins/authplain/auth.php:185"
+        ]
+      }
+    },
+    {
+      "tool": "user_admindelete",
+      "description": "Delete one or more users through the user-management admin. Superuser only. You cannot delete the account you are signed in as.",
+      "family": "crud.delete",
+      "entity": "User",
+      "exec_spec": {
+        "entity": "User",
+        "lookup_by": {
+          "login": {
+            "$arg": "delete"
+          }
+        },
+        "multi": {
+          "arg": "delete",
+          "bind": "delete",
+          "max": 100
+        }
+      },
+      "input_schema": {
+        "delete": {
+          "type": "array",
+          "items": {
+            "type": "text"
+          },
+          "required": true,
+          "description": "List of usernames to delete. May be a single value or an array."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Config",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "key",
+                      "op": "eq",
+                      "value": "superuser"
+                    },
+                    {
+                      "node": "field",
+                      "col": "value",
+                      "op": "contains",
+                      "value": {
+                        "session": "login"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "delete"
+        ],
+        "messages": {
+          "auth": "You must sign in as the superuser to delete users.",
+          "precondition": "Only a superuser can delete users.",
+          "not_found": "One of those users does not exist."
+        }
+      },
+      "_evidence": {
+        "locator": "lib/plugins/usermanager/admin.php:714",
+        "id_local": "User.adminDelete",
+        "entry": {
+          "kind": "http",
+          "route": "do=admin&page=usermanager",
+          "locator": "lib/plugins/usermanager/admin.php:714"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "if(in_array($_SERVER['REMOTE_USER'],$selected)){ msg($this->lang['delete_fail_self'],-1); return false; } $count=$this->auth->triggerUserMod('delete',[$selected]); ...; io_saveFile($conf['cachedir'].'/sessionpurge',time());",
+        "edges": [
+          "lib/plugins/usermanager/admin.php:718"
+        ]
+      }
+    },
+    {
+      "tool": "aclrule_addorupdate",
+      "description": "Add or update one ACL rule (scope + user, with a permission level). This is how page/namespace permissions are changed. Superuser only. Levels: 0 none, 1 read, 2 edit, 4 create, 8 upload, 16 delete.",
+      "family": "crud.upsert",
+      "entity": "AclRule",
+      "exec_spec": {
+        "key": {
+          "scope": {
+            "$arg": "acl_scope"
+          },
+          "user": {
+            "$arg": "acl_user"
+          }
+        },
+        "set_on_exists": {
+          "level": {
+            "$arg": "acl_level"
+          }
+        },
+        "insert_fields": {
+          "scope": {
+            "$arg": "acl_scope"
+          },
+          "user": {
+            "$arg": "acl_user"
+          },
+          "level": {
+            "$arg": "acl_level"
+          }
+        },
+        "entity": "AclRule"
+      },
+      "input_schema": {
+        "acl_scope": {
+          "type": "text",
+          "required": true,
+          "description": "The page id or namespace pattern the rule applies to ('*' for all pages)."
+        },
+        "acl_user": {
+          "type": "text",
+          "required": true,
+          "description": "The user, '@group', or '@ALL' the rule applies to."
+        },
+        "acl_level": {
+          "type": "int",
+          "required": true,
+          "description": "Permission level 0-16."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Config",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "key",
+                      "op": "eq",
+                      "value": "superuser"
+                    },
+                    {
+                      "node": "field",
+                      "col": "value",
+                      "op": "contains",
+                      "value": {
+                        "session": "login"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "acl_scope",
+          "acl_user",
+          "acl_level"
+        ],
+        "messages": {
+          "auth": "You must sign in as the superuser to change ACL rules.",
+          "precondition": "Only a superuser can change ACL rules."
+        }
+      },
+      "_evidence": {
+        "locator": "lib/plugins/acl/admin.php:728",
+        "id_local": "AclRule.addOrUpdate",
+        "entry": {
+          "kind": "http",
+          "route": "do=admin&page=acl",
+          "locator": "lib/plugins/acl/admin.php:728"
+        },
+        "entity_why": "primary effect row_upsert lands on this table",
+        "ref_code": "public function addOrUpdateACL($acl_scope,$acl_user,$acl_level){ global $config_cascade; $this->deleteACL($acl_scope,$acl_user); $acl_user=auth_nameencode($acl_user,true); if(!str_contains($acl_scope,'*')){ if($acl_level>AUTH_EDIT)$acl_level=AUTH_EDIT; } $new_acl=\"$acl_scope\\t$acl_user\\t$acl_level\\n\"; return io_saveFile($config_cascade['acl']['default'],$new_acl,true); }",
+        "edges": [
+          "lib/plugins/acl/admin.php:44, lib/plugins/acl/remote.php:42",
+          "lib/plugins/acl/admin.php:733"
+        ]
+      }
+    },
+    {
+      "tool": "aclrule_delete",
+      "description": "Remove an ACL rule by scope and user. Superuser only.",
+      "family": "crud.delete",
+      "entity": "AclRule",
+      "exec_spec": {
+        "entity": "AclRule",
+        "lookup_by": {
+          "scope": {
+            "$arg": "acl_scope"
+          },
+          "user": {
+            "$arg": "acl_user"
+          }
+        }
+      },
+      "input_schema": {
+        "acl_scope": {
+          "type": "text",
+          "required": true,
+          "description": "The scope of the rule to remove."
+        },
+        "acl_user": {
+          "type": "text",
+          "required": true,
+          "description": "The user/group the rule applies to."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Config",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "key",
+                      "op": "eq",
+                      "value": "superuser"
+                    },
+                    {
+                      "node": "field",
+                      "col": "value",
+                      "op": "contains",
+                      "value": {
+                        "session": "login"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "acl_scope",
+          "acl_user"
+        ],
+        "messages": {
+          "auth": "You must sign in as the superuser to change ACL rules.",
+          "precondition": "Only a superuser can change ACL rules.",
+          "not_found": "That ACL rule does not exist."
+        }
+      },
+      "_evidence": {
+        "locator": "lib/plugins/acl/admin.php:751",
+        "id_local": "AclRule.delete",
+        "entry": {
+          "kind": "http",
+          "route": "do=admin&page=acl",
+          "locator": "lib/plugins/acl/admin.php:751"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "public function deleteACL($acl_scope,$acl_user){ global $config_cascade; $acl_user=auth_nameencode($acl_user,true); $acl_pattern='^'.preg_quote($acl_scope,'/').'[ \\t]+'.$acl_user.'[ \\t]+[0-8].*$'; return io_deleteFromFile($config_cascade['acl']['default'],\"/$acl_pattern/\",true); }",
+        "edges": [
+          "lib/plugins/acl/admin.php:44"
+        ]
+      }
+    },
+    {
+      "tool": "config_save",
+      "description": "Set a configuration value in the wiki config. Superuser only. Returns ok:false if the config is locked or would be left empty.",
+      "family": "crud.upsert",
+      "entity": "Config",
+      "exec_spec": {
+        "key": {
+          "key": {
+            "$arg": "key"
+          }
+        },
+        "set_on_exists": {
+          "value": {
+            "$arg": "value"
+          }
+        },
+        "insert_fields": {
+          "key": {
+            "$arg": "key"
+          },
+          "value": {
+            "$arg": "value"
+          }
+        },
+        "entity": "Config"
+      },
+      "input_schema": {
+        "key": {
+          "type": "text",
+          "required": true,
+          "description": "The config key, e.g. 'useacl' or 'title'."
+        },
+        "value": {
+          "type": "text",
+          "required": true,
+          "description": "The value to assign."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Config",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "key",
+                      "op": "eq",
+                      "value": "superuser"
+                    },
+                    {
+                      "node": "field",
+                      "col": "value",
+                      "op": "contains",
+                      "value": {
+                        "session": "login"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "key",
+          "value"
+        ],
+        "messages": {
+          "auth": "You must sign in as the superuser to change config.",
+          "precondition": "Only a superuser can change config."
+        }
+      },
+      "_evidence": {
+        "locator": "lib/plugins/config/core/Writer.php:34",
+        "id_local": "Config.save",
+        "entry": {
+          "kind": "http",
+          "route": "do=admin&page=config",
+          "locator": "lib/plugins/config/admin.php:38"
+        },
+        "entity_why": "primary effect row_upsert lands on this table",
+        "ref_code": "public function save($settings){ global $conf; if($this->isLocked())throw new Exception('no save'); if(file_exists($this->savefile)){ if(file_exists($this->savefile.'.bak.php'))@unlink($this->savefile.'.bak.php'); if(!io_rename($this->savefile,$this->savefile.'.bak.php'))throw new Exception('no backup'); } $out=''; foreach($settings as $setting){ if($setting->shouldBeSaved()){ $out.=$setting->out('conf','php'); } } if($out==='')throw new Exception('empty config'); $out=$this->getHeader().$out; fwrite($fh,$out); fclose($fh); ... }",
+        "edges": [
+          "lib/plugins/config/admin.php:45"
+        ]
+      }
+    },
+    {
+      "tool": "pluginconfig_set",
+      "description": "Enable or disable a plugin. Superuser only. Fails if the plugin does not exist or is a protected core plugin.",
+      "family": "update.field_set",
+      "entity": "PluginConfig",
+      "exec_spec": {
+        "entity": "PluginConfig",
+        "row_key": {
+          "plugin": {
+            "$arg": "plugin"
+          }
+        },
+        "set": {
+          "enabled": {
+            "$arg": "enabled"
+          }
+        }
+      },
+      "input_schema": {
+        "plugin": {
+          "type": "text",
+          "required": true,
+          "description": "The plugin base name."
+        },
+        "enabled": {
+          "type": "int",
+          "enum": [
+            0,
+            1
+          ],
+          "required": true,
+          "description": "1 to enable, 0 to disable."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Config",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "key",
+                      "op": "eq",
+                      "value": "superuser"
+                    },
+                    {
+                      "node": "field",
+                      "col": "value",
+                      "op": "contains",
+                      "value": {
+                        "session": "login"
+                      }
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "PluginConfig",
+                "where": {
+                  "node": "field",
+                  "col": "plugin",
+                  "op": "eq",
+                  "value": {
+                    "arg": "plugin"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "plugin",
+          "enabled"
+        ],
+        "messages": {
+          "auth": "You must sign in as the superuser to manage plugins.",
+          "precondition": "Only a superuser can enable plugins, and the plugin must exist."
+        }
+      },
+      "_evidence": {
+        "locator": "inc/Extension/PluginController.php:182",
+        "id_local": "PluginConfig.set",
+        "entry": {
+          "kind": "http",
+          "route": "do=admin&page=extension",
+          "locator": "lib/plugins/extension/admin.php:21"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "public function enable($plugin){ if(array_key_exists($plugin,$this->pluginCascade['protected']))return false; $this->masterList[$plugin]=1; return $this->saveList(); } // saveList rewrites $plugins['name']=0|1 in conf/plugins.local.php (backup .bak)",
+        "edges": [
+          "inc/Extension/AdminPlugin.php:98, lib/plugins/extension/remote.php:28",
+          "inc/Extension/PluginController.php:169,182"
+        ]
+      }
+    },
+    {
+      "tool": "remoteapi_savepage",
+      "description": "Save a page through the XML-RPC remote API (core.savePage). Creates or overwrites the page's current text. Requires edit permission; fails if the page is locked or the text is blocked by the spam filter.",
+      "family": "crud.upsert",
+      "entity": "Page",
+      "exec_spec": {
+        "key": {
+          "id": {
+            "$arg": "page"
+          }
+        },
+        "insert_fields": {
+          "id": {
+            "$arg": "page"
+          },
+          "content": {
+            "$arg": "text"
+          },
+          "exists": true
+        },
+        "set_on_exists": {
+          "content": {
+            "$arg": "text"
+          },
+          "exists": true
+        },
+        "entity": "Page"
+      },
+      "input_schema": {
+        "page": {
+          "type": "text",
+          "required": true,
+          "description": "The page id to save."
+        },
+        "text": {
+          "type": "text",
+          "required": true,
+          "description": "The page text. Empty deletes an existing page."
+        },
+        "summary": {
+          "type": "text",
+          "required": false,
+          "description": "Edit summary."
+        },
+        "isminor": {
+          "type": "bool",
+          "required": false,
+          "description": "Mark as a minor edit."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "AclRule",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "scope",
+                      "op": "eq",
+                      "value": {
+                        "arg": "page"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "level",
+                      "op": "gte",
+                      "value": 8
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "AclRule",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "scope",
+                      "op": "eq",
+                      "value": "*"
+                    },
+                    {
+                      "node": "field",
+                      "col": "level",
+                      "op": "gte",
+                      "value": 8
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "page",
+          "text"
+        ],
+        "messages": {
+          "auth": "You must sign in to save a page.",
+          "precondition": "You need edit permission (ACL level >= 8) on that page.",
+          "not_found": "That page does not exist."
+        }
+      },
+      "_evidence": {
+        "locator": "inc/Remote/ApiCore.php:695",
+        "id_local": "RemoteApi.savePage",
+        "entry": {
+          "kind": "rpc",
+          "route": "core.savePage",
+          "locator": "lib/exe/xmlrpc.php:14, inc/Remote/ApiCore.php:695"
+        },
+        "entity_why": "primary effect spawn lands on this table",
+        "ref_code": "$page=$this->checkPage($page,0,false,AUTH_EDIT); $TEXT=cleanText($text); if(!page_exists($page)&&trim($TEXT)==''){ throw new RemoteException('Refusing to write an empty new wiki page',132); } if(checklock($page)){ throw new RemoteException('The page is currently locked',133); } if(checkwordblock()){ throw new RemoteException('The page content was blocked by the spam filter',134); } if(!page_exists($page)&&empty($summary))$summary=$lang['created']; if(page_exists($page)&&empty($TEXT)&&empty($summary))$summary=$lang['deleted']; lock($page); saveWikiText($page,$TEXT,$summary,$isminor); unlock($pa",
+        "edges": [
+          "inc/Remote/ApiCore.php:700"
+        ]
+      }
+    },
+    {
+      "tool": "remoteapi_getpage",
+      "description": "Fetch a page's raw wiki text through the XML-RPC remote API (core.getPage). Requires read permission on the page.",
+      "family": "crud.fetch",
+      "entity": "Page",
+      "exec_spec": {
+        "entity": "Page",
+        "lookup_by": {
+          "id": {
+            "$arg": "page"
+          }
+        }
+      },
+      "input_schema": {
+        "page": {
+          "type": "text",
+          "required": true,
+          "description": "The page id to fetch."
+        },
+        "rev": {
+          "type": "int",
+          "required": false,
+          "description": "Revision to fetch; empty means the current text."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "AclRule",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "scope",
+                      "op": "eq",
+                      "value": {
+                        "arg": "page"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "level",
+                      "op": "gte",
+                      "value": 1
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "AclRule",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "scope",
+                      "op": "eq",
+                      "value": "*"
+                    },
+                    {
+                      "node": "field",
+                      "col": "level",
+                      "op": "gte",
+                      "value": 1
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "page"
+        ],
+        "messages": {
+          "auth": "You must sign in to read a page.",
+          "precondition": "You need read permission on that page.",
+          "not_found": "That page does not exist."
+        }
+      },
+      "_evidence": {
+        "locator": "inc/Remote/ApiCore.php:438",
+        "id_local": "RemoteApi.getPage",
+        "entry": {
+          "kind": "rpc",
+          "route": "core.getPage",
+          "locator": "inc/Remote/ApiCore.php:438"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "$page=$this->checkPage($page,$rev,false); $text=rawWiki($page,$rev); if(!$text&&!$rev){ return pageTemplate($page); } return $text;",
+        "edges": [
+          "inc/Remote/ApiCore.php:440"
+        ]
+      }
+    },
+    {
+      "tool": "remoteapi_getpagehistory",
+      "description": "Fetch a page's change history through the XML-RPC remote API (core.getPageHistory): each change with revision, user, ip, summary, type and size change.",
+      "family": "search",
+      "entity": "ChangeLogEntry",
+      "exec_spec": {
+        "entity": "ChangeLogEntry",
+        "search_fields": [
+          "id",
+          "date"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "id",
+            "date"
+          ]
+        },
+        "sort": {
+          "col": "date",
+          "dir": "desc"
+        }
+      },
+      "input_schema": {
+        "page": {
+          "type": "text",
+          "required": true,
+          "description": "The page id whose history to fetch."
+        },
+        "first": {
+          "type": "int",
+          "required": false,
+          "description": "Offset into the change list."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "AclRule",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "scope",
+                      "op": "eq",
+                      "value": {
+                        "arg": "page"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "level",
+                      "op": "gte",
+                      "value": 1
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "AclRule",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "scope",
+                      "op": "eq",
+                      "value": "*"
+                    },
+                    {
+                      "node": "field",
+                      "col": "level",
+                      "op": "gte",
+                      "value": 1
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "page"
+        ],
+        "messages": {
+          "auth": "You must sign in to read a page's history.",
+          "precondition": "You need read permission on that page."
+        }
+      },
+      "_evidence": {
+        "locator": "inc/Remote/ApiCore.php:513",
+        "id_local": "RemoteApi.getPageHistory",
+        "entry": {
+          "kind": "rpc",
+          "route": "core.getPageHistory",
+          "locator": "inc/Remote/ApiCore.php:513"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "$page=$this->checkPage($page,0,false); $pagelog=new PageChangeLog($page); $pagelog->setChunkSize(1024); $revisions=$pagelog->getRevisions($first-1,$conf['recent']); $result=[]; foreach($revisions as $rev){ if(!page_exists($page,$rev))continue; $info=$pagelog->getRevisionInfo($rev); $result[]=new PageChange($page,$rev,$info['user'],$info['ip'],$info['sum'],$info['type'],$info['sizechange']); } return $result;",
+        "edges": [
+          {
+            "subject": "RemoteApi.getPageHistory",
+            "relation": "requires",
+            "object": {
+              "ref": "AclRule",
+              "kind": "entity"
+            },
+            "condition": "checkPage enforces page read permission",
+            "evidence": "inc/Remote/ApiCore.php:513"
+          }
+        ]
+      }
+    },
+    {
+      "tool": "remoteapi_searchpages",
+      "description": "Full-text search the wiki through the XML-RPC remote API (core.searchPages). Returns matching page ids with snippets and scores.",
+      "family": "search",
+      "entity": "SearchIndex",
+      "exec_spec": {
+        "entity": "SearchIndex",
+        "search_fields": [
+          "fulltext_tokens"
+        ],
+        "rank": {
+          "method": "keyword",
+          "fields": [
+            "fulltext_tokens"
+          ]
+        }
+      },
+      "input_schema": {
+        "query": {
+          "type": "text",
+          "required": true,
+          "description": "The full-text search query."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "query"
+        ],
+        "messages": {
+          "auth": "You must sign in to search."
+        }
+      },
+      "_evidence": {
+        "locator": "inc/Remote/ApiCore.php:360",
+        "id_local": "RemoteApi.searchPages",
+        "entry": {
+          "kind": "rpc",
+          "route": "core.searchPages",
+          "locator": "inc/Remote/ApiCore.php:360"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "$FulltextSearch=new FulltextSearch(); $data=$FulltextSearch->pageSearch($query,$regex); $pages=[]; foreach($data as $id=>$score){ ... $pages[]=new PageHit($id,$snippet,$score,...); } return $pages;"
+      }
+    },
+    {
+      "tool": "remoteapi_listpages",
+      "description": "List pages in a namespace through the XML-RPC remote API (core.listPages), optionally recursing into sub-namespaces.",
+      "family": "search",
+      "entity": "Page",
+      "exec_spec": {
+        "entity": "Page",
+        "search_fields": [
+          "id"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "id"
+          ]
+        }
+      },
+      "input_schema": {
+        "namespace": {
+          "type": "text",
+          "required": false,
+          "description": "Namespace to list; empty lists all."
+        },
+        "depth": {
+          "type": "int",
+          "required": false,
+          "description": "Recursion depth into sub-namespaces."
+        },
+        "hash": {
+          "type": "bool",
+          "required": false,
+          "description": "Include the page content hash."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in to list pages."
+        }
+      },
+      "_evidence": {
+        "locator": "inc/Remote/ApiCore.php:283",
+        "id_local": "RemoteApi.listPages",
+        "entry": {
+          "kind": "rpc",
+          "route": "core.listPages",
+          "locator": "inc/Remote/ApiCore.php:283"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "$namespace=cleanID($namespace); ... $data=[]; $opts['skipacl']=0; $opts['depth']=$depth; $opts['hash']=$hash; search($data,$conf['datadir'],'search_allpages',$opts,$dir); return array_map(...new Page(...),$data);"
+      }
+    },
+    {
+      "tool": "remoteapi_getrecentpagechanges",
+      "description": "Fetch recent page changes through the XML-RPC remote API (core.getRecentChanges), optionally only those after a timestamp.",
+      "family": "search",
+      "entity": "GlobalChangeLogEntry",
+      "exec_spec": {
+        "entity": "GlobalChangeLogEntry",
+        "search_fields": [
+          "date",
+          "id",
+          "user",
+          "ip",
+          "sum",
+          "type"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "date",
+            "id",
+            "user",
+            "ip",
+            "sum",
+            "type"
+          ]
+        },
+        "sort": {
+          "col": "date",
+          "dir": "desc"
+        }
+      },
+      "input_schema": {
+        "timestamp": {
+          "type": "int",
+          "required": false,
+          "description": "Only return changes after this timestamp."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in to read recent changes."
+        }
+      },
+      "_evidence": {
+        "locator": "inc/Remote/ApiCore.php:402",
+        "id_local": "RemoteApi.getRecentPageChanges",
+        "entry": {
+          "kind": "rpc",
+          "route": "core.getRecentPageChanges",
+          "locator": "inc/Remote/ApiCore.php:402"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "$recents=getRecentsSince($timestamp); $changes=[]; foreach($recents as $recent){ $changes[]=new PageChange($recent['id'],$recent['date'],$recent['user'],$recent['ip'],$recent['sum'],$recent['type'],$recent['sizechange']); } return $changes;"
+      }
+    },
+    {
+      "tool": "remoteapi_getpagebacklinks",
+      "description": "List pages that link to the given page through the XML-RPC remote API (core.getPageBackLinks).",
+      "family": "search",
+      "entity": "SearchIndex",
+      "exec_spec": {
+        "entity": "SearchIndex",
+        "search_fields": [
+          "metadata_keys"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "metadata_keys"
+          ]
+        }
+      },
+      "input_schema": {
+        "page": {
+          "type": "text",
+          "required": true,
+          "description": "The page whose backlinks to find."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "AclRule",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "scope",
+                      "op": "eq",
+                      "value": {
+                        "arg": "page"
+                      }
+                    },
+                    {
+                      "node": "field",
+                      "col": "level",
+                      "op": "gte",
+                      "value": 1
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "AclRule",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "scope",
+                      "op": "eq",
+                      "value": "*"
+                    },
+                    {
+                      "node": "field",
+                      "col": "level",
+                      "op": "gte",
+                      "value": 1
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "page"
+        ],
+        "messages": {
+          "auth": "You must sign in to list backlinks.",
+          "precondition": "You need read permission on that page."
+        }
+      },
+      "_evidence": {
+        "locator": "inc/Remote/ApiCore.php:605",
+        "id_local": "RemoteApi.getPageBackLinks",
+        "entry": {
+          "kind": "rpc",
+          "route": "core.getPageBackLinks",
+          "locator": "inc/Remote/ApiCore.php:605"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "$page=$this->checkPage($page,0,false); return (new MetadataSearch())->backlinks($page);",
+        "edges": [
+          {
+            "subject": "RemoteApi.getPageBackLinks",
+            "relation": "requires",
+            "object": {
+              "ref": "AclRule",
+              "kind": "entity"
+            },
+            "condition": "checkPage enforces page read permission",
+            "evidence": "inc/Remote/ApiCore.php:605"
+          }
+        ]
+      }
+    },
+    {
+      "tool": "remoteapi_lockpages",
+      "description": "Lock one or more pages through the XML-RPC remote API (core.lockPages) so others cannot edit them. A page you lack edit permission on, or that is already locked, is skipped. Returns the pages actually locked.",
+      "family": "crud.insert",
+      "entity": "PageLock",
+      "exec_spec": {
+        "entity": "PageLock",
+        "fields": {
+          "id": {
+            "$arg": "pages"
+          },
+          "holder": {
+            "$session": "login"
+          }
+        },
+        "multi": {
+          "arg": "pages",
+          "bind": "pages",
+          "max": 100
+        }
+      },
+      "input_schema": {
+        "pages": {
+          "type": "array",
+          "items": {
+            "type": "text"
+          },
+          "required": true,
+          "description": "Page ids to lock."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "AclRule",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "scope",
+                      "op": "eq",
+                      "value": "*"
+                    },
+                    {
+                      "node": "field",
+                      "col": "level",
+                      "op": "gte",
+                      "value": 2
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "pages"
+        ],
+        "messages": {
+          "auth": "You must sign in to lock pages.",
+          "precondition": "You need edit permission to lock a page."
+        }
+      },
+      "_evidence": {
+        "locator": "inc/Remote/ApiCore.php:631",
+        "id_local": "RemoteApi.lockPages",
+        "entry": {
+          "kind": "rpc",
+          "route": "core.lockPages",
+          "locator": "inc/Remote/ApiCore.php:631"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "$locked=[]; foreach($pages as $id){ $id=cleanID($id); if($id==='')continue; if(auth_quickaclcheck($id)<AUTH_EDIT||checklock($id)){ continue; } lock($id); $locked[]=$id; } return $locked;",
+        "edges": [
+          "inc/Remote/ApiCore.php:631"
+        ]
+      }
+    },
+    {
+      "tool": "remoteapi_unlockpages",
+      "description": "Unlock one or more pages through the XML-RPC remote API (core.unlockPages). Only the lock holder (or the original session) can unlock. Returns the pages actually unlocked.",
+      "family": "crud.delete",
+      "entity": "PageLock",
+      "exec_spec": {
+        "entity": "PageLock",
+        "lookup_by": {
+          "id": {
+            "$arg": "pages"
+          }
+        },
+        "multi": {
+          "arg": "pages",
+          "bind": "pages",
+          "max": 100
+        }
+      },
+      "input_schema": {
+        "pages": {
+          "type": "array",
+          "items": {
+            "type": "text"
+          },
+          "required": true,
+          "description": "Page ids to unlock."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "AclRule",
+                "where": {
+                  "node": "and",
+                  "args": [
+                    {
+                      "node": "field",
+                      "col": "scope",
+                      "op": "eq",
+                      "value": "*"
+                    },
+                    {
+                      "node": "field",
+                      "col": "level",
+                      "op": "gte",
+                      "value": 2
+                    }
+                  ]
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "pages"
+        ],
+        "messages": {
+          "auth": "You must sign in to unlock pages.",
+          "precondition": "You need edit permission to unlock a page."
+        }
+      },
+      "_evidence": {
+        "locator": "inc/Remote/ApiCore.php:662",
+        "id_local": "RemoteApi.unlockPages",
+        "entry": {
+          "kind": "rpc",
+          "route": "core.unlockPages",
+          "locator": "inc/Remote/ApiCore.php:662"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "$unlocked=[]; foreach($pages as $id){ $id=cleanID($id); if($id==='')continue; if(auth_quickaclcheck($id)<AUTH_EDIT||!unlock($id)){ continue; } $unlocked[]=$id; } return $unlocked;",
+        "edges": [
+          "inc/Remote/ApiCore.php:662"
+        ]
+      }
+    },
+    {
+      "tool": "subscription_create",
+      "description": "Subscribe a user to a page or namespace so they get notified of changes. Re-subscribing the same target+user replaces the existing subscription (style/data are overwritten). Fails if the user does not exist.",
+      "family": "crud.upsert",
+      "entity": "Subscription",
+      "exec_spec": {
+        "key": {
+          "target": {
+            "$arg": "target"
+          },
+          "user": {
+            "$arg": "user"
+          }
+        },
+        "insert_fields": {
+          "target": {
+            "$arg": "target"
+          },
+          "user": {
+            "$arg": "user"
+          },
+          "style": {
+            "$arg": "style"
+          },
+          "data": {
+            "sym": "$now"
+          }
+        },
+        "set_on_exists": {
+          "style": {
+            "$arg": "style"
+          },
+          "data": {
+            "sym": "$now"
+          }
+        },
+        "entity": "Subscription"
+      },
+      "input_schema": {
+        "target": {
+          "type": "text",
+          "required": true,
+          "description": "The page id or namespace to subscribe to."
+        },
+        "user": {
+          "type": "text",
+          "required": true,
+          "description": "The subscribed user's login."
+        },
+        "style": {
+          "type": "text",
+          "enum": [
+            "every",
+            "list",
+            "digest"
+          ],
+          "required": true,
+          "description": "Notification style."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "User",
+                "where": {
+                  "node": "field",
+                  "col": "login",
+                  "op": "eq",
+                  "value": {
+                    "arg": "user"
+                  }
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "required": [
+          "target",
+          "user",
+          "style"
+        ],
+        "messages": {
+          "auth": "You must sign in to subscribe.",
+          "precondition": "The user must exist.",
+          "not_found": "That user does not exist."
+        }
+      },
+      "_evidence": {
+        "locator": "inc/Action/Subscribe.php:90",
+        "id_local": "Subscription.create",
+        "entry": {
+          "kind": "http",
+          "route": "do=subscribe",
+          "locator": "inc/Action/Subscribe.php:61, inc/Action/Subscribe.php:90"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "public function add($id,$user,$style,$data=''){ if(!$this->isenabled())return false; $this->remove($id,$user); $user=auth_nameencode(trim($user)); $style=trim($style); $data=trim($data); if(!$user)throw new Exception('no subscription user given'); if(!$style)throw new Exception('no subscription style given'); if(!$data)$data=time(); $line=\"$user $style $data\\n\"; $file=$this->file($id); return io_saveFile($file,$line,true); }",
+        "edges": [
+          "inc/Action/Subscribe.php:24,154",
+          "inc/Subscriptions/SubscriberManager.php:43"
+        ]
+      }
+    },
+    {
+      "tool": "subscription_delete",
+      "description": "Unsubscribe a user from a page or namespace. Fails if the subscription does not exist.",
+      "family": "crud.delete",
+      "entity": "Subscription",
+      "exec_spec": {
+        "entity": "Subscription",
+        "lookup_by": {
+          "target": {
+            "$arg": "target"
+          },
+          "user": {
+            "$arg": "user"
+          }
+        }
+      },
+      "input_schema": {
+        "target": {
+          "type": "text",
+          "required": true,
+          "description": "The page id or namespace to unsubscribe from."
+        },
+        "user": {
+          "type": "text",
+          "required": true,
+          "description": "The subscribed user's login."
+        },
+        "style": {
+          "type": "text",
+          "required": false,
+          "description": "Style to remove; omitted removes all entries for that target+user."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "target",
+          "user"
+        ],
+        "messages": {
+          "auth": "You must sign in to unsubscribe.",
+          "not_found": "That subscription does not exist."
+        }
+      },
+      "_evidence": {
+        "locator": "inc/Action/Subscribe.php:88",
+        "id_local": "Subscription.delete",
+        "entry": {
+          "kind": "http",
+          "route": "do=subscribe (unsubscribe)",
+          "locator": "inc/Action/Subscribe.php:61, inc/Action/Subscribe.php:88"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "public function remove($id,$user=null,$style=null,$data=null){ if(!$this->isenabled())return false; $file=$this->file($id); if(!file_exists($file))return true; $re=(new SubscriberRegexBuilder())->buildRegex($user,$style,$data); return io_deleteFromFile($file,$re,true); }",
+        "edges": [
+          "inc/Action/Subscribe.php:24",
+          "inc/Action/Subscribe.php:157"
+        ]
+      }
+    },
+    {
+      "tool": "feed_generate",
+      "description": "Generate a feed of recent page changes (the raw changelog rows used to build the RSS/Atom feed). Returns recent change-log entries, newest first. Requires an RSS feed to be enabled.",
+      "family": "search",
+      "entity": "GlobalChangeLogEntry",
+      "exec_spec": {
+        "entity": "GlobalChangeLogEntry",
+        "search_fields": [
+          "date",
+          "id",
+          "user",
+          "ip",
+          "sum",
+          "type"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "date",
+            "id",
+            "user",
+            "ip",
+            "sum",
+            "type"
+          ]
+        },
+        "sort": {
+          "col": "date",
+          "dir": "desc"
+        }
+      },
+      "input_schema": {
+        "type": {
+          "type": "text",
+          "required": false,
+          "description": "Feed type: rss, rss1, rss2, atom. Affects serialization only."
+        },
+        "ns": {
+          "type": "text",
+          "required": false,
+          "description": "Namespace to restrict the feed to."
+        },
+        "num": {
+          "type": "int",
+          "required": false,
+          "description": "Number of items."
+        }
+      },
+      "guards": {
+        "requires_auth": true,
+        "preconditions": [
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "Config",
+                "where": {
+                  "node": "field",
+                  "col": "key",
+                  "op": "eq",
+                  "value": "rss"
+                }
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ],
+          [
+            {
+              "node": "count",
+              "select": {
+                "node": "select",
+                "entity": "GlobalChangeLogEntry",
+                "where": null
+              },
+              "op": "gte",
+              "n": 1
+            }
+          ]
+        ],
+        "messages": {
+          "auth": "You must sign in to read the feed.",
+          "precondition": "An RSS feed must be enabled, and there must be a change to report."
+        }
+      },
+      "_evidence": {
+        "locator": "inc/Feed/FeedCreator.php:38",
+        "id_local": "Feed.generate",
+        "entry": {
+          "kind": "http",
+          "route": "feed.php",
+          "locator": "feed.php:29"
+        },
+        "entity_why": "primary effect row_upsert lands on this table",
+        "ref_code": "if($cache?->useCache($depends)){ http_conditionalRequest($cache->getTime()); echo $cache->retrieveCache(); exit; } ... $feed=(new FeedCreator($options))->build(); $cache?->storeCache($feed); ... FeedCreator: return getRecents(0,$items,$namespace,$flags);",
+        "edges": [
+          "feed.php:29",
+          "inc/Feed/FeedCreator.php:175"
+        ]
+      }
+    }
+  ],
+  "seed_state": {
+    "Config": [
+      {
+        "key": "useacl",
+        "value": "1",
+        "id": 1
+      },
+      {
+        "key": "openregister",
+        "value": "1",
+        "id": 2
+      },
+      {
+        "key": "usedraft",
+        "value": "1",
+        "id": 3
+      },
+      {
+        "key": "rss",
+        "value": "1",
+        "id": 4
+      },
+      {
+        "key": "superuser",
+        "value": "@admin",
+        "id": 5
+      },
+      {
+        "key": "title",
+        "value": "Doku",
+        "id": 6
+      },
+      {
+        "key": "authtype",
+        "value": "authplain",
+        "id": 7
+      }
+    ],
+    "User": [
+      {
+        "login": "ops@dokuwiki.example",
+        "pass": "pw-operations",
+        "name": "Admin User",
+        "mail": "admin@example.com",
+        "grps": [
+          "admin"
+        ],
+        "protected": true,
+        "id": 1
+      },
+      {
+        "login": "peer1@dokuwiki.example",
+        "pass": "pw-peer",
+        "name": "Alice Example",
+        "mail": "alice@example.com",
+        "grps": [
+          "user"
+        ],
+        "id": 2
+      },
+      {
+        "login": "peer2@dokuwiki.example",
+        "pass": "pw-peer",
+        "name": "Bob Example",
+        "mail": "bob@example.com",
+        "grps": [
+          "user"
+        ],
+        "id": 3
+      }
+    ],
+    "AclRule": [
+      {
+        "scope": "*",
+        "user": "@ALL",
+        "level": 8,
+        "id": 1
+      },
+      {
+        "scope": "*",
+        "user": "@admin",
+        "level": 16,
+        "id": 2
+      },
+      {
+        "scope": "playground",
+        "user": "@ALL",
+        "level": 8,
+        "id": 3
+      }
+    ],
+    "Page": [
+      {
+        "id": "start",
+        "content": "= Welcome =\nThis is the DokuWiki start page.\n",
+        "exists": true,
+        "filemtime": 1699000000
+      },
+      {
+        "id": "playground",
+        "content": "Try editing here.\n",
+        "exists": true,
+        "filemtime": 1699000100
+      },
+      {
+        "id": "wiki:syntax",
+        "content": "= Syntax =\n**bold** and //italic//.\n",
+        "exists": true,
+        "filemtime": 1699000200
+      }
+    ],
+    "PageRevision": [
+      {
+        "id": "start",
+        "rev": 1698900000,
+        "content": "Initial start page.\n"
+      },
+      {
+        "id": "playground",
+        "rev": 1698900100,
+        "content": "Bare playground.\n"
+      },
+      {
+        "id": "wiki:syntax",
+        "rev": 1698900200,
+        "content": "= Syntax =\nFirst draft.\n"
+      }
+    ],
+    "ChangeLogEntry": [
+      {
+        "date": 1698900000,
+        "ip": "127.0.0.1",
+        "type": "C",
+        "id": "start",
+        "user": "",
+        "sum": "created",
+        "sizechange": 42
+      },
+      {
+        "date": 1698900100,
+        "ip": "127.0.0.1",
+        "type": "C",
+        "id": "playground",
+        "user": "",
+        "sum": "created",
+        "sizechange": 22
+      },
+      {
+        "date": 1698900200,
+        "ip": "127.0.0.1",
+        "type": "C",
+        "id": "wiki:syntax",
+        "user": "",
+        "sum": "created",
+        "sizechange": 33
+      }
+    ],
+    "GlobalChangeLogEntry": [
+      {
+        "date": 1698900000,
+        "ip": "127.0.0.1",
+        "type": "C",
+        "id": "start",
+        "user": "",
+        "sum": "created",
+        "mode": "page",
+        "sizechange": 42
+      },
+      {
+        "date": 1698900100,
+        "ip": "127.0.0.1",
+        "type": "C",
+        "id": "playground",
+        "user": "",
+        "sum": "created",
+        "mode": "page",
+        "sizechange": 22
+      },
+      {
+        "date": 1698900200,
+        "ip": "127.0.0.1",
+        "type": "C",
+        "id": "wiki:syntax",
+        "user": "",
+        "sum": "created",
+        "mode": "page",
+        "sizechange": 33
+      }
+    ],
+    "Subscription": [
+      {
+        "target": "start",
+        "user": "alice",
+        "style": "every",
+        "data": 1698900000,
+        "id": 1
+      },
+      {
+        "target": "wiki:syntax",
+        "user": "bob",
+        "style": "digest",
+        "data": 1698900200,
+        "id": 2
+      }
+    ],
+    "MediaFile": [
+      {
+        "id": "wiki:logo.png",
+        "content": "FAKEBIN0",
+        "rev": 1699000300,
+        "mime": "image/png",
+        "size": 9
+      }
+    ],
+    "MediaMetadata": [
+      {
+        "id": "wiki:logo.png",
+        "size": 9,
+        "width": 64,
+        "height": 64,
+        "mime": "image/png"
+      }
+    ],
+    "PluginConfig": [
+      {
+        "plugin": "authplain",
+        "enabled": 1,
+        "id": 1
+      },
+      {
+        "plugin": "acl",
+        "enabled": 1,
+        "id": 2
+      },
+      {
+        "plugin": "usermanager",
+        "enabled": 1,
+        "id": 3
+      },
+      {
+        "plugin": "config",
+        "enabled": 1,
+        "id": 4
+      }
+    ],
+    "SearchIndex": [
+      {
+        "page": "start",
+        "title_index": {
+          "welcome": [
+            "start"
+          ]
+        },
+        "fulltext_tokens": {
+          "welcome": [
+            "start"
+          ],
+          "dokuwiki": [
+            "start"
+          ],
+          "start": [
+            "start"
+          ],
+          "page": [
+            "start"
+          ]
+        },
+        "metadata_keys": {
+          "relation_references": []
+        },
+        "version": "v1",
+        "id": 1
+      },
+      {
+        "page": "playground",
+        "title_index": {
+          "playground": [
+            "playground"
+          ]
+        },
+        "fulltext_tokens": {
+          "try": [
+            "playground"
+          ],
+          "editing": [
+            "playground"
+          ],
+          "here": [
+            "playground"
+          ]
+        },
+        "metadata_keys": {
+          "relation_references": []
+        },
+        "version": "v1",
+        "id": 2
+      },
+      {
+        "page": "wiki:syntax",
+        "title_index": {
+          "syntax": [
+            "wiki:syntax"
+          ]
+        },
+        "fulltext_tokens": {
+          "syntax": [
+            "wiki:syntax"
+          ],
+          "bold": [
+            "wiki:syntax"
+          ],
+          "italic": [
+            "wiki:syntax"
+          ]
+        },
+        "metadata_keys": {
+          "relation_references": []
+        },
+        "version": "v1",
+        "id": 3
+      }
+    ],
+    "IndexTag": [
+      {
+        "page": "start",
+        "version": "v1",
+        "id": 1
+      },
+      {
+        "page": "playground",
+        "version": "v1",
+        "id": 2
+      },
+      {
+        "page": "wiki:syntax",
+        "version": "v1",
+        "id": 3
+      }
+    ]
+  },
+  "summary": "DokuWiki is a PHP flat-file wiki: pages stored as .txt files in data/pages with old revisions in data/attic, per-page changelogs and PHP-serialized metadata in data/meta, an inverted full-text/metadata search index in data/index, media files in data/media, users/ACL/config in conf/*.php, and subscriptions/cache/locks as flat files; it ships a web UI plus an XMLRPC/JSONRPC remote API."
+}

@@ -1,0 +1,3682 @@
+{
+  "env_id": "trilium",
+  "auth": {
+    "account_entity": "Option",
+    "username_col": "name",
+    "password_col": "value"
+  },
+  "entities": [
+    {
+      "name": "Note",
+      "columns": [
+        {
+          "name": "noteId",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "nullable": false,
+          "default": "note"
+        },
+        {
+          "name": "isProtected",
+          "type": "bool",
+          "nullable": false,
+          "default": 0
+        },
+        {
+          "name": "type",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "text",
+            "code",
+            "file",
+            "image",
+            "render",
+            "book",
+            "mermaid",
+            "relation-map",
+            "search",
+            "geo-map",
+            "content-widget",
+            "web-view",
+            "canvas",
+            "board",
+            "pdf",
+            "wiki",
+            "env"
+          ],
+          "default": "text"
+        },
+        {
+          "name": "mime",
+          "type": "text",
+          "nullable": false,
+          "default": "text/html"
+        },
+        {
+          "name": "blobId",
+          "type": "id",
+          "nullable": true,
+          "fk_to": "Blob.blobId"
+        },
+        {
+          "name": "isDeleted",
+          "type": "bool",
+          "nullable": false,
+          "default": 0
+        },
+        {
+          "name": "deleteId",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "dateCreated",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "dateModified",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "utcDateCreated",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "utcDateModified",
+          "type": "text",
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "name": "Branch",
+      "columns": [
+        {
+          "name": "branchId",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "noteId",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Note.noteId"
+        },
+        {
+          "name": "parentNoteId",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Note.noteId"
+        },
+        {
+          "name": "notePosition",
+          "type": "int",
+          "nullable": false
+        },
+        {
+          "name": "prefix",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "isExpanded",
+          "type": "bool",
+          "nullable": false,
+          "default": 0
+        },
+        {
+          "name": "isDeleted",
+          "type": "bool",
+          "nullable": false,
+          "default": 0
+        },
+        {
+          "name": "deleteId",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "utcDateModified",
+          "type": "text",
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "name": "Attribute",
+      "columns": [
+        {
+          "name": "attributeId",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "noteId",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Note.noteId"
+        },
+        {
+          "name": "type",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "label",
+            "relation"
+          ]
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "value",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        },
+        {
+          "name": "position",
+          "type": "int",
+          "nullable": false,
+          "default": 0
+        },
+        {
+          "name": "utcDateModified",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "isDeleted",
+          "type": "bool",
+          "nullable": false,
+          "default": 0
+        },
+        {
+          "name": "deleteId",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "isInheritable",
+          "type": "bool",
+          "nullable": true,
+          "default": 0
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "noteId",
+            "type",
+            "name",
+            "value",
+            "isInheritable"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Revision",
+      "columns": [
+        {
+          "name": "revisionId",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "noteId",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Note.noteId"
+        },
+        {
+          "name": "type",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        },
+        {
+          "name": "mime",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "nullable": false,
+          "default": ""
+        },
+        {
+          "name": "source",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "auto",
+            "user",
+            "versioned"
+          ],
+          "default": "auto"
+        },
+        {
+          "name": "isProtected",
+          "type": "bool",
+          "nullable": false,
+          "default": 0
+        },
+        {
+          "name": "blobId",
+          "type": "id",
+          "nullable": true,
+          "fk_to": "Blob.blobId"
+        },
+        {
+          "name": "utcDateLastEdited",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "utcDateCreated",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "utcDateModified",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "dateLastEdited",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "dateCreated",
+          "type": "text",
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "name": "Blob",
+      "columns": [
+        {
+          "name": "blobId",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "content",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "textRepresentation",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "dateModified",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "utcDateModified",
+          "type": "text",
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "name": "Attachment",
+      "columns": [
+        {
+          "name": "attachmentId",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "ownerId",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Note.noteId"
+        },
+        {
+          "name": "role",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "mime",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "isProtected",
+          "type": "bool",
+          "nullable": false,
+          "default": 0
+        },
+        {
+          "name": "position",
+          "type": "int",
+          "nullable": false,
+          "default": 0
+        },
+        {
+          "name": "blobId",
+          "type": "id",
+          "nullable": true,
+          "fk_to": "Blob.blobId"
+        },
+        {
+          "name": "dateModified",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "utcDateModified",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "utcDateScheduledForErasureSince",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "isDeleted",
+          "type": "bool",
+          "nullable": false,
+          "default": 0
+        },
+        {
+          "name": "deleteId",
+          "type": "text",
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "name": "Option",
+      "columns": [
+        {
+          "name": "name",
+          "type": "text",
+          "pk": true
+        },
+        {
+          "name": "value",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "isSynced",
+          "type": "bool",
+          "nullable": false,
+          "default": 0
+        },
+        {
+          "name": "utcDateModified",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "id",
+          "type": "id"
+        }
+      ]
+    },
+    {
+      "name": "RecentNote",
+      "columns": [
+        {
+          "name": "noteId",
+          "type": "id",
+          "pk": true,
+          "fk_to": "Note.noteId"
+        },
+        {
+          "name": "notePath",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "utcDateCreated",
+          "type": "text",
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "name": "EtapiToken",
+      "columns": [
+        {
+          "name": "etapiTokenId",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "tokenHash",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "utcDateCreated",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "utcDateModified",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "isDeleted",
+          "type": "bool",
+          "nullable": false,
+          "default": 0
+        }
+      ]
+    },
+    {
+      "name": "EntityChange",
+      "columns": [
+        {
+          "name": "id",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "entityName",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "entityId",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "hash",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "isErased",
+          "type": "bool",
+          "nullable": false
+        },
+        {
+          "name": "changeId",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "componentId",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "instanceId",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "isSynced",
+          "type": "bool",
+          "nullable": false
+        },
+        {
+          "name": "utcDateChanged",
+          "type": "text",
+          "nullable": false
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "entityName",
+            "entityId"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "NoteEmbedding",
+      "columns": [
+        {
+          "name": "embedId",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "noteId",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "Note.noteId"
+        },
+        {
+          "name": "providerId",
+          "type": "id",
+          "nullable": false,
+          "fk_to": "EmbeddingProvider.providerId"
+        },
+        {
+          "name": "modelId",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "dimension",
+          "type": "int",
+          "nullable": false
+        },
+        {
+          "name": "embedding",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "version",
+          "type": "int",
+          "nullable": false,
+          "default": 1
+        },
+        {
+          "name": "dateCreated",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "utcDateCreated",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "dateModified",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "utcDateModified",
+          "type": "text",
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "name": "EmbeddingQueue",
+      "columns": [
+        {
+          "name": "noteId",
+          "type": "id",
+          "pk": true,
+          "fk_to": "Note.noteId"
+        },
+        {
+          "name": "operation",
+          "type": "text",
+          "nullable": false,
+          "enum": [
+            "CREATE",
+            "UPDATE",
+            "DELETE"
+          ]
+        },
+        {
+          "name": "dateQueued",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "utcDateQueued",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "priority",
+          "type": "int",
+          "nullable": false,
+          "default": 0
+        },
+        {
+          "name": "attempts",
+          "type": "int",
+          "nullable": false,
+          "default": 0
+        },
+        {
+          "name": "lastAttempt",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "error",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "failed",
+          "type": "bool",
+          "nullable": false,
+          "default": 0
+        },
+        {
+          "name": "isProcessing",
+          "type": "bool",
+          "nullable": false,
+          "default": 0
+        }
+      ]
+    },
+    {
+      "name": "EmbeddingProvider",
+      "columns": [
+        {
+          "name": "providerId",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "priority",
+          "type": "int",
+          "nullable": false,
+          "default": 0
+        },
+        {
+          "name": "config",
+          "type": "json",
+          "nullable": false
+        },
+        {
+          "name": "dateCreated",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "utcDateCreated",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "dateModified",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "utcDateModified",
+          "type": "text",
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "name": "UserData",
+      "columns": [
+        {
+          "name": "tmpID",
+          "type": "id",
+          "pk": true
+        },
+        {
+          "name": "username",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "email",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "userIDEncryptedDataKey",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "userIDVerificationHash",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "salt",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "derivedKey",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "isSetup",
+          "type": "text",
+          "nullable": true,
+          "default": "false"
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "unique",
+          "cols": [
+            "tmpID"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Session",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "pk": true
+        },
+        {
+          "name": "data",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "expires",
+          "type": "int",
+          "nullable": true
+        }
+      ]
+    }
+  ],
+  "seed_state": {
+    "Option": [
+      {
+        "name": "ops@trilium.example",
+        "value": "pw-operations",
+        "isSynced": 1,
+        "id": 1
+      },
+      {
+        "name": "instance",
+        "value": "Trilium",
+        "isSynced": 0,
+        "id": 2
+      },
+      {
+        "name": "locale",
+        "value": "en_GB",
+        "isSynced": 1,
+        "id": 3
+      }
+    ],
+    "Note": [
+      {
+        "noteId": 1,
+        "title": "Welcome to Trilium",
+        "type": "text",
+        "mime": "text/html",
+        "blobId": 1,
+        "isProtected": 0,
+        "isDeleted": 0,
+        "dateCreated": "2026-01-01T00:00:00Z",
+        "dateModified": "2026-01-01T00:00:00Z",
+        "utcDateCreated": "2026-01-01T00:00:00Z",
+        "utcDateModified": "2026-01-01T00:00:00Z",
+        "id": 1
+      },
+      {
+        "noteId": 2,
+        "title": "Daily journal template",
+        "type": "text",
+        "mime": "text/html",
+        "blobId": 2,
+        "isProtected": 0,
+        "isDeleted": 0,
+        "dateCreated": "2026-01-01T00:00:00Z",
+        "dateModified": "2026-01-01T00:00:00Z",
+        "utcDateCreated": "2026-01-01T00:00:00Z",
+        "utcDateModified": "2026-01-01T00:00:00Z",
+        "id": 2
+      },
+      {
+        "noteId": 3,
+        "title": "Project notes",
+        "type": "text",
+        "mime": "text/html",
+        "blobId": 3,
+        "isProtected": 0,
+        "isDeleted": 0,
+        "dateCreated": "2026-01-01T00:00:00Z",
+        "dateModified": "2026-01-01T00:00:00Z",
+        "utcDateCreated": "2026-01-01T00:00:00Z",
+        "utcDateModified": "2026-01-01T00:00:00Z",
+        "id": 3
+      }
+    ],
+    "Blob": [
+      {
+        "blobId": 1,
+        "content": "# Welcome\nThis is your new notes database, content of note 1.",
+        "dateModified": "2026-01-01T00:00:00Z",
+        "utcDateModified": "2026-01-01T00:00:00Z",
+        "id": 1
+      },
+      {
+        "blobId": 2,
+        "content": "Template for daily entries, content of note 2.",
+        "dateModified": "2026-01-01T00:00:00Z",
+        "utcDateModified": "2026-01-01T00:00:00Z",
+        "id": 2
+      },
+      {
+        "blobId": 3,
+        "content": "Notes for current projects, content of note 3.",
+        "dateModified": "2026-01-01T00:00:00Z",
+        "utcDateModified": "2026-01-01T00:00:00Z",
+        "id": 3
+      }
+    ],
+    "Branch": [
+      {
+        "branchId": 1,
+        "noteId": 1,
+        "parentNoteId": "root",
+        "notePosition": 10,
+        "prefix": null,
+        "isExpanded": 1,
+        "isDeleted": 0,
+        "utcDateModified": "2026-01-01T00:00:00Z",
+        "id": 1
+      },
+      {
+        "branchId": 2,
+        "noteId": 2,
+        "parentNoteId": 1,
+        "notePosition": 10,
+        "prefix": null,
+        "isExpanded": 0,
+        "isDeleted": 0,
+        "utcDateModified": "2026-01-01T00:00:00Z",
+        "id": 2
+      },
+      {
+        "branchId": 3,
+        "noteId": 3,
+        "parentNoteId": 1,
+        "notePosition": 20,
+        "prefix": null,
+        "isExpanded": 0,
+        "isDeleted": 0,
+        "utcDateModified": "2026-01-01T00:00:00Z",
+        "id": 3
+      }
+    ]
+  },
+  "summary": "Trilium Notes (TriliumNext): self-hosted hierarchical note-taking application with a SQLite backend. Users create/edit/delete notes organized in a tree of branches, attach attributes (labels/relations), revisions, and attachments, and persist options, recent notes, ETAPI tokens, and embeddings.",
+  "tools": [
+    {
+      "tool": "note_createnote",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Note",
+        "fields": [
+          "title",
+          "type",
+          "mime",
+          "isProtected"
+        ],
+        "set_on_create": {
+          "utcDateCreated": "2026-01-01T00:00:00Z",
+          "utcDateModified": "2026-01-01T00:00:00Z",
+          "isDeleted": 0
+        }
+      },
+      "input_schema": {
+        "parentNoteId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the note to create the new note as a child of."
+        },
+        "title": {
+          "type": "text",
+          "required": true,
+          "description": "Title of the new note."
+        },
+        "content": {
+          "type": "text",
+          "required": false,
+          "description": "Optional body content (stored server-side)."
+        },
+        "type": {
+          "type": "text",
+          "required": false,
+          "description": "Note type, e.g. text/code/file. Defaults to text."
+        },
+        "mime": {
+          "type": "text",
+          "required": false,
+          "description": "MIME type of the content. Defaults to text/html."
+        },
+        "isProtected": {
+          "type": "bool",
+          "required": false,
+          "description": "Whether to mark the note protected."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/trilium-core/src/routes/api/notes.ts:107",
+        "id_local": "Note.createNote",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/notes/:parentNoteId/children",
+          "locator": "packages/trilium-core/src/routes/index.ts:105"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "const params = Object.assign({}, req.body); params.parentNoteId = req.params.parentNoteId; const { target, targetBranchId } = req.query; if (target !== \"into\" && target !== \"after\" && target !== \"before\") throw new ValidationError(\"Invalid target type.\"); const { note, branch } = noteService.createNewNoteWithTarget(target, String(targetBranchId), params); if (typeof params.content === \"string\" && params.content) { void noteService.asyncPostProcessContent(note, params.content); }",
+        "edges": [
+          "all /api/* routes behind checkApiAuthOrElectron requiring a logged-in session (apps/server/src/services/auth.ts:142)"
+        ]
+      },
+      "entity": "Note",
+      "_binds": {
+        "parentNoteId": "Note.noteId",
+        "isProtected": "Note.isProtected",
+        "type": "Note.type",
+        "mime": "Note.mime",
+        "title": "Note.title"
+      },
+      "_output_schema": {
+        "note": "the created Note row",
+        "branch": "the created Branch row"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "parentNoteId",
+          "title"
+        ],
+        "messages": {
+          "auth": "You must sign in before creating a note.",
+          "required": "A parent note and a title are required to create a note."
+        }
+      },
+      "description": "Create a new note as a child of the given parent note, with a title and body content. Fails if you are not signed in or a required field is missing.",
+      "_defaulted": [
+        "fields (content writes to the note's blob via a following revision; the note row itself carries title/type/mime)"
+      ]
+    },
+    {
+      "tool": "note_updatenotedata",
+      "op": "update",
+      "family": "crud.upsert",
+      "exec_spec": {
+        "entity": "Blob",
+        "key": {
+          "blobId": {
+            "$ref": {
+              "entity": "Note",
+              "where": {
+                "noteId": {
+                  "$arg": "note_id"
+                }
+              },
+              "col": "blobId"
+            }
+          }
+        },
+        "insert_fields": [
+          "content"
+        ],
+        "set_on_exists": {
+          "content": {
+            "$arg": "content"
+          },
+          "dateModified": "2026-01-01T00:00:00Z",
+          "utcDateModified": "2026-01-01T00:00:00Z"
+        }
+      },
+      "input_schema": {
+        "note_id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the note whose content to replace."
+        },
+        "content": {
+          "type": "text",
+          "required": true,
+          "description": "New full content of the note."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/trilium-core/src/services/notes.ts:1073",
+        "id_local": "Note.updateNoteData",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /api/notes/:noteId/data",
+          "locator": "packages/trilium-core/src/routes/index.ts:101"
+        },
+        "entity_why": "primary effect row_upsert lands on this table",
+        "ref_code": "function updateNoteData(noteId, content, attachments) { const note = becca.getNote(noteId); if (!note || !note.isContentAvailable()) throw new Error(`Note '${noteId}' is not available for change!`); saveRevisionIfNeeded(note); const { forceFrontendReload, content: newContent } = saveLinks(note, content); note.setContent(newContent, { forceFrontendReload }); if (attachments?.length > 0) { for (const { attachmentId, role, mime, title, position, content, encoding } of attachments) { note.saveAttachment({ attachmentId, role, mime, title, content: decodedContent, position }); } } }",
+        "edges": [
+          "checkApiAuthOrElectron on PUT /api/notes/:noteId/data (apps/server/src/routes/index.ts:101)"
+        ]
+      },
+      "entity": "Blob",
+      "_binds": {
+        "note_id": "Note.noteId"
+      },
+      "_output_schema": {},
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "note_id",
+          "content"
+        ],
+        "messages": {
+          "auth": "You must sign in to edit note content.",
+          "required": "Both the note id and the new content are required.",
+          "not_found": "That note does not exist or has no content blob."
+        }
+      },
+      "_defaulted": [
+        "fields",
+        "row_key (content lives on the Note's Blob; keyed by noteId->blobId)"
+      ],
+      "description": "Replace the full content of a note. Fails if you are not signed in or the note does not exist."
+    },
+    {
+      "tool": "note_changetitle",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Note",
+        "row_key": {
+          "noteId": {
+            "$arg": "noteId"
+          }
+        },
+        "fields": [
+          "title"
+        ],
+        "set": {
+          "utcDateModified": "2026-01-01T00:00:00Z"
+        }
+      },
+      "input_schema": {
+        "noteId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the note to rename."
+        },
+        "title": {
+          "type": "text",
+          "required": true,
+          "description": "New title for the note."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/trilium-core/src/routes/api/notes.ts:270",
+        "id_local": "Note.changeTitle",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /api/notes/:noteId/title",
+          "locator": "packages/trilium-core/src/routes/index.ts:109"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "const note = becca.getNoteOrThrow(noteId); if (!note.isContentAvailable()) throw new ValidationError(...); const noteTitleChanged = note.title !== title; if (noteTitleChanged) noteService.saveRevisionIfNeeded(note); note.title = title; note.save();",
+        "edges": [
+          "checkApiAuthOrElectron on title route (apps/server/src/routes/index.ts:109)"
+        ]
+      },
+      "entity": "Revision",
+      "_binds": {
+        "noteId": "Note.noteId",
+        "title": "Note.title"
+      },
+      "_output_schema": {
+        "note": "the Note row with new title"
+      },
+      "guards": {
+        "required": [
+          "noteId",
+          "title"
+        ],
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in to rename a note.",
+          "required": "Both the note id and the new title are required.",
+          "not_found": "That note does not exist."
+        }
+      },
+      "description": "Change the title of a note. Fails if you are not signed in or the note does not exist.",
+      "_defaulted": [
+        "family (was crud.insert on Revision — the side-effect revision save; primary effect is the title change on the Note)",
+        "entity (was Revision)"
+      ]
+    },
+    {
+      "tool": "note_setnotetypemime",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Note",
+        "row_key": {
+          "noteId": {
+            "$arg": "noteId"
+          }
+        },
+        "fields": [
+          "type",
+          "mime"
+        ],
+        "set": {
+          "utcDateModified": "2026-01-01T00:00:00Z"
+        }
+      },
+      "input_schema": {
+        "noteId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the note to change the type/mime of."
+        },
+        "type": {
+          "type": "text",
+          "required": true,
+          "description": "New note type (e.g. text/code/file)."
+        },
+        "mime": {
+          "type": "text",
+          "required": true,
+          "description": "New MIME type of the content."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/trilium-core/src/routes/api/notes.ts:259",
+        "id_local": "Note.setNoteTypeMime",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /api/notes/:noteId/type",
+          "locator": "packages/trilium-core/src/routes/index.ts:108"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "const note = becca.getNoteOrThrow(noteId); note.type = type; note.mime = mime; note.save();",
+        "edges": [
+          "checkApiAuthOrElectron on type route (apps/server/src/routes/index.ts:108)"
+        ]
+      },
+      "entity": "Note",
+      "_binds": {
+        "noteId": "Note.noteId",
+        "type": "Note.type",
+        "mime": "Note.mime"
+      },
+      "_output_schema": {
+        "type": "Note.type after change"
+      },
+      "guards": {
+        "required": [
+          "noteId",
+          "type",
+          "mime"
+        ],
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in to change a note's type.",
+          "required": "note id, type and mime are all required.",
+          "not_found": "That note does not exist."
+        }
+      },
+      "description": "Change the type and MIME of a note. Fails if the note does not exist or you are not signed in."
+    },
+    {
+      "tool": "note_deletenote",
+      "op": "delete",
+      "family": "crud.soft_delete",
+      "exec_spec": {
+        "entity": "Note",
+        "lookup_by": {
+          "noteId": {
+            "$arg": "noteId"
+          }
+        },
+        "set": {
+          "isDeleted": 1,
+          "deleteId": {
+            "$arg": "deleteId"
+          },
+          "utcDateModified": "2026-01-01T00:00:00"
+        }
+      },
+      "input_schema": {
+        "noteId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the note to delete."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/trilium-core/src/routes/api/notes.ts:186",
+        "id_local": "Note.deleteNote",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/notes/:noteId/",
+          "locator": "packages/trilium-core/src/routes/index.ts:102"
+        },
+        "entity_why": "primary effect row_soft_delete lands on this table",
+        "ref_code": "const deleteId = randomString(10); const note = becca.getNoteOrThrow(noteId); const taskContext = TaskContext.getInstance(taskId, \"deleteNotes\", null); note.deleteNote(deleteId, taskContext); if (eraseNotes) taskContext.scheduleErase(deleteId); if (last) { eraseService.eraseNotesWithDeleteIds(taskContext.takeScheduledErases()); taskContext.taskSucceeded(null); }",
+        "edges": [
+          "checkApiAuthOrElectron on DELETE /api/notes (apps/server/src/routes/index.ts:102); further requires note exists"
+        ]
+      },
+      "entity": "Note",
+      "_binds": {
+        "noteId": "Note.noteId"
+      },
+      "_output_schema": {},
+      "guards": {
+        "required": [
+          "noteId"
+        ],
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in to delete a note.",
+          "required": "The note id is required.",
+          "not_found": "That note does not exist."
+        }
+      },
+      "description": "Soft-delete a note (move it to the trash). Fails if you are not signed in or the note does not exist."
+    },
+    {
+      "tool": "note_protectnote",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Note",
+        "row_key": {
+          "noteId": {
+            "$arg": "noteId"
+          }
+        },
+        "fields": [
+          "isProtected"
+        ],
+        "set": {
+          "utcDateModified": "2026-01-01T00:00:00Z"
+        }
+      },
+      "input_schema": {
+        "noteId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the note to protect/unprotect."
+        },
+        "isProtected": {
+          "type": "bool",
+          "required": true,
+          "description": "True to protect the note, false to unprotect it."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/trilium-core/src/routes/api/notes.ts:246",
+        "id_local": "Note.protectNote",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /api/notes/:noteId/protect/:isProtected",
+          "locator": "packages/trilium-core/src/routes/index.ts:107"
+        },
+        "entity_why": "primary effect row_upsert lands on this table",
+        "ref_code": "const protect = !!parseInt(req.params.isProtected); const includingSubTree = !!parseInt(req.query?.subtree); noteService.protectNoteRecursively(note, protect, includingSubTree, taskContext); taskContext.taskSucceeded(null); // protectNote: if (protect !== note.isProtected) { const content = note.getContent(); note.isProtected = protect; note.setContent(content, { forceSave: true }); } revisionService.protectRevisions(note);",
+        "edges": [
+          "checkApiAuthOrElectron on protect route (apps/server/src/routes/index.ts:107)"
+        ]
+      },
+      "entity": "Blob",
+      "_binds": {
+        "noteId": "Note.noteId",
+        "isProtected": "Note.isProtected"
+      },
+      "_output_schema": {},
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "noteId",
+          "isProtected"
+        ],
+        "messages": {
+          "auth": "You must sign in before protecting a note.",
+          "required": "Both the note id and the protect flag are required.",
+          "not_found": "That note does not exist."
+        }
+      },
+      "_defaulted": [
+        "family (was crud.upsert on Blob), entity (was Blob)",
+        "fields (the observable effect is the isProtected flag on the Note)"
+      ],
+      "description": "Mark a note as protected (password-encrypted) or unprotected. Fails if the note does not exist or you are not signed in."
+    },
+    {
+      "tool": "note_forcesaverevision",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Revision",
+        "fields": [
+          "noteId",
+          "title",
+          "description"
+        ],
+        "set_on_create": {
+          "source": "manual",
+          "utcDateCreated": "2026-01-01T00:00:00Z",
+          "utcDateModified": "2026-01-01T00:00:00Z",
+          "dateCreated": "2026-01-01T00:00:00Z",
+          "dateLastEdited": "2026-01-01T00:00:00Z"
+        }
+      },
+      "input_schema": {
+        "noteId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the note to snapshot."
+        },
+        "description": {
+          "type": "text",
+          "required": false,
+          "description": "Optional note about this revision."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/trilium-core/src/routes/api/notes.ts:373",
+        "id_local": "Note.forceSaveRevision",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/notes/:noteId/revision",
+          "locator": "packages/trilium-core/src/routes/index.ts:104"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "const note = becca.getNoteOrThrow(noteId); if (!note.isContentAvailable()) throw new ValidationError(`Note revision of a protected note cannot be created outside of a protected session.`); const description = typeof req.body?.description === \"string\" ? req.body.description : \"\"; const revision = note.saveRevision({ description, source: \"manual\" }); return { revisionId: revision.revisionId };",
+        "edges": [
+          "checkApiAuthOrElectron on revision route (apps/server/src/routes/index.ts:104)"
+        ]
+      },
+      "entity": "Revision",
+      "_binds": {
+        "noteId": "Revision.noteId"
+      },
+      "_output_schema": {
+        "revisionId": "id of the saved Revision"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "noteId"
+        ],
+        "messages": {
+          "auth": "You must sign in before saving a revision.",
+          "required": "The note id is required.",
+          "not_found": "That note does not exist."
+        }
+      },
+      "description": "Force-create a manual revision snapshot of a note's current state. Fails if you are not signed in or the note does not exist."
+    },
+    {
+      "tool": "note_erasedeletednotesnow",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "Note",
+        "lookup_by": {
+          "isDeleted": 1
+        }
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "packages/trilium-core/src/routes/api/notes.ts:303",
+        "id_local": "Note.eraseDeletedNotesNow",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/notes/erase-deleted-notes-now",
+          "locator": "packages/trilium-core/src/routes/index.ts:111"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "function eraseDeletedNotesNow() { eraseDeletedEntities(0); }",
+        "edges": [
+          "checkApiAuthOrElectron on erase-deleted-notes-now route (apps/server/src/routes/index.ts:111)"
+        ]
+      },
+      "entity": "Note",
+      "_output_schema": {},
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in before erasing deleted notes."
+        }
+      },
+      "description": "Permanently erase every soft-deleted note. This is destructive and cannot be undone. Sign-in required."
+    },
+    {
+      "tool": "note_undeletenote",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Note",
+        "row_key": {
+          "noteId": {
+            "$arg": "noteId"
+          }
+        },
+        "fields": [
+          "isDeleted",
+          "deleteId"
+        ],
+        "set": {
+          "isDeleted": 0,
+          "deleteId": null
+        }
+      },
+      "input_schema": {
+        "noteId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the soft-deleted note to restore."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/trilium-core/src/routes/api/notes.ts:214",
+        "id_local": "Note.undeleteNote",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /api/notes/:noteId/undelete",
+          "locator": "packages/trilium-core/src/routes/index.ts:103"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "const result = noteService.undeleteNote(req.params.noteId, taskContext, { fallbackParentNoteId }); taskContext.taskSucceeded(null); return result;",
+        "edges": [
+          "checkApiAuthOrElectron on PUT /api/notes/:noteId/undelete (apps/server/src/routes/index.ts:103)"
+        ]
+      },
+      "entity": "Branch",
+      "_binds": {
+        "noteId": "Note.noteId",
+        "fallbackParentNoteId": "Note.noteId"
+      },
+      "_output_schema": {
+        "undeleted": "whether the note and subtree were restored",
+        "restoredToFallbackParent": "whether reattached under fallback parent"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "noteId"
+        ],
+        "messages": {
+          "auth": "You must sign in to restore a note.",
+          "not_found": "That note does not exist.",
+          "required": "The note id is required."
+        }
+      },
+      "description": "Restore a soft-deleted note so it is visible again. Fails if the note does not exist or you are not signed in.",
+      "_defaulted": [
+        "family (was crud.insert on Branch), entity (was Branch)",
+        "fields (set isDeleted=0 on the Note)"
+      ]
+    },
+    {
+      "tool": "branch_createclone",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Branch",
+        "fields": [
+          "noteId",
+          "parentNoteId",
+          "prefix"
+        ],
+        "set_on_create": {
+          "utcDateModified": "2026-01-01T00:00:00Z",
+          "isExpanded": 0,
+          "isDeleted": 0
+        }
+      },
+      "input_schema": {
+        "noteId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the note to clone."
+        },
+        "parentNoteId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the parent note to place the clone under."
+        },
+        "prefix": {
+          "type": "text",
+          "required": false,
+          "description": "Optional name prefix for the clone."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/trilium-core/src/services/cloning.ts:11",
+        "id_local": "Branch.createClone",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /api/notes/:noteId/clone-to-note/:parentNoteId",
+          "locator": "packages/trilium-core/src/routes/index.ts:254"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "const branch = new BBranch({ noteId, parentNoteId, prefix, isExpanded: false }).save(); return { success: true, branchId: branch.branchId };",
+        "edges": [
+          "cloning routes behind checkApiAuth (apps/server/src/routes/index.ts:254)"
+        ]
+      },
+      "entity": "Branch",
+      "_binds": {
+        "noteId": "Note.noteId",
+        "parentNoteId": "Note.noteId",
+        "prefix": "Branch.prefix"
+      },
+      "_output_schema": {
+        "success": "bool",
+        "branchId": "the new clone branch id"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "noteId",
+          "parentNoteId"
+        ],
+        "messages": {
+          "auth": "You must sign in to clone a note.",
+          "required": "note id and parent note id are required.",
+          "fk": "The parent note does not exist.",
+          "not_found": "The note or parent does not exist."
+        }
+      },
+      "description": "Clone a note under a given parent, creating a second branch/position for the same note. Fails if the note or parent does not exist.",
+      "_defaulted": [
+        "fields"
+      ]
+    },
+    {
+      "tool": "branch_movebranchtoparent",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Branch",
+        "row_key": {
+          "branchId": {
+            "$arg": "branchId"
+          }
+        },
+        "fields": [
+          "parentNoteId",
+          "notePosition"
+        ],
+        "set": {
+          "parentNoteId": {
+            "$arg": "parent_note_id"
+          },
+          "utcDateModified": "2026-01-01T00:00:00Z"
+        }
+      },
+      "input_schema": {
+        "branchId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the branch to move."
+        },
+        "parent_note_id": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the new parent note."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/trilium-core/src/services/branches.ts:5",
+        "id_local": "Branch.moveBranchToParent",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /api/branches/:branchId/move-to/:parentBranchId",
+          "locator": "packages/trilium-core/src/routes/index.ts:145"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "if (branchToMove.parentNoteId === targetParentNoteId) return { success: true }; const maxNotePos = getSql().getValue(\"SELECT MAX(notePosition) FROM branches WHERE parentNoteId = ? AND isDeleted = 0\", [targetParentNoteId]); const newNotePos = !maxNotePos ? 0 : maxNotePos + 10; const newBranch = branchToMove.createClone(targetParentNoteId, newNotePos); newBranch.save(); branchToMove.markAsDeleted();",
+        "edges": [
+          "move route checkApiAuth (apps/server/src/routes/index.ts:145)"
+        ]
+      },
+      "entity": "Branch",
+      "_binds": {
+        "branchId": "Branch.branchId",
+        "parentBranchId": "Branch.branchId"
+      },
+      "_output_schema": {
+        "success": "bool",
+        "branch": "the new clone branch"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "branchId",
+          "parent_note_id"
+        ],
+        "messages": {
+          "auth": "You must sign in to move a branch.",
+          "required": "branch id and new parent id are required.",
+          "not_found": "That branch does not exist.",
+          "fk": "The target parent note does not exist."
+        }
+      },
+      "_defaulted": [
+        "family (was crud.insert on Branch — clone+delete internals; modelled as re-parent)",
+        "entity (unchanged Branch)"
+      ],
+      "description": "Move a branch (and its note) under a different parent note. Fails if the branch or target parent does not exist."
+    },
+    {
+      "tool": "branch_setexpanded",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Branch",
+        "row_key": {
+          "branchId": {
+            "$arg": "branchId"
+          }
+        },
+        "fields": [
+          "isExpanded"
+        ],
+        "set": {
+          "isExpanded": {
+            "$arg": "expanded"
+          },
+          "utcDateModified": "2026-01-01T00:00:00Z"
+        }
+      },
+      "input_schema": {
+        "branchId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the branch to expand/collapse."
+        },
+        "expanded": {
+          "type": "int",
+          "required": true,
+          "description": "1 to expand the branch in the tree, 0 to collapse."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/trilium-core/src/routes/api/branches.ts:130",
+        "id_local": "Branch.setExpanded",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /api/branches/:branchId/expanded/:expanded",
+          "locator": "packages/trilium-core/src/routes/index.ts:148"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "if (branchId !== \"none_root\") { getSql().execute(\"UPDATE branches SET isExpanded = ? WHERE branchId = ?\", [expanded, branchId]); }",
+        "edges": [
+          "expanded route checkApiAuth (apps/server/src/routes/index.ts:148)"
+        ]
+      },
+      "entity": "Branch",
+      "_binds": {
+        "branchId": "Branch.branchId",
+        "expanded": "Branch.isExpanded"
+      },
+      "_output_schema": {
+        "branchIds": "list of affected branch ids"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "branchId",
+          "expanded"
+        ],
+        "messages": {
+          "auth": "You must sign in to expand a branch.",
+          "required": "branch id and the expanded flag are required.",
+          "not_found": "That branch does not exist."
+        }
+      },
+      "_defaulted": [
+        "fields (field_set writes from `set`, not the dict `fields` form; the pre-pass form was the no_op bug)"
+      ],
+      "description": "Mark a tree branch as expanded or collapsed. Fails if you are not signed in or the branch does not exist."
+    },
+    {
+      "tool": "branch_deletebranch",
+      "op": "delete",
+      "family": "crud.soft_delete",
+      "exec_spec": {
+        "entity": "Branch",
+        "lookup_by": {
+          "branchId": {
+            "$arg": "branchId"
+          }
+        },
+        "set": {
+          "isDeleted": 1,
+          "utcDateModified": "2026-01-01T00:00:00"
+        }
+      },
+      "input_schema": {
+        "branchId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the branch to delete."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/trilium-core/src/routes/api/branches.ts:236",
+        "id_local": "Branch.deleteBranch",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/branches/:branchId",
+          "locator": "packages/trilium-core/src/routes/index.ts:150"
+        },
+        "entity_why": "primary effect row_soft_delete lands on this table",
+        "ref_code": "if (eraseNotes) { branch.getNote().deleteNote(deleteId, taskContext); taskContext.scheduleErase(deleteId); noteDeleted = true; } else { noteDeleted = branch.deleteBranch(deleteId, taskContext); } if (last) { eraseService.eraseNotesWithDeleteIds(taskContext.takeScheduledErases()); taskContext.taskSucceeded(null); }",
+        "edges": [
+          "delete branch route checkApiAuth (apps/server/src/routes/index.ts:150)"
+        ]
+      },
+      "entity": "Branch",
+      "_binds": {
+        "branchId": "Branch.branchId"
+      },
+      "_output_schema": {
+        "noteDeleted": "bool"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "branchId"
+        ],
+        "messages": {
+          "auth": "You must sign in to delete a branch.",
+          "required": "The branch id is required.",
+          "not_found": "That branch does not exist."
+        }
+      },
+      "description": "Soft-delete a branch and its note relationship. Fails if the branch does not exist or you are not signed in."
+    },
+    {
+      "tool": "branch_setprefix",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Branch",
+        "row_key": {
+          "branchId": {
+            "$arg": "branchId"
+          }
+        },
+        "fields": [
+          "prefix"
+        ],
+        "set": {
+          "utcDateModified": "2026-01-01T00:00:00Z"
+        }
+      },
+      "input_schema": {
+        "branchId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the branch to set the prefix on."
+        },
+        "prefix": {
+          "type": "text",
+          "required": true,
+          "description": "New name prefix, or empty to clear it."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/trilium-core/src/routes/api/branches.ts:265",
+        "id_local": "Branch.setPrefix",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /api/branches/:branchId/set-prefix",
+          "locator": "packages/trilium-core/src/routes/index.ts:151"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "const prefix = isEmptyOrWhitespace(req.body.prefix) ? null : req.body.prefix; const branch = becca.getBranchOrThrow(branchId); branch.prefix = prefix; branch.save();",
+        "edges": [
+          "set-prefix route checkApiAuth (apps/server/src/routes/index.ts:151)"
+        ]
+      },
+      "entity": "Branch",
+      "_binds": {
+        "branchId": "Branch.branchId",
+        "prefix": "Branch.prefix"
+      },
+      "_output_schema": {},
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "branchId",
+          "prefix"
+        ],
+        "messages": {
+          "auth": "You must sign in to set a branch prefix.",
+          "required": "branch id and prefix are required.",
+          "not_found": "That branch does not exist."
+        }
+      },
+      "description": "Set the prefix (renamed display) of a branch. Fails if the branch does not exist or you are not signed in."
+    },
+    {
+      "tool": "branch_gettree",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Branch",
+        "search_fields": [
+          "branchId",
+          "noteId",
+          "parentNoteId",
+          "notePosition",
+          "prefix",
+          "isExpanded"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "branchId",
+            "noteId",
+            "parentNoteId",
+            "notePosition",
+            "prefix",
+            "isExpanded"
+          ]
+        }
+      },
+      "input_schema": {
+        "subTreeNoteId": {
+          "type": "int",
+          "required": false,
+          "description": "Only include branches under this note (optional)."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/trilium-core/src/routes/api/tree.ts:170",
+        "id_local": "Branch.getTree",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/tree",
+          "locator": "packages/trilium-core/src/routes/index.ts:86"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "for (const childNote of parentNote.children) { collectedNoteIds.add(childNote.noteId); const childBranch = becca.getBranchFromChildAndParent(childNote.noteId, parentNote.noteId); if (childBranch?.isExpanded) collect(childBranch.childNote); }"
+      },
+      "entity": "Branch",
+      "_binds": {
+        "subTreeNoteId": "Note.noteId"
+      },
+      "_output_schema": {
+        "branches": "list of Branch rows",
+        "notes": "list of Note rows"
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in to read the note tree."
+        }
+      },
+      "description": "Return the note tree as a list of branches, optionally rooted at a given note."
+    },
+    {
+      "tool": "attribute_create",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Attribute",
+        "fields": [
+          "noteId",
+          "type",
+          "name",
+          "value",
+          "isInheritable"
+        ],
+        "set_on_create": {
+          "position": 0,
+          "utcDateModified": "2026-01-01T00:00:00Z",
+          "isDeleted": 0
+        },
+        "unique_on": [
+          "noteId",
+          "type",
+          "name",
+          "value",
+          "isInheritable"
+        ]
+      },
+      "input_schema": {
+        "noteId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the note to attach the attribute to."
+        },
+        "type": {
+          "type": "text",
+          "required": true,
+          "description": "Attribute type: 'label' or 'relation'."
+        },
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "Attribute name, e.g. 'foo' or 'template'."
+        },
+        "value": {
+          "type": "text",
+          "required": false,
+          "description": "Attribute value (empty for a plain label)."
+        },
+        "isInheritable": {
+          "type": "bool",
+          "required": false,
+          "description": "Whether children inherit this attribute."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/trilium-core/src/routes/api/attributes.ts:93",
+        "id_local": "Attribute.create",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/notes/:noteId/attributes",
+          "locator": "packages/trilium-core/src/routes/index.ts:125"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "function addNoteAttribute(req) { const noteId = req.params.noteId; const body = req.body; new BAttribute({ ...body, noteId }).save(); }",
+        "edges": [
+          "attributes route checkApiAuth (apps/server/src/routes/index.ts:125)"
+        ]
+      },
+      "entity": "Attribute",
+      "_binds": {
+        "noteId": "Attribute.noteId",
+        "type": "Attribute.type",
+        "name": "Attribute.name",
+        "value": "Attribute.value",
+        "isInheritable": "Attribute.isInheritable"
+      },
+      "_output_schema": {
+        "attributeId": "string"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "noteId",
+          "type",
+          "name"
+        ],
+        "messages": {
+          "auth": "You must sign in to add an attribute.",
+          "required": "note id, type and name are required.",
+          "unique": "An identical attribute already exists on this note. Use a different value or update the existing one.",
+          "fk": "That note does not exist."
+        }
+      },
+      "description": "Add a label or relation attribute to a note. Fails if an identical attribute already exists on the note, the note does not exist, or you are not signed in."
+    },
+    {
+      "tool": "attribute_upsert",
+      "op": "update",
+      "family": "crud.upsert",
+      "exec_spec": {
+        "entity": "Attribute",
+        "key": {
+          "attributeId": {
+            "$arg": "attributeId"
+          }
+        },
+        "insert_fields": [
+          "noteId",
+          "type",
+          "name",
+          "value",
+          "isInheritable"
+        ],
+        "set_on_exists": {
+          "noteId": {
+            "$arg": "noteId"
+          },
+          "type": {
+            "$arg": "type"
+          },
+          "name": {
+            "$arg": "name"
+          },
+          "value": {
+            "$arg": "value"
+          },
+          "isInheritable": {
+            "$arg": "isInheritable"
+          },
+          "utcDateModified": "2026-01-01T00:00:00Z"
+        }
+      },
+      "input_schema": {
+        "noteId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the note the attribute belongs to."
+        },
+        "attributeId": {
+          "type": "int",
+          "required": false,
+          "description": "Existing attribute id to update (omit to create)."
+        },
+        "type": {
+          "type": "text",
+          "required": true,
+          "description": "Attribute type: 'label' or 'relation'."
+        },
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "Attribute name."
+        },
+        "value": {
+          "type": "text",
+          "required": false,
+          "description": "Attribute value."
+        },
+        "isInheritable": {
+          "type": "bool",
+          "required": false,
+          "description": "Whether children inherit it."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/trilium-core/src/routes/api/attributes.ts:17",
+        "id_local": "Attribute.upsert",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /api/notes/:noteId/attribute",
+          "locator": "packages/trilium-core/src/routes/index.ts:127"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "if (body.attributeId) { attribute = becca.getAttributeOrThrow(body.attributeId); if (attribute.noteId !== noteId) throw new ValidationError(...); if (type/name/value changed) { let newAttribute = attribute.createClone(...); newAttribute.save(); attribute.markAsDeleted(); return { attributeId: newAttribute.attributeId }; } } else { if (body.type === \"relation\" && !body.value?.trim()) return {}; attribute = new BAttribute({ noteId, name, type, isInheritable }); } attribute.save();",
+        "edges": [
+          "attribute upsert route checkApiAuth (apps/server/src/routes/index.ts:127)"
+        ]
+      },
+      "entity": "Attribute",
+      "_binds": {
+        "noteId": "Attribute.noteId",
+        "attributeId": "Attribute.attributeId",
+        "type": "Attribute.type",
+        "name": "Attribute.name",
+        "value": "Attribute.value",
+        "isInheritable": "Attribute.isInheritable"
+      },
+      "_output_schema": {
+        "attributeId": "string|null"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "noteId",
+          "type",
+          "name"
+        ],
+        "messages": {
+          "auth": "You must sign in to upsert an attribute.",
+          "required": "note id, type and name are required.",
+          "unique": "An identical attribute already exists on this note."
+        }
+      },
+      "description": "Create an attribute or, if an existing attribute id is given, replace it with the new values. Fails if not signed in."
+    },
+    {
+      "tool": "attribute_setorcreate",
+      "op": "update",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Attribute",
+        "fields": [
+          "noteId",
+          "type",
+          "name",
+          "value",
+          "isInheritable"
+        ],
+        "set_on_create": {
+          "utcDateModified": "2026-01-01T00:00:00Z"
+        }
+      },
+      "input_schema": {
+        "noteId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the note for the attribute."
+        },
+        "type": {
+          "type": "text",
+          "required": true,
+          "description": "Attribute type: 'label' or 'relation'."
+        },
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "Attribute name."
+        },
+        "value": {
+          "type": "text",
+          "required": true,
+          "description": "New value to set (or empty)."
+        },
+        "isInheritable": {
+          "type": "bool",
+          "required": false,
+          "description": "Whether children inherit it."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/trilium-core/src/routes/api/attributes.ts:71",
+        "id_local": "Attribute.setOrCreate",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /api/notes/:noteId/set-attribute",
+          "locator": "packages/trilium-core/src/routes/index.ts:128"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "const attributeId = getSql().getValue(`SELECT attributeId FROM attributes WHERE isDeleted = 0 AND noteId = ? AND type = ? AND name = ?`, [noteId, body.type, body.name]); if (attributeId) { const attr = becca.getAttribute(attributeId); attr.value = body.value; attr.save(); } else { new BAttribute({ ...body, noteId }).save(); }",
+        "edges": [
+          "set-attribute route checkApiAuth (apps/server/src/routes/index.ts:128)"
+        ]
+      },
+      "entity": "Attribute",
+      "_binds": {
+        "noteId": "Attribute.noteId",
+        "type": "Attribute.type",
+        "name": "Attribute.name",
+        "value": "Attribute.value",
+        "isInheritable": "Attribute.isInheritable"
+      },
+      "_output_schema": {},
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "noteId",
+          "type",
+          "name",
+          "value"
+        ],
+        "messages": {
+          "auth": "You must sign in to set an attribute.",
+          "required": "note id, type, name and value are required."
+        }
+      },
+      "description": "Set a single-valued attribute on a note: update its value if it already exists, otherwise create it. Fails if not signed in."
+    },
+    {
+      "tool": "attribute_delete",
+      "op": "delete",
+      "family": "crud.soft_delete",
+      "exec_spec": {
+        "entity": "Attribute",
+        "lookup_by": {
+          "attributeId": {
+            "$arg": "attributeId"
+          }
+        },
+        "set": {
+          "isDeleted": 1,
+          "utcDateModified": "2026-01-01T00:00:00"
+        }
+      },
+      "input_schema": {
+        "noteId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the note the attribute belongs to."
+        },
+        "attributeId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the attribute to delete."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/trilium-core/src/routes/api/attributes.ts:100",
+        "id_local": "Attribute.delete",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/notes/:noteId/attributes/:attributeId",
+          "locator": "packages/trilium-core/src/routes/index.ts:131"
+        },
+        "entity_why": "primary effect row_soft_delete lands on this table",
+        "ref_code": "const attribute = becca.getAttribute(attributeId); if (attribute) { if (attribute.noteId !== noteId) throw new ValidationError(`Attribute ${attributeId} is not owned by ${noteId}`); attribute.markAsDeleted(); }",
+        "edges": [
+          "delete attribute route checkApiAuth (apps/server/src/routes/index.ts:131)"
+        ]
+      },
+      "entity": "Attribute",
+      "_binds": {
+        "noteId": "Attribute.noteId",
+        "attributeId": "Attribute.attributeId"
+      },
+      "_output_schema": {},
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "noteId",
+          "attributeId"
+        ],
+        "messages": {
+          "auth": "You must sign in to delete an attribute.",
+          "required": "note id and attribute id are required.",
+          "not_found": "That attribute does not exist."
+        }
+      },
+      "description": "Soft-delete an attribute from a note. Fails if the attribute does not belong to the note or does not exist."
+    },
+    {
+      "tool": "relation_create",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Attribute",
+        "fields": {
+          "noteId": {
+            "$arg": "noteId"
+          },
+          "name": {
+            "$arg": "name"
+          },
+          "value": {
+            "$arg": "targetNoteId"
+          }
+        },
+        "set_on_create": {
+          "type": "relation",
+          "utcDateModified": "2026-01-01T00:00:00Z",
+          "isDeleted": 0
+        }
+      },
+      "input_schema": {
+        "noteId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the source note."
+        },
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "Relation name."
+        },
+        "targetNoteId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the target note the relation points to."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/trilium-core/src/routes/api/attributes.ts:197",
+        "id_local": "Relation.create",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /api/notes/:noteId/relations/:name/to/:targetNoteId",
+          "locator": "packages/trilium-core/src/routes/index.ts:129"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "const attributeId = getSql().getValue(`SELECT attributeId FROM attributes WHERE isDeleted = 0 AND noteId = ? AND type = 'relation' AND name = ? AND value = ?`, [sourceNoteId, name, targetNoteId]); let attribute = becca.getAttribute(attributeId); if (!attribute) { attribute = new BAttribute({ noteId: sourceNoteId, name, type: \"relation\", value: targetNoteId }).save(); } return attribute;",
+        "edges": [
+          "relations route checkApiAuth (apps/server/src/routes/index.ts:129)"
+        ]
+      },
+      "entity": "Attribute",
+      "_binds": {
+        "noteId": "Attribute.noteId",
+        "name": "Attribute.name",
+        "targetNoteId": "Attribute.value"
+      },
+      "_output_schema": {
+        "attributeId": "string"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "noteId",
+          "name",
+          "targetNoteId"
+        ],
+        "messages": {
+          "auth": "You must sign in to add a relation.",
+          "required": "source note, relation name and target note are all required.",
+          "fk": "The source or target note does not exist."
+        }
+      },
+      "_defaulted": [
+        "fields (mapped to real param names via binds)",
+        "unique_on (real code is set-or-return-existing, not a rejection)"
+      ],
+      "description": "Create a relation attribute from one note to another. Creating a relation that already exists is a no-op (the existing relation is returned). Fails if a note does not exist."
+    },
+    {
+      "tool": "relation_delete",
+      "op": "delete",
+      "family": "crud.soft_delete",
+      "exec_spec": {
+        "entity": "Attribute",
+        "lookup_by": {
+          "noteId": {
+            "$arg": "noteId"
+          },
+          "name": {
+            "$arg": "name"
+          },
+          "value": {
+            "$arg": "targetNoteId"
+          }
+        },
+        "set": {
+          "isDeleted": 1,
+          "utcDateModified": "2026-01-01T00:00:00Z"
+        }
+      },
+      "input_schema": {
+        "noteId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the source note."
+        },
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "Relation name."
+        },
+        "targetNoteId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the target note."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/trilium-core/src/routes/api/attributes.ts:221",
+        "id_local": "Relation.delete",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/notes/:noteId/relations/:name/to/:targetNoteId",
+          "locator": "packages/trilium-core/src/routes/index.ts:130"
+        },
+        "entity_why": "primary effect row_soft_delete lands on this table",
+        "ref_code": "const attributeId = getSql().getValue(`SELECT attributeId FROM attributes WHERE isDeleted = 0 AND noteId = ? AND type = 'relation' AND name = ? AND value = ?`, [sourceNoteId, name, targetNoteId]); if (attributeId) { const attribute = becca.getAttribute(attributeId); if (attribute) attribute.markAsDeleted(); }",
+        "edges": [
+          "relation delete route checkApiAuth (apps/server/src/routes/index.ts:130)"
+        ]
+      },
+      "entity": "Attribute",
+      "_binds": {
+        "noteId": "Attribute.noteId",
+        "name": "Attribute.name",
+        "targetNoteId": "Attribute.value"
+      },
+      "_output_schema": {},
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "noteId",
+          "name",
+          "targetNoteId"
+        ],
+        "messages": {
+          "auth": "You must sign in to remove a relation.",
+          "required": "source note, relation name and target note are all required.",
+          "not_found": "That relation does not exist on the source note."
+        }
+      },
+      "description": "Remove the relation attribute from a source note to a target note. Fails if the relation does not exist.",
+      "_defaulted": [
+        "row_key (lookup was attributeId=targetNoteId — wrong; now keyed by note+name+value)"
+      ]
+    },
+    {
+      "tool": "attribute_readeffective",
+      "op": "read",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Attribute",
+        "filter": {
+          "col": "noteId",
+          "mode": "exact",
+          "val": {
+            "$arg": "noteId"
+          }
+        }
+      },
+      "input_schema": {
+        "noteId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the note whose attributes to read."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/trilium-core/src/routes/api/attributes.ts:11",
+        "id_local": "Attribute.readEffective",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/notes/:noteId/attributes",
+          "locator": "packages/trilium-core/src/routes/index.ts:124"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "function getEffectiveNoteAttributes(req) { const note = becca.getNote(req.params.noteId); return note?.getAttributes(); }"
+      },
+      "entity": "Attribute",
+      "_binds": {
+        "noteId": "Attribute.noteId"
+      },
+      "_output_schema": {
+        "attributes": "effective (owned + inherited) Attribute rows"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "noteId"
+        ],
+        "messages": {
+          "auth": "You must sign in to read attributes.",
+          "required": "The note id is required."
+        }
+      },
+      "description": "List the attributes (labels and relations) attached to a note. Fails if not signed in.",
+      "_defaulted": [
+        "fields→filter (scope was undecided; single-user so note-level filter)"
+      ]
+    },
+    {
+      "tool": "attribute_searchnames",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Attribute",
+        "search_fields": [
+          "name"
+        ],
+        "rank": {
+          "method": "substring",
+          "fields": [
+            "name"
+          ]
+        }
+      },
+      "input_schema": {
+        "type": "text",
+        "query": "text"
+      },
+      "_evidence": {
+        "locator": "packages/trilium-core/src/routes/api/attributes.ts:180",
+        "id_local": "Attribute.searchNames",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/attribute-names/",
+          "locator": "packages/trilium-core/src/routes/index.ts:132"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "let names = getSql().getColumn(`SELECT DISTINCT name FROM attributes WHERE isDeleted = 0 AND type = ? AND name LIKE ?`, [type, `%${nameLike}%`]); names.sort(...); return names;"
+      },
+      "entity": "Attribute",
+      "_binds": {
+        "type": "Attribute.type",
+        "query": "Attribute.name"
+      },
+      "_output_schema": {
+        "names": "distinct attribute name string"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "type",
+          "query"
+        ],
+        "messages": {
+          "auth": "You must sign in to search attribute names.",
+          "required": "type and query are required."
+        }
+      },
+      "description": "Search distinct attribute names matching the query (substring), for a given attribute type (label/relation). Fails if not signed in.",
+      "_defaulted": [
+        "fields"
+      ]
+    },
+    {
+      "tool": "attribute_searchvalues",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Attribute",
+        "search_fields": [
+          "value"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "value"
+          ]
+        }
+      },
+      "input_schema": {
+        "attributeName": "text"
+      },
+      "_evidence": {
+        "locator": "packages/trilium-core/src/routes/api/attributes.ts:191",
+        "id_local": "Attribute.searchValues",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/attribute-values/:attributeName",
+          "locator": "packages/trilium-core/src/routes/index.ts:133"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "return getSql().getColumn(\"SELECT DISTINCT value FROM attributes WHERE isDeleted = 0 AND name = ? AND type = 'label' AND value != '' ORDER BY value\", [attributeName]);"
+      },
+      "entity": "Attribute",
+      "_binds": {
+        "attributeName": "Attribute.name"
+      },
+      "_output_schema": {
+        "values": "distinct attribute value strings"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "attributeName"
+        ],
+        "messages": {
+          "auth": "You must sign in to search attribute values.",
+          "required": "The attribute name is required."
+        }
+      },
+      "description": "List distinct values used by a given label attribute across notes. Fails if not signed in.",
+      "_defaulted": [
+        "fields"
+      ]
+    },
+    {
+      "tool": "revision_list",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Revision",
+        "filter": {
+          "col": "noteId",
+          "mode": "exact",
+          "val": {
+            "$arg": "noteId"
+          }
+        },
+        "sort": {
+          "col": "utcDateCreated",
+          "dir": "desc"
+        }
+      },
+      "input_schema": {
+        "noteId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the note whose revisions to list."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/trilium-core/src/routes/api/revisions.ts:38",
+        "id_local": "Revision.list",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/notes/:noteId/revisions",
+          "locator": "packages/trilium-core/src/routes/index.ts:135"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "SELECT revisions.*, LENGTH(blobs.content) AS contentLength FROM revisions JOIN blobs ON revisions.blobId = blobs.blobId WHERE revisions.noteId = ? ORDER BY revisions.utcDateCreated DESC"
+      },
+      "entity": "Revision",
+      "_binds": {
+        "noteId": "Revision.noteId"
+      },
+      "_output_schema": {
+        "type": "array",
+        "items": "Revision rows"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "noteId"
+        ],
+        "messages": {
+          "auth": "You must sign in to list revisions.",
+          "required": "The note id is required."
+        }
+      },
+      "description": "List the revision history of a note (newest first). Fails if not signed in.",
+      "_defaulted": [
+        "fields→filter+sort"
+      ]
+    },
+    {
+      "tool": "revision_get",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Revision",
+        "lookup_by": {
+          "revisionId": {
+            "$arg": "revisionId"
+          }
+        }
+      },
+      "input_schema": {
+        "revisionId": "int"
+      },
+      "_evidence": {
+        "locator": "packages/trilium-core/src/routes/api/revisions.ts:51",
+        "id_local": "Revision.get",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/revisions/:revisionId",
+          "locator": "packages/trilium-core/src/routes/index.ts:138"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "const revision = becca.getRevisionOrThrow(req.params.revisionId); revision.content = revision.getContent();"
+      },
+      "entity": "Revision",
+      "_binds": {
+        "revisionId": "Revision.revisionId"
+      },
+      "_output_schema": {
+        "revisionId": "string",
+        "content": "string"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "revisionId"
+        ],
+        "messages": {
+          "auth": "You must sign in to read a revision.",
+          "required": "The revision id is required.",
+          "not_found": "That revision does not exist."
+        }
+      },
+      "description": "Fetch one revision's metadata. Fails if the revision does not exist or you are not signed in."
+    },
+    {
+      "tool": "revision_deleteall",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "Revision",
+        "lookup_by": {
+          "noteId": {
+            "$arg": "noteId"
+          }
+        }
+      },
+      "input_schema": {
+        "noteId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the note whose revisions to erase."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/trilium-core/src/routes/api/revisions.ts:108",
+        "id_local": "Revision.deleteAll",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/notes/:noteId/revisions",
+          "locator": "packages/trilium-core/src/routes/index.ts:136"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "function eraseAllRevisions(req) { const revisionIdsToErase = getSql().getColumn(\"SELECT revisionId FROM revisions WHERE noteId = ?\", [req.params.noteId]); eraseService.eraseRevisions(revisionIdsToErase); }",
+        "edges": [
+          "delete revisions route checkApiAuth (apps/server/src/routes/index.ts:136)"
+        ]
+      },
+      "entity": "Revision",
+      "_binds": {
+        "noteId": "Revision.noteId"
+      },
+      "_output_schema": {},
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "noteId"
+        ],
+        "messages": {
+          "auth": "You must sign in to erase revisions.",
+          "required": "The note id is required."
+        }
+      },
+      "description": "Permanently erase all revisions of a note (this is destructive). Fails if not signed in.",
+      "_defaulted": [
+        "row_key (was revisionId=noteId — matched nothing; now keys on the note)"
+      ]
+    },
+    {
+      "tool": "revision_delete",
+      "op": "delete",
+      "family": "crud.delete",
+      "exec_spec": {
+        "entity": "Revision",
+        "lookup_by": {
+          "revisionId": {
+            "$arg": "revisionId"
+          }
+        }
+      },
+      "input_schema": {
+        "revisionId": "int"
+      },
+      "_evidence": {
+        "locator": "packages/trilium-core/src/routes/api/revisions.ts:114",
+        "id_local": "Revision.delete",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/revisions/:revisionId",
+          "locator": "packages/trilium-core/src/routes/index.ts:140"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "function eraseRevision(req) { eraseService.eraseRevisions([req.params.revisionId]); }",
+        "edges": [
+          "delete revision route checkApiAuth (apps/server/src/routes/index.ts:140)"
+        ]
+      },
+      "entity": "Revision",
+      "_binds": {
+        "revisionId": "Revision.revisionId"
+      },
+      "_output_schema": {},
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "revisionId"
+        ],
+        "messages": {
+          "auth": "You must sign in to delete a revision.",
+          "required": "The revision id is required.",
+          "not_found": "That revision does not exist."
+        }
+      },
+      "description": "Permanently erase a single revision. Fails if the revision does not exist."
+    },
+    {
+      "tool": "revision_updatedescription",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Revision",
+        "row_key": {
+          "revisionId": {
+            "$arg": "revisionId"
+          }
+        },
+        "fields": [
+          "description"
+        ],
+        "set": {
+          "utcDateModified": "2026-01-01T00:00:00Z"
+        }
+      },
+      "input_schema": {
+        "revisionId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the revision to annotate."
+        },
+        "description": {
+          "type": "text",
+          "required": true,
+          "description": "New description for the revision."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/trilium-core/src/routes/api/revisions.ts:118",
+        "id_local": "Revision.updateDescription",
+        "entry": {
+          "kind": "http",
+          "route": "PATCH /api/revisions/:revisionId",
+          "locator": "packages/trilium-core/src/routes/index.ts:141"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "const revision = becca.getRevisionOrThrow(req.params.revisionId); revision.description = req.body.description; revision.save();",
+        "edges": [
+          "patch revision route checkApiAuth (apps/server/src/routes/index.ts:141)"
+        ]
+      },
+      "entity": "Revision",
+      "_binds": {
+        "revisionId": "Revision.revisionId",
+        "description": "Revision.description"
+      },
+      "_output_schema": {},
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "revisionId",
+          "description"
+        ],
+        "messages": {
+          "auth": "You must sign in to edit a revision.",
+          "required": "revision id and description are required.",
+          "not_found": "That revision does not exist."
+        }
+      },
+      "description": "Update the description of a revision. Fails if the revision does not exist."
+    },
+    {
+      "tool": "attachment_list",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Attachment",
+        "filter": {
+          "col": "ownerId",
+          "mode": "exact",
+          "val": {
+            "$arg": "noteId"
+          }
+        },
+        "sort": {
+          "col": "position",
+          "dir": "asc"
+        }
+      },
+      "input_schema": {
+        "noteId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the note whose attachments to list."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/trilium-core/src/becca/entities/bnote.ts:1100",
+        "id_local": "Attachment.list",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/notes/:noteId/attachments",
+          "locator": "packages/trilium-core/src/routes/index.ts:115"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "SELECT attachments.*, LENGTH(blobs.content) AS contentLength FROM attachments JOIN blobs USING (blobId) WHERE ownerId = ? AND isDeleted = 0 ORDER BY position"
+      },
+      "entity": "Attachment",
+      "_binds": {
+        "noteId": "Attachment.ownerId"
+      },
+      "_output_schema": {
+        "type": "array",
+        "items": "Attachment rows"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "noteId"
+        ],
+        "messages": {
+          "auth": "You must sign in to list attachments.",
+          "required": "The note id is required."
+        }
+      },
+      "description": "List the attachments of a note, in position order. Fails if not signed in.",
+      "_defaulted": [
+        "fields→filter (scope was undecided; owner-filtered by note)"
+      ]
+    },
+    {
+      "tool": "attachment_get",
+      "op": "read",
+      "family": "crud.fetch",
+      "exec_spec": {
+        "entity": "Attachment",
+        "lookup_by": {
+          "attachmentId": {
+            "$arg": "attachmentId"
+          }
+        }
+      },
+      "input_schema": {
+        "attachmentId": "int"
+      },
+      "_evidence": {
+        "locator": "packages/trilium-core/src/routes/api/attachments.ts:25",
+        "id_local": "Attachment.get",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/attachments/:attachmentId",
+          "locator": "packages/trilium-core/src/routes/index.ts:117"
+        },
+        "entity_why": "primary effect row_read lands on this table",
+        "ref_code": "function getAttachment(req) { const { attachmentId } = req.params; return becca.getAttachmentOrThrow(attachmentId); }"
+      },
+      "entity": "Attachment",
+      "_binds": {
+        "attachmentId": "Attachment.attachmentId"
+      },
+      "_output_schema": {
+        "attachmentId": "string",
+        "title": "string"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "attachmentId"
+        ],
+        "messages": {
+          "auth": "You must sign in to read an attachment.",
+          "required": "The attachment id is required.",
+          "not_found": "That attachment does not exist."
+        }
+      },
+      "description": "Fetch an attachment's metadata. Fails if the attachment does not exist."
+    },
+    {
+      "tool": "attachment_save",
+      "op": "update",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "Attachment",
+        "fields": {
+          "ownerId": {
+            "$arg": "noteId"
+          },
+          "role": {
+            "$arg": "role"
+          },
+          "mime": {
+            "$arg": "mime"
+          },
+          "title": {
+            "$arg": "title"
+          }
+        },
+        "set_on_create": {
+          "utcDateModified": "2026-01-01T00:00:00Z",
+          "dateModified": "2026-01-01T00:00:00Z",
+          "isDeleted": 0,
+          "position": 0
+        }
+      },
+      "input_schema": {
+        "noteId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the note that owns the attachment."
+        },
+        "role": {
+          "type": "text",
+          "required": true,
+          "description": "Attachment role (e.g. 'file')."
+        },
+        "mime": {
+          "type": "text",
+          "required": true,
+          "description": "MIME type of the attachment."
+        },
+        "title": {
+          "type": "text",
+          "required": true,
+          "description": "Display title/filename of the attachment."
+        },
+        "content": {
+          "type": "text",
+          "required": true,
+          "description": "The attachment's content."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/trilium-core/src/routes/api/attachments.ts:39",
+        "id_local": "Attachment.save",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/notes/:noteId/attachments",
+          "locator": "packages/trilium-core/src/routes/index.ts:116"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "function saveAttachment(req) { const { attachmentId, role, mime, title, content } = req.body; const note = becca.getNoteOrThrow(noteId); note.saveAttachment({ attachmentId, role, mime, title, content }, matchBy); }",
+        "edges": [
+          "attachments route checkApiAuth (apps/server/src/routes/index.ts:116)"
+        ]
+      },
+      "entity": "Attachment",
+      "_binds": {
+        "noteId": "Attachment.ownerId",
+        "attachmentId": "Attachment.attachmentId",
+        "role": "Attachment.role",
+        "mime": "Attachment.mime",
+        "title": "Attachment.title"
+      },
+      "_output_schema": {},
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "noteId",
+          "role",
+          "mime",
+          "title",
+          "content"
+        ],
+        "messages": {
+          "auth": "You must sign in to save an attachment.",
+          "required": "note id, role, mime, title and content are all required.",
+          "fk": "That note does not exist."
+        }
+      },
+      "_defaulted": [
+        "fields (mapped to real parameter names via binds)"
+      ],
+      "description": "Save a new attachment onto a note with the given role, MIME, title and content. Fails if the note does not exist or you are not signed in."
+    },
+    {
+      "tool": "attachment_rename",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "Attachment",
+        "row_key": {
+          "attachmentId": {
+            "$arg": "attachmentId"
+          }
+        },
+        "fields": [
+          "title"
+        ],
+        "set": {
+          "utcDateModified": "2026-01-01T00:00:00Z",
+          "dateModified": "2026-01-01T00:00:00Z"
+        }
+      },
+      "input_schema": {
+        "attachmentId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the attachment to rename."
+        },
+        "title": {
+          "type": "text",
+          "required": true,
+          "description": "New title/filename."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/trilium-core/src/routes/api/attachments.ts:96",
+        "id_local": "Attachment.rename",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /api/attachments/:attachmentId/rename",
+          "locator": "packages/trilium-core/src/routes/index.ts:121"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "const attachment = becca.getAttachmentOrThrow(attachmentId); if (!title?.trim()) { throw new ValidationError(\"Title must not be empty\"); } attachment.title = title; attachment.save();",
+        "edges": [
+          "rename route checkApiAuth (apps/server/src/routes/index.ts:121)"
+        ]
+      },
+      "entity": "Attachment",
+      "_binds": {
+        "attachmentId": "Attachment.attachmentId",
+        "title": "Attachment.title"
+      },
+      "_output_schema": {},
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "attachmentId",
+          "title"
+        ],
+        "messages": {
+          "auth": "You must sign in to rename an attachment.",
+          "required": "attachment id and title are required.",
+          "not_found": "That attachment does not exist."
+        }
+      },
+      "description": "Rename an attachment. Fails if the attachment does not exist or the title is empty."
+    },
+    {
+      "tool": "attachment_deletesoft",
+      "op": "delete",
+      "family": "crud.soft_delete",
+      "exec_spec": {
+        "entity": "Attachment",
+        "lookup_by": {
+          "attachmentId": {
+            "$arg": "attachmentId"
+          }
+        },
+        "set": {
+          "isDeleted": 1,
+          "utcDateModified": "2026-01-01T00:00:00"
+        }
+      },
+      "input_schema": {
+        "attachmentId": {
+          "type": "int",
+          "required": true,
+          "description": "Id of the attachment to delete."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/trilium-core/src/routes/api/attachments.ts:110",
+        "id_local": "Attachment.deleteSoft",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/attachments/:attachmentId",
+          "locator": "packages/trilium-core/src/routes/index.ts:120"
+        },
+        "entity_why": "primary effect row_soft_delete lands on this table",
+        "ref_code": "function deleteAttachment(req) { const { attachmentId } = req.params; const attachment = becca.getAttachment(attachmentId); if (attachment) { attachment.markAsDeleted(); } }",
+        "edges": [
+          "delete attachment route checkApiAuth (apps/server/src/routes/index.ts:120)"
+        ]
+      },
+      "entity": "Attachment",
+      "_binds": {
+        "attachmentId": "Attachment.attachmentId"
+      },
+      "_output_schema": {},
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "attachmentId"
+        ],
+        "messages": {
+          "auth": "You must sign in to delete an attachment.",
+          "required": "The attachment id is required.",
+          "not_found": "That attachment does not exist."
+        }
+      },
+      "description": "Soft-delete an attachment. Fails if it does not exist or you are not signed in."
+    },
+    {
+      "tool": "option_getoptions",
+      "op": "read",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Option",
+        "search_fields": [
+          "name",
+          "value"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "name",
+            "value"
+          ]
+        }
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "packages/trilium-core/src/routes/api/options.ts:172",
+        "id_local": "Option.getOptions",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/options",
+          "locator": "packages/trilium-core/src/routes/index.ts:89"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "function getOptions() { const optionMap = optionService.getOptionMap(); const resultMap = {}; for (const optionName in optionMap) { if (isReadable(optionName)) { resultMap[optionName] = optionMap[optionName]; } } return resultMap; }"
+      },
+      "entity": "Option",
+      "_output_schema": {
+        "options": "map of readable option name -> value"
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in to read options."
+        }
+      },
+      "description": "Read the current option values (settings) of the instance. Sign-in required."
+    },
+    {
+      "tool": "option_setvalue",
+      "op": "update",
+      "family": "crud.upsert",
+      "exec_spec": {
+        "entity": "Option",
+        "key": {
+          "name": {
+            "$arg": "name"
+          }
+        },
+        "insert_fields": [
+          "value"
+        ],
+        "set_on_exists": {
+          "value": {
+            "$arg": "value"
+          },
+          "utcDateModified": "2026-01-01T00:00:00Z"
+        }
+      },
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "Name of the option to set."
+        },
+        "value": {
+          "type": "text",
+          "required": true,
+          "description": "New string value for the option."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/trilium-core/src/routes/api/options.ts:212",
+        "id_local": "Option.setValue",
+        "entry": {
+          "kind": "http",
+          "route": "PUT /api/options/:name/:value",
+          "locator": "packages/trilium-core/src/routes/index.ts:91"
+        },
+        "entity_why": "primary effect row_upsert lands on this table",
+        "ref_code": "async function updateOption(req) { const { name, value } = req.params; if (!update(name, value)) { throw new ValidationError(\"not allowed option to change\"); } if (name === \"locale\") { await changeLanguage(value); } }",
+        "edges": [
+          "options route checkApiAuthOrElectron (apps/server/src/routes/index.ts:91)"
+        ]
+      },
+      "entity": "Option",
+      "_binds": {
+        "name": "Option.name",
+        "value": "Option.value"
+      },
+      "_output_schema": {},
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "name",
+          "value"
+        ],
+        "messages": {
+          "auth": "You must sign in to change a setting.",
+          "required": "option name and value are required."
+        }
+      },
+      "_defaulted": [
+        "dropped unwritable columns [name] (name is the option key / pk)"
+      ],
+      "description": "Set an instance option/setting by name. Fails if you are not signed in."
+    },
+    {
+      "tool": "note_search",
+      "op": "search",
+      "family": "search",
+      "exec_spec": {
+        "entity": "Note",
+        "search_fields": [
+          "title",
+          "type",
+          "mime"
+        ],
+        "rank": {
+          "method": "keyword",
+          "fields": [
+            "title"
+          ]
+        }
+      },
+      "input_schema": {
+        "search": {
+          "type": "text",
+          "required": true,
+          "description": "Free-text query over note titles and content."
+        }
+      },
+      "_evidence": {
+        "locator": "packages/trilium-core/src/routes/api/search.ts:148",
+        "id_local": "Note.search",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/search/:searchString",
+          "locator": "packages/trilium-core/src/routes/index.ts:240"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "const searchContext = new SearchContext({ fastSearch: false, includeArchivedNotes: true, fuzzyAttributeSearch: false, ignoreHoistedNote: true }); return searchService.findResultsWithQuery(searchString, searchContext).map((sr) => sr.noteId);"
+      },
+      "entity": "Note",
+      "_output_schema": {
+        "results": "array of matching noteId values"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "search"
+        ],
+        "messages": {
+          "auth": "You must sign in to search notes.",
+          "required": "A search query is required."
+        }
+      },
+      "description": "Search notes by free text across titles and content, returning matching notes ranked by keyword relevance. Fails if not signed in.",
+      "_defaulted": [
+        "fields→search_fields (single-user: no owner scoping)"
+      ]
+    },
+    {
+      "tool": "sign_in",
+      "op": "action",
+      "family": "guard.auth",
+      "exec_spec": {
+        "verify": {
+          "entity": "Option",
+          "username_col": "name",
+          "password_col": "value"
+        }
+      },
+      "input_schema": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "description": "Account name for the instance (single shared login)."
+        },
+        "password": {
+          "type": "text",
+          "required": true,
+          "description": "The instance password."
+        }
+      },
+      "_evidence": {
+        "locator": "apps/server/src/routes/login.ts:78",
+        "id_local": "Auth.login",
+        "entry": {
+          "kind": "http",
+          "route": "POST /login",
+          "locator": "apps/server/src/routes/routes.ts:58"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "const failedFactor = await verifyLoginCredentials(submittedPassword, submittedTotpToken); if (failedFactor) { sendLoginError(req, res, failedFactor); return; } req.session.regenerate(() => { req.session.loggedIn = true; res.redirect('.'); });",
+        "edges": [
+          "verifyLoginCredentials compares password against passwordVerificationHash etc (apps/server/src/services/auth.ts:290)"
+        ]
+      },
+      "entity": "Session",
+      "_output_schema": {
+        "redirect": "the session is established and the client redirected"
+      },
+      "guards": {
+        "required": [
+          "name"
+        ],
+        "messages": {
+          "required": "Sign in needs an account name.",
+          "auth": "Wrong account name or password."
+        }
+      },
+      "description": "Sign in to the Trilium instance with the shared account name and password. Every note, branch, attribute, revision and attachment operation requires being signed in first; this is what $actor resolves to. Fails if the name/password do not match."
+    },
+    {
+      "tool": "sign_out",
+      "op": "action",
+      "family": "guard.logout",
+      "exec_spec": {
+        "entity": "Session"
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "apps/server/src/routes/login.ts:129",
+        "id_local": "Auth.logout",
+        "entry": {
+          "kind": "http",
+          "route": "POST /logout",
+          "locator": "apps/server/src/routes/routes.ts:59"
+        },
+        "entity_why": "primary effect row_delete lands on this table",
+        "ref_code": "function logout(req, res) { req.session.regenerate(() => { req.session.loggedIn = false; res.redirect(\"login\"); }); }",
+        "edges": [
+          "POST /logout is gated by checkAuth requiring a logged-in session (apps/server/src/routes/routes.ts:59)"
+        ]
+      },
+      "entity": "Session",
+      "_output_schema": {
+        "redirect": "client redirected to login / OIDC provider"
+      },
+      "guards": {},
+      "description": "End the current signed-in session so that auth-gated tools are refused again until you sign back in."
+    },
+    {
+      "tool": "create_etapi_token",
+      "op": "create",
+      "family": "crud.insert",
+      "exec_spec": {
+        "entity": "EtapiToken",
+        "fields": [
+          "name"
+        ],
+        "set_on_create": {
+          "isDeleted": 0,
+          "utcDateCreated": "2026-01-01T00:00:00Z",
+          "utcDateModified": "2026-01-01T00:00:00Z"
+        }
+      },
+      "input_schema": {
+        "tokenName": {
+          "type": "text",
+          "required": true,
+          "description": "Human-readable name for the new token."
+        }
+      },
+      "_evidence": {
+        "locator": "apps/server/src/services/etapi_tokens.ts:15",
+        "id_local": "Auth.createEtapiToken",
+        "entry": {
+          "kind": "http",
+          "route": "POST /api/etapi-tokens",
+          "locator": "apps/server/src/routes/routes.ts:133"
+        },
+        "entity_why": "primary effect row_insert lands on this table",
+        "ref_code": "function createToken(tokenName) { const token = randomSecureToken(32); const tokenHash = getTokenHash(token); const etapiToken = new BEtapiToken({ name: tokenName, tokenHash }).save(); return { authToken: `${etapiToken.etapiTokenId}_${token}` }; }",
+        "edges": [
+          "etapi-tokens route checkApiAuth (apps/server/src/routes/routes.ts:133)"
+        ]
+      },
+      "entity": "EtapiToken",
+      "_output_schema": {
+        "authToken": "etapiTokenId_token, shown once"
+      },
+      "guards": {
+        "requires_auth": true,
+        "required": [
+          "tokenName"
+        ],
+        "messages": {
+          "auth": "You must sign in before creating an API token.",
+          "required": "A token name is required."
+        }
+      },
+      "_defaulted": [
+        "fields"
+      ],
+      "description": "Create a new ETAPI access token. Returns the token id so it can be listed, renamed or deleted later. Sign-in required."
+    },
+    {
+      "tool": "list_api_tokens",
+      "op": "read",
+      "family": "search",
+      "exec_spec": {
+        "entity": "EtapiToken",
+        "search_fields": [
+          "etapiTokenId",
+          "name",
+          "tokenHash",
+          "utcDateCreated",
+          "utcDateModified",
+          "isDeleted"
+        ],
+        "rank": {
+          "method": "exact",
+          "fields": [
+            "etapiTokenId",
+            "name",
+            "tokenHash",
+            "utcDateCreated",
+            "utcDateModified",
+            "isDeleted"
+          ]
+        }
+      },
+      "input_schema": {},
+      "_evidence": {
+        "locator": "apps/server/src/routes/api/etapi_tokens.ts:6",
+        "id_local": "EtapiToken.list",
+        "entry": {
+          "kind": "http",
+          "route": "GET /api/etapi-tokens",
+          "locator": "apps/server/src/routes/routes.ts:132"
+        },
+        "entity_why": "primary effect row_search lands on this table",
+        "ref_code": "function getTokens() { const tokens = etapiTokenService.getTokens(); tokens.sort((a, b) => (a.utcDateCreated < b.utcDateCreated ? -1 : 1)); return tokens; }"
+      },
+      "entity": "EtapiToken",
+      "_output_schema": {
+        "tokens": "array of EtapiToken rows"
+      },
+      "guards": {
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in to list API tokens."
+        }
+      },
+      "description": "List all ETAPI access tokens on this instance. Sign-in required."
+    },
+    {
+      "tool": "rename_api_token",
+      "op": "update",
+      "family": "update.field_set",
+      "exec_spec": {
+        "entity": "EtapiToken",
+        "row_key": {
+          "etapiTokenId": {
+            "$arg": "etapiTokenId"
+          }
+        },
+        "fields": [
+          "name"
+        ],
+        "set": {
+          "utcDateModified": "2026-01-01T00:00:00"
+        }
+      },
+      "input_schema": {
+        "etapiTokenId": "int",
+        "name": "text"
+      },
+      "_evidence": {
+        "locator": "apps/server/src/services/etapi_tokens.ts:100",
+        "id_local": "EtapiToken.rename",
+        "entry": {
+          "kind": "http",
+          "route": "PATCH /api/etapi-tokens/:etapiTokenId",
+          "locator": "apps/server/src/routes/routes.ts:134"
+        },
+        "entity_why": "primary effect row_update lands on this table",
+        "ref_code": "function renameToken(etapiTokenId, newName) { const etapiToken = becca.getEtapiToken(etapiTokenId); if (!etapiToken) throw new Error(...); etapiToken.name = newName; etapiToken.save(); }",
+        "edges": [
+          "etapi-tokens route checkApiAuth (apps/server/src/routes/routes.ts:134)"
+        ]
+      },
+      "entity": "EtapiToken",
+      "_binds": {
+        "etapiTokenId": "EtapiToken.etapiTokenId",
+        "name": "EtapiToken.name"
+      },
+      "_output_schema": {},
+      "guards": {
+        "required": [
+          "etapiTokenId",
+          "name"
+        ],
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in to rename an API token.",
+          "not_found": "That API token does not exist.",
+          "required": "Both the token id and a new name are required."
+        }
+      },
+      "description": "Rename an ETAPI access token. Fails if the token id does not exist. Sign-in required."
+    },
+    {
+      "tool": "delete_api_token",
+      "op": "delete",
+      "family": "crud.soft_delete",
+      "exec_spec": {
+        "entity": "EtapiToken",
+        "lookup_by": {
+          "etapiTokenId": {
+            "$arg": "etapiTokenId"
+          }
+        },
+        "set": {
+          "isDeleted": 1,
+          "utcDateModified": "2026-01-01T00:00:00"
+        }
+      },
+      "input_schema": {
+        "etapiTokenId": "int"
+      },
+      "_evidence": {
+        "locator": "apps/server/src/services/etapi_tokens.ts:111",
+        "id_local": "EtapiToken.delete",
+        "entry": {
+          "kind": "http",
+          "route": "DELETE /api/etapi-tokens/:etapiTokenId",
+          "locator": "apps/server/src/routes/routes.ts:135"
+        },
+        "entity_why": "primary effect row_soft_delete lands on this table",
+        "ref_code": "function deleteToken(etapiTokenId) { const etapiToken = becca.getEtapiToken(etapiTokenId); if (!etapiToken) return; etapiToken.markAsDeletedSimple(); }",
+        "edges": [
+          "etapi-tokens route checkApiAuth (apps/server/src/routes/routes.ts:135)"
+        ]
+      },
+      "entity": "EtapiToken",
+      "_binds": {
+        "etapiTokenId": "EtapiToken.etapiTokenId"
+      },
+      "_output_schema": {},
+      "guards": {
+        "required": [
+          "etapiTokenId"
+        ],
+        "requires_auth": true,
+        "messages": {
+          "auth": "You must sign in to delete an API token.",
+          "not_found": "That API token does not exist.",
+          "required": "The token id is required."
+        }
+      },
+      "description": "Permanently remove an ETAPI access token. Fails if it does not exist. Sign-in required."
+    }
+  ]
+}

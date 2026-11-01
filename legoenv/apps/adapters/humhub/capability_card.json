@@ -1,0 +1,122 @@
+{
+  "app": "humhub",
+  "role": "Social intranet scalar posts, comments, content state and file metadata",
+  "domains": [
+    "operations",
+    "marketing",
+    "support",
+    "it_ops"
+  ],
+  "kinds": {
+    "create_record": [
+      "create_post",
+      "upload_file"
+    ],
+    "update_record": [
+      "edit_post",
+      "edit_comment",
+      "set_content_visibility",
+      "pin_content",
+      "unpin_content"
+    ],
+    "attach_note_or_task": [
+      "create_comment"
+    ],
+    "record_status_change": [
+      "publish_draft"
+    ],
+    "delete_or_archive_row": [
+      "delete_comment",
+      "delete_file",
+      "delete_content",
+      "archive_content"
+    ]
+  },
+  "check_kinds": [
+    "record_exists",
+    "record_not_exists",
+    "record_field_equals",
+    "record_field_contains",
+    "record_field_unchanged",
+    "note_or_task_exists",
+    "note_or_task_not_exists",
+    "action_done",
+    "action_not_done"
+  ],
+  "carriers": {
+    "notes_field": {
+      "entity": "Post",
+      "field": "message"
+    }
+  },
+  "login": {
+    "tool": "sign_in",
+    "user_field": "email",
+    "persona_entity": "User"
+  },
+  "content_entities": [
+    "Post",
+    "Comment",
+    "Content",
+    "Space",
+    "SpaceMembership",
+    "File",
+    "Notification",
+    "Like",
+    "Friendship"
+  ],
+  "seed_helpers": [
+    "spaces",
+    "posts",
+    "comments",
+    "files",
+    "notifications"
+  ],
+  "tool_families_to_keep": [
+    "sign_in",
+    "create_",
+    "edit_",
+    "delete_",
+    "get_",
+    "list_",
+    "count_",
+    "search_",
+    "upload_file",
+    "download_file",
+    "publish_draft",
+    "pin_content",
+    "unpin_content",
+    "set_content_visibility",
+    "archive_content"
+  ],
+  "obs_reads": [
+    "search_content",
+    "list_comments",
+    "list_friends",
+    "count_likes",
+    "search_move_targets",
+    "get_post"
+  ],
+  "known_patches": [
+    "env_id humhub",
+    "Integer schemas for existing identity arguments",
+    "User id 1 persona and consistent personal containers; synthetic secondary users retained",
+    "Concrete target/owner/substring read filters; remove ineffective default list truncation; no write executor changed"
+  ],
+  "smoke": {
+    "passed": true,
+    "date": "2026-10-24",
+    "report": "ok"
+  },
+  "limitations": [
+    "create_post creates only Post and does not create its Content wrapper, channel association or published stream entry. No full post_channel or send_dm capability is claimed.",
+    "No direct-message, Space creation or membership write interfaces exist. Helpers seed existing world rows only.",
+    "move_content uses crud.delete and removes Content instead of moving it; schedule_content sets a date without scheduled-state transition.",
+    "mark_notifications_seen updates only one matching notification; content lock flags are not enforced by create_comment.",
+    "upload_file/download_file store/read scalar file metadata, not binary bytes; supplied object attachments and hideInStream are not implemented.",
+    "search_content filters published metadata, not post message full text; date and pageSize source args are unsupported. Raw general read/write ACLs are incomplete; original authored-comment and file-uploader guards are retained.",
+    "Author/container GUID filters require known GUIDs; unresolved optional references act as omitted filters and may broaden the returned metadata set."
+  ],
+  "register_file": "pack/newspecs3/humhub/register.py",
+  "base_spec": "pack/base_specs/humhub.spec.json"
+}

@@ -1,0 +1,118 @@
+{
+  "app": "gitea",
+  "role": "Development project boards, issue state/comments and scalar releases",
+  "domains": [
+    "it_ops",
+    "operations",
+    "research"
+  ],
+  "kinds": {
+    "create_record": [
+      "project_create",
+      "column_create",
+      "release_createrelease"
+    ],
+    "update_record": [
+      "project_update",
+      "column_update",
+      "release_updaterelease"
+    ],
+    "create_or_update_issue": [
+      "issue_create",
+      "issue_close",
+      "issue_reopen"
+    ],
+    "attach_note_or_task": [
+      "issue_comment_create"
+    ],
+    "create_or_move_card": [
+      "projectissue_add"
+    ],
+    "delete_or_archive_row": [
+      "issue_delete",
+      "column_delete",
+      "release_deletereleasebyid"
+    ]
+  },
+  "check_kinds": [
+    "record_exists",
+    "record_not_exists",
+    "record_field_equals",
+    "record_field_contains",
+    "record_field_unchanged",
+    "note_or_task_exists",
+    "note_or_task_not_exists",
+    "issue_exists_with",
+    "card_exists_in_bucket",
+    "card_not_moved",
+    "action_done",
+    "action_not_done"
+  ],
+  "carriers": {
+    "notes_field": {
+      "entity": "Project",
+      "field": "description"
+    }
+  },
+  "login": {
+    "tool": "user_sign_in",
+    "user_field": "username",
+    "persona_entity": "User"
+  },
+  "content_entities": [
+    "Repository",
+    "Issue",
+    "Comment",
+    "Project",
+    "Column",
+    "ProjectIssue",
+    "Release"
+  ],
+  "seed_helpers": [
+    "repositories",
+    "projects",
+    "columns",
+    "issues",
+    "releases"
+  ],
+  "tool_families_to_keep": [
+    "user_sign_in",
+    "project_",
+    "projectissue_add",
+    "column_",
+    "issue_create",
+    "issue_close",
+    "issue_reopen",
+    "issue_comment_create",
+    "issue_delete",
+    "release_"
+  ],
+  "obs_reads": [
+    "project_search",
+    "project_read"
+  ],
+  "known_patches": [
+    "env_id gitea",
+    "135 identity argument schemas accept integers",
+    "Issue index SQL quoting normalized in non-evidence columns, refs and seeds",
+    "Persona User id 1 is active administrator, matching EmailAddress",
+    "Existing issue-comment lookup exposes its owner/repo path args; close/reopen owner/repo schemas typed and required",
+    "Existing project_search adds optional q substring filter while preserving repository scope",
+    "Materialize declared Project.is_closed=false and Column.default=false/sorting=0 on existing create tools"
+  ],
+  "smoke": {
+    "passed": true,
+    "date": "2026-10-24",
+    "report": "ok"
+  },
+  "limitations": [
+    "No Repository/Issue/Comment/Column/Release read or list tools exist; tasks must supply ids, owner and repository names. Project reads expose the supported policy carrier.",
+    "issue_create uses a seed-reserved IssueIndex value without incrementing it; repeated creates cannot rely on unique indices.",
+    "issue_edit targets Comment and lacks its target issue-id argument; it fails rather than reliably updating Issue title/body. comment_edit updates IssueContentHistory, not the Comment.",
+    "projectissue_add creates membership; projectissue_move/remove append comments without moving/deleting ProjectIssue. project_delete does not delete Project.",
+    "Repository update/transfer, team membership, workflow/Git/file/package operations have mismapped or partial effects and are not capability claims.",
+    "issue_delete is verified for unreferenced issues only; existing comments block deletion and are not cascaded."
+  ],
+  "register_file": "pack/newspecs3/gitea/register.py",
+  "base_spec": "pack/base_specs/gitea.spec.json"
+}
