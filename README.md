@@ -1,7 +1,7 @@
 # LegoEnv: Self-Evolving Agentic Environments via Modular Recombination
 
 [![GitHub](https://img.shields.io/badge/GitHub-JazyJiang%2FLegoEnv-181717?logo=github)](https://github.com/JazyJiang/LegoEnv)
-[![arXiv](https://img.shields.io/badge/arXiv-coming%20soon-b31b1b?logo=arxiv)](https://arxiv.org/)
+[![arXiv](https://img.shields.io/badge/arXiv-2611.01834-b31b1b?logo=arxiv)](https://arxiv.org/abs/2611.01834v1)
 [![Model](https://img.shields.io/badge/%F0%9F%A4%97%20Model-JazySong%2FLegoEnv-yellow)](https://huggingface.co/JazySong/LegoEnv)
 [![Data](https://img.shields.io/badge/%F0%9F%A4%97%20Data-coming%20soon-yellow)](https://huggingface.co/JazySong)
 [![License](https://img.shields.io/badge/License-Apache--2.0-blue)](LICENSE)
