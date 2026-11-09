@@ -3,7 +3,7 @@
 [![GitHub](https://img.shields.io/badge/GitHub-JazyJiang%2FLegoEnv-181717?logo=github)](https://github.com/JazyJiang/LegoEnv)
 [![arXiv](https://img.shields.io/badge/arXiv-2611.01834-b31b1b?logo=arxiv)](https://arxiv.org/abs/2611.01834v1)
 [![Model](https://img.shields.io/badge/%F0%9F%A4%97%20Model-JazySong%2FLegoEnv-yellow)](https://huggingface.co/JazySong/LegoEnv)
-[![Data](https://img.shields.io/badge/%F0%9F%A4%97%20Data-coming%20soon-yellow)](https://huggingface.co/JazySong)
+[![Data](https://img.shields.io/badge/%F0%9F%A4%97%20Data-JazySong%2FLegoEnv-yellow)](https://huggingface.co/datasets/JazySong/LegoEnv)
 [![License](https://img.shields.io/badge/License-Apache--2.0-blue)](LICENSE)
 
 LegoEnv builds training environments for tool-using agents by composing them
@@ -134,7 +134,8 @@ Details: [runtime and training](legoenv/docs/runtime_and_training.md),
 Model checkpoints are published at
 [`JazySong/LegoEnv`](https://huggingface.co/JazySong/LegoEnv) (see
 [`legoenv/docs/models.md`](legoenv/docs/models.md)). Environments, trajectories,
-atom pools and rebuild recipes will follow as a dataset under the same account.
+atom pools and rebuild recipes are published as the dataset
+[`JazySong/LegoEnv`](https://huggingface.co/datasets/JazySong/LegoEnv).
 
 ## License
 
