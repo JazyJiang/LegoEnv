@@ -153,7 +153,7 @@ model license.
   author  = {Jiang, Zhuosong and Wu, Chengxu and Liu, Junqi and Yi, Yujie and Wang, Siqin and
              Huang, Zhixuan and Jiang, Jinqian and Xiao, Lijun and Li, Jianxun and Pan, Yongyang and
              Wang, Jieran and Shen, Shiqi and Liu, Fei and Lin, Xinyu},
-  journal = {arXiv preprint arXiv:TODO},
+  journal = {arXiv preprint arXiv:2611.01834},
   year    = {2026}
 }
 ```
